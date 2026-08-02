@@ -138,6 +138,66 @@ def stats(problems):
         print(f'{s:<12}' + ''.join(f'{row.get(c, 0):>10}' for c in CATEGORIES) + f'{sum(row.values()):>8}')
 
 
+# 目标赛事 → 星级配比（权重，按比例取题）。锚点见 docs/赛事地图与官方题源.md
+PLAN_PROFILES = {
+    'AMC8':   {1: 6, 2: 4},
+    'AMC10':  {2: 5, 3: 4, 4: 1},
+    'AMC12':  {2: 4, 3: 5, 4: 1},
+    'AIME':   {2: 1, 3: 6, 4: 3},
+    '高联一试': {2: 5, 3: 5},
+    '高联加试': {3: 4, 4: 6},
+    'CMO':    {4: 6, 5: 4},
+    'USAMO':  {4: 7, 5: 3},
+    'IMO':    {4: 5, 5: 5},
+}
+
+
+def plan(problems, args):
+    import random
+    profile = PLAN_PROFILES.get(args.target)
+    if not profile:
+        print(f'未知目标赛事。可选：{"、".join(PLAN_PROFILES)}')
+        sys.exit(2)
+    rng = random.Random(args.seed)
+    n = args.n
+    total_w = sum(profile.values())
+    # 每星级配额（至少凑满 n 题）
+    quota = {d: max(1, round(n * w / total_w)) for d, w in profile.items()}
+    pool = {}
+    for p in problems:
+        fm = p['fm'] or {}
+        d = fm.get('difficulty')
+        if d in quota:
+            pool.setdefault(d, []).append(fm)
+    picked = []
+    for d, k in sorted(quota.items()):
+        cands = pool.get(d, [])
+        rng.shuffle(cands)
+        # 尽量四板块轮转，避免全落在一个板块
+        by_cat = {}
+        for fm in cands:
+            by_cat.setdefault(fm['category'], []).append(fm)
+        order = sorted(by_cat)
+        rng.shuffle(order)
+        sel, i = [], 0
+        while len(sel) < min(k, len(cands)):
+            cat = order[i % len(order)]
+            if by_cat[cat]:
+                sel.append(by_cat[cat].pop(0))
+            i += 1
+            if i > 10 * len(cands) + 10:
+                break
+        picked += sel
+    print(f'目标：{args.target}　共 {len(picked)} 题（seed={args.seed}，换一套用 --seed）\n')
+    for fm in sorted(picked, key=lambda f: (f['difficulty'], f['id'])):
+        star = '★' * fm['difficulty']
+        print(f"{fm['id']}  {star:<5}  {fm.get('contest') or '?':<8} {fm['title']}  [{' / '.join(fm['topics'])}]")
+    dist = {}
+    for fm in picked:
+        dist[fm['difficulty']] = dist.get(fm['difficulty'], 0) + 1
+    print('\n难度构成：' + '，'.join(f'★{d}×{c}' for d, c in sorted(dist.items())))
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest='cmd', required=True)
@@ -149,12 +209,18 @@ def main():
     q.add_argument('--category', choices=CATEGORIES)
     q.add_argument('--unverified', action='store_true')
     sub.add_parser('stats')
+    pl = sub.add_parser('plan')
+    pl.add_argument('--target', required=True)
+    pl.add_argument('--n', type=int, default=12)
+    pl.add_argument('--seed', type=int, default=1)
     args = ap.parse_args()
     problems = load_all()
     if args.cmd == 'lint':
         sys.exit(lint(problems))
     elif args.cmd == 'query':
         query(problems, args)
+    elif args.cmd == 'plan':
+        plan(problems, args)
     else:
         stats(problems)
 
