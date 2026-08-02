@@ -16,6 +16,7 @@ id: A-018            # 必填，与文件名一致
 title: 三分式根号不等式  # 必填，简短题名
 category: algebra    # 必填
 contest: IMO         # 规范化赛事名：IMO/ISL/USAMO/USAJMO/AIME/AMC 8/AMC 10/AMC 12/CMO/高联/华杯赛/…
+original_lang: en    # 原文语言：en ｜ zh。en 的题正文必须含「## 原文（English）」小节
 year: 2001           # 可为 null（出处无年份时）
 system: IMO/ISL      # 备赛体系：小学/初中｜高联/CMO｜AMC体系｜IMO/ISL
 source_ref: IMO 2001 Problem 2   # 必填，原始出处字符串
@@ -37,6 +38,10 @@ compliance: ""       # 非白名单/停办/违规赛事须注明状态
 
 ## 题面
 （忠实中译，LaTeX 行内 $...$；依赖图形的题必须用文字把构造关系交代清楚）
+
+## 原文（English）
+（仅 original_lang: en 的题必填：逐字照录官方来源的英文题面，不做任何改写——
+它是翻译质量的审计凭证，也供高阶训练者直接阅读原题。原文为中文的题省略此节。）
 
 ## 答案
 （填空选择给答案；证明题给结论）
