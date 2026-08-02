@@ -74,7 +74,26 @@ def lint(problems):
     return 0
 
 
+def load_aliases():
+    path = os.path.join(ROOT, 'taxonomy', 'aliases.yml')
+    if not os.path.exists(path):
+        return {}
+    return yaml.safe_load(open(path, encoding='utf-8')) or {}
+
+
+def topic_match(q, topics, title, aliases):
+    ql = q.lower()
+    if any(q in t for t in topics) or q in title:
+        return True
+    # 英文查询 → 命中英文别名的中文标准名出现在 topics 中
+    for zh, ens in aliases.items():
+        if any(ql in en.lower() for en in ens) and any(zh in t for t in topics):
+            return True
+    return False
+
+
 def query(problems, args):
+    aliases = load_aliases()
     rows = []
     for p in problems:
         fm = p['fm'] or {}
@@ -84,8 +103,7 @@ def query(problems, args):
             continue
         if args.contest and args.contest.lower() not in str(fm.get('contest', '')).lower():
             continue
-        if args.topic and not any(args.topic in t for t in fm.get('topics', [])) \
-           and args.topic not in fm.get('title', ''):
+        if args.topic and not topic_match(args.topic, fm.get('topics', []), fm.get('title', ''), aliases):
             continue
         if args.unverified and fm.get('verification') == 'sourced':
             continue
