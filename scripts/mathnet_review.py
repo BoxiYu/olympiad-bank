@@ -77,7 +77,7 @@ def cmd_batch(args):
                       'conf': r['difficulty_conf'], 'category': r['category'],
                       'topics': r['topics'], 'contest': r['contest_raw'],
                       'problem': ds[i]['problem_markdown'][:args.chars],
-                      'solution_head': (ds[i]['solutions_markdown'] or '')[:args.chars // 2]})
+                      'solution_head': '\n\n---\n\n'.join(ds[i]['solutions_markdown'] or [])[:args.chars // 2]})
     d = os.path.join(ROOT, args.out)
     os.makedirs(d, exist_ok=True)
     json.dump(batch, open(os.path.join(d, 'batch.json'), 'w', encoding='utf-8'),

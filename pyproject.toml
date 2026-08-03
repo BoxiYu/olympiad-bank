@@ -12,4 +12,4 @@ dependencies = [
 
 [dependency-groups]
 # MathNet 候选池构建（scripts/mathnet_ingest.py）：uv run --group mathnet python ...
-mathnet = ["datasets>=3.0"]
+mathnet = ["datasets>=3.0", "pillow>=10"]
