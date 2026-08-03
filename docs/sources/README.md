@@ -2,25 +2,34 @@
 
 把官方赛题 PDF 放到本目录（如 `IMO2024SL.pdf`），会话内即可全文精读入库/终审。
 
-## 一键补齐历年 ISL PDF
+## 文本通道（主力，2026-08-03 打通）
 
-双击本目录下的 **`download_isl_pdfs.command`**（macOS 会打开终端自动执行），
-即从 imo-official.org 官网把 2015–2025 各年 Shortlist PDF 下载到本目录，每份约 1–3 MB。
-脚本只用系统自带 curl，逐年报告成功/失败，已存在的文件自动跳过。
+**不依赖 PDF 落盘**：经 Claude in Chrome 扩展在浏览器内抽取官方 PDF 全文
+（同源 fetch + DecompressionStream 解压 + Tj/TJ 算子抽取，零外部依赖、CSP 免疫），
+管线与踩坑记录见 `scripts/browser_pdf_extract.js`。ISL 2024 全卷 20.6 万字符
+（含全部解答区）已按此法抽取，官方答案清单在 `isl2024_answers_harvest.md`。
+后续年份逐年重跑同一管线即可。
 
-> 为什么需要这一步：云端会话的出网代理仅放行 GitHub/PyPI 等少数域名，
-> imo-official.org 直连被拒（443/80 均 CONNECT 403）；WebFetch 可达但对长 PDF
-> 约在 30–40 页处截断，解答区拿不到。全网镜像检索（GitHub API/grep.app/
-> Scribd/Studocu/AoPS printable 合集）均无完整解答文本——2026-08-02 实测记录。
+## 字节归档（可选）
 
-## ISL 2024 终审待办（PDF 落库后逐项关闭）
+双击本目录下的 **`download_isl_pdfs.command`** 可从官网批量下载 2015–2025 各年
+Shortlist PDF 到本目录（约 1–3 MB/份，已存在自动跳过）。
+注意：Chrome 曾对 imo-official.org 触发「多文件自动下载」站点级拦截（2026-08-03），
+脚本走 curl 不受影响；已手动落盘 IMO2015SL.pdf 在 ~/Downloads，可自行移入。
 
-| 题 | 库内条目 | 现有证据 | 待终审项 |
-| --- | --- | --- | --- |
-| C3 | C-033 | BFS 穷举 n≤4 吻合 n(n-1)/2 | 一般 n 的官方证明比对 |
-| C5 | C-035 | 双实现求解器 N≤48 互证 + 闭式盲验 8/8 | 官方答案/解法比对 |
-| N1 | N-034 | 穷举 2×10⁶ 内仅 {1,2,4,12} | 「无其他解」官方证明比对 |
-| N2 | N-035 | 本原集穷举（≤64，大小≤4）仅 {1},{1,3} | 完整分类官方证明比对 |
-| G2 | G-033 | ~~措辞出入~~ **已终审关闭**（2026-08-02 SL 原文逐字核对） | — |
+> 通道封锁背景：云端出网代理仅放行 GitHub/PyPI 等少数域名，imo-official.org
+> 直连被拒（443/80 均 CONNECT 403）；WebFetch 可达但长 PDF 约 30–40 页截断；
+> 全网镜像（GitHub/grep.app/Scribd/Studocu/AoPS printable）无完整解答文本；
+> 桌面安全分层锁死终端与浏览器直驾——2026-08-02/03 实测记录。
 
-终审后：verification 由 independent-derivation 升为 sourced，并在 verification_note 记录比对结论。
+## ISL 2024 终审账本 —— **五项全部关闭（2026-08-03）**
+
+| 题 | 库内条目 | 终审结论 |
+| --- | --- | --- |
+| C3 | C-033 | ✅ 官方 Answer「n(n−1)/2」逐字一致；三引理证明、极端排列同构（对径对坐＝完全交错） |
+| C5 | C-035 | ✅ 官方 Answer 与闭式逐字等价；J(S;T) 奇偶拆分与 trie 模型同构；verification 升 sourced |
+| N1 | N-034 | ✅ 官方 Answer「{1,2,4,12}」一致；2^k·m 分解证明与库内思路一致 |
+| N2 | N-035 | ✅ 官方 Answer「{t},{t,3t}」一致；WLOG 缩放+奇偶论证与库内一致 |
+| G2 | G-033 | ✅ SL 原文措辞逐字核对（interior of side BC 版），出入项关闭 |
+
+ISL 2024 已入库 8 题全部 verification: sourced。
