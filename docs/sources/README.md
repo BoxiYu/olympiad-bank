@@ -32,4 +32,5 @@ Shortlist PDF 到本目录（约 1–3 MB/份，已存在自动跳过）。
 | N2 | N-035 | ✅ 官方 Answer「{t},{t,3t}」一致；WLOG 缩放+奇偶论证与库内一致 |
 | G2 | G-033 | ✅ SL 原文措辞逐字核对（interior of side BC 版），出入项关闭 |
 
-ISL 2024 已入库 8 题全部 verification: sourced。
+ISL 2024 相关条目 19 题（含正赛 P1/P2/P4/P5）全部 verification: sourced；
+有官方 Answer 行的题已全部入库，余题清单见 isl2024_answers_harvest.md。

@@ -198,6 +198,122 @@ def plan(problems, args):
     print('\n难度构成：' + '，'.join(f'★{d}×{c}' for d, c in sorted(dist.items())))
 
 
+# ---------------- 教练闭环：coach / log / review ----------------
+ATTEMPTS = os.path.join(ROOT, 'data', 'attempts.jsonl')
+INTERVALS = {'fail': 2, 'hard': 7, 'ok': 21}   # 间隔复习天数
+TIME_LIMIT = {1: 15, 2: 25, 3: 40, 4: 80, 5: 120}  # 独立攻坚限时（分钟）
+
+
+def load_attempts():
+    import json
+    if not os.path.exists(ATTEMPTS):
+        return []
+    return [json.loads(l) for l in open(ATTEMPTS, encoding='utf-8') if l.strip()]
+
+
+def log_attempt(problems, args):
+    import json, datetime
+    ids = {p['fm']['id'] for p in problems if p['fm']}
+    if args.id not in ids:
+        print(f'未知题号 {args.id}')
+        sys.exit(2)
+    os.makedirs(os.path.dirname(ATTEMPTS), exist_ok=True)
+    rec = {'id': args.id, 'result': args.result,
+           'date': args.date or datetime.date.today().isoformat(),
+           'hints': args.hints, 'note': args.note or ''}
+    with open(ATTEMPTS, 'a', encoding='utf-8') as f:
+        f.write(json.dumps(rec, ensure_ascii=False) + '\n')
+    nxt = INTERVALS.get(args.result)
+    print(f"已记录 {rec['id']}：{rec['result']}（用提示 {args.hints} 级）"
+          + (f'，{nxt} 天后进入复习队列' if nxt else ''))
+
+
+def review(problems, args=None):
+    import datetime
+    today = datetime.date.today()
+    last = {}
+    for r in load_attempts():
+        last[r['id']] = r          # 追加式日志，后写覆盖前写
+    fmmap = {p['fm']['id']: p['fm'] for p in problems if p['fm']}
+    due = []
+    for pid, r in last.items():
+        gap = INTERVALS.get(r['result'])
+        if gap is None or pid not in fmmap:
+            continue
+        due_date = datetime.date.fromisoformat(r['date']) + datetime.timedelta(days=gap)
+        if due_date <= today:
+            due.append((due_date, r, fmmap[pid]))
+    if not due:
+        print('复习队列为空。')
+        return []
+    due.sort()
+    print(f'应复习 {len(due)} 题（按到期先后）：\n')
+    for dd, r, fm in due:
+        od = (today - dd).days
+        tag = f'逾期 {od} 天' if od > 0 else '今日到期'
+        print(f"{fm['id']}  {'★' * fm['difficulty']:<5} 上次 {r['result']:<4} {tag:<8} {fm['title']}")
+    print('\n复习纪律：先不看任何提示重做；仍卡再按提示阶梯逐级解锁。做完 log。')
+    return due
+
+
+def _pick_rotating(cands, k, rng):
+    """按板块轮转从候选中取 k 题，避免同板块扎堆。"""
+    by_cat = {}
+    for fm in cands:
+        by_cat.setdefault(fm['category'], []).append(fm)
+    order = sorted(by_cat)
+    rng.shuffle(order)
+    sel, i = [], 0
+    while len(sel) < min(k, len(cands)):
+        cat = order[i % len(order)]
+        if by_cat[cat]:
+            sel.append(by_cat[cat].pop(0))
+        i += 1
+        if i > 10 * len(cands) + 10:
+            break
+    return sel
+
+
+def coach(problems, args):
+    import random
+    profile = PLAN_PROFILES.get(args.target)
+    if not profile:
+        print(f'未知目标赛事。可选：{"、".join(PLAN_PROFILES)}')
+        sys.exit(2)
+    rng = random.Random(args.seed)
+    attempted = {r['id'] for r in load_attempts()}
+    total_w = sum(profile.values())
+    pool = {}
+    for p in problems:
+        fm = p['fm'] or {}
+        if fm.get('id') in attempted:
+            continue
+        d = fm.get('difficulty')
+        if d in profile:
+            pool.setdefault(d, []).append(fm)
+    for lst in pool.values():
+        rng.shuffle(lst)
+    print(f'=== 教练周计划 | 目标 {args.target} | {args.weeks} 周 × 每周 {args.n} 题 | seed={args.seed} ===\n')
+    print('攻坚纪律：限时独立攻坚（' + '，'.join(f'★{d}≤{m}min' for d, m in sorted(TIME_LIMIT.items()) if d in profile)
+          + '）；卡住按「提示阶梯」逐级解锁，每级之间再战 15 分钟；无论成败必须 log。\n')
+    for w in range(1, args.weeks + 1):
+        print(f'—— 第 {w} 周 ——')
+        picked = []
+        for d, wt in sorted(profile.items()):
+            k = max(1, round(args.n * wt / total_w))
+            sel = _pick_rotating(pool.get(d, []), k, rng)
+            for fm in sel:
+                pool[d].remove(fm)
+            picked += sel
+        for fm in sorted(picked, key=lambda f: (f['difficulty'], f['id'])):
+            print(f"  {fm['id']}  {'★' * fm['difficulty']:<5} {fm.get('contest') or '?':<6} {fm['title']}")
+        if not picked:
+            print('  （题池已耗尽——先复习或扩池）')
+        print()
+    print('—— 复习检查 ——')
+    review(problems)
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest='cmd', required=True)
@@ -213,6 +329,18 @@ def main():
     pl.add_argument('--target', required=True)
     pl.add_argument('--n', type=int, default=12)
     pl.add_argument('--seed', type=int, default=1)
+    co = sub.add_parser('coach')
+    co.add_argument('--target', required=True)
+    co.add_argument('--weeks', type=int, default=4)
+    co.add_argument('--n', type=int, default=10)
+    co.add_argument('--seed', type=int, default=1)
+    lg = sub.add_parser('log')
+    lg.add_argument('--id', required=True)
+    lg.add_argument('--result', required=True, choices=['ok', 'hard', 'fail'])
+    lg.add_argument('--hints', type=int, default=0, choices=[0, 1, 2, 3])
+    lg.add_argument('--date')
+    lg.add_argument('--note')
+    sub.add_parser('review')
     args = ap.parse_args()
     problems = load_all()
     if args.cmd == 'lint':
@@ -221,6 +349,12 @@ def main():
         query(problems, args)
     elif args.cmd == 'plan':
         plan(problems, args)
+    elif args.cmd == 'coach':
+        coach(problems, args)
+    elif args.cmd == 'log':
+        log_attempt(problems, args)
+    elif args.cmd == 'review':
+        review(problems)
     else:
         stats(problems)
 
