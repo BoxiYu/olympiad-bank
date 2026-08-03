@@ -17,6 +17,9 @@ Shortlist PDF 到本目录（约 1–3 MB/份，已存在自动跳过）。
 注意：Chrome 曾对 imo-official.org 触发「多文件自动下载」站点级拦截（2026-08-03），
 脚本走 curl 不受影响；已手动落盘 IMO2015SL.pdf 在 ~/Downloads，可自行移入。
 
+当前已落盘：`IMO2015SL.pdf`、`IMO2024SL.pdf`（Shortlist 全卷），
+`IMO2025-problems-eng.pdf`（IMO 2025 正赛六题官方英文题面；**六题均未入库**，待批）。
+
 > 通道封锁背景：云端出网代理仅放行 GitHub/PyPI 等少数域名，imo-official.org
 > 直连被拒（443/80 均 CONNECT 403）；WebFetch 可达但长 PDF 约 30–40 页截断；
 > 全网镜像（GitHub/grep.app/Scribd/Studocu/AoPS printable）无完整解答文本；
