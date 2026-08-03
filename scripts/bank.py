@@ -70,7 +70,12 @@ def lint(problems):
         print('\n'.join(errors))
         print(f'\nLINT FAILED: {len(errors)} 个问题')
         return 1
-    print(f'LINT OK: {len(problems)} 题全部通过')
+    warns = registry_report(problems)
+    if warns:
+        print(f'警告：{len(warns)} 处知识点未注册（不阻塞，请在 taxonomy/registry.yml 登记）：')
+        for w in warns[:12]:
+            print('  ' + w)
+    print(f'LINT OK: {len(problems)} 题全部通过' + ('' if not warns else f'（{len(warns)} 条词表警告）'))
     return 0
 
 
@@ -314,6 +319,86 @@ def coach(problems, args):
     review(problems)
 
 
+# ---------------- 知识点注册表与指示图 ----------------
+CAT_LABEL = {'algebra': '代数', 'number-theory': '数论', 'combinatorics': '组合', 'geometry': '几何'}
+
+
+def load_registry():
+    path = os.path.join(ROOT, 'taxonomy', 'registry.yml')
+    if not os.path.exists(path):
+        return None
+    data = yaml.safe_load(open(path, encoding='utf-8')) or {}
+    return {c: (v or {}) for c, v in data.items() if not str(c).startswith('_')}
+
+
+def resolve_topic(reg, cat, t):
+    nodes = (reg or {}).get(cat) or {}
+    if t in nodes:
+        return t
+    for node, aliases in nodes.items():
+        if t in (aliases or []):
+            return node
+    return None
+
+
+def registry_report(problems):
+    reg = load_registry()
+    if reg is None:
+        return ['taxonomy/registry.yml 缺失']
+    bad = []
+    for p in problems:
+        fm = p['fm'] or {}
+        for t in fm.get('topics', []) or []:
+            if resolve_topic(reg, fm.get('category'), t) is None:
+                bad.append(f"{fm.get('id')}: 「{t}」")
+    return bad
+
+
+def gen_map(problems):
+    import json, datetime
+    reg = load_registry()
+    if reg is None:
+        print('缺 taxonomy/registry.yml')
+        sys.exit(2)
+    cats, unresolved = [], []
+    for cat in CATEGORIES:
+        nodes = {n: {'name': n, 'stars': {str(i): 0 for i in range(1, 6)}, 'problems': []}
+                 for n in (reg.get(cat) or {})}
+        for p in problems:
+            fm = p['fm'] or {}
+            if fm.get('category') != cat:
+                continue
+            hit = set()
+            for t in fm.get('topics', []) or []:
+                node = resolve_topic(reg, cat, t)
+                if node is None:
+                    unresolved.append((fm.get('id'), t))
+                else:
+                    hit.add(node)
+            for node in hit:
+                d = fm.get('difficulty')
+                nodes[node]['stars'][str(d)] += 1
+                nodes[node]['problems'].append(
+                    {'id': fm['id'], 'd': d, 't': fm.get('title', ''),
+                     'c': fm.get('contest', ''), 'y': fm.get('year', '')})
+        for nd in nodes.values():
+            nd['problems'].sort(key=lambda x: (-x['d'], x['id']))
+            nd['total'] = len(nd['problems'])
+        cats.append({'cat': cat, 'label': CAT_LABEL[cat],
+                     'nodes': [nodes[n] for n in (reg.get(cat) or {})]})
+    data = {'generated': datetime.date.today().isoformat(), 'total': len(problems), 'cats': cats}
+    os.makedirs(os.path.join(ROOT, 'maps'), exist_ok=True)
+    with open(os.path.join(ROOT, 'maps', 'map_data.json'), 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=1)
+    tpl = open(os.path.join(ROOT, 'scripts', 'map_template.html'), encoding='utf-8').read()
+    with open(os.path.join(ROOT, 'maps', '指示图.html'), 'w', encoding='utf-8') as f:
+        f.write(tpl.replace('__MAP_DATA__', json.dumps(data, ensure_ascii=False)))
+    n_nodes = sum(len(c['nodes']) for c in cats)
+    print(f'maps/指示图.html 已生成：{len(problems)} 题 → {n_nodes} 个知识点节点')
+    if unresolved:
+        print(f'未注册 topic {len(unresolved)} 处（跑 lint 看明细）')
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest='cmd', required=True)
@@ -341,6 +426,7 @@ def main():
     lg.add_argument('--date')
     lg.add_argument('--note')
     sub.add_parser('review')
+    sub.add_parser('map')
     args = ap.parse_args()
     problems = load_all()
     if args.cmd == 'lint':
@@ -355,6 +441,8 @@ def main():
         log_attempt(problems, args)
     elif args.cmd == 'review':
         review(problems)
+    elif args.cmd == 'map':
+        gen_map(problems)
     else:
         stats(problems)
 
