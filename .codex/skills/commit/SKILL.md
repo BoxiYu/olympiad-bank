@@ -22,7 +22,7 @@ description:
 
 1. 读会话历史，确认这一批的范围与动机。
 2. 检查工作区与暂存区（`git status`、`git diff`、`git diff --staged`）。
-3. **提交前先跑门槛**：`python3 scripts/bank.py lint`，必须 `LINT OK`。
+3. **提交前先跑门槛**：`uv run python scripts/bank.py lint`，必须 `LINT OK`。
 4. 确认范围后暂存（`git add -A`）。
 5. 逐一核对新增文件。如果混进了构建产物、日志、临时文件，或
    `__pycache__/`、`*.pyc`、`.DS_Store`，先从索引里剔除。
@@ -55,7 +55,7 @@ description:
 - <为什么>
 
 核验：
-- python3 scripts/bank.py lint → LINT OK（NNN 题）
+- uv run python scripts/bank.py lint → LINT OK（NNN 题）
 - <题号>：题面 <来源>，答案 <来源>，<逐字比对/程序验证>
 - 抽样：<比例>，<结果>
 

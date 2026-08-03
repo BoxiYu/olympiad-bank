@@ -15,7 +15,7 @@
 ## 唯一的硬门槛
 
 ```bash
-python3 scripts/bank.py lint
+uv run python scripts/bank.py lint
 ```
 
 必须输出 `LINT OK`。CI 跑的就是这一条。lint 不过 = 工作未完成，不许 push。
@@ -23,13 +23,13 @@ python3 scripts/bank.py lint
 辅助命令：
 
 ```bash
-python3 scripts/bank.py stats                 # 难度 × 板块 / 体系分布
-python3 scripts/bank.py query --difficulty 4  # 按难度检索
-python3 scripts/bank.py query --topic 韦达    # 按知识点检索
-python3 scripts/bank.py query --unverified    # 待二次复核的题
+uv run python scripts/bank.py stats                 # 难度 × 板块 / 体系分布
+uv run python scripts/bank.py query --difficulty 4  # 按难度检索
+uv run python scripts/bank.py query --topic 韦达    # 按知识点检索
+uv run python scripts/bank.py query --unverified    # 待二次复核的题
 ```
 
-依赖：Python 3 + PyYAML。
+依赖由 `pyproject.toml` + `uv.lock` 声明，`uv run` 自动解决；无 uv 的环境退回 `python3` + 手动装 PyYAML 也能跑。
 
 ## 铁律（摘自 SPEC.md 第 5 节，不可协商）
 

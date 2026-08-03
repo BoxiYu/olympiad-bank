@@ -18,8 +18,12 @@ hooks:
   after_create: |
     set -euo pipefail
     git clone "$SYMPHONY_SOURCE_REPO" .
-    python3 -c 'import yaml' 2>/dev/null || python3 -m pip install --user --quiet pyyaml
-    python3 scripts/bank.py lint
+    if command -v uv >/dev/null 2>&1; then
+      uv run python scripts/bank.py lint
+    else
+      python3 -c 'import yaml' 2>/dev/null || python3 -m pip install --user --quiet pyyaml
+      python3 scripts/bank.py lint
+    fi
 agent:
   max_concurrent_agents: 2
   max_turns: 20
@@ -88,8 +92,8 @@ codex:
 # 二、验收门槛（每次 push 前必须过）
 
 ```bash
-python3 scripts/bank.py lint     # 硬门槛：必须输出 LINT OK
-python3 scripts/bank.py stats    # 参考：确认难度/板块分布没有被意外打乱
+uv run python scripts/bank.py lint     # 硬门槛：必须输出 LINT OK
+uv run python scripts/bank.py stats    # 参考：确认难度/板块分布没有被意外打乱
 ```
 
 `lint` 不过就不算完成工作，不许 push，也不许把工单交回人工评审。
@@ -166,14 +170,14 @@ GitHub 只有 open/closed 两种原生状态，因此本项目用标签表达流
 2. 读 `AGENTS.md` 与 `SPEC.md`，确认本次工单涉及的约定。
 3. 建立/刷新工作台，写出分层计划与验收标准；把工单正文里的「验收/测试/核验」要求原样抄进验收标准，不许降级为可选。
 4. 跑 `pull` skill 与 `origin/main` 同步，把结果记进工作台备注。
-5. 先建立基线信号：跑一次 `python3 scripts/bank.py lint` 和 `stats`，记下改动前的题数与分布。
+5. 先建立基线信号：跑一次 `uv run python scripts/bank.py lint` 和 `stats`，记下改动前的题数与分布。
 
 ## 2. 实施
 
 1. 从 `origin/main` 切新分支，命名 `symphony/gh-{{ issue.id }}-<短描述>`。
 2. 按计划实施，每完成一个里程碑就即时更新工作台，不要把已完成项留成未勾选。
 3. 涉及新题时，**先取来源、后写文件**：拿不到来源就不写这道题。
-4. 每次 push 前跑 `python3 scripts/bank.py lint`，红了就修到绿。
+4. 每次 push 前跑 `uv run python scripts/bank.py lint`，红了就修到绿。
 5. 用 `commit` skill 产出干净的提交，用 `push` skill 推分支并建/更新 PR。
 6. 给 PR 打上 `symphony` 标签，并在 PR 描述里链接本 issue（`Closes #{{ issue.id }}`）。
 

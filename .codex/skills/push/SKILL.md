@@ -25,7 +25,7 @@ description:
 ## 步骤
 
 1. 确认当前分支与远端状态。
-2. **推之前先过门槛**：`python3 scripts/bank.py lint` 必须 `LINT OK`。
+2. **推之前先过门槛**：`uv run python scripts/bank.py lint` 必须 `LINT OK`。
    红了就修到绿再推，不要带着红的 lint 推分支。
 3. 用现有的 remote URL 推分支，必要时建立 upstream 跟踪。
 4. push 不干净时：
@@ -53,7 +53,7 @@ description:
 branch=$(git branch --show-current)
 
 # 门槛
-python3 scripts/bank.py lint
+uv run python scripts/bank.py lint
 
 # 首次推送：沿用当前 origin
 git push -u origin HEAD

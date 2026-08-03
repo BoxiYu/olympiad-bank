@@ -30,7 +30,7 @@ description:
 7. If conflicts appear, resolve them (see conflict guidance below), then:
    - `git add <files>`
    - `git commit` (or `git merge --continue` if the merge is paused)
-8. Verify with project checks: run `python3 scripts/bank.py lint` and require
+8. Verify with project checks: run `uv run python scripts/bank.py lint` and require
    `LINT OK` before considering the merge done (see `AGENTS.md`). A merge that
    leaves lint red is not resolved, however clean the conflict markers look.
 9. Summarize the merge:

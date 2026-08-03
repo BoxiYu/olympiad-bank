@@ -19,15 +19,15 @@ SPEC.md              入库规范：字段定义、难度标准、入库铁律
 ## 常用命令
 
 ```bash
-python3 scripts/bank.py lint                       # 入库校验（CI 必跑）
-python3 scripts/bank.py stats                      # 难度 × 板块 / 体系分布
-python3 scripts/bank.py query --difficulty 4       # 按难度检索
-python3 scripts/bank.py query --topic 韦达         # 按知识点检索
-python3 scripts/bank.py query --contest IMO --category geometry
-python3 scripts/bank.py query --unverified         # 列出待二次复核的题
+uv run python scripts/bank.py lint                       # 入库校验（CI 必跑）
+uv run python scripts/bank.py stats                      # 难度 × 板块 / 体系分布
+uv run python scripts/bank.py query --difficulty 4       # 按难度检索
+uv run python scripts/bank.py query --topic 韦达         # 按知识点检索
+uv run python scripts/bank.py query --contest IMO --category geometry
+uv run python scripts/bank.py query --unverified         # 列出待二次复核的题
 ```
 
-依赖：Python 3 + PyYAML（`pip install pyyaml`）。
+依赖由 `pyproject.toml` + `uv.lock` 声明（Python ≥3.11 + PyYAML），装好 [uv](https://docs.astral.sh/uv/) 后 `uv run` 会自动解决，无需手动装包。
 
 ## 四维建设路线
 

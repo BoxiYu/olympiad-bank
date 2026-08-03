@@ -23,7 +23,7 @@ description:
 ## 步骤
 
 1. 定位当前分支对应的 PR。
-2. 本地先过门槛：`python3 scripts/bank.py lint` 必须 `LINT OK`。
+2. 本地先过门槛：`uv run python scripts/bank.py lint` 必须 `LINT OK`。
 3. 工作区若有未提交改动，用 `commit` skill 提交、`push` skill 推送，再继续。
 4. 检查与 `main` 的可合并性（`gh pr view --json mergeable`）。
 5. 有冲突：走 `pull` skill 合 `origin/main` 并解冲突，重跑 lint，
@@ -44,7 +44,7 @@ pr_title=$(gh pr view --json title -q .title)
 pr_body=$(gh pr view --json body -q .body)
 
 # 门槛
-python3 scripts/bank.py lint
+uv run python scripts/bank.py lint
 
 # 可合并性
 mergeable=$(gh pr view --json mergeable -q .mergeable)

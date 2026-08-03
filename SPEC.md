@@ -1,6 +1,6 @@
 # 题库规范（SPEC）
 
-本文件是全库的**入库标准**。任何新题必须通过 `python3 scripts/bank.py lint` 才算入库。
+本文件是全库的**入库标准**。任何新题必须通过 `uv run python scripts/bank.py lint` 才算入库。
 
 ## 1. 一题一文件
 
