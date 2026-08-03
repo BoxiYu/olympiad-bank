@@ -4,3 +4,4 @@ __pycache__/
 .venv/
 candidates/
 maps/
+data/sessions/

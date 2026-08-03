@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
-"""题库工具：lint / query / stats
+"""题库工具：lint / query / stats / plan / coach / spar / review / similar
 
 用法：
-  python3 scripts/bank.py lint
-  python3 scripts/bank.py query [--difficulty 3] [--topic 韦达] [--contest IMO] [--category algebra] [--unverified]
-  python3 scripts/bank.py stats
+  uv run python scripts/bank.py lint
+  uv run python scripts/bank.py query [--difficulty 3] [--topic 韦达] [--contest IMO] [--category algebra] [--unverified]
+  uv run python scripts/bank.py stats
+  uv run python scripts/bank.py coach --target IMO --save     # 周计划 → data/plan.json
+  uv run python scripts/bank.py spar next                     # 开卡（复习到期 > 周计划）
+  uv run python scripts/bank.py spar hint / reveal / finish   # 提示 / 看解 / 落账
+  uv run python scripts/bank.py similar A-037                 # 相似候选 + 确认边
 """
 import argparse, os, re, sys, yaml
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, 'scripts'))
+import spar_session as sp  # 会话流程 + v2 日志契约（间隔/毕业/归一化），三方共用
 CATEGORIES = ['algebra', 'number-theory', 'combinatorics', 'geometry']
 PREFIX = {'algebra': 'A', 'number-theory': 'N', 'combinatorics': 'C', 'geometry': 'G'}
 REQUIRED = ['id', 'title', 'category', 'source_ref', 'difficulty', 'topics', 'verification', 'source_url']
@@ -196,24 +202,17 @@ def plan(problems, args):
     print(f'目标：{args.target}　共 {len(picked)} 题（seed={args.seed}，换一套用 --seed）\n')
     for fm in sorted(picked, key=lambda f: (f['difficulty'], f['id'])):
         star = '★' * fm['difficulty']
-        print(f"{fm['id']}  {star:<5}  {fm.get('contest') or '?':<8} {fm['title']}  [{' / '.join(fm['topics'])}]")
+        print(f"{fm['id']}  {star:<5}  {fm.get('contest') or '?':<8} {fm['title']}  [{' / '.join(fm['topics'])}]"
+              f"  → uv run python scripts/bank.py spar {fm['id']}")
     dist = {}
     for fm in picked:
         dist[fm['difficulty']] = dist.get(fm['difficulty'], 0) + 1
     print('\n难度构成：' + '，'.join(f'★{d}×{c}' for d, c in sorted(dist.items())))
 
 
-# ---------------- 教练闭环：coach / log / review ----------------
-ATTEMPTS = os.path.join(ROOT, 'data', 'attempts.jsonl')
-INTERVALS = {'fail': 2, 'hard': 7, 'ok': 21}   # 间隔复习天数
-TIME_LIMIT = {1: 15, 2: 25, 3: 40, 4: 80, 5: 120}  # 独立攻坚限时（分钟）
-
-
-def load_attempts():
-    import json
-    if not os.path.exists(ATTEMPTS):
-        return []
-    return [json.loads(l) for l in open(ATTEMPTS, encoding='utf-8') if l.strip()]
+# ---------------- 教练闭环：coach / log / review / spar ----------------
+ATTEMPTS = sp.ATTEMPTS_PATH
+TIME_LIMIT = sp.TIME_LIMIT
 
 
 def log_attempt(problems, args):
@@ -228,36 +227,43 @@ def log_attempt(problems, args):
            'hints': args.hints, 'note': args.note or ''}
     with open(ATTEMPTS, 'a', encoding='utf-8') as f:
         f.write(json.dumps(rec, ensure_ascii=False) + '\n')
-    nxt = INTERVALS.get(args.result)
-    print(f"已记录 {rec['id']}：{rec['result']}（用提示 {args.hints} 级）"
+    norm = sp.normalize_attempt(rec)['result']
+    nxt = sp.INTERVALS.get(norm)
+    print(f"已记录 {rec['id']}：{rec['result']}（读取时归一化为 {norm}，提示 {args.hints} 级）"
           + (f'，{nxt} 天后进入复习队列' if nxt else ''))
+    print(f'建议改用 spar 流程（全程留痕、自动判定）：uv run python scripts/bank.py spar {args.id}')
 
 
 def review(problems, args=None):
     import datetime
     today = datetime.date.today()
-    last = {}
-    for r in load_attempts():
-        last[r['id']] = r          # 追加式日志，后写覆盖前写
     fmmap = {p['fm']['id']: p['fm'] for p in problems if p['fm']}
-    due = []
-    for pid, r in last.items():
-        gap = INTERVALS.get(r['result'])
-        if gap is None or pid not in fmmap:
+    hist = sp.history_by_id(sp.load_attempts_v2())   # 全历史扫描（非只看最后一条）
+    grads, due = [], []
+    for pid, recs in hist.items():
+        if pid not in fmmap:
             continue
-        due_date = datetime.date.fromisoformat(r['date']) + datetime.timedelta(days=gap)
-        if due_date <= today:
-            due.append((due_date, r, fmmap[pid]))
+        if sp.is_graduated(recs):
+            grads.append(fmmap[pid])
+            continue
+        dd = sp.due_date_of(recs)
+        if dd is not None and dd <= today:
+            due.append((dd, recs[-1], fmmap[pid]))
+    if grads:
+        print(f'🎓 本次毕业（连续 {sp.GRADUATE_STREAK} 次 independent_ok，永久退出复习队列）：')
+        for fm in sorted(grads, key=lambda f: f['id']):
+            print(f"  {fm['id']}  {'★' * fm['difficulty']:<5} {fm['title']}")
+        print()
     if not due:
         print('复习队列为空。')
         return []
-    due.sort()
+    due.sort(key=lambda t: (t[0], t[2]['id']))
     print(f'应复习 {len(due)} 题（按到期先后）：\n')
     for dd, r, fm in due:
         od = (today - dd).days
         tag = f'逾期 {od} 天' if od > 0 else '今日到期'
-        print(f"{fm['id']}  {'★' * fm['difficulty']:<5} 上次 {r['result']:<4} {tag:<8} {fm['title']}")
-    print('\n复习纪律：先不看任何提示重做；仍卡再按提示阶梯逐级解锁。做完 log。')
+        print(f"{fm['id']}  {'★' * fm['difficulty']:<5} 上次 {r['result']:<22} {tag:<8} {fm['title']}")
+    print('\n复习纪律：先不看任何提示重做。开卡：uv run python scripts/bank.py spar next（自动优先到期复习）')
     return due
 
 
@@ -280,18 +286,20 @@ def _pick_rotating(cands, k, rng):
 
 
 def coach(problems, args):
-    import random
+    import datetime, random
     profile = PLAN_PROFILES.get(args.target)
     if not profile:
         print(f'未知目标赛事。可选：{"、".join(PLAN_PROFILES)}')
         sys.exit(2)
     rng = random.Random(args.seed)
-    attempted = {r['id'] for r in load_attempts()}
+    hist = sp.history_by_id(sp.load_attempts_v2())
+    graduated = {pid for pid, recs in hist.items() if sp.is_graduated(recs)}
+    excluded = set(hist) | graduated   # 做过的走复习队列；毕业题永久不进周计划
     total_w = sum(profile.values())
     pool = {}
     for p in problems:
         fm = p['fm'] or {}
-        if fm.get('id') in attempted:
+        if fm.get('id') in excluded:
             continue
         d = fm.get('difficulty')
         if d in profile:
@@ -300,7 +308,8 @@ def coach(problems, args):
         rng.shuffle(lst)
     print(f'=== 教练周计划 | 目标 {args.target} | {args.weeks} 周 × 每周 {args.n} 题 | seed={args.seed} ===\n')
     print('攻坚纪律：限时独立攻坚（' + '，'.join(f'★{d}≤{m}min' for d, m in sorted(TIME_LIMIT.items()) if d in profile)
-          + '）；卡住按「提示阶梯」逐级解锁，每级之间再战 15 分钟；无论成败必须 log。\n')
+          + '）；卡住按「提示阶梯」逐级解锁，每级之间再战 15 分钟；无论成败必须 spar finish 落账。\n')
+    week1 = []
     for w in range(1, args.weeks + 1):
         print(f'—— 第 {w} 周 ——')
         picked = []
@@ -310,11 +319,22 @@ def coach(problems, args):
             for fm in sel:
                 pool[d].remove(fm)
             picked += sel
-        for fm in sorted(picked, key=lambda f: (f['difficulty'], f['id'])):
-            print(f"  {fm['id']}  {'★' * fm['difficulty']:<5} {fm.get('contest') or '?':<6} {fm['title']}")
+        picked.sort(key=lambda f: (f['difficulty'], f['id']))
+        for fm in picked:
+            print(f"  {fm['id']}  {'★' * fm['difficulty']:<5} {fm.get('contest') or '?':<6} {fm['title']}"
+                  f"  → uv run python scripts/bank.py spar {fm['id']}")
         if not picked:
             print('  （题池已耗尽——先复习或扩池）')
+        if w == 1:
+            week1 = [fm['id'] for fm in picked]
         print()
+    if getattr(args, 'save', False):
+        if week1:
+            week = sp.iso_week_str(datetime.date.today())
+            sp.save_plan(week, args.target, args.seed, week1)
+            print(f'已写入 data/plan.json（{week}，第 1 周 {len(week1)} 题）——spar next 会按此计划出题\n')
+        else:
+            print('题池为空，未写 data/plan.json\n')
     print('—— 复习检查 ——')
     review(problems)
 
@@ -518,6 +538,24 @@ def main():
     co.add_argument('--weeks', type=int, default=4)
     co.add_argument('--n', type=int, default=10)
     co.add_argument('--seed', type=int, default=1)
+    co.add_argument('--save', action='store_true', help='把第 1 周选题写入 data/plan.json（spar next 按此出题）')
+    spar = sub.add_parser('spar', help='攻坚会话：start <ID> / next / hint / reveal / finish')
+    spar.add_argument('action', help='start|next|hint|reveal|finish，或直接给题号（= start）')
+    spar.add_argument('target', nargs='?', help='start 的题号')
+    spar.add_argument('--print', dest='print_card', action='store_true', help='start：题卡纯文本输出到 stdout（可打印）')
+    spar.add_argument('--abandon', action='store_true', help='start：放弃当前未关会话再开新卡')
+    spar.add_argument('--mode', choices=['fresh', 'review', 'variant'], help='start：手动指定模式')
+    spar.add_argument('--result', choices=list(sp.RESULTS), help='finish：直接给判定（跳过交互）')
+    spar.add_argument('--retell', choices=['yes', 'no'], help='finish：已看答案时的复述结果（跳过交互）')
+    spar.add_argument('--stuck', choices=list(sp.STUCK_CHOICES), help='finish：卡点五选一')
+    spar.add_argument('--note', help='finish：备注')
+    si = sub.add_parser('similar', help='相似候选（委托 similar_index.py）+ 确认边台账')
+    si.add_argument('id')
+    si.add_argument('--top', type=int, default=20)
+    si.add_argument('--confirm', metavar='DST', help='确认与 DST 的关系，写入 data/similar/edges.jsonl')
+    si.add_argument('--relation', choices=list(sp.RELATIONS))
+    si.add_argument('--confidence', type=float, default=1.0)
+    si.add_argument('--evidence', default='manual', choices=['text', 'formula', 'solution', 'manual'])
     lg = sub.add_parser('log')
     lg.add_argument('--id', required=True)
     lg.add_argument('--result', required=True, choices=['ok', 'hard', 'fail'])
@@ -550,6 +588,10 @@ def main():
         coach(problems, args)
     elif args.cmd == 'log':
         log_attempt(problems, args)
+    elif args.cmd == 'spar':
+        sp.cmd_spar(problems, args)
+    elif args.cmd == 'similar':
+        sp.cmd_similar(problems, args)
     elif args.cmd == 'review':
         review(problems)
     elif args.cmd == 'map':

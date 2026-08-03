@@ -11,7 +11,7 @@
 - `problems/<category>/<ID>.md` —— 一题一文件，YAML frontmatter + 固定小节的正文
 - `taxonomy/` —— 四板块知识点树；`registry.yml` 是知识点正名注册表
 - `docs/` —— 赛事地图、官方题源账本、教练手册
-- `scripts/bank.py` —— 唯一的 CLI 入口（lint/query/stats/plan/coach/log/review/map）
+- `scripts/bank.py` —— 唯一的 CLI 入口（lint/query/stats/plan/map/candidates + coach/spar/log/review/similar 训练闭环；`spar_session.py`、`similar_index.py` 是其辅助模块）
 - `SPEC.md` —— **入库规范，本仓库的最高约束**
 
 ## 唯一的硬门槛

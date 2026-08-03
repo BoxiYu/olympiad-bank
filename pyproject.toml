@@ -11,5 +11,10 @@ dependencies = [
 #   uv run --with sympy python scripts/verify/recheck_xxx.py
 
 [dependency-groups]
+# 测试（tests/）：uv run --group dev pytest -q
+dev = ["pytest>=8"]
 # MathNet 候选池构建（scripts/mathnet_ingest.py）：uv run --group mathnet python ...
 mathnet = ["datasets>=3.0", "pillow>=10"]
+# 相似度设施（scripts/similar_index.py）：uv run --group similar python ...
+# （候选池全量/子集 build 需读 HF 缓存，再叠加 --group mathnet）
+similar = ["sentence-transformers>=3"]
