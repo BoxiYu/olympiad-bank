@@ -1,0 +1,27 @@
+name: lint
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  lint:
+    name: bank.py lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: python -m pip install --quiet pyyaml
+
+      - name: 入库校验
+        run: python3 scripts/bank.py lint
+
+      - name: 分布统计（参考）
+        if: always()
+        run: python3 scripts/bank.py stats
