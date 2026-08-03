@@ -25,6 +25,11 @@ uv run python scripts/bank.py query --difficulty 4       # 按难度检索
 uv run python scripts/bank.py query --topic 韦达         # 按知识点检索
 uv run python scripts/bank.py query --contest IMO --category geometry
 uv run python scripts/bank.py query --unverified         # 列出待二次复核的题
+
+# MathNet 候选池（外部筛题索引，不属正式题库；入库须官方源核验）
+uv run --group mathnet python scripts/mathnet_ingest.py  # 构建候选池（读两张 taxonomy 映射表）
+uv run python scripts/bank.py candidates --category geometry --difficulty 2-3 --node 共线共点定理
+uv run python scripts/bank.py candidates --gaps          # 45 节点缺口采购单：库内 vs 候选
 ```
 
 依赖由 `pyproject.toml` + `uv.lock` 声明（Python ≥3.11 + PyYAML），装好 [uv](https://docs.astral.sh/uv/) 后 `uv run` 会自动解决，无需手动装包。

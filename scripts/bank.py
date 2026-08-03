@@ -399,6 +399,105 @@ def gen_map(problems):
         print(f'未注册 topic {len(unresolved)} 处（跑 lint 看明细）')
 
 
+# ---------------- MathNet 候选池 ----------------
+CANDIDATES = os.path.join(ROOT, 'candidates', 'mathnet.jsonl')
+
+
+def load_candidates():
+    import json
+    if not os.path.exists(CANDIDATES):
+        print('候选池不存在。先构建：uv run --group mathnet python scripts/mathnet_ingest.py')
+        sys.exit(2)
+    return [json.loads(l) for l in open(CANDIDATES, encoding='utf-8') if l.strip()]
+
+
+def _parse_diff(s):
+    """'3' → (3,3)；'2-3' → (2,3)。"""
+    a, _, b = s.partition('-')
+    lo, hi = int(a), int(b or a)
+    return lo, hi
+
+
+CONF_RANK = {'high': 2, 'mid': 1, 'low': 0}
+
+
+def candidates_cmd(problems, args):
+    rows = load_candidates()
+    if args.gaps:
+        return candidates_gaps(problems, rows)
+    pool = [r for r in rows if r['status'] == 'ok']
+    if not args.with_images:
+        pool = [r for r in pool if not r['has_images']]
+    min_conf = CONF_RANK.get(args.conf, 1)
+    pool = [r for r in pool if CONF_RANK[r['difficulty_conf']] >= min_conf]
+    if args.category:
+        pool = [r for r in pool if r['category'] == args.category]
+    if args.difficulty:
+        lo, hi = _parse_diff(args.difficulty)
+        pool = [r for r in pool if lo <= r['difficulty_est'] <= hi]
+    if args.node:
+        pool = [r for r in pool if any(args.node in t for t in r['topics'])]
+    if args.contest:
+        q = args.contest.lower()
+        pool = [r for r in pool if q in (r['contest_raw'] or '').lower() or q in (r['comp_norm'] or '')]
+    if args.lang:
+        q = args.lang.lower()
+        pool = [r for r in pool if q in (r['language'] or '').lower()]
+    if args.grep:
+        rx = re.compile(args.grep, re.I)
+        pool = [r for r in pool if rx.search(r['head'])]
+    if args.stats:
+        diff = {}
+        for r in pool:
+            diff.setdefault(r['difficulty_est'], {}).setdefault(r['category'], 0)
+            diff[r['difficulty_est']][r['category']] += 1
+        header = f"{'':<12}" + ''.join(f'{c[:8]:>10}' for c in CATEGORIES) + f"{'合计':>8}"
+        print(f'候选池分布（当前筛选条件下，共 {len(pool)} 题）'); print(header)
+        for d in sorted(diff):
+            row = diff[d]
+            print(f"{'★' * d:<12}" + ''.join(f'{row.get(c, 0):>10}' for c in CATEGORIES) + f'{sum(row.values()):>8}')
+        return
+    pool.sort(key=lambda r: (r['difficulty_est'], -CONF_RANK[r['difficulty_conf']], r['comp_norm'] or '~', r['mathnet_id']))
+    shown = pool[:args.limit]
+    for r in shown:
+        star = '★' * r['difficulty_est']
+        topics = ' / '.join(r['topics'][:4]) or '（仅板块）'
+        weak = '‹弱›' if r.get('topics_weak_only') else ''
+        img = '图' if r['has_images'] else ''
+        print(f"MN-{r['mathnet_id']}  {star:<5}({r['difficulty_conf'][0]})  {(r['contest_raw'] or '?')[:34]:<34} {r['year'] or '----'} {img:<2} [{topics}]{weak}")
+        print(f"       {r['head'][:76]}")
+    print(f'\n匹配 {len(pool)} 题，显示前 {len(shown)}（--limit 调整；est 为估级非定级，入库时按 SPEC 定稿）')
+
+
+def candidates_gaps(problems, rows):
+    """45 节点采购单：库内现有 vs 候选可补（含中低星细分）。"""
+    reg = load_registry()
+    bank = {}
+    for p in problems:
+        fm = p['fm'] or {}
+        for t in fm.get('topics', []) or []:
+            node = resolve_topic(reg, fm.get('category'), t)
+            if node:
+                bank.setdefault((fm['category'], node), set()).add(fm['id'])
+    cand, cand_low = {}, {}
+    for r in rows:
+        if r['status'] != 'ok':
+            continue
+        for node in r['topics']:
+            k = (r['category'], node)
+            cand[k] = cand.get(k, 0) + 1
+            if r['difficulty_est'] <= 3:
+                cand_low[k] = cand_low.get(k, 0) + 1
+    print(f"{'板块':<6} {'知识点':<14} {'库内':>4} {'候选':>6} {'候选★≤3':>7}")
+    for cat in CATEGORIES:
+        for node in (reg.get(cat) or {}):
+            k = (cat, node)
+            b = len(bank.get(k, ()))
+            mark = ' ←缺' if b <= 2 else ''
+            print(f'{CAT_LABEL[cat]:<6} {node:<14} {b:>4} {cand.get(k, 0):>6} {cand_low.get(k, 0):>7}{mark}')
+    print('\n「←缺」= 库内 ≤2 题的薄弱节点；候选数为标签流估计，入库前须官方源核验。')
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest='cmd', required=True)
@@ -427,6 +526,18 @@ def main():
     lg.add_argument('--note')
     sub.add_parser('review')
     sub.add_parser('map')
+    ca = sub.add_parser('candidates')
+    ca.add_argument('--category', choices=CATEGORIES)
+    ca.add_argument('--difficulty', help='单值 3 或区间 2-3（估级）')
+    ca.add_argument('--node', help='知识点（registry 规范节点名，子串匹配）')
+    ca.add_argument('--contest', help='赛事名子串')
+    ca.add_argument('--lang', help='语言子串，如 english')
+    ca.add_argument('--grep', help='题面预览正则（Ramsey 类标签盖不住的召回旁路）')
+    ca.add_argument('--conf', default='mid', choices=['high', 'mid', 'low'], help='最低置信度，默认 mid')
+    ca.add_argument('--with-images', action='store_true', help='包含带图题（默认排除）')
+    ca.add_argument('--limit', type=int, default=20)
+    ca.add_argument('--stats', action='store_true', help='只看 难度×板块 分布')
+    ca.add_argument('--gaps', action='store_true', help='45 节点缺口采购单：库内 vs 候选')
     args = ap.parse_args()
     problems = load_all()
     if args.cmd == 'lint':
@@ -443,6 +554,8 @@ def main():
         review(problems)
     elif args.cmd == 'map':
         gen_map(problems)
+    elif args.cmd == 'candidates':
+        candidates_cmd(problems, args)
     else:
         stats(problems)
 

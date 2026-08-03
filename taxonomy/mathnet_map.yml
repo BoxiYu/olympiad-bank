@@ -7,6 +7,16 @@
 # 生成：2026-08-03，AI 分板块起草+对抗审核；175 条路径完备覆盖 ShadenA/MathNet v0 全库（27,817 行）。
 # 维护：数据集升级出现新路径时 → 补表（map/ignore 三选一）后再跑管线；节点名以 registry.yml 为唯一真理源。
 version: 1
+# keyword_rules：MathNet 标签树盖不住的节点走全文正则召回（仅当该行已投对应板块票时附加，控误报）
+keyword_rules:
+- pattern: (?i)\bramsey\b|monochromatic
+  category: combinatorics
+  node: Ramsey 型问题
+  note: 标签树无 Ramsey 叶子（最近仅 van der Waerden 3 行且挂在被 ignore 的代数数论下）
+- pattern: (?i)lifting the exponent|\bLTE\b|p-adic|v_\{?p\}?\(|\\nu_p
+  category: number-theory
+  node: p-adic 赋值与 LTE
+  note: 标签树无对应叶子，靠 LTE/p 进赋值记号召回
 normalize:
 - from: 'Algebra > Algebraic Expressions > Polynomials > Irreducibility: Rational Root Theorem, Gauss’s Lemma'
   to: 'Algebra > Algebraic Expressions > Polynomials > Irreducibility: Rational Root Theorem, Gauss''s Lemma'
