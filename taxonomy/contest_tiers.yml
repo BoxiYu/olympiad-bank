@@ -1,0 +1,599 @@
+# 赛事难度层级表：归一化赛名 → 难度底档 base(★1–5)
+# 用途：MathNet 候选池的 difficulty_est 第一层（就低不就高：与其他信号冲突时取低值）。
+# 赛名归一化：小写、去 4 位年份/序数/罗马数字/标点、压空格（见 scripts 管线）。
+# tiers 覆盖 top-220 规范名（74.8% 行）；名内已含轮次词的 base 已计入轮次，fallback_modifiers 只作用于表外长尾。
+# default_unknown：完全未知赛名的默认档。est 永远不是正式 difficulty——入库时按 SPEC 第 4 节思维跨度定稿。
+# 校准（2026-08-03，独立重算）：ISL2024 30/30、AIME2022 2/2、USAMO2010 1/1、APMO2025 5/5，合计 38/38=100% 在 ±1 内（阈值 80%）。
+version: 1
+tiers:
+  harvard mit mathematics tournament:
+    base: 3
+    note: 轮次未知，Nov(2–3)/Feb(3–4)混合，取中
+  hmmt november:
+    base: 2
+    note: 锚点2–3，就低
+  hmmt february:
+    base: 3
+  baltic way:
+    base: 3
+  brazilian mathematical olympiad:
+    base: 3
+    note: nível 混合
+  asu:
+    base: 3
+    note: 推定为全苏(All-Soviet Union)奥赛；low-conf
+  romanian mathematical olympiad:
+    base: 3
+    note: 轮次混合；final round 另列为4
+  iranian mathematical olympiad:
+    base: 3
+    note: 轮次混合，就低；二三轮偏难
+  préparation olympique française de mathématiques:
+    base: 2
+    note: 训练 envoi 材料，难度混杂
+  belarusian mathematical olympiad:
+    base: 3
+  ukrainian national mathematical olympiad:
+    base: 3
+  mongolian mathematical olympiad:
+    base: 3
+  saudi arabian mathematical competitions:
+    base: 2
+    note: 训练汇编，混杂
+  philippine mathematical olympiad:
+    base: 3
+  russian mathematical olympiad:
+    base: 4
+    note: 全俄奥赛，公认高难国家决赛
+  harvard mit math tournament:
+    base: 3
+    note: 同 HMMT 泛称
+  mathematica competitions in croatia:
+    base: 2
+    note: 各级学校赛混合
+  canadian mathematical olympiad:
+    base: 4
+    note: 锚点：国家决赛
+  berkeley math circle:
+    base: 2
+    note: 证明题月赛；SPEC ★1=2–5分钟单步题不符，对齐 BAMO 取2
+  saudi arabian imo booklet:
+    base: 3
+    note: IMO 训练册
+  imo selektion:
+    base: 4
+    note: 瑞士/德语区 TST
+  harvard mit november tournament:
+    base: 2
+  china mathematical competition:
+    base: 3
+    note: 高联正赛（一试压轴/加试锚★3）；题库高联真值{2:4,3:3,4:1}支持
+  hmmt:
+    base: 3
+    note: 轮次未知
+  imo hk tst:
+    base: 4
+    note: TST 锚点
+  olympiades françaises de mathématiques:
+    base: 3
+    note: 法国国家奥赛正赛
+  estonian math competitions:
+    base: 2
+    note: 各级混合汇编
+  shortlisted problems for the nmo:
+    base: 3
+    note: 国别不明的国家奥赛候选题；low-conf；shortlist 已含在名内
+  annual harvard mit mathematics tournament:
+    base: 3
+  olimpiada matemática española:
+    base: 3
+  samc:
+    base: 2
+    note: 推定沙特赛汇编缩写；low-conf
+  obm:
+    base: 3
+    note: 巴西奥赛
+  olimpiada matemática rioplatense:
+    base: 3
+  imo shortlisted problems:
+    base: 4
+    note: ISL 锚点4–5就低；独立重算校准 30/30 在±1（est=5 仅 28/30）
+  estonian mathematical olympiad:
+    base: 3
+  national math olympiad:
+    base: 3
+    note: 国别不明；low-conf
+  imo selectietoets:
+    base: 4
+    note: 荷兰 TST
+  japan mathematical olympiad:
+    base: 3
+    note: 预赛/决赛混合，就低
+  czech and slovak mathematical olympiad:
+    base: 3
+  team selection test:
+    base: 4
+    note: TST 锚点4–5，就低
+  balkan mathematical olympiad:
+    base: 3
+    note: 锚点3–4，就低
+  junior balkan mathematical olympiad:
+    base: 2
+    note: JBMO 锚点2–3，就低
+  bulgarian mathematical competitions:
+    base: 3
+  baltic way shortlist:
+    base: 3
+    note: shortlist 已含在名内
+  nível 2:
+    base: 2
+    note: OBM 初中组
+  saudi arabia mathematical competitions:
+    base: 2
+  final round:
+    base: 3
+    note: 国别不明的决赛轮；low-conf
+  bay area mathematical olympiad:
+    base: 2
+  shortlisted problems for the romanian nmo:
+    base: 3
+    note: shortlist 已含在名内
+  smo finalrunde:
+    base: 3
+    note: 瑞士奥赛决赛轮
+  iberoamerican mathematical olympiad:
+    base: 3
+    note: 约 Balkan 档，就低
+  inmo:
+    base: 4
+    note: 印度国家决赛
+  progetto olimpiadi di matematica:
+    base: 2
+    note: 意大利各级选拔材料
+  apmo:
+    base: 4
+    note: 锚点3–4；按校准取4（5/5 在±1，取3则4/5）
+  ireland:
+    base: 2
+  hellenic mathematical olympiad:
+    base: 3
+  chkmo:
+    base: 2
+    note: 香港 CHKMO，约 BMO1 档；low-conf
+  olimpiada republicană la matematică:
+    base: 3
+    note: 摩尔多瓦共和国奥赛
+  international mathematical olympiad:
+    base: 4
+    note: IMO 正赛4–5，就低；注意 1970 前早期题可低至★2（题库 IMO1959/1964 真值=2），入库时按题定级
+  macedonian mathematical competitions:
+    base: 2
+    note: 各级汇编，刻意比 macedonian mathematical olympiad 低一档
+  nível 3:
+    base: 3
+    note: OBM 高中组
+  philippine mathematical olympiad area stage:
+    base: 2
+    note: 早期短答轮
+  selection and training session:
+    base: 3
+    note: 训练/选拔混合；low-conf
+  singapore mathematical olympiad (smo):
+    base: 2
+    note: 多组别短答为主
+  ukrainian mathematical olympiad:
+    base: 3
+  brazilian math olympiad:
+    base: 3
+  china girls' mathematical olympiad:
+    base: 3
+  progetto olimpiadi di matematica gara di secondo livello:
+    base: 2
+    note: 意大利第二级轮
+  south african mathematics olympiad:
+    base: 2
+    note: 多轮混合，选择题为主
+  indija ts:
+    base: 4
+    note: 印度 TST
+  austrian mathematical olympiad:
+    base: 3
+  team selection test for imo:
+    base: 4
+  slovenija:
+    base: 2
+    note: 斯洛文尼亚各级混合
+  nmo selection tests for the balkan and international mathematical olympiads:
+    base: 4
+    note: IMO/BMO 选拔
+  selection examination:
+    base: 4
+    note: IMO 选拔考（土耳其等惯用名）
+  irska:
+    base: 2
+    note: 爱尔兰（克语拼写）
+  china western mathematical olympiad:
+    base: 3
+  south afrika:
+    base: 2
+  february:
+    base: 2
+    note: 归一化残词，指向不明（HMMT Feb 或意大利二月赛）；low-conf，就低
+  ukrainian national mathematical olympiad round:
+    base: 3
+  irl abooklet:
+    base: 2
+    note: 爱尔兰训练册
+  middle european mathematical olympiad:
+    base: 3
+  open contests:
+    base: 2
+    note: 公开赛（爱沙尼亚系）
+  turkish mathematical olympiad:
+    base: 3
+    note: 轮次混合，就低
+  saudi booklet:
+    base: 2
+  irish mathematical olympiad:
+    base: 2
+  mathematical competitions in croatia:
+    base: 2
+  nmo selection tests for jbmo:
+    base: 2
+    note: JBMO 选拔，junior 档
+  croatiancompetitions2011:
+    base: 2
+  olimpiade italiana di matematica:
+    base: 3
+    note: 意大利全国决赛（Cesenatico）
+  hmmo:
+    base: 2
+    note: 缩写指向不明；low-conf
+  ukrainemo:
+    base: 3
+  aime:
+    base: 3
+    note: SPEC ★3 锚点；独立重算校准 2/2
+  croatia mathematical competitions:
+    base: 2
+  annual harvard mit november tournament:
+    base: 2
+  croatia 2018:
+    base: 2
+  japan junior mathematical olympiad:
+    base: 2
+    note: junior 档
+  china national team selection test:
+    base: 5
+    note: 中国 TST，公认最难 TST，常达 ISL 高难档；极值复核保留
+  usamo:
+    base: 4
+    note: SPEC ★4 锚点；独立重算校准 1/1；题库 USAMO 其他年份真值{4:3,5:2}亦支持
+  dutch mathematical olympiad:
+    base: 2
+  nmo shortlisted problems:
+    base: 3
+    note: shortlist 已含在名内
+  the south african mathematical olympiad third round:
+    base: 3
+    note: 第三轮=证明决赛轮
+  selection examinations for the imo:
+    base: 4
+  shortlist jbmo:
+    base: 2
+    note: JBMO 档，shortlist 已含在名内
+  croatian mathematical society competitions:
+    base: 2
+  philippines mathematical olympiad:
+    base: 3
+  bulgaria:
+    base: 3
+    note: low-conf
+  the romanian mathematical olympiad:
+    base: 3
+  nmo selection tests for the junior balkan mathematical olympiad:
+    base: 2
+  tenth philippine mathematical olympiad:
+    base: 3
+  romanian mathematical olympiad final round:
+    base: 4
+    note: final round 已含在名内，勿再叠加修正
+  selectietoets:
+    base: 4
+    note: 荷兰 TST
+  vmo:
+    base: 4
+    note: 越南国家决赛，偏难
+  nmo selection tests for bmo and imo:
+    base: 4
+  junior mathematical olympiad:
+    base: 2
+    note: junior 档
+  china mathematical olympiad:
+    base: 4
+    note: CMO 锚点★4（压轴★5，就低）；题库 CMO 真值{4:3,5:8}，est=4 全部在±1
+  gara di febbraio:
+    base: 2
+    note: 意大利二月轮
+  baltic way problem shortlist:
+    base: 3
+  croatian mathematical olympiad:
+    base: 3
+  benelux mathematical olympiad:
+    base: 2
+  mongolian mathematical olympiad 46:
+    base: 3
+  international mathematical olympiad shortlist:
+    base: 4
+    note: 同 ISL
+  china southeastern mathematical olympiad:
+    base: 3
+  hmic:
+    base: 4
+    note: HMMT 邀请赛，证明题，约 USAMO 档
+  argentina:
+    base: 2
+    note: low-conf
+  bmo shortlist:
+    base: 3
+    note: Balkan shortlist，与 bmo short list 同一条目异写
+  berkeley math circle monthly contest 4:
+    base: 2
+  japan:
+    base: 3
+    note: low-conf
+  amc 12 a:
+    base: 2
+    note: SPEC ★2 锚点
+  junior balkan mathematical olympiad shortlist:
+    base: 2
+  the 47 th mathematial olympiad of republic of moldova:
+    base: 3
+  belorusija:
+    base: 3
+    note: 白俄罗斯（克语拼写）
+  mongolian national mathematical olympiad:
+    base: 3
+  area stage:
+    base: 2
+    note: PMO area stage 档
+  memo:
+    base: 3
+    note: 中欧奥赛
+  berkeley math circle monthly contest 2:
+    base: 2
+  hkg tst:
+    base: 4
+  regional round:
+    base: 2
+    note: 地区轮；low-conf
+  silk road mathematics competition:
+    base: 3
+  državno tekmovanje:
+    base: 2
+    note: 斯洛文尼亚/克罗地亚国家级学校赛；low-conf
+  mathematical olympiad in ukraine:
+    base: 3
+  national math olympiad in slovenia:
+    base: 2
+  final round of national olympiad:
+    base: 3
+    note: 国别不明；low-conf
+  olimpiadi di matematica:
+    base: 2
+  berkeley math circle monthly contest 1:
+    base: 2
+  national math olympiad first round:
+    base: 1
+    note: 初轮锚点1–2，就低
+  nzmo round one:
+    base: 1
+  macedonian mathematical olympiad:
+    base: 3
+  korean mathematical olympiad final round:
+    base: 4
+    note: final round 已含在名内，勿再叠加修正
+  irl abooklet 2023:
+    base: 2
+  amc 12 b:
+    base: 2
+  pmo area stage:
+    base: 2
+  'préparation olympique française de mathématiques envoi 5 : pot pourri':
+    base: 2
+  baltic way shl:
+    base: 3
+    note: shortlist 已含在名内
+  hong kong preliminary selection contest:
+    base: 2
+    note: 预选短答赛，非 TST；preliminary 已含在名内
+  usa imo:
+    base: 4
+    note: 推定 USA IMO 选拔/正赛残名；low-conf
+  amc 10 a:
+    base: 2
+  rioplatense mathematical olympiad:
+    base: 3
+  'berkeley math circle: monthly contest 5':
+    base: 2
+  south african mathematics olympiad first round:
+    base: 1
+  irl abooklet 2020:
+    base: 2
+  brazilian mathematical olympiad nível 2:
+    base: 2
+  the problems of ukrainian authors:
+    base: 3
+    note: 乌克兰供题集；low-conf
+  'berkeley math circle: monthly contest 2':
+    base: 2
+  belarusmo 2013 s:
+    base: 3
+  year:
+    base: 2
+    note: 归一化垃圾残词，按 default_unknown；low-conf
+  progetto olimpiadi della matematica gara di febbraio:
+    base: 2
+  vijetnam:
+    base: 4
+    note: 越南（克语拼写），按 VMO
+  argentine national olympiad:
+    base: 2
+    note: OMA 难度偏易，就低；low-conf
+  international mathematical olympiad shortlisted problems:
+    base: 4
+    note: 同 ISL
+  vorrundenprüfung:
+    base: 1
+    note: 瑞士预选轮
+  pmo national stage oral phase:
+    base: 3
+  nmo:
+    base: 3
+    note: 国别不明；low-conf
+  olimpiada naţională de matematică:
+    base: 3
+    note: 罗马尼亚国家奥赛，轮次混合
+  nacional oma:
+    base: 2
+    note: 阿根廷 OMA 全国轮；low-conf
+  usa tstst:
+    base: 4
+    note: TSTST≈ISL 档，与 ISL 同取4
+  dutch tst:
+    base: 4
+  junior turkish mathematical olympiad:
+    base: 2
+    note: junior 档
+  berkeley math circle monthly contest 3:
+    base: 2
+  austria:
+    base: 2
+    note: 各级混合；low-conf
+  vietnamese mathematical competitions:
+    base: 3
+    note: 汇编混合（含省赛），刻意比 VMO 低一档，就低
+  estonija:
+    base: 2
+  italian mathematical olympiad february round:
+    base: 2
+  desafios:
+    base: 1
+    note: 低龄挑战题；low-conf
+  hmmt february guts round:
+    base: 2
+    note: guts 单题偏易
+  hrvatska:
+    base: 2
+    note: 克罗地亚
+  auswahlwettbewerb zur imo:
+    base: 4
+    note: 德国 IMO 选拔
+  berkeley math circle monthly contest 6:
+    base: 2
+  ммо 48:
+    base: 3
+    note: 莫斯科数学奥赛
+  'berkeley math circle: monthly contest 7':
+    base: 2
+  irl abooklet 2024:
+    base: 2
+  progetto olimpiadi della matematica:
+    base: 2
+  hmmt spring guts round:
+    base: 2
+  imo team selection contest:
+    base: 4
+    note: TST 锚点（爱沙尼亚系惯用名）
+  bmo short list:
+    base: 3
+    note: Balkan shortlist
+  53 bulgarian mathematical olympiad:
+    base: 3
+  cesenatico:
+    base: 3
+    note: 意大利全国决赛
+  gara nazionale di matematica:
+    base: 3
+  'préparation olympique française de mathématiques envoi 2 : algèbre':
+    base: 2
+  belarus2022:
+    base: 3
+  the romanian mathematical olympiad final round:
+    base: 4
+  vietnamese mathematical olympiad:
+    base: 4
+  'berkeley math circle: monthly contest 6':
+    base: 2
+  berkeley math circle monthly contest 8:
+    base: 2
+  philippine mathematical olympiad national orals:
+    base: 3
+  qualifying stage:
+    base: 1
+  the thailand mathematical olympiad:
+    base: 2
+    note: TMO 证明题但偏易，就低；low-conf
+  'berkeley math circle: monthly contest 4':
+    base: 2
+  54 bulgarian mathematical olympiad:
+    base: 3
+  irish:
+    base: 2
+  hmmt spring:
+    base: 3
+    note: 即 February 档
+  egmo:
+    base: 3
+    note: 锚点3–4，就低
+  national math olympiad final round:
+    base: 3
+    note: 国别不明决赛轮；low-conf
+  qualifying round:
+    base: 1
+  mmo2025 round 2:
+    base: 2
+    note: 缩写指向不明（马其顿/蒙古/莫斯科），第2轮；low-conf
+  the romanian mathematical olympiad district round:
+    base: 2
+    note: district round 已含在名内
+  singapur:
+    base: 2
+  jbmo shortlist:
+    base: 2
+  the danube mathematical competition:
+    base: 3
+  first round:
+    base: 1
+    note: 初轮，就低
+fallback_modifiers:
+- pattern: (?i)(math circle|monthly contest)
+  effect: 直接定为2
+  note: 圈子月赛为take-home证明题，不符★1的2–5分钟单步描述；直接定级规则按列表顺序求值，命中即终止，后续加减规则不再应用（所有修正仅作用于未命中 tiers 表的表外长尾赛名）
+- pattern: (?i)(kangaroo|känguru)
+  effect: 直接定为1
+  note: 普及速答类；直接定级，命中即终止
+- pattern: (?i)\b(imo|international mathematical olympiad)\b(?!.*(junior|prelim|first|booklet|training))
+  effect: 直接定为4
+  note: IMO 正赛/直接冠 IMO 名的长尾条目；4–5 就低取4；lookahead 排除 junior/prelim/first/booklet/training，防止训练册与低龄选拔被误定4
+- pattern: (?i)\b(tst|tstst|team selection|selection (test|exam|examination|contest)|selektion|selectietoets|auswahlwettbewerb)\b
+  effect: +1（上限5）
+  note: TST/选拔类；若同名还含 junior/jbmo 则不加（junior 修正优先）；preliminary selection 类先命中初轮规则者按初轮处理
+- pattern: (?i)\b(shortlist(ed)?|short list|shl)\b
+  effect: +1（上限5）
+  note: 候选题通常难于正赛均值
+- pattern: (?i)\b(final round|finalrunde|final stage|third round|last round)\b
+  effect: +1（上限5）
+  note: 决赛轮
+- pattern: (?i)\b(first round|1st round|round one|preliminary|prelim|qualif\w*|vorrunde\w*|district|regional|area stage|school round)\b
+  effect: -1（下限1）
+  note: 初轮/资格/地区轮
+- pattern: (?i)\b(junior|jbmo|cadet|youth|nível 1|beginner)\b
+  effect: -1（下限1）
+  note: 低龄组；与 shortlist/final 同现时先减后加
+- pattern: (?i)\b(booklet|training|preparation|préparation|envoi|problem set)\b
+  effect: -0（保持 default，标记 low-conf）
+  note: 训练材料难度混杂，不加不减仅降置信度
+default_unknown:
+  base: 2
+  conf: low

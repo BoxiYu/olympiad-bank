@@ -1,0 +1,677 @@
+# MathNet topics_flat → taxonomy/registry.yml 规范节点映射表
+# 用途：MathNet 候选池管线的「知识点—标签流」查表层；registry.yml 与 lint 零改动。
+# 结构：normalize（查表前字符串归一化：NFC、压空格、弯引号转直、修已知拼写变体）
+#       map（归一化路径 → 板块+规范节点；weak=true 为解题动作类兜底标签，仅当该题无其他标签时计入）
+#       board_only（只能定板块的 Other/无叶截断路径，知识点留待读题旁路）
+#       ignore（超奥数口径，显式排除——不允许静默丢弃）
+# 生成：2026-08-03，AI 分板块起草+对抗审核；175 条路径完备覆盖 ShadenA/MathNet v0 全库（27,817 行）。
+# 维护：数据集升级出现新路径时 → 补表（map/ignore 三选一）后再跑管线；节点名以 registry.yml 为唯一真理源。
+version: 1
+normalize:
+- from: 'Algebra > Algebraic Expressions > Polynomials > Irreducibility: Rational Root Theorem, Gauss’s Lemma'
+  to: 'Algebra > Algebraic Expressions > Polynomials > Irreducibility: Rational Root Theorem, Gauss''s Lemma'
+- from: Geometry > Plane Geometry > Quadrilaterals > Cyclic quadrilaterials
+  to: Geometry > Plane Geometry > Quadrilaterals > Cyclic quadrilaterals
+- from: Geometry > Plane Geometry > Quadrilaterals > Inscribed/circumscribed quadrilaterials
+  to: Geometry > Plane Geometry > Quadrilaterals > Inscribed/circumscribed quadrilaterals
+- from: Geometry > Plane Geometry > Quadrilaterals > Inscribed/circumscribed quadrilaterrals
+  to: Geometry > Plane Geometry > Quadrilaterals > Inscribed/circumscribed quadrilaterals
+- from: 'Geometry > Plane Geometry > Triangles > Triangle centers: centroid, incenter,    circumcenter, Euler line, nine-point circle'
+  to: 'Geometry > Plane Geometry > Triangles > Triangle centers: centroid, incenter, circumcenter, Euler line, nine-point circle'
+- from: 'Geometry > Plane Geometry > Triangles > Triangle centers: centroid, incenter, circumcenter, Euler line, nine-point circle'
+  to: 'Geometry > Plane Geometry > Triangles > Triangle centers: centroid, incenter, circumcenter, orthocenter, Euler line, nine-point circle'
+map:
+  Geometry > Plane Geometry > Miscellaneous > Angle chasing:
+    category: geometry
+    node: 三角形与四边形基本性质
+    weak: true
+    reason: 导角是解题动作非知识点，registry 该节点已有别名「角度计数」，作兜底
+  Discrete Mathematics > Combinatorics > Coloring schemes, extremal arguments:
+    category: combinatorics
+    node: 染色与不变量
+    weak: true
+    reason: 标签并置染色与极端论证两类技法：染色取头词映射到染色与不变量，但极端论证部分本应属极端原理，单节点映射有损，故标弱作兜底
+  ? 'Geometry > Plane Geometry > Triangles > Triangle centers: centroid, incenter, circumcenter, orthocenter, Euler line, nine-point circle'
+  : category: geometry
+    node: 三角形五心与经典引理
+    reason: 五心、欧拉线、九点圆正是该节点的核心内容
+  Number Theory > Divisibility / Factorization > Factorization techniques:
+    category: number-theory
+    node: 素数与算术基本定理
+    reason: 因式分解技巧（平方差分解、链分解、Zsygmondy 型分解等）在 registry 中正是该节点的别名族，对应算术基本定理层面的分解
+  Geometry > Plane Geometry > Quadrilaterals > Cyclic quadrilaterals:
+    category: geometry
+    node: 圆与四点共圆
+    reason: 圆内接四边形即四点共圆，节点别名直接含「四点共圆」
+  Geometry > Plane Geometry > Circles > Tangents:
+    category: geometry
+    node: 圆与四点共圆
+    reason: 切线性质归圆的基本节点，别名含「圆的切线」「弦切角」
+  Discrete Mathematics > Combinatorics > Invariants / monovariants:
+    category: combinatorics
+    node: 染色与不变量
+    reason: 不变量/单调量正是该节点内涵，registry 别名已含「不变量」「单调量」
+  'Number Theory > Diophantine Equations > Techniques: modulo, size analysis, order analysis, inequalities':
+    category: number-theory
+    node: 不定方程
+    reason: 叶子是解法枚举，但父级 Diophantine Equations 已精确锁定知识点为不定方程
+  Algebra > Algebraic Expressions > Polynomials > Polynomial operations:
+    category: algebra
+    node: 多项式
+    reason: 多项式四则与恒等运算即多项式节点核心内容
+  Geometry > Plane Geometry > Miscellaneous > Distance chasing:
+    category: geometry
+    node: 面积法与三角法
+    weak: true
+    reason: 算长度是解题动作，正余弦定理等度量计算最接近三角法节点，仅作兜底
+  Algebra > Equations and Inequalities > Linear and quadratic inequalities:
+    category: algebra
+    node: 不等式
+    reason: 一次二次不等式直接归不等式节点
+  Algebra > Prealgebra / Basic Algebra > Integers:
+    category: algebra
+    node: 代数变换技巧
+    weak: true
+    reason: 基础整数运算杂类无对应知识点，技巧节点兜底，内容混杂待读题细化
+  Discrete Mathematics > Combinatorics > Counting two ways:
+    category: combinatorics
+    node: 计数与容斥
+    reason: 算两次即双计数，registry 该节点别名已含「双计数」
+  Number Theory > Divisibility / Factorization > Prime numbers:
+    category: number-theory
+    node: 素数与算术基本定理
+    reason: 素数性质与素因子分解直接对应该节点
+  Geometry > Plane Geometry > Miscellaneous > Constructions and loci:
+    category: geometry
+    node: 三角形与四边形基本性质
+    weak: true
+    reason: 作图与轨迹无专门节点，Miscellaneous 泛化标签兜底到最粗的基本性质节点
+  Number Theory > Divisibility / Factorization > Greatest common divisors (gcd):
+    category: number-theory
+    node: 最大公约数与欧几里得算法
+    reason: gcd 即该节点本体，别名含最大公约数、欧几里得算法
+  Discrete Mathematics > Combinatorics > Pigeonhole principle:
+    category: combinatorics
+    node: 抽屉原理
+    reason: 鸽笼原理与节点抽屉原理一一对应
+  Algebra > Algebraic Expressions > Sequences and Series > Sums and products:
+    category: algebra
+    node: 数列与递推
+    reason: 数列求和求积归数列与递推（别名含求和公式）
+  Geometry > Plane Geometry > Triangles > Triangle trigonometry:
+    category: geometry
+    node: 面积法与三角法
+    reason: 三角形中正余弦定理与三角计算即「三角法」，别名含「面积法与正弦定理」
+  Algebra > Algebraic Expressions > Sequences and Series > Recurrence relations:
+    category: algebra
+    node: 数列与递推
+    reason: 递推关系即节点名义内容
+  Algebra > Equations and Inequalities > QM-AM-GM-HM / Power Mean:
+    category: algebra
+    node: 不等式
+    reason: 均值/幂平均不等式，registry 别名含 AM-GM、幂平均
+  Geometry > Plane Geometry > Analytic / Coordinate Methods > Cartesian coordinates:
+    category: geometry
+    node: 解析几何与向量复数法
+    reason: 笛卡尔坐标法即解析几何（坐标法）
+  Discrete Mathematics > Combinatorics > Games / greedy algorithms:
+    category: combinatorics
+    node: 组合博弈与策略
+    weak: true
+    reason: 博弈为头词归组合博弈与策略；但标签并置贪心算法（属组合构造别名「贪心与算法构造」），与 Coloring/extremal 同类双技法压缩，标弱
+  Discrete Mathematics > Combinatorics > Recursion, bijection:
+    category: combinatorics
+    node: 递推与生成结构
+    reason: 递推为头词且节点别名含「递推」，双射是与递推同源的结构化计数手段
+  Algebra > Prealgebra / Basic Algebra > Simple Equations:
+    category: algebra
+    node: 方程与设元
+    reason: 简单方程即设元列式解方程，别名含一次方程组
+  Number Theory > Modular Arithmetic:
+    category: number-theory
+    node: 整除与同余
+    reason: 模算术即同余，二级路径本身就是知识点，归主干节点整除与同余
+  Geometry > Plane Geometry > Transformations > Homothety:
+    category: geometry
+    node: 相似位似与全等
+    reason: 位似是该节点核心，别名直接含「位似」
+  Geometry > Plane Geometry > Analytic / Coordinate Methods > Trigonometry:
+    category: geometry
+    node: 面积法与三角法
+    reason: 作为几何计算方法的三角运算归三角法节点
+  Algebra > Intermediate Algebra > Quadratic functions:
+    category: algebra
+    node: 根与系数
+    reason: 二次函数题核心为根、判别式与系数关系，归韦达系节点
+  Algebra > Algebraic Expressions > Functional Equations:
+    category: algebra
+    node: 函数方程
+    reason: 同名直配
+  Geometry > Plane Geometry > Circles > Radical axis theorem:
+    category: geometry
+    node: 根轴与幂
+    reason: 根轴定理逐字对应该节点，别名含「根轴」
+  Number Theory > Modular Arithmetic > Fermat / Euler / Wilson theorems:
+    category: number-theory
+    node: 费马小定理与欧拉定理
+    reason: 费马/欧拉定理是节点本体，Wilson 定理奥数惯例同归此类（registry 另有 Wilson 定理式估计仅作估计用法）
+  Geometry > Plane Geometry > Geometric Inequalities > Optimization in geometry:
+    category: algebra
+    node: 不等式
+    reason: 几何极值/最优化本质是不等式论证，registry 不等式节点含「边界极值」「组合优化」等别名，几何板块无不等式节点
+  Algebra > Equations and Inequalities > Cauchy-Schwarz:
+    category: algebra
+    node: 不等式
+    reason: 柯西不等式，registry 别名含 Cauchy
+  Number Theory > Divisibility / Factorization:
+    category: number-theory
+    node: 整除与同余
+    reason: 无叶截断但二级名本身有信息：整除性归整除与同余主干节点
+  Algebra > Algebraic Expressions > Polynomials > Vieta's formulas:
+    category: algebra
+    node: 根与系数
+    reason: 韦达定理是根与系数节点的注册别名
+  Geometry > Plane Geometry > Triangles:
+    category: geometry
+    node: 三角形与四边形基本性质
+    reason: 裸三角形子类无更细信息，归最粗的三角形基本性质节点
+  Geometry > Plane Geometry > Transformations > Rotation:
+    category: geometry
+    node: 变换几何
+    reason: 纯旋转变换归变换几何（旋转相似另属相似位似节点）
+  Algebra > Algebraic Expressions > Sequences and Series > Floors and ceilings:
+    category: algebra
+    node: 数列与递推
+    reason: 取整函数为数列与递推注册别名，且父路径在数列下
+  Discrete Mathematics > Combinatorics > Enumeration with symmetry:
+    category: combinatorics
+    node: 计数与容斥
+    reason: 对称计数（Burnside/轨道式）体系内无细分节点，归入计数总节点最稳
+  Algebra > Algebraic Expressions > Polynomials > Symmetric functions:
+    category: algebra
+    node: 根与系数
+    reason: 根的对称多项式经韦达与牛顿恒等式处理
+  Algebra > Algebraic Expressions > Functional Equations > Injectivity / surjectivity:
+    category: algebra
+    node: 函数方程
+    reason: 单射满射是函数方程标准手法，别名含单射性
+  Geometry > Plane Geometry > Analytic / Coordinate Methods > Vectors:
+    category: geometry
+    node: 解析几何与向量复数法
+    reason: 向量法是该节点明示的方法之一
+  Algebra > Prealgebra / Basic Algebra > Fractions:
+    category: algebra
+    node: 代数变换技巧
+    weak: true
+    reason: 分数基础运算类无独立知识点，技巧节点兜底
+  Number Theory > Modular Arithmetic > Inverses mod n:
+    category: number-theory
+    node: 整除与同余
+    reason: 模逆元对应该节点别名逆元技巧
+  Discrete Mathematics > Graph Theory:
+    category: combinatorics
+    node: 图论
+    reason: 裸 Graph Theory 与节点图论一一对应（口径已定），非无信息截断
+  Algebra > Intermediate Algebra > Complex numbers:
+    category: algebra
+    node: 复数与三角
+    reason: 复数直配复数与三角节点
+  Number Theory > Modular Arithmetic > Chinese remainder theorem:
+    category: number-theory
+    node: 中国剩余定理
+    reason: 同名节点直接对应
+  Algebra > Algebraic Expressions > Functional Equations > Existential quantifiers:
+    category: algebra
+    node: 函数方程
+    reason: 量词型条件仍是函数方程子技法
+  Number Theory > Residues and Primitive Roots > Multiplicative order:
+    category: number-theory
+    node: 阶与原根
+    reason: 乘法阶即该节点别名「阶」
+  Geometry > Plane Geometry > Quadrilaterals:
+    category: geometry
+    node: 三角形与四边形基本性质
+    reason: 裸四边形子类归三角形与四边形基本性质
+  Discrete Mathematics > Combinatorics > Algebraic properties of binomial coefficients:
+    category: combinatorics
+    node: 计数与容斥
+    reason: 二项式系数恒等式与代数性质按奥数惯例归组合计数；个别 Kummer/Lucas 型题偏数论但非主体
+  Number Theory > Number-Theoretic Functions > τ (number of divisors):
+    category: number-theory
+    node: 数论函数与阶乘估计
+    reason: 除数个数函数 τ 属数论函数，归该节点
+  Geometry > Solid Geometry > Other 3D problems:
+    category: geometry
+    node: 立体几何
+    reason: 三维杂题统归立体几何
+  Algebra > Algebraic Expressions > Sequences and Series > Telescoping series:
+    category: algebra
+    node: 数列与递推
+    reason: 裂项相消是数列求和技术
+  Algebra > Intermediate Algebra > Exponential functions:
+    category: algebra
+    node: 代数变换技巧
+    reason: 指数运算与指数方程归指对运算技巧（与对数运算律同族）
+  Discrete Mathematics > Combinatorics > Inclusion-exclusion:
+    category: combinatorics
+    node: 计数与容斥
+    reason: 容斥即节点本名成分，直配
+  Geometry > Plane Geometry > Geometric Inequalities > Triangle inequalities:
+    category: geometry
+    node: 三角形与四边形基本性质
+    reason: registry 该节点已登记别名「三角形不等式」（registry 钦定，故不随 Geometric Inequalities 族其余条目归 algebra/不等式）
+  Algebra > Equations and Inequalities > Jensen / smoothing:
+    category: algebra
+    node: 不等式
+    reason: Jensen 与光滑化为不等式手法，别名含光滑化
+  Number Theory > Modular Arithmetic > Polynomials mod p:
+    category: number-theory
+    node: 整除与同余
+    reason: 多项式取模对应该节点别名多项式整值、二项式展开取模、模素数幂
+  Number Theory > Residues and Primitive Roots > Quadratic residues:
+    category: number-theory
+    node: 二次剩余与平方数判别
+    reason: 二次剩余是节点本体
+  Number Theory > Divisibility / Factorization > Least common multiples (lcm):
+    category: number-theory
+    node: 最大公约数与欧几里得算法
+    reason: lcm 对应该节点别名最小公倍数，与 gcd 同族
+  Geometry > Plane Geometry > Triangles > Triangle inequalities:
+    category: geometry
+    node: 三角形与四边形基本性质
+    reason: 三角形不等式是该节点登记别名
+  Algebra > Equations and Inequalities > Combinatorial optimization:
+    category: algebra
+    node: 不等式
+    reason: registry 已将别名「组合优化」收敛到不等式节点
+  Geometry > Plane Geometry > Transformations > Inversion:
+    category: geometry
+    node: 反演变换
+    reason: 反演逐字对应该节点
+  Geometry > Plane Geometry > Transformations > Spiral similarity:
+    category: geometry
+    node: 相似位似与全等
+    reason: 旋转相似（spiral similarity）是该节点登记别名
+  Algebra > Intermediate Algebra > Logarithmic functions:
+    category: algebra
+    node: 代数变换技巧
+    reason: 对数运算律与换底为该节点注册别名
+  Discrete Mathematics > Combinatorics > Expected values:
+    category: combinatorics
+    node: 概率与期望
+    reason: 期望值直配概率与期望节点
+  Geometry > Plane Geometry > Analytic / Coordinate Methods > Complex numbers in geometry:
+    category: geometry
+    node: 解析几何与向量复数法
+    reason: 几何中的复数法即该节点的复数法部分
+  Geometry > Plane Geometry > Advanced Configurations > Polar triangles, harmonic conjugates:
+    category: geometry
+    node: 射影几何与调和点列
+    reason: 极点极线与调和共轭是该节点核心，别名含「极点极线与调和点列」
+  Geometry > Plane Geometry > Combinatorial Geometry:
+    category: geometry
+    node: 组合几何
+    reason: 审核补漏：无叶截断但二级名即节点本名（Combinatorial Geometry=组合几何），且其全部叶子（凸包/Pick/Helly/Minkowski/Sylvester）均落此节点，直配
+  Geometry > Plane Geometry > Quadrilaterals > Inscribed/circumscribed quadrilaterals:
+    category: geometry
+    node: 圆与四点共圆
+    reason: 审核补漏：内接四边形即四点共圆（与 Cyclic quadrilaterals 同口径），外切四边形性质走该节点别名「圆的切线」「圆的相切」族，均属圆与四边形位置关系
+  Geometry > Plane Geometry > Advanced Configurations > Isogonal/isotomic conjugates, barycentric coordinates:
+    category: geometry
+    node: 三角形五心与经典引理
+    reason: 等角/等截共轭属三角形经典引理体系（重心坐标只是计算工具）
+  Geometry > Plane Geometry > Circles:
+    category: geometry
+    node: 圆与四点共圆
+    reason: 裸圆子类归圆的基本节点
+  Geometry > Solid Geometry > 3D Shapes:
+    category: geometry
+    node: 立体几何
+    reason: 三维形体归立体几何
+  Geometry > Plane Geometry > Concurrency and Collinearity > Ceva's theorem:
+    category: geometry
+    node: 共线共点定理
+    reason: 塞瓦定理是共线共点定理的代表内容
+  Geometry > Plane Geometry > Concurrency and Collinearity > Menelaus' theorem:
+    category: geometry
+    node: 共线共点定理
+    reason: 梅涅劳斯定理是共线共点定理的代表内容
+  Discrete Mathematics > Graph Theory > Matchings, Marriage Lemma, Tutte's theorem:
+    category: combinatorics
+    node: 图论
+    reason: 匹配/Hall/Tutte 是图论核心内容，体系内图论无更细分节点
+  Algebra > Algebraic Expressions > Polynomials:
+    category: algebra
+    node: 多项式
+    reason: 无叶截断但子树整体落在多项式节点，直配
+  Algebra > Algebraic Expressions > Polynomials > Roots of unity:
+    category: algebra
+    node: 复数与三角
+    reason: 单位根本质是复数技术（分圆、单位根滤波）
+  Discrete Mathematics > Algorithms:
+    category: combinatorics
+    node: 算法与过程类问题
+    reason: 口径已定 Algorithms→算法与过程类问题
+  Number Theory > Number-Theoretic Functions > φ (Euler's totient):
+    category: number-theory
+    node: 数论函数与阶乘估计
+    reason: 欧拉函数 φ 作为数论函数归此节点，与 τ、σ 保持同族一致（欧拉定理应用另有其节点）
+  Statistics > Probability > Counting Methods > Other:
+    category: combinatorics
+    node: 概率与期望
+    reason: 口径决策 Statistics>Probability*→概率与期望；计数型古典概型
+  Geometry > Plane Geometry > Concurrency and Collinearity:
+    category: geometry
+    node: 共线共点定理
+    reason: 裸共点共线子类直接对应该节点
+  Geometry > Plane Geometry > Advanced Configurations > Brocard point, symmedians:
+    category: geometry
+    node: 三角形五心与经典引理
+    reason: 布洛卡点与陪位中线属三角形经典引理
+  Geometry > Solid Geometry > Volume:
+    category: geometry
+    node: 立体几何
+    reason: 体积计算归立体几何
+  Discrete Mathematics > Logic:
+    category: combinatorics
+    node: 算法与过程类问题
+    weak: true
+    reason: 逻辑谜题按内容应散归组合各节点，路径级无内容信息；推理过程类是最近似兜底，标弱留待读题细分
+  Algebra > Intermediate Algebra > Other:
+    category: algebra
+    node: 代数变换技巧
+    weak: true
+    reason: 杂项标签无信息量，技巧节点兜底
+  Geometry > Plane Geometry > Transformations > Translation:
+    category: geometry
+    node: 变换几何
+    reason: 平移是基本几何变换
+  Precalculus > Trigonometric functions:
+    category: algebra
+    node: 复数与三角
+    reason: Precalculus 三角类按既定决策归复数与三角
+  Algebra > Prealgebra / Basic Algebra > Decimals:
+    category: algebra
+    node: 代数变换技巧
+    weak: true
+    reason: 小数基础运算类无独立知识点，技巧节点兜底
+  Geometry > Plane Geometry > Combinatorial Geometry > Convex hulls:
+    category: geometry
+    node: 组合几何
+    reason: 凸包是组合几何标准内容
+  Geometry > Plane Geometry > Quadrilaterals > Quadrilaterals with perpendicular diagonals:
+    category: geometry
+    node: 三角形与四边形基本性质
+    reason: 对角线垂直四边形的度量关系属四边形基本性质
+  'Algebra > Algebraic Expressions > Polynomials > Irreducibility: Rational Root Theorem, Gauss''s Lemma, Eisenstein':
+    category: algebra
+    node: 多项式
+    reason: 不可约性判别是奥数多项式核心专题
+  Number Theory > Number-Theoretic Functions > σ (sum of divisors):
+    category: number-theory
+    node: 数论函数与阶乘估计
+    reason: 除数和函数 σ 属数论函数，归该节点
+  Discrete Mathematics > Combinatorics > Generating functions:
+    category: combinatorics
+    node: 递推与生成结构
+    reason: 生成函数即「生成结构」本意，直配
+  Algebra > Algebraic Expressions > Sequences and Series:
+    category: algebra
+    node: 数列与递推
+    reason: 无叶截断但子树整体落在数列与递推节点，直配
+  Algebra > Algebraic Expressions > Polynomials > Intermediate Value Theorem:
+    category: algebra
+    node: 多项式
+    reason: 介值定理在此指多项式实根存在性论证，仍属多项式专题
+  Geometry > Plane Geometry > Advanced Configurations > Miquel point:
+    category: geometry
+    node: 三角形五心与经典引理
+    reason: 密克点是三角形经典引理体系的标准引理
+  Algebra > Equations and Inequalities > Muirhead / majorization:
+    category: algebra
+    node: 不等式
+    reason: Muirhead/优超是对称不等式标准工具
+  Number Theory > Diophantine Equations > Infinite descent / root flipping:
+    category: number-theory
+    node: 不定方程
+    reason: 无穷递降与 root flipping（韦达跳跃）正是该节点别名
+  'Algebra > Algebraic Expressions > Polynomials > Polynomial interpolation: Newton, Lagrange':
+    category: algebra
+    node: 多项式
+    reason: 拉格朗日/牛顿插值是奥数多项式专题
+  Algebra > Prealgebra / Basic Algebra > Other:
+    category: algebra
+    node: 代数变换技巧
+    weak: true
+    reason: 杂项标签无信息量，技巧节点兜底
+  Precalculus > Functions:
+    category: algebra
+    node: 函数方程
+    weak: true
+    reason: 泛化函数性质标签（复合/反函数/迭代）非知识点，就近函数方程兜底
+  Statistics > Probability > Counting Methods > Combinations:
+    category: combinatorics
+    node: 概率与期望
+    reason: 口径决策 Probability*→概率与期望；组合数计算的古典概型
+  Geometry > Plane Geometry > Advanced Configurations > Simson line:
+    category: geometry
+    node: 三角形五心与经典引理
+    reason: registry 该节点已登记别名「西姆松线」
+  Number Theory > Diophantine Equations > Pell's equations:
+    category: number-theory
+    node: 不定方程
+    reason: Pell 方程是经典不定方程类型，45 节点中无更细分节点
+  Statistics > Probability > Counting Methods > Permutations:
+    category: combinatorics
+    node: 概率与期望
+    reason: 口径决策 Probability*→概率与期望；排列计数的古典概型
+  Number Theory > Diophantine Equations > Pythagorean triples:
+    category: number-theory
+    node: 不定方程
+    reason: 勾股数对应该节点别名勾股数参数化
+  Number Theory > Residues and Primitive Roots > Primitive roots mod p / p^n:
+    category: number-theory
+    node: 阶与原根
+    reason: 原根是节点本体
+  'Discrete Mathematics > Graph Theory > Euler characteristic: V-E+F':
+    category: combinatorics
+    node: 图论
+    reason: 平面图欧拉公式属图论范畴
+  Geometry > Plane Geometry > Circles > Coaxal circles:
+    category: geometry
+    node: 根轴与幂
+    reason: 共轴圆系由公共根轴刻画，属根轴与幂
+  Discrete Mathematics > Combinatorics > Catalan numbers, partitions:
+    category: combinatorics
+    node: 递推与生成结构
+    reason: 卡特兰数与整数分拆的核心是递推关系与生成函数结构，较计数总节点更贴切
+  Geometry > Plane Geometry > Circles > Circle of Apollonius:
+    category: geometry
+    node: 圆与四点共圆
+    reason: 阿波罗尼斯圆是圆的经典轨迹，归圆的基本节点（稍粗但正确）
+  Geometry > Solid Geometry > Surface Area:
+    category: geometry
+    node: 立体几何
+    reason: 表面积计算归立体几何
+  Discrete Mathematics > Graph Theory > Turán's theorem:
+    category: combinatorics
+    node: 图论
+    reason: 极值图论（Turán）归图论节点
+  Discrete Mathematics > Combinatorics > Functional equations:
+    category: algebra
+    node: 函数方程
+    reason: 离散语境下多为 N→N 函数方程，中文体系惯例归代数函数方程，跨板块映射
+  Geometry > Plane Geometry > Concurrency and Collinearity > Desargues theorem:
+    category: geometry
+    node: 共线共点定理
+    reason: 德萨格定理按其父类归共线共点定理（射影味道但奥数惯例列于共点共线）
+  Geometry > Plane Geometry > Combinatorial Geometry > Pick's theorem:
+    category: geometry
+    node: 组合几何
+    reason: 皮克定理属格点/组合几何
+  Number Theory > Residues and Primitive Roots > Quadratic reciprocity:
+    category: number-theory
+    node: 二次剩余与平方数判别
+    reason: 二次互反律是二次剩余理论核心工具，奥数训练常规内容
+  Algebra > Algebraic Expressions > Polynomials > Chebyshev polynomials:
+    category: algebra
+    node: 多项式
+    reason: 切比雪夫多项式归多项式专题（三角联系为派生）
+  Algebra > Algebraic Expressions > Sequences and Series > Abel summation:
+    category: algebra
+    node: 数列与递推
+    reason: Abel 求和是数列求和变换技术
+  Geometry > Plane Geometry > Geometric Inequalities > Jensen/smoothing:
+    category: algebra
+    node: 不等式
+    reason: Jensen 与光滑化是不等式技术，registry 不等式节点别名含「光滑化」
+  Geometry > Plane Geometry > Concurrency and Collinearity > Pappus theorem:
+    category: geometry
+    node: 共线共点定理
+    reason: 帕普斯定理是共线定理，按父类归共线共点定理
+  Geometry > Plane Geometry > Advanced Configurations > Napoleon and Fermat points:
+    category: geometry
+    node: 三角形五心与经典引理
+    reason: 拿破仑点与费马点属三角形特殊点经典引理
+  Number Theory > Diophantine Equations:
+    category: number-theory
+    node: 不定方程
+    reason: 无叶截断但二级名即知识点本体，直接映射不定方程
+  Discrete Mathematics > Graph Theory > Menger's theorem / max-flow, min-cut:
+    category: combinatorics
+    node: 图论
+    reason: 连通度/最大流最小割属图论
+  Geometry > Plane Geometry > Combinatorial Geometry > Helly's theorem:
+    category: geometry
+    node: 组合几何
+    reason: Helly 定理是凸集组合几何经典定理
+  Geometry > Plane Geometry > Transformations:
+    category: geometry
+    node: 变换几何
+    reason: 裸变换子类直接对应变换几何
+  Number Theory > Number-Theoretic Functions > Möbius inversion:
+    category: number-theory
+    node: 数论函数与阶乘估计
+    reason: Möbius 反演属数论函数工具，且贴近该节点别名筛法与容斥
+  Geometry > Plane Geometry > Combinatorial Geometry > Minkowski's theorem:
+    category: geometry
+    node: 组合几何
+    reason: 闵可夫斯基定理（数的几何/凸体格点）归组合几何
+  Geometry > Plane Geometry > Transformations > Reflection:
+    category: geometry
+    node: 变换几何
+    reason: registry 变换几何节点别名含「轴对称变换」
+  Algebra > Algebraic Expressions > Polynomials > Descartes' Rule of Signs:
+    category: algebra
+    node: 多项式
+    reason: 符号法则是多项式实根分析工具
+  Geometry > Plane Geometry > Combinatorial Geometry > Sylvester's theorem:
+    category: geometry
+    node: 组合几何
+    reason: Sylvester–Gallai 定理是组合几何经典结果
+  'Number Theory > Algebraic Number Theory > Combinatorial number theory: van der Waerden''s theorem':
+    category: combinatorics
+    node: Ramsey 型问题
+    reason: MathNet 归类错位：van der Waerden 定理是经典 Ramsey 型结果且叶名自称组合数论，按内容归组合板块而不套用 ANT 的 ignore 口径
+  Number Theory > Number-Theoretic Functions:
+    category: number-theory
+    node: 数论函数与阶乘估计
+    reason: 无叶截断但二级名即知识点本体，直接映射数论函数与阶乘估计
+  'Algebra > Algebraic Expressions > Polynomials > Irreducibility: Rational Root Theorem, Gauss''s Lemma':
+    category: algebra
+    node: 多项式
+    reason: 不可约性专题的变体写法，同归多项式
+  Algebra > Equations and Inequalities > QM-AM-GM / Power Mean:
+    category: algebra
+    node: 不等式
+    reason: QM-AM-GM-HM 条目的变体写法，同归不等式
+  Geometry > Plane Geometry > Geometric Inequalities:
+    category: algebra
+    node: 不等式
+    reason: 几何板块无不等式节点，几何不等式统一归 algebra/不等式（与 Optimization/Jensen 条目口径一致；Triangle inequalities 因 registry 显式别名除外）
+  Geometry > Plane Geometry > Quadrilaterals > Cyclic quadrilaterilaterals:
+    category: geometry
+    node: 圆与四点共圆
+    reason: Cyclic quadrilaterals 的拼写变体，同归四点共圆
+  Geometry > Plane Geometry > Quadrilaterals > Cyclic quadrilaterillaterals:
+    category: geometry
+    node: 圆与四点共圆
+    reason: Cyclic quadrilaterals 的拼写变体，同归四点共圆
+  'Number Theory > Diophantine Equations > Techniques: modulo, size analysis':
+    category: number-theory
+    node: 不定方程
+    reason: 同其长版本技巧叶：父级已锁定不定方程
+board_only:
+  Discrete Mathematics > Combinatorics > Induction / smoothing:
+    category: combinatorics
+    reason: 归纳/调整（smoothing）是通用论证动作而非知识点，45 节点中无对应项，只定组合板块兜底，细分留待读题旁路
+  Number Theory > Other:
+    category: number-theory
+    reason: Other 无任何知识点信息，只能确定数论板块，留待读题旁路细分（审核补 category 字段）
+  Discrete Mathematics > Other:
+    category: combinatorics
+    reason: Other 属泛化 Miscellaneous 类，无知识点信息，只定离散→组合板块兜底
+  Discrete Mathematics > Combinatorics:
+    category: combinatorics
+    reason: 无叶截断路径（口径示例），仅能定组合板块
+  Algebra > Equations and Inequalities:
+    category: algebra
+    reason: 无叶截断路径横跨不等式与方程与设元两节点，只能定板块
+  Geometry > Plane Geometry > Miscellaneous:
+    category: geometry
+    reason: 裸 Miscellaneous 无叶无信息，只能定几何板块
+ignore:
+  Algebra > Linear Algebra > Matrices:
+    reason: 线性代数超奥数口径（既定决策）
+  Algebra > Linear Algebra > Vectors:
+    reason: 线性代数超奥数口径（既定决策）
+  Algebra > Linear Algebra > Determinants:
+    reason: 线性代数超奥数口径（既定决策）
+  Algebra > Abstract Algebra > Permutations / basic group theory:
+    reason: 抽象代数超奥数口径（既定决策）
+  Calculus > Integral Calculus > Techniques > Single-variable:
+    reason: 微积分超奥数口径（既定决策）
+  Calculus > Differential Calculus > Derivatives:
+    reason: 微积分超奥数口径（既定决策）
+  Algebra > Abstract Algebra > Group Theory:
+    reason: 抽象代数超奥数口径（既定决策）
+  Math Word Problems:
+    reason: 深度1无信息（既定决策），留待读题旁路
+  Calculus > Differential Calculus > Applications:
+    reason: 微积分超奥数口径（既定决策）
+  Precalculus > Limits:
+    reason: 极限属分析内容，超奥数口径，与 Calculus 同类处理
+  Number Theory > Algebraic Number Theory > Quadratic forms:
+    reason: 按既定口径 Algebraic Number Theory* 超奥数口径 ignore；二次型理论无对应节点，个别平方和表示题留读题旁路
+  Algebra > Abstract Algebra > Ring Theory:
+    reason: 抽象代数超奥数口径（既定决策）
+  Algebra > Abstract Algebra > Field Theory:
+    reason: 抽象代数超奥数口径（既定决策）
+  Calculus > Integral Calculus > Applications:
+    reason: 微积分超奥数口径（既定决策）
+  Algebra > Linear Algebra > Linear transformations:
+    reason: 线性代数超奥数口径（既定决策）
+  Number Theory > Algebraic Number Theory > Quadratic fields:
+    reason: 二次域属代数数论，按既定口径超纲 ignore
+  Calculus > Differential Equations > ODEs:
+    reason: 微积分超奥数口径（既定决策）
+  Number Theory > Algebraic Number Theory > Algebraic numbers:
+    reason: 代数数理论按既定口径超纲 ignore
+  Number Theory > Algebraic Number Theory > Unique factorization:
+    reason: 此处指代数整数环的唯一分解（UFD），按既定口径超纲 ignore；普通整数分解已由 Divisibility 族覆盖
+  Algebra > Abstract Algebra > Other:
+    reason: 抽象代数超奥数口径（既定决策）
+  Statistics > Mathematical Statistics:
+    reason: 口径决策 Mathematical Statistics* 超奥数口径（数理统计非竞赛内容）
+  Geometry > Non-Euclidean Geometry > Spherical Geometry:
+    reason: 超纲：Non-Euclidean* 按既定口径 ignore
+  Calculus > Differential Calculus > Other:
+    reason: 微积分超奥数口径（既定决策）
+  Calculus > Differential Calculus > Related Rates:
+    reason: 微积分超奥数口径（既定决策）
+  Geometry > Differential Geometry > Curvature:
+    reason: 超纲：Differential Geometry* 按既定口径 ignore
+  Geometry > Differential Geometry > Manifolds:
+    reason: 超纲：Differential Geometry* 按既定口径 ignore
+  Geometry > Non-Euclidean Geometry > Hyperbolic Geometry:
+    reason: 超纲：Non-Euclidean* 按既定口径 ignore
