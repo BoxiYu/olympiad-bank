@@ -1,5 +1,7 @@
 # 奥林匹克数学竞赛题库
 
+> **项目使命：用 AI 促进数学教育，帮助学生高效地学习数学。** 本仓库是这一目标的地基——AI 教学的可靠性取决于题目与答案的可靠性，所以先建成一个每道题都可溯源核实的题库，再在其上生长训练系统（教练闭环、诊断报告、自适应计划）。
+
 按「知识点 × 难度」双维组织的中文奥数题库 + 训练系统。当前 **164 道已核实真题**，覆盖小学/初中 → 高联/CMO → AMC-AIME-USAMO → IMO/ISL 四大体系。架构按 10000 题规模设计。训练用法见 `docs/教练手册.md`。
 
 ## 目录结构
@@ -10,10 +12,18 @@ problems/            一题一文件（YAML frontmatter + 题面/答案/解法�
   number-theory/     N-001 ~ N-042
   combinatorics/     C-001 ~ C-038
   geometry/          G-001 ~ G-040
-taxonomy/            四板块知识点树（二级子类 + 典型考法）
-docs/                赛事地图与官方题源（30+ 赛事赛制/难度/题源链接）
-scripts/             bank.py（lint/query/stats/plan + coach/log/review 教练闭环）、isl2024_*.py（程序验证）、browser_pdf_extract.js（官方 PDF 抽取管线）
-SPEC.md              入库规范：字段定义、难度标准、入库铁律
+taxonomy/            四板块知识点树 + registry.yml 正名注册表 + MathNet/赛事分层映射表
+docs/                赛事地图与官方题源（30+ 赛事）、教练手册、sources/ 官方 PDF 弹药库
+scripts/             bank.py（唯一 CLI 入口：lint/query/stats/plan/map + coach/log/review 教练闭环）
+  mathnet_ingest.py / mathnet_review.py   MathNet 候选池构建与 Codex 第二意见评审
+  browser_pdf_extract.js                  官方 PDF 抽取管线
+  verify/            一次性程序验证脚本（题目 verification_note 引用的核验凭证，只增不改）
+  archive/           已完成使命的一次性脚本（如初始迁移 migrate.py）
+data/review/         Codex 跨模型评审通道的批次与裁决记录
+maps/                bank.py map 生成的交互式知识点指示图（生成产物，不入库）
+SPEC.md              入库规范：字段定义、难度标准、入库铁律（本仓库最高约束）
+WORKFLOW.md          Symphony 派单代理配置：按 GitHub Issue 自动开工作区跑批
+AGENTS.md            给编码代理（Claude Code / Codex）的常驻工作说明
 ```
 
 ## 常用命令
