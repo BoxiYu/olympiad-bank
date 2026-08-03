@@ -9,10 +9,12 @@
 version: 1
 # keyword_rules：MathNet 标签树盖不住的节点走全文正则召回（仅当该行已投对应板块票时附加，控误报）
 keyword_rules:
-- pattern: (?i)\bramsey\b|monochromatic
+- pattern: (?i)\bramsey\b|van der waerden|schur'?s theorem
   category: combinatorics
   node: Ramsey 型问题
-  note: 标签树无 Ramsey 叶子（最近仅 van der Waerden 3 行且挂在被 ignore 的代数数论下）
+  note: 标签树无 Ramsey 叶子（最近仅 van der Waerden 3 行且挂在被 ignore 的代数数论下）。
+    收紧记：初版含裸 monochromatic，Codex 试点复核 6 题仅 1 题真属 Ramsey——普通染色题已由
+    「染色与不变量」覆盖，故只保留拉姆齐理论的专名信号。
 - pattern: (?i)lifting the exponent|\bLTE\b|p-adic|v_\{?p\}?\(|\\nu_p
   category: number-theory
   node: p-adic 赋值与 LTE

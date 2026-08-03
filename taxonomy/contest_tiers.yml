@@ -4,8 +4,15 @@
 # tiers 覆盖 top-220 规范名（74.8% 行）；名内已含轮次词的 base 已计入轮次，fallback_modifiers 只作用于表外长尾。
 # default_unknown：完全未知赛名的默认档。est 永远不是正式 difficulty——入库时按 SPEC 第 4 节思维跨度定稿。
 # 校准（2026-08-03，独立重算）：ISL2024 30/30、AIME2022 2/2、USAMO2010 1/1、APMO2025 5/5，合计 38/38=100% 在 ±1 内（阈值 80%）。
-version: 1
+version: 2
+# v2 补录：Codex 试点复核发现 RMM 家族整体缺失（0clv 被判 ★2 实际 ★4）。
 tiers:
+  romanian master of mathematics:
+    base: 5
+    note: RMM 是国际邀请赛顶级难度，与 IMO/TST 同档（v2 补，试点实证）
+  romanian masters of mathematics:
+    base: 5
+    note: RMM 异写
   harvard mit mathematics tournament:
     base: 3
     note: 轮次未知，Nov(2–3)/Feb(3–4)混合，取中

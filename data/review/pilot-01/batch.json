@@ -1,0 +1,189 @@
+[
+ {
+  "mathnet_id": "03g0",
+  "est": 3,
+  "conf": "mid",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "共线共点定理",
+   "相似位似与全等"
+  ],
+  "contest": "Bulgarian National Olympiad - Final Round",
+  "problem": "Given is a triangle $ABC$ and a circle $\\omega$ with center $I$ that touches $AB$, $AC$ and meets $BC$ at $X$, $Y$. The line through $I$ perpendicular to $BC$ meets the line through $A$ parallel to $BC$ at $Z$. Show that the circumcircles of $\\triangle XYZ$ and $\\triangle ABC$ are tangent to each other.",
+  "solution_head": [
+   "Let $W$ be the midpoint of the major arc $BAC$, $A' \\in (ABC)$ be such that $AA' \\parallel BC$, $T$ be the intersection of the circle with diameter $AI$ and $(ABC)$, and let $\\omega$ touch $AC$, $AB$ at $E$, $F$. We claim the two circles touch at $T$.\n\nFirstly, observe that $Z \\in (AEF)$, so\n\n$$\n\\begin{aligned}\n\\angle ATZ &= \\angle AIZ = 90^\\circ - \\left(\\frac{\\alpha}{2} + \\gamma\\right) \\\\\n&= \\frac{\\beta - \\gamma}{2} = \\beta - \\left(90^\\circ - \\frac{\\alpha}{2}\\right) \\\\\n&= \\angle ABC - \\angle WBC = \\angle ABW = \\angle ATW,\n\\end{aligned}\n$$\n\nhence $T$, $Z$, $W$ are collinear. Let $TW \\cap BC = P$. By spiral similarity and angle bisector theorem we have $\\frac{PB}{PC} = \\frac{TB}{TC} = \\frac{BF}{CE}$, so by converse of Menelaus theorem for $\\triangle ABC$ we obtain that $EF$, $TZ$, $BC$ are concurrent at $P$. Thus, by power of point at $P$, we obtain that $PX \\cdot PY = PE \\cdot PF = PZ \\cdot PT$, so $XYZT$ is cyclic.\n\nFinally, observe that the center of $(ZXY)$ lies on $IZ$, so $(ZXY)$ touches $AA'$ at $Z$. Hence, by shooting lemma, since $W$ is the midpoint of the minor arc $AA'$, we obtain that $(ZXY)$ touches $(ABC)$ at $T$ and we are done. $\\square$"
+  ]
+ },
+ {
+  "mathnet_id": "0fx7",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "共线共点定理",
+   "根轴与幂"
+  ],
+  "contest": "SMO Finalrunde",
+  "problem": "Problem:\n\nSei $ABCDEF$ ein konvexes Sechseck mit einem Umkreis. Beweise, dass sich die Diagonalen $AD$, $BE$ und $CF$ genau dann in einem Punkt schneiden, wenn gilt\n$$\n\\frac{AB}{BC} \\cdot \\frac{CD}{DE} \\cdot \\frac{EF}{FA}=1\n$$",
+  "solution_head": [
+   "Solution:\n\nWir nehmen zuerst an, dass sich die Diagonalen in einem Punkt $S$ schneiden. Es gilt $\\Varangle ASB=\\Varangle DSE$ und $\\Varangle BAS=\\Varangle DES$, letzteres weil beides Peripheriewinkel über der Sehne $BD$ sind. Also sind die Dreiecke $ABS$ und $EDS$ ähnlich. Analog zeigt man die Ähnlichkeit der Dreiecke $BCS$ und $FES$ sowie der Dreiecke $CDS$ und $AFS$. Diese Ähnlichkeiten liefern die Verhältnisse (beachte die Asymmetrie)\n$$\n\\frac{AB}{DE}=\\frac{BS}{DS}, \\quad \\frac{BC}{EF}=\\frac{BS}{FS}, \\quad \\frac{CD}{FA}=\\frac{DS}{FS}\n$$\nund Multiplikation ergibt (1).\n\nFür die Umkehrung argumentieren wir rückwärts. Dazu gehen wir von der Situation aus, wo sich alle drei Diagonalen in einem Punkt schneiden und verschieben die Gerade $AD$ parallel in Richtung von $E$ und $F$. Während dieser Verschiebung nehmen die Längen $AB$ und $CD$ strikt zu, wogegen $DE$ und $FA$ strikt abnehmen. Insgesamt wächst also die linke Seite von (1) streng monoton. Analog fällt sie streng monoton bei einer Verschiebung in Richtung von $B$ und $C$. Folglich gibt es höchstens eine Position der Geraden $AD$, sodass (1) gilt und nach dem ersten Teil ist das dann der Fall wenn sich die Diagonalen in einem Punkt schneiden.",
+   "Solution:\n\nWir nehmen wieder zuerst an, dass sich die Diagonalen in einem Punkt $S$ schneiden. Wie in der ersten Lösung erhält man die drei Paare ähnlicher Dreiecke. Daraus folgt (diesmal zyklisch)\n$$\n\\frac{AB}{BC} \\cdot \\frac{CD}{DE} \\cdot \\frac{EF}{FA}=\\frac{AB}{DE} \\cdot \\frac{EF}{BC} \\cdot \\frac{CD}{FA}=\\frac{SB}{SD} \\cdot \\frac{SE}{SC} \\cdot \\frac{SD}{SF}=\\frac{SB \\cdot SE}{SC \\cdot SF}\n$$\nEine Anwendung des Potenzsatzes auf $S$ und den Umkreis des Sechsecks zeigt, dass der letzte Bruch den Wert 1 hat.\n\nDie andere Richtung beweisen wir rückwärts. Angenommen die drei Diagonalen schneiden sich nicht in einem Punkt. Der Schnittpunkt von $BE$ und $FC$ sei $S$. Die Gerade $AS$ schneide den Kreis nochmals in $D' \\neq D$. Da 1 nach dem schon Gezeigten sowohl für $D$ als auch für $D'$ gilt, folgt\n$$\n\\frac{ED}{DC}=\\frac{ED'}{D'C}\n$$\nwas aber nicht möglich ist, da dieses Verhältnis streng monoton wächst, wenn man $D'$ von $E$ nach $C$ bewegt."
+  ]
+ },
+ {
+  "mathnet_id": "07ab",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "共线共点定理",
+   "圆与四点共圆",
+   "相似位似与全等"
+  ],
+  "contest": "Iranian Mathematical Olympiad",
+  "problem": "Suppose $S$ is a convex figure in plane with area $10$. Consider a chord of length $3$ in $S$ and let $A$ and $B$ be two points on this chord which divide it into three equal parts. For a variable point $X$ in $S - \\{A, B\\}$, let $A'$ and $B'$ be the intersection points of rays $AX$ and $BX$ with the boundary of $S$. Let $S'$ be those points of $X$ for which $AA' > \\frac{1}{3} BB'$. Prove that the area of $S'$ is at least $6$.",
+  "solution_head": [
+   "The idea is to remove some neighborhoods of $A$ and $B$, because near these points we cannot bound $\\frac{AA'}{BB'}$. Let $Z$ be the intersection of the ray $AB$ with the boundary of $S$ and let $ZB'$ intersect $AA'$ in $A''$. $A''$ is between $A$ and $A'$ since $S$ is convex. So, if we let $S''$ be the set of those points $X$ such that $AA'' > \\frac{1}{3} BB'$, we have $S'' \\subseteq S'$. Hence, it is enough to prove that the area of $S''$ is at least $6$.\nBy *Menelaus's theorem*, we have\n$$\n\\frac{AA''}{A''X} \\cdot \\frac{XB'}{B'B} \\cdot \\frac{BZ}{ZA} = 1 \\Rightarrow \\frac{AA''}{A''X} \\cdot \\frac{XB'}{B'B} = 2.\n$$\nTo omit $A''X$, we write $\\frac{AA''}{A''X}$ in terms of $AA''$ and $AX$ and we treat $B'X$ similarly:\n$$\n\\begin{align*}\n\\Rightarrow \\quad \\frac{A''X}{AA''} &= \\frac{1}{2} \\cdot \\frac{XB'}{B'B} \\\\\n\\Rightarrow \\quad \\frac{AX}{AA''} &= 1 - \\frac{1}{2}\\left(1 - \\frac{BX}{BB'}\\right) \\\\\n\\Rightarrow \\quad \\frac{AX}{AA''} &= \\frac{1}{2} \\cdot \\frac{BX}{BB'} + \\frac{1}{2}.\n\\end{align*}\n$$\nLet $D_1$ be the set of those points $X$ such that $\\frac{1}{2} \\cdot \\frac{BX}{BB'} + \\frac{1}{2} \\ge \\alpha \\frac{BX}{BB'}$ for some constant $\\alpha$ (for suitable $\\alpha$, $D_1$ is a neighborhood of $B$). If $X \\notin D_1$, then\n$$\n\\begin{array}{l}\n\\frac{AX}{AA''} < \\alpha \\frac{BX}{BB'} \\\\\n\\Rightarrow \\quad \\frac{AA''}{BB'} > \\frac{1}{\\alpha} \\cdot \\frac{AX}{BX}.\n\\end{array}\n$$\nLet $D_2$ be the set of those points $X$ in the plane such that $\\frac{AX}{BX} < \\frac{\\alpha}{3}$ (for suitable $\\alpha$, $D_2$ is a neighborhood of $A$). If $X$ is not in either of $D_1$ or $D_2$, then\n$$\n\\frac{AA''}{BB'} > \\frac{1}{\\alpha} \\cdot \\frac{\\alpha}{3} = \\frac{1}{3}\n$$\nas desired. So\n$$\nS - D_1 - D_2 \\subseteq S'' \\subseteq S'.\n$$\nNow, we calculate the areas of $D_1$ and $D_2$. If $\\alpha < 3$, then $D_2$ is the interior part of the Apollonius circle of $A$ and $B$. Also,\n$$\nX \\in D_1 \\Leftrightarrow \\frac{1}{2} \\cdot \\frac{BX}{BB'} + \\frac{1}{2} \\ge \\alpha \\frac{BX}{BB'} \\Leftrightarrow \\frac{BX}{BB'} < \\frac{1}{2\\alpha - 1}.\n$$\nSo, if $\\alpha > 1$ then $D_1$ is a neighborhood of $B$ similar to $S$. Now, we take $\\alpha = \\frac{3}{2}$. We conclude that the area of $D_1$ is $\\left(\\frac{1}{2}\\right)^2$ times the area of $S$ which is $\\frac{10}{4} = 2.5$. Also, if $C$ and $D$ are the intersection points of the boundary of $D_2$ with the line $AB$ and $C$ is between $A$ and $B$, we have\n$$\n\\begin{align*}\n\\frac{AD}{DB} &= \\frac{1}{2} \\Rightarrow \\frac{AD}{AD+1} = \\frac{1}{2} \\Rightarrow AD = 1 \\\\\n\\frac{AC}{CB} &= \\frac{1}{2} \\Rightarrow \\frac{AC}{1-AC} = \\frac{1}{2} \\Rightarrow AC = \\frac{1}{3}.\n\\end{align*}\n$$\nSo the diameter of $D_2$ is $1 + \\frac{1}{3} = \\frac{4}{3}$ and hence, the area of $D_2$ is $\\left(\\frac{2}{3}\\right)^2 \\pi < 1.5$. So\n$$\n\\begin{align*}\nT_X &\\ge T_{S-D_1-D_2} \\\\\n&\\ge 2T_S - T_{D_1} - T_{D_2} \\\\\n&> 10 - 2.5 - 1.5 = 6.\n\\end{align*}\n$$\nwhere $T_K$ represents the area of figure $K$ in the plane. Hence, the assertion is proved. $\\square$"
+  ]
+ },
+ {
+  "mathnet_id": "0ago",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "共线共点定理"
+  ],
+  "contest": "Macedonian Mathematical Olympiad",
+  "problem": "The point $O$ is the centre of the circumcircle of triangle $\\Delta ABC$.\nThe line $AO$ intersects the side $BC$ in point $N$, and the line $BO$ the side $AC$ in point $M$. Prove that, if $CM = CN$, then $AC = BC$.",
+  "solution_head": [
+   "Then $\\angle ABC > \\angle BAC$ i.e. $\\angle ADC = \\angle ABC > \\angle BAC = \\angle BDC$.\nThis implies\n\nBut\n$$\n\\angle AOE = 2\\angle ACE \\text{ and } \\angle BOE = 2\\angle BCE.\n$$\nHence\n$\\angle AOE < \\angle BOE$ i.e. $\\overline{AE} < \\overline{BE}$\n($\\triangle ABO$ is isosceles).\nFrom Ceva's theorem we have:\n$$\n\\frac{\\overline{AM}}{MC} \\cdot \\frac{\\overline{CN}}{NB} \\cdot \\frac{\\overline{BE}}{EA} = 1,\n$$\nand it holds that $\\overline{CM} = \\overline{CN}$ (by condition).\nWe get that $\\frac{\\overline{AM}}{BN} = \\frac{\\overline{EA}}{\\overline{BE}} < 1$ i.e. we have\n$$\n\\overline{AC} = \\overline{AM} + \\overline{CM} = \\overline{AM} + \\overline{CN} < \\overline{BN} + \\overline{CN} = \\overline{BC}\n$$\nwhich is in contradiction with (1).\nAnalogously we can show that $\\overline{AC} < \\overline{BC}$ is impossible. This implies $\\overline{AC} = \\overline{BC}$."
+  ]
+ },
+ {
+  "mathnet_id": "0ijw",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "共线共点定理",
+   "根轴与幂"
+  ],
+  "contest": "Harvard-MIT Mathematics Tournament",
+  "problem": "Problem:\nLet $\\Gamma$ denote the circumcircle of triangle $A B C$. Point $D$ is on $\\overline{A B}$ such that $\\overline{C D}$ bisects $\\angle A C B$. Points $P$ and $Q$ are on $\\Gamma$ such that $\\overline{P Q}$ passes through $D$ and is perpendicular to $\\overline{C D}$. Compute $P Q$, given that $B C=20$, $C A=80$, $A B=65$.",
+  "solution_head": [
+   "Solution:\nSuppose that $P$ lies between $A$ and $B$ and $Q$ lies between $A$ and $C$, and let line $P Q$ intersect lines $A C$ and $B C$ at $E$ and $F$ respectively. As usual, we write $a$, $b$, $c$ for the lengths of $B C$, $C A$, $A B$.\n\nBy the angle bisector theorem, $A D / D B = A C / C B$ so that $A D = \\frac{b c}{a+b}$ and $B D = \\frac{a c}{a+b}$.\n\nNow by Stewart's theorem,\n$$\nc \\cdot C D^{2} + \\left(\\frac{a c}{a+b}\\right)\\left(\\frac{b c}{a+b}\\right) c = \\frac{a^{2} b c}{a+b} + \\frac{a b^{2} c}{a+b}\n$$\nfrom which\n$$\nC D^{2} = \\frac{a b \\left((a+b)^{2} - c^{2}\\right)}{(a+b)^{2}}\n$$\n\nNow observe that triangles $C D E$ and $C D F$ are congruent, so $E D = D F$.\n\nBy Menelaus' theorem,\n$$\n\\frac{C A}{A E} \\cdot \\frac{E D}{D F} \\cdot \\frac{F B}{B C} = 1\n$$\nso that\n$$\n\\frac{C A}{B C} = \\frac{A E}{F B}\n$$\nSince $C F = C E$ while $b > a$, it follows that $A E = \\frac{b(b-a)}{a+b}$ so that $E C = \\frac{2 a b}{a+b}$.\n\nFinally,\n$$\nD E = \\sqrt{C E^{2} - C D^{2}} = \\frac{\\sqrt{a b \\left(c^{2} - (a-b)^{2}\\right)}}{a+b}\n$$\n\nPlugging in $a=20$, $b=80$, $c=65$, we see that $A E = 48$, $E C = 32$, $D E = 10$ as well as $A D = 52$, $B D = 13$.\n\nNow let $P D = x$, $Q E = y$. By power of a point about $D$ and $E$, we have $x(y+10) = 676$ and $y(x+10) = 1536$. Subtracting one from the other, we see that $y = x + 86$. Therefore,\n$$\nx^{2} + 96 x - 676 = 0\n$$\nfrom which\n$$\nx = -48 + 2 \\sqrt{745}\n$$\nFinally,\n$$\nP Q = x + y + 10 = 4 \\sqrt{745}\n$$"
+  ]
+ },
+ {
+  "mathnet_id": "0h22",
+  "est": 2,
+  "conf": "low",
+  "category": "geometry",
+  "topics": [
+   "共线共点定理",
+   "三角形五心与经典引理",
+   "圆与四点共圆",
+   "面积法与三角法"
+  ],
+  "contest": "Problems of Ukrainian Authors",
+  "problem": "Inscribed circle $\\omega$ of a triangle $ABC$ touches its sides $AB$, $BC$, $CA$ at the points $K$, $L$, $M$ respectively. On the arc $KL$ of the circle $\\omega$ that does not contain the point $M$ a point $S$ is chosen. Let $P$, $Q$, $R$, $T$ be the points of intersection of the lines $AS$ and $KM$, $ML$ and $SC$, $LP$ and $KQ$, $AQ$ and $PC$ respectively. If the points $R$, $S$ and $M$ are collinear, prove that $T$ also belongs to the line $SM$.",
+  "solution_head": [
+   "Consider the triangle $SLM$. $LC$ and $MC$ are the tangent lines to the circumscribed circle of this triangle drawn at the points $L$ and $M$, therefore $SC$ is a simedian, and so $\\frac{MQ}{CL} = \\frac{MS^2}{SL^2}$.\n\nSimilarly, $\\frac{KP}{PM} = \\frac{KS^2}{SM^2}$. Let $E$ be the point of intersection of the lines $KL$ and $MR$. Since the lines $ME$, $KQ$ and $LP$ are concurrent, by the Ceva's theorem we have that $\\frac{KP}{PM} \\cdot \\frac{MQ}{QL} \\cdot \\frac{LE}{EK} = 1$, hence applying the above equalities we obtain that $\\frac{LE}{EK} = \\frac{SL^2}{KS^2}$. This implies that the line $SE$ is a simedian of the triangle $SKL$, therefore it passes through the point of intersection of the tangents to the circumscribed circle of the triangle $KSL$ that are drawn at the points $L$ and $K$, that is through the point $B$ (Fig. 49). So, we have proved that the points $B$, $S$, $R$ and $M$ are collinear.\n\nNext we will prove that the point $T$ also belongs to this line. By the Ceva's theorem, it is sufficient to prove that $\\frac{AP}{\\sin \\angle AMP} = \\frac{AM}{\\sin \\angle APM}$, $\\frac{PS}{\\sin \\angle KMB} = \\frac{MS}{\\sin \\angle SPM}$. Dividing the last two inequalities we obtain that $\\frac{AP}{PS} = \\frac{AM \\sin \\angle AMK}{MS \\sin \\angle KMB}$. Similarly, $\\frac{CQ}{QS} = \\frac{MC \\sin \\angle CML}{MS \\sin \\angle LMB}$. Substitute the last two relations into the equality that we need to prove:\n$$\n\\frac{AP}{PS} \\cdot \\frac{SQ}{QC} \\cdot \\frac{CM}{MA} = \\frac{AP}{PS} = \\frac{AM \\sin \\angle AMK}{MS \\sin \\angle KMB} \\cdot \\frac{MS \\sin \\angle LMB}{MC \\sin \\angle CML} \\cdot \\frac{CM}{MA} = \\frac{\\sin \\angle AMK \\cdot \\sin \\angle LMB}{\\sin \\angle KMB \\cdot \\sin \\angle CML}\n$$\nBy the sine theorem for the triangles $BLM$ and $BMK$, we obtain:\n$$\n\\frac{BL}{BM} = \\frac{\\sin \\angle LMB}{\\sin \\angle BLM} = \\frac{\\sin \\angle LMB}{\\sin \\angle MLC} = \\frac{\\sin \\angle LMB}{\\sin \\angle CML}, \\text{ since the triangle MLC is isosceles. Similarly, } \\frac{BK}{BM} = \\frac{\\sin \\angle KMB}{\\sin \\angle AMK}\n$$\nTherefore,\n$$\n\\frac{AP}{PS} \\cdot \\frac{SQ}{QC} \\cdot \\frac{CM}{MA} = \\frac{\\sin \\angle AMK \\cdot \\sin \\angle LMB}{\\sin \\angle KMB \\cdot \\sin \\angle CML} = \\frac{BM}{BK} \\cdot \\frac{BL}{BM} = 1,\n$$"
+  ]
+ },
+ {
+  "mathnet_id": "09b7",
+  "est": 3,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "整除与同余",
+   "素数与算术基本定理",
+   "Ramsey 型问题"
+  ],
+  "contest": "46th Mongolian Mathematical Olympiad",
+  "problem": "Let $r$ be a given positive integer. Is it true that for every $r$-coloring of the natural numbers there exists monochromatic solution of the equation $x + y = 3z$?",
+  "solution_head": [
+   "Let $m$ be a positive integer and $m = 5^{\\alpha_m}(5\\beta_m + \\gamma_m)$, $1 \\le \\gamma_m \\le 4$. It is clear that $\\gamma_m$ is unique. So we can color $m$ by $\\gamma_m$. Now we will show that there is no monochromatic solution of the equation $x + y = 3z$.\n\nTo the contrary assume that there is a monochromatic solution of the equation. Then $x = 5^{\\alpha_x}(5\\beta_x + \\gamma)$, $y = 5^{\\alpha_y}(5\\beta_y + \\gamma)$, $z = 5^{\\alpha_z}(5\\beta_z + \\gamma)$ and $x + y = 3z$ (1). Let $\\alpha = \\min(\\alpha_x, \\alpha_y, \\alpha_z)$. Let us divide (1) by $5^\\alpha$ then,\n$$\n\\xi_x\\gamma + \\xi_y\\gamma \\equiv 3\\xi_z\\gamma \\pmod{5}, \\text{ where } \\xi_x, \\xi_y, \\xi_z \\in \\{0,1\\}.\n$$\nSince $(\\gamma, 5) = 1$, $\\xi_x + \\xi_y \\equiv \\xi_z \\pmod{5}$, which means $\\xi_x = \\xi_y = \\xi_z = 0$. But at least one of them must be 1. This shows that there is no monochromatic solution of the equation."
+  ]
+ },
+ {
+  "mathnet_id": "0b6k",
+  "est": 2,
+  "conf": "low",
+  "category": "combinatorics",
+  "topics": [
+   "染色与不变量",
+   "Ramsey 型问题"
+  ],
+  "contest": "2010 DANUBE MATHEMATICAL COMPETITION",
+  "problem": "All sides and diagonals of a convex $n$-gon, $n \\ge 3$, are coloured one of two colours. Show that there exist $\\lfloor (n+1)/3 \\rfloor$ pairwise disjoint monochromatic segments. (Two segments are disjoint if they do not share an endpoint or an interior point.)",
+  "solution_head": [
+   "If all sides are monochromatic, then the assertion is clearly true. Otherwise, delete a vertex incident with two sides of different colours together with its neighbours, delete all sides and diagonals incident with these three vertices and apply induction."
+  ]
+ },
+ {
+  "mathnet_id": "03e5",
+  "est": 2,
+  "conf": "low",
+  "category": "combinatorics",
+  "topics": [
+   "图论",
+   "抽屉原理",
+   "不等式",
+   "Ramsey 型问题"
+  ],
+  "contest": "1 Autumn tournament",
+  "problem": "Let $G$ be a complete bipartite graph with partition sets $A$ and $B$ of sizes $km$ and $kn$, respectively. The edges of $G$ are colored in $k$ colors. Prove that there exists a monochromatic connected component with at least $m+n$ vertices (which means that there exists a color and a set of vertices, such that between any two of them, there is a path consisting of edges only in that color).",
+  "solution_head": [
+   "There are at least $kmn$ edges colored in the most used color. We delete the remaining edges and prove that there exists a connected component with at least $m+n$ vertices in the remaining graph. The idea is to consider all the connected components. If each one has less than $m+n$ vertices, then the graph is too fragmented and it's impossible to have too many (at least $kmn$) edges even if all edges are present in every connected component. It boils down to prove a certain inequality.\n\n**Lemma.** Let $x, y$ be two positive real numbers and $\\ell, k$; $\\ell \\ge k$ be natural numbers. Let $x_i, y_i, i = 1, 2, \\dots, \\ell$ satisfy the following conditions.\n$$\nx_i \\ge 0, y_i \\ge 0, x_i + y_i \\le (x+y)/k, i = 1, 2, \\dots, \\ell;\n$$\n$$\n\\sum_{i=1}^{\\ell} x_i = x, \\quad \\sum_{i=1}^{\\ell} y_i = y. \\qquad (1)\n$$\nThen it holds\n$$\n\\sum_{i=1}^{\\ell} x_i y_i \\le \\frac{xy}{k}.\n$$\nThe equality is reached only if $x_i = x/k, y_i = y/k, i = 1, 2, \\dots, k$; $x_i = y_i = 0, i > k$.\n**Proof.** Let us denote $f(x, y) := \\sum_{i=1}^{\\ell} x_i y_i$, where $x = (x_1, \\dots, x_{\\ell})$, $y = (y_1, \\dots, y_{\\ell})$. The conditions in (1) determine a compact set, hence $f$ attains its maximum value on it, say, at the points $x'_i, y'_i, i = 1, 2, \\dots, \\ell$. We can assume $x'_1 \\ge x'_2 \\ge \\dots \\ge x'_{\\ell}$. We shall prove that $y'_i$ are also in decreasing order. Let us assume on the contrary that $y'_i < y'_{i+1}$. Set\n$$\nx_i = x_{i+1} := (x'_i + x'_{i+1})/2; \\quad y_i = y_{i+1} := (y'_i + y'_{i+1})/2.\n$$\nThen (Chebyshev inequality)\n$$\nx_i y_i + x_{i+1} y_{i+1} > x'_i y'_i + x'_{i+1} y'_{i+1}.\n$$\nBut it contradicts the maximality of $x'_i, y'_i, i = 1, \\dots, \\ell$. Next, if $x'_1 + y'_1 < (x+y)/k$ we can similarly set $x_1 := x'_1 + \\varepsilon, x_2 := x'_2 - \\varepsilon; y_1 := y'_1 + \\delta, x_2 := x'_2 - \\delta$ for sufficiently small $\\varepsilon, \\delta \\ge 0$ and get a larger value of $f$. Therefore, $x'_1 + y'_1 = (x+y)/k$.\nLet $k'$ be the largest index for which $x_{k'} > 0$ and $y_{k'} > 0$. In the same way we can see that $x'_i + y'_i = (x+y)/k, i = 1, 2, \\dots, k'$. Hence, $k' \\le k$. Assume that $k' < k$ and $y_i = 0, i > k'$. We modify $x', y'$ as follows. Set\n$$\nx_i := x'_i, y_i := y'_i, i = 1, 2, \\dots, k' - 1; \\\\\n x_{k'} := x'_{k'}, y_{k'} := y'_{k'} - \\varepsilon, x_{k'+1} := (x+y)/k, y_{k'+1} := \\varepsilon.\n$$\nFor $i > k' + 1$ we set $y_i = 0$, and the values of $x_i, i > k' + 1$ are irrelevant providing they comply with (1). Since $x'_k < (x+y)/k$, it can be seen that $f(x, y) > f(x', y')$ which contradicts the maximality of $x', y'$.\nThus, $k' = k$. We prove that $x'_i = x/k, y'_i = y/k, i = 1, 2, \\dots, k$. Assume on the contrary it doesn't hold and let $j$ be the first index for which $x'_j \\ne x/k$. WLOG let $x'_j < x/k$. Then there exists $i > j$ for which $x'_i > x/k$. This means $x'_i > x'_j$ and thus the sequence $x'_1, x'_2, \\dots, x'_k$ is not decreasing, contradiction. To recap, we established that $x'_i = x/k, y'_i = y/k, i = 1, 2, \\dots, k$. In this case $f(x', y') = kxy$, and Lemma 1 is proved. $\\square$\n\nBack to the problem. The number of all edges of $K$ is $k^2mn$, hence there is a color, say, white such that at least $kmn$ edges are colored white. We delete all edges colored in a color other than white. We'll prove that in the remaining graph $K'$, there exists a connected component with at least $m+n$ vertices. Assume on the contrary it is not true. Denote the connected components of $K'$ by $G(A_i, B_i)$, $i = 1, 2, \\dots, \\ell$ and let $|A_i| = m_i, |B_i| = n_i, i = 1, 2, \\dots, \\ell$. We have\n$$\n\\sum_{i = 1}^\\ell m_i = km, \\quad \\sum_{i=1}^\\ell n_i = kn, m_i + n_i < m + n.\n$$\nAccording to Lemma 1,\n$$\n\\sum_{i=1}^{\\ell} m_i n_i < kmn\n$$\nwhich contradicts the choice of the white color. This means that for at least one index $i$ it holds $m_i + n_i \\ge m + n$."
+  ]
+ },
+ {
+  "mathnet_id": "0lfd",
+  "est": 3,
+  "conf": "mid",
+  "category": "combinatorics",
+  "topics": [
+   "抽屉原理",
+   "Ramsey 型问题"
+  ],
+  "contest": "Team selection tests",
+  "problem": "Let $n \\ge 3$ be an integer and $S$ be a set of $n$ elements. Determine the largest integer $k_n$ such that: for each selection of $k_n$ 3-subsets of $S$, there exists a way to color elements of $S$ with two colors such that none of the chosen 3-subset is monochromatic.",
+  "solution_head": [
+   "The answer to the problem depends on the values of $n$. We have the following cases\n\n* If $n = 3$ then it is obvious that $k_n = 1$.\n\n* If $n = 4$ then $k_n = 4$ because $A_4$ has 4 subsets with 3 elements. For example, color (1, 2) blue and (3, 4) red. Each set contains one of the two numbers above, so it has two colors.\n\n* If $n = 5$ then $k_n \\le 10$ because $A_5$ has 10 subsets with 3 elements. According to pigeonhole principle, since $n = 5$, there are at least 3 elements of $A_5$ of the same color, so the subset with these 3 elements does not satisfy the problem. So $k_n \\le 9$. For $k_n = 9$, say $\\{x, y, z\\}$ is a subset that is not taken. Coloring $x, y, z$ in red and the other two numbers in blue. Since $K = \\{x, y, z\\}$ is not chosen, and $|A_5 \\setminus K| = 2$, every selected subset has an element of $K$ and an element that is not in $K$. Therefore, every selected subset has two different colors.\n\n* If $n = 6$, since $k_5 = 9$ then $k_6 \\le 10$ because one can take 10 subsets of $A_5$ that can not be colored to satisfy the problem. We show that 9 is the answer in this case. Since there are 10 pairs of 3-subsets of $A_6$, and the union of two subsets each is equal to $A_6$, there exists a pair where both sets are not selected. Coloring the first set in green, the second set in red. Obviously every selected subset intersects with one of the above two subsets, since if it doesn't intersect the first set then it has at most 3 elements, and it must be the second set, a contradiction. So $k_6 = 9$.\n\nFinally $n \\ge 7$ is the hardest case. Consider the following subsets $\\{1, 2, 3\\}, \\{1, 4, 5\\}, \\{1, 6, 7\\}, \\{2, 4, 6\\}, \\{2, 5, 7\\}, \\{3, 4, 7\\}, \\{3, 5, 6\\}$.\nWe will show that there is no satisfactory coloring of $A_n$ in this case. Assuming 1 is blue, then (2, 3), (4, 5), (6, 7) have a symmetrical role, and each pair can't all be blue. If (2, 3) is both red then 4 or 6 is blue, assuming 4 is blue, then 5 is red because $\\{1, 4, 5\\}$ cannot be the same green. Since $\\{3, 5, 6\\}$ is not the same red, 6 is blue. Finally, $\\{2, 5, 7\\}$ is not all red, $\\{1, 6, 7\\}$ is not all green so there is no way to color the number 7.\n\nNext, consider the case of 2 is blue and 3 is red. As mentioned, (4, 5) and (6, 7) have a symmetric role. Similarly for (2, 3) then these pairs do not have the same color. Now, it is easy to see that 4 cases of color of pairs (4, 5) and (6, 7) lead to absurdity. For example 4, 6 is in the same set as 2 and 3 so they cannot be the same color and neither 4, 7.\n\nLet $A_1, A_2, \\dots, A_6$ be the selected sets and $A = A_1 \\cup \\dots \\cup A_6$. We prove the problem according to the maximum number of times an element of $A$ belongs to one of 6 chosen subset. Assume $1 \\in A$ is the element that occurs most times. In the argument below, a set is said to be selected if it is some $A_i$ with $i \\in \\{1, \\dots, 6\\}$.\n\n* If 1 appears 6 times then color 1 red and $A \\setminus \\{1\\}$ green. Since 1 belongs to a set of 6, each set has a red element and only 1 of red elements, so each set has 2 of blue elements.\n\n* If 1 appears 5 times then color 1 in red. Assume $A_6 = \\{x, y, z\\}$ does not contain 1. Color $x$ red, $y$ and $z$ green. Since there are 2 red elements, there is no set that has 3 red elements and since $A_1, A_2, \\dots, A_5$ contains 1, they have at least one red element.\n\n* If 1 appears 4 times, assume $A_5$ and $A_6$ do not contain 1. If there exists $x$ that both belong to $A_5$ and $A_6$, color 1, $x$ in red and the remaining elements of $A_n$ in blue. The statement can be proved as in previous case. Conversely, if $A_5 \\cap A_6 = \\emptyset$ then there are 9 pairs $(a, b)$ where $a \\in A_5$ and $b \\in A_6$. Since there is only 4 subset containing 1, according to the pigeonhole principle there exist $a \\in A_5$ and $b \\in A_6$ such that $\\{1, a, b\\}$ is not selected. Color 1, $a$, $b$ red and the rest of the elements blue. Since there are exactly 3 of red elements and $\\{1, a, b\\}$ is not selected, every set has two colors.\n\n* If 1 appears 3 times and is not in $A_4, A_5, A_6$. Let $x$ be the element that belongs to the most sets in this set 3. If $x$ appears 3 times then color 1, $x$ in red and this way satisfies the problem. If $x$ occurs twice, and is not in $A_6$, then we show that there is $y \\in A_6$ so that $\\{1, x, y\\}$ is not selected. Indeed, $x$ appears at most 3 times because 1 occurs the most, but $x \\in A_4, A_5$ so it is chosen in 1 other subset. So there is an element of $A_6$ which is $y$ so that $\\{1, x, y\\}$ is not selected. Fill these three elements with red, the rest with blue to satisfy the problem. Finally, if every element in $A_4, A_5, A_6$ appears exactly 1 times, similar to the case where 1 appears 4 times, we will show there is\n$$\n(x, y, z) \\in A_4 \\times A_5 \\times A_6\n$$\nsuch that the subsets $A_1, A_2, A_3$ do not have the form $\\{1, a, b\\}$ where $a, b \\in \\{x, y, z\\}$. There are 3 pairs $(a, b)$ for which $\\{1, a, b\\}$ is chosen. However, for a pair $(a, b)$, there exists at most 7 elements $c$ belonging to $A_4 \\cup A_5 \\cup A_6$ so that $(a, b, c) \\in A_4 \\times A_5 \\times A_6$. Thus, there are at most 21 tuples $(a, b, c) \\in A_4 \\times A_5 \\times A_6$ such that two of three elements of this tuple together with 1 form a chosen set. There are 27 tuples $(x, y, z) \\in A_4 \\times A_5 \\times A_6$ so there is a tuple $(x, y, z)$ that every 2 of its elements does not form with 1 a selected set. Coloring 1, $x, y, z$ in red and the remaining numbers in blue to satisfy the problem.\n\n* If 1 appears 2 times and belongs to $A_1, A_2$. Assume 2 is the element that occurs most times in $A_3 \\cup \\dots \\cup A_6$. We have the following cases\n\n- If 2 occurs 2 times in $A_3, \\dots, A_6$, then 1 and 2 do not appear together. We consider 1 and 2 to be the same element $x$ and $x$ that appear 4 times, reducing the problem to the case where 1 occurs 4 times.\n- If 2 occurs 1 times, that means $A_3 \\cup \\dots \\cup A_6$ has 12 elements and there exists an element that is not in $A_1 \\cup A_2$. Assuming it's $y$, again let 1 and $y$ be the same element $x$ appearing 3 times, reducing the problem to the case where 1 occurs 3 times.\n\n* If 1 appears 1 times, then every element appear once. Choose an arbitrary element from each set and color them red. Other elements are blue.\n\nSo we have $k_3 = 1, k_4 = 4, k_5 = k_6 = 9$ and $k_n = 6, \\forall n \\ge 7$. $\\square$"
+  ]
+ },
+ {
+  "mathnet_id": "0clv",
+  "est": 2,
+  "conf": "low",
+  "category": "combinatorics",
+  "topics": [
+   "计数与容斥",
+   "Ramsey 型问题"
+  ],
+  "contest": "Seventeenth ROMANIAN MASTER OF MATHEMATICS",
+  "problem": "Let $k$ and $m$ be integers greater than $1$. Consider $k$ pairwise disjoint sets $S_1, S_2, \\dots, S_k$; each of these sets has exactly $m+1$ elements, one of which is red and the other $m$ are all blue. Let $\\mathcal{F}$ be the family of all subsets $F$ of $S_1 \\cup S_2 \\cup \\dots \\cup S_k$ such that, for every $i$, the intersection $F \\cap S_i$ is monochromatic; the empty set is monochromatic. Determine the largest possible cardinality of a subfamily $\\mathcal{G} \\subseteq \\mathcal{F}$, no two sets of which are disjoint.",
+  "solution_head": [
+   "We now prove that $|\\mathcal{G}| \\le 2^{m-1}(2^m + 1)^{k-1}$ for any $\\mathcal{G}$ satisfying the conditions in the statement. For convenience, write $M = 2^m + 1$. Let $r_i$ denote the red element of $S_i$, and let $B_i$ be the set of blue elements in $S_i$.\nFor every subset $X_i \\subset B_i$ and every $j \\in \\mathbb{Z}_M$, define the sets\n\n$$\nT_{X_i, j} = \\begin{cases} \\{r_i\\}, & \\text{if } j = 0; \\\\ X_i, & \\text{if } j \\ne 0 \\text{ and } j \\text{ is even (considered as a number in } [1, M-1]\\}; \\\\ B_i \\setminus X_i, & \\text{if } j \\ne 0 \\text{ and } j \\text{ is odd (considered as a number in } [1, M-1]\\}. \\end{cases}\n$$\n\nNote that, for every $i$ and every $j$, the sets $T_{X_i,j}$ and $T_{X_i,j+1}$ are disjoint. Now, for every sets $X_i \\subset B_i$ and every elements $j_i \\in \\mathbb{Z}_M$, $i = 1, 2, \\dots, k$, denote\n$$\nF(X_1, X_2, \\dots, X_k, j_1, j_2, \\dots, j_k) = \\bigcup_{i=1}^{k} T_{X_i, j_i}. \\quad (*)\n$$\n\n**Claim.** Every set $F \\in \\mathcal{F}$ has exactly $2^{mk}$ representations of the form ($*$).\n\n*Proof.* Set $F_i = F \\cap S_i$. If $F_i = \\{r_i\\}$, then there are $2^m$ possible choices for $X_i$, and one should necessarily have $j_i = 0$. Otherwise, there are only two possible choices for $X_i$, namely $X_i = F_i$ and $X_i = B_i \\setminus F_i$, and for each of them there are $2^{m-1}$ possible choices for $j_i$. So, whatever $F$, there are $2^m$ possible choices for each pair $(X_i, j_i)$ all of which can be made independently, whence a total of $2^{mk}$ possible tuples $(X_1, X_2, \\dots, X_k, j_1, j_2, \\dots, j_k)$. This proves the Claim.\n\nThe Claim implies that each $F \\in \\mathcal{F}$ has the same number of representations of the form ($*$). Thus, it suffices to show that, among all $N = 2^{km}(2^m + 1)^k$ tuples $(X_1, X_2, \\dots, X_k, j_1, j_2, \\dots, j_k)$, at most $\\frac{2^{m-1}}{2^m+1}N$ satisfy\n$$\nF(X_1, X_2, \\dots, X_k, j_1, j_2, \\dots, j_k) \\in \\mathcal{G}.\n$$\nTo this end, split all these tuples into length $M$ cycles\n$$\n(F(X_1, X_2, \\dots, X_k, j_1, j_2, \\dots, j_k), F(X_1, X_2, \\dots, X_k, j_1+1, j_2+1, \\dots, j_k+1), \\dots, F(X_1, X_2, \\dots, X_k, j_1+M-1, j_2+M-1, \\dots, j_k+M-1)),\n$$\nand note that any two adjacent sets of a cycle are disjoint. Hence each cycle contains at most $\\lfloor M/2 \\rfloor = 2^{m-1}$ sets from $\\mathcal{G}$. This provides the desired upper bound and completes the solution."
+  ]
+ },
+ {
+  "mathnet_id": "0juv",
+  "est": 2,
+  "conf": "low",
+  "category": "combinatorics",
+  "topics": [
+   "Ramsey 型问题"
+  ],
+  "contest": "HMMT Invitational Competition",
+  "problem": "Problem:\nLet $S=\\{a_{1}, \\ldots, a_{n}\\}$ be a finite set of positive integers of size $n \\geq 1$, and let $T$ be the set of all positive integers that can be expressed as sums of perfect powers (including $1$) of distinct numbers in $S$, meaning\n$$\nT=\\left\\{\\sum_{i=1}^{n} a_{i}^{e_{i}} \\mid e_{1}, e_{2}, \\ldots, e_{n} \\geq 0\\right\\}\n$$\nShow that there is a positive integer $N$ (only depending on $n$) such that $T$ contains no arithmetic progression of length $N$.",
+  "solution_head": [
+   "Solution:\nIn general we can assume that each $a_{i}>1$, since replacing $a_{i}=1$ by some large integer $a$ creates a set $T$ containing the original $T$ as a subset (by setting $e_{i}=0$).\n\nWe proceed by induction on $n$. For the base case $n=1$, an arithmetic progression of length at least $3$ would give $a_{1}^{e_{1}}+a_{1}^{e_{3}}=2 a_{1}^{e_{2}}$ where $e_{3}>e_{2}>e_{1}$. But $a_{1}^{e_{3}} \\geq 2 a_{1}^{e_{2}}$, so this is impossible. Thus our result holds for $n=1$.\n\nAssume the result is true for some $n-1$, and let $A_{n-1}$ be a number such that the longest progression when $|S|=n-1$ has length less than $A_{n-1}$. Let $M$ be a large integer that we will choose later. Take an arithmetic progression of length $2M+1$, calling the terms $b_{1}, b_{2}, \\ldots, b_{2M+1}$. Note that $b_{2M+1} \\leq 2 b_{M+1}$, since $b$ is a sequence of positive integers. For each term from $b_{M+1}$ to $b_{2M+1}$ assign to it the maximum power that is part of the sum. Call this value $c(b_{i})$. More explicitly, if $b_{i}=\\sum_{j=1}^{n} a_{j}^{e_{j}}$, then $c(b_{i})=\\max \\left(a_{1}^{e_{1}}, a_{2}^{e_{2}}, \\ldots, a_{n}^{e_{n}}\\right)$.\n\nSince $\\frac{b_{M+1}}{n} \\leq c(b_{i}) \\leq b_{2M+1} \\leq 2 b_{M+1}$ for $M+1 \\leq i \\leq 2M+1$, there are at most $\\sum_{j=1}^{n}\\left(\\log_{a_{i}} 2n+1\\right) \\leq n\\left(\\log_{2} 2n+1\\right)$ different values of $c(b_{i})$. By Van der Waerden's Theorem, there exists a value of $M$ such that coloring an arithmetic progression of length $M$ with $n\\left(\\log_{2} 2n+1\\right)$ colors yields a monochromatic arithmetic progression of length $A_{n-1}$. In particular, we can take $M=W\\left(A_{n-1}, n\\left(\\log_{2} 2n+1\\right)\\right)$, where $W(n, k)$ denotes the Van der Waerden number. So, we color $b_{M+1}, \\ldots, b_{2M+1}$ by their $c(b_{i})$. Subtracting the common perfect power from each term of the monochromatic arithmetic progression obtained gives an arithmetic progression of $A_{n-1}$ integers expressible as the sum of perfect powers of distinct numbers in $S \\setminus a_{j}$. By the inductive hypothesis, this is a contradiction. So no arithmetic progression of length $2M+1$ can be contained in $T$, and we can take $A_{n}=2M+1$.\n\nBy induction, we thus have such an $A_{n}$ for all $n$."
+  ]
+ }
+]

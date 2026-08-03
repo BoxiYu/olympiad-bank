@@ -63,6 +63,44 @@ def norm_comp(c):
     return c or None
 
 
+# 届数序数（英文拼写）——只剥赛名开头的，句中的 "third round" 是轮次信息必须保留
+_ORD_WORDS = (r'first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth|'
+              r'thirteenth|fourteenth|fifteenth|sixteenth|seventeenth|eighteenth|nineteenth|twentieth|'
+              r'thirtieth|fortieth|fiftieth|sixtieth')
+_LEAD_ORD = re.compile(rf'^(the\s+)?({_ORD_WORDS})\s+(?!round|stage|selection|day|problem)')
+
+
+def comp_variants(cn):
+    """赛名的回退写法：原名 → 去开头 the → 去开头届数序数。用于 tier 表精确匹配的重试。"""
+    seen, out = set(), []
+    for v in (cn, re.sub(r'^the\s+', '', cn or ''), _LEAD_ORD.sub('', cn or '')):
+        v = (v or '').strip()
+        if v and v not in seen:
+            seen.add(v)
+            out.append(v)
+    return out
+
+
+def key_form(s):
+    """表键与输入的双向归一：去开头 the 与届数序数，用于精确匹配的查找键。"""
+    return _LEAD_ORD.sub('', re.sub(r'^the\s+', '', (s or '').strip())).strip()
+
+
+# 家族回退的整词子串匹配下限：短于此的键只允许显式白名单（知名缩写），防止泛词误配
+FAMILY_MIN_LEN = 8
+FAMILY_SHORT_OK = {'hmmt', 'imo', 'egmo', 'apmo', 'jbmo', 'rmm', 'usamo', 'usajmo', 'aime', 'cmo', 'tst'}
+
+
+def family_match(cn, tier_keys_by_len):
+    """家族回退：知名赛事的长尾写法（如 'hmmt invitational competition'）按最长的表内整词子串归档。"""
+    for key in tier_keys_by_len:
+        if len(key) < FAMILY_MIN_LEN and key not in FAMILY_SHORT_OK:
+            continue
+        if re.search(rf'(?<![a-z]){re.escape(key)}(?![a-z])', cn):
+            return key
+    return None
+
+
 def extract_year(c):
     m = re.search(r'\b(19|20)\d{2}\b', c or '')
     return int(m.group(0)) if m else None
@@ -89,14 +127,27 @@ def compile_modifiers(mods):
     return out
 
 
-def grade(comp_norm, ptype, tiers, modifiers, default):
+def grade(comp_norm, ptype, tiers, modifiers, default, tier_keys_by_len=()):
     """难度估级：tier 表命中 → high；表外走 modifiers → mid；全未命中 → default/low。
     modifiers 语义（见表注）：按序求值，set 规则命中即终止；delta 规则累加；
     TST 类 +1 在同名含 junior/初轮词时不加（表注的优先关系）。最后 problem_type 封顶。
     """
     conf = None
-    if comp_norm and comp_norm in tiers:
-        est, conf = tiers[comp_norm]['base'], 'high'
+    hit = None
+    if comp_norm:
+        for v in comp_variants(comp_norm):
+            if v in tiers:
+                hit = v
+                break
+            kf = key_form(v)
+            if kf in tiers.get('_by_keyform', {}):
+                hit = tiers['_by_keyform'][kf]
+                break
+    fam = family_match(comp_norm, tier_keys_by_len) if (comp_norm and not hit) else None
+    if hit:
+        est, conf = tiers[hit]['base'], 'high'
+    elif fam:
+        est, conf = tiers[fam]['base'], 'mid'   # 家族回退：档位可信但写法未审定，降一级置信
     elif comp_norm:
         est = default['base']
         matched = [(rx, kind, val, lc) for rx, kind, val, lc in modifiers if rx.search(comp_norm)]
@@ -169,6 +220,9 @@ def build(mp, tr):
     kw_rules = [(re.compile(r['pattern']), r['category'], r['node']) for r in (mp.get('keyword_rules') or [])]
     sec_map, sec_board, sec_ign = mp.get('map') or {}, mp.get('board_only') or {}, mp.get('ignore') or {}
     tiers = tr.get('tiers') or {}
+    tier_keys_by_len = sorted([k for k in tiers if not k.startswith("_")], key=len, reverse=True)
+    # 表键侧也做一次归一（去 the/届数序数），供输入侧回退查找
+    tiers['_by_keyform'] = {key_form(k): k for k in tier_keys_by_len if key_form(k) != k}
     modifiers = compile_modifiers(tr.get('fallback_modifiers') or [])
     default = tr.get('default_unknown') or {'base': 2, 'conf': 'low'}
 
@@ -209,7 +263,7 @@ def build(mp, tr):
                 reason = '；'.join(dict.fromkeys(ign_reasons)) or '无标签'
             comp_raw = cols['competition'][i]
             cn = norm_comp(comp_raw)
-            est, conf = grade(cn, cols['problem_type'][i], tiers, modifiers, default)
+            est, conf = grade(cn, cols['problem_type'][i], tiers, modifiers, default, tier_keys_by_len)
             row = {
                 'mathnet_id': cols['id'][i],
                 'status': status,
