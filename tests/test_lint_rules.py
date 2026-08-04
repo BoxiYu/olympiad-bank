@@ -109,8 +109,10 @@ def repo(tmp_path, monkeypatch):
     write_prereq(root)
     monkeypatch.setattr(bank, 'ROOT', root)
     bank._VERDICT_CACHE.clear()   # 模块级缓存按 ref 相对路径存，换 ROOT 必须清，否则串味
+    bank._MACHINE_CACHE.clear()
     yield root
     bank._VERDICT_CACHE.clear()
+    bank._MACHINE_CACHE.clear()
 
 
 def run_lint(capsys):
@@ -530,3 +532,57 @@ class TestGenMapEdges:
         capsys.readouterr()
         data = json.load(open(os.path.join(repo, 'maps', 'map_data.json'), encoding='utf-8'))
         assert data['edges'] == []
+
+# ---------------- 机器核验凭证（可选字段 machine_check_ref） ----------------
+
+MACHINE_REL = 'data/verify/machine-01/results.json'
+
+
+def make_machine_ledger(root, rel=MACHINE_REL, rows=None, raw=None):
+    """落一份机器核验台账；raw 非 None 时写原始字符串（造坏 JSON 用）。"""
+    payload = raw if raw is not None else json.dumps(rows or [], ensure_ascii=False)
+    _write(os.path.join(root, *rel.split('/')), payload)
+    return rel
+
+
+class TestMachineCheckRef:
+    def test_no_field_requires_nothing(self, repo, capsys):
+        """增量式：没挂 machine_check_ref 的题一切照旧——机器核验是补充凭证，不是门槛。"""
+        make_problem(repo)
+        rc, out = run_lint(capsys)
+        assert rc == 0, out
+        assert 'machine_check_ref' not in out
+
+    def test_missing_ledger_caught(self, repo, capsys):
+        make_problem(repo, machine_check_ref=MACHINE_REL)
+        rc, out = run_lint(capsys)
+        assert rc == 1
+        assert f'machine_check_ref 指向的核验台账不存在或无法解析：{MACHINE_REL}' in out
+
+    def test_corrupt_ledger_caught(self, repo, capsys):
+        make_machine_ledger(repo, raw='{不是 JSON')
+        make_problem(repo, machine_check_ref=MACHINE_REL)
+        rc, out = run_lint(capsys)
+        assert rc == 1
+        assert '核验台账不存在或无法解析' in out
+
+    def test_ledger_not_covering_problem_caught(self, repo, capsys):
+        """防回归（最核心）：台账在但没本题——「裸声明不被信任」对机器核验同样成立。"""
+        make_machine_ledger(repo, rows=[{'id': 'N-001', 'status': 'pass'}])
+        make_problem(repo, machine_check_ref=MACHINE_REL)
+        rc, out = run_lint(capsys)
+        assert rc == 1
+        assert f'核验台账 {MACHINE_REL} 未覆盖 A-001 或状态非 pass' in out
+
+    def test_ledger_status_fail_caught(self, repo, capsys):
+        make_machine_ledger(repo, rows=[{'id': 'A-001', 'status': 'fail'}])
+        make_problem(repo, machine_check_ref=MACHINE_REL)
+        rc, out = run_lint(capsys)
+        assert rc == 1
+        assert '未覆盖 A-001 或状态非 pass' in out
+
+    def test_ledger_pass_ok(self, repo, capsys):
+        make_machine_ledger(repo, rows=[{'id': 'A-001', 'status': 'pass'}])
+        make_problem(repo, machine_check_ref=MACHINE_REL)
+        rc, out = run_lint(capsys)
+        assert rc == 0, out

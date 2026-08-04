@@ -58,6 +58,10 @@ source_url: https://huggingface.co/datasets/ShadenA/MathNet
   **且其中含有本题的 mathnet_id**——指向不覆盖本题的凭证 = 未评审（铁律 3、4）。
 - `source_url`：数据集主页 `https://huggingface.co/datasets/ShadenA/MathNet`（新题固定值；
   精确溯源靠 mathnet_id + revision，不靠 URL）。
+- `machine_check_ref`（**可选**）：指向 `data/verify/<batch>/results.json` 的机器核验台账路径。
+  仅数值/闭式答案题适用（证明题不进本机制）；是 review_ref 之外的**补充凭证**，不改变
+  verification 档位、不是入库门槛。挂了此字段的题，lint 校验台账存在、含本题且 status=pass；
+  凭证保真由 CI 重跑核验脚本保证——机制正本在 `scripts/checks/run_checks.py` 头注。
 - legacy 专用字段（`original_lang` / `system` / `verification_note` / `compliance`）：仅存于旧题，
   兼容期内 lint 继续按旧语义校验，新题一律不写。
 
@@ -178,6 +182,7 @@ source_url: https://huggingface.co/datasets/ShadenA/MathNet
 | 知识点正名与别名 | `taxonomy/registry.yml`（检索别名 `aliases.yml`） | `bank.py lint` 告警、map/query |
 | 知识点前置依赖图（教学建议边） | `taxonomy/prereq.yml`（语义见其头注） | `bank.py doclint`（端点/DAG 校验）、`bank.py map`（指示图前置 chips）、`student_profile.gap_queue`（补齐队列按上游优先） |
 | 攻坚限时/复习间隔/毕业条件 | `spar_session.py` 契约常量（`TIME_LIMIT`/`INTERVALS`/`GRADUATE_STREAK`） | docs/ 两手册、`bank.py` coach/review、`web_app.py`（数值由服务端下发，前端不复制） |
+| 机器核验凭证（machine_check_ref 与台账保真） | `scripts/checks/run_checks.py` 头注 | `bank.py lint`（凭证覆盖校验）、CI「机器核验」步骤（重跑保真）、SPEC §2（字段语义指针）、`data/verify/` 台账（必须提交） |
 | 入库铁律 v2 | SPEC §5 | AGENTS.md（路由指针） |
 | 版权边界 | SPEC §6 | AGENTS.md（路由指针） |
 | lint 执行命令 | `scripts/lint.sh` | CI workflow、AGENTS.md |

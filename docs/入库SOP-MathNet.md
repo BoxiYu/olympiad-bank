@@ -142,6 +142,20 @@ uv run --group mathnet python scripts/mathnet_import.py --dir data/review/geo-01
 | `source_url` | `https://huggingface.co/datasets/ShadenA/MathNet` |
 | 题面 / 答案 / 解法要点 | MathNet 原文英文直用 / final_answer（证明题写「证明题」）/ 官方解拼接 |
 
+## 6.5｜可选：机器核验（数值/闭式答案题）
+
+入库后可给答案补一份**机器核验凭证**（机制正本 `scripts/checks/run_checks.py` 头注，SPEC §7 已登记）：
+
+```bash
+uv run --with sympy python scripts/checks/run_checks.py                  # 重跑全部核验
+uv run --with sympy python scripts/checks/run_checks.py --write <batch>  # 全 pass 后写台账
+```
+
+在 `scripts/checks/check_<batch>.py` 里为题号写独立核验（穷举/精确计算/双实现互证，
+**不许把答案抄进来验证它等于自己**），`--write` 出台账后把 `machine_check_ref` 回填进题文件。
+台账 `data/verify/` 必须提交（同 `data/review/` 纪律）；CI 每次重跑保真。
+证明题不进本机制——机器核验是补充凭证，做不了不是缺陷。
+
 ## 7｜lint：唯一硬门槛
 
 ```bash
