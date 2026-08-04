@@ -1,0 +1,79 @@
+[
+ {
+  "mathnet_id": "0kzy",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "素数与算术基本定理",
+   "整除与同余",
+   "多项式"
+  ],
+  "contest": "AMC 10 A",
+  "problem": "There are exactly $K$ positive integers $b$ with $5 \\le b \\le 2024$ such that the base-$b$ integer $2024_b$ is divisible by 16 (where 16 is in base ten). What is the sum of the digits of $K$?\n(A) 16 (B) 17 (C) 18 (D) 20 (E) 21",
+  "solution_head": "Notice that $2024_b = 2b^3 + 2b + 4 = 2(b+1)(b^2 - b + 2)$, and consider the residue classes of this number modulo 8. If $b \\equiv 7 \\pmod{8}$, then $b+1 \\equiv 0 \\pmod{8}$, and if $b \\equiv 3 \\pmod{8}$, then $b^2 - b + 2 \\equiv 0 \\pmod{8}$. In each case $2024_b$ is divisible by 16.\nIn all other cases $2024_b$ is not divisible by 16. Indeed, if $b \\equiv 0, 2, \\text{ or } 4 \\pmod{8}$, then $b+1$ is odd, and $b^2 - b + 2 \\equiv b + 2 \\pmod{8}$, so $2024_b$ is divisible by no power of 2 greater than $2^3$. If $b \\equiv 1 \\pmod{8}$, then $b+1$ and $b^2 - b + 2$ are both odd multiples of 2, so $2024_b$ is divisible by 8, but not by 16.\nBecause $2024 = 253 \\cdot 8$, there are $253 \\cdot 3 = 759$ positive integers $b \\le 2024$ that are congruent to 3, 6, or 7 modulo 8. The number 3 must be excluded from this total, because the problem statement requires $b$ to be at least 5. Thus $K = 759 - 1 = 758$, and the sum of the digits of $K$ is $7+5+8 = 20$."
+ },
+ {
+  "mathnet_id": "0i7y",
+  "est": 3,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "计数与容斥",
+   "素数与算术基本定理"
+  ],
+  "contest": "Harvard-MIT Mathematics Tournament",
+  "problem": "Problem:\nThe product of the digits of a 5-digit number is $180$. How many such numbers exist?",
+  "solution_head": "Solution:\nLet the digits be $a, b, c, d, e$. Then $a b c d e = 180 = 2^{2} \\cdot 3^{2} \\cdot 5$. We observe that there are 6 ways to factor $180$ into digits $a, b, c, d, e$ (ignoring differences in ordering):\n$$\n180 = 1 \\cdot 1 \\cdot 4 \\cdot 5 \\cdot 9 = 1 \\cdot 1 \\cdot 5 \\cdot 6 \\cdot 6 = 1 \\cdot 2 \\cdot 2 \\cdot 5 \\cdot 9 = 1 \\cdot 2 \\cdot 3 \\cdot 5 \\cdot 6 = 1 \\cdot 3 \\cdot 3 \\cdot 4 \\cdot 5 = 2 \\cdot 2 \\cdot 3 \\cdot 3 \\cdot 5.\n$$\nThere are (respectively) $60, 30, 60, 120, 60$, and $30$ permutations of these breakdowns, for a total of $360$ numbers."
+ },
+ {
+  "mathnet_id": "00xk",
+  "est": 3,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "代数变换技巧"
+  ],
+  "contest": "Baltic Way 1993",
+  "problem": "Problem:\n\n$\\overline{a_{1} a_{2} a_{3}}$ and $\\overline{a_{3} a_{2} a_{1}}$ are two three-digit decimal numbers, with $a_{1}, a_{3}$ being different non-zero digits. The squares of these numbers are five-digit numbers $\\overline{b_{1} b_{2} b_{3} b_{4} b_{5}}$ and $\\overline{b_{5} b_{4} b_{3} b_{2} b_{1}}$ respectively. Find all such three-digit numbers.",
+  "solution_head": "Solution:\n\nAssume $a_{1} > a_{3} > 0$. As the square of $\\overline{a_{1} a_{2} a_{3}}$ must be a five-digit number we have $a_{1} \\leq 3$. Now a straightforward case study shows that $\\overline{a_{1} a_{2} a_{3}}$ can be 301, 311, 201, 211 or 221."
+ },
+ {
+  "mathnet_id": "0440",
+  "est": 5,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "代数变换技巧",
+   "染色与不变量"
+  ],
+  "contest": "China National Team Selection Test",
+  "problem": "Let $S(k)$ denote the sum of all digits of $k$ in base 10. Find all integers $n \\ge 2$ and rational numbers $\\beta \\in (0,1)$, such that there exist $n$ distinct positive integers $a_1, a_2, \\dots, a_n$ that satisfy: for any subset $I \\subseteq \\{1, 2, \\dots, n\\}$ with two or more elements,\n$$ S\\left(\\sum_{i \\in I} a_i\\right) = \\beta \\cdot \\sum_{i \\in I} S(a_i). $$",
+  "solution_head": "The desired are integers $n \\in \\{2, 3, \\dots, 10\\}$ and all rational numbers $\\beta \\in (0, 1)$.\n\nFirst, for integer $n \\in \\{2, 3, \\dots, 10\\}$ and rational $\\beta \\in (0, 1)$, construct $a_1, a_2, \\dots, a_n$ as follows. Let $c$ and $s$ be positive integers that will be determined later. For $k = 1, \\dots, n$, define\n$$\na_k = 2 \\cdot 10^{cn+sk} - 10^{cn+s(k-1)+1} + \\sum_{\\substack{i \\in \\{1, \\dots, n\\} \\\\ i \\neq k}} 10^{cn+s(i-1)+1} + 10^{k-1} \\cdot \\sum_{i=0}^{c-1} 10^{ni}\n$$\nHere, among the last $cn$ places of $a_1, a_2, \\dots, a_n$, each place corresponds to a unique $a_i$ whose digit at that place is nonzero, and that digit is 1; for the next (to the left) $s$ places, $a_1$ has $199\\dots9$ ($s-1$ of 9's), while all other $a_i$'s have $00\\dots01$; for the next $s$ places, $a_2$ has $199\\dots9$ ($s-1$ of 9's), while all other $a_i$'s have $00\\dots01$; and so on.\n\nFor every $1 \\le i \\le n$, $S(a_i) = n + 9(s - 1) + c$; for every\n$$\nI \\subseteq \\{1, 2, \\dots, n\\} \\ (|I| \\ge 2),\n$$\nit is easy to check that\n$$\nS\\left(\\sum_{i \\in I} a_i\\right) = n \\cdot |I| + c \\cdot |I|.\n$$\nAs long "
+ },
+ {
+  "mathnet_id": "054v",
+  "est": 3,
+  "conf": "mid",
+  "category": "number-theory",
+  "topics": [
+   "整除与同余"
+  ],
+  "contest": "National Olympiad Final Round",
+  "problem": "a) The general form $\\overline{ABC}$ of a three-digit number is initially written on a blackboard. Ann and Enn replace by turns letters with digits, exactly one at a time, with Ann starting. Can Ann write digits in such a way that, irrespectively of Enn's move, the resulting three-digit number would be divisible by 11? (Different letters may be replaced with equal digits but the letter $A$ must not be replaced with zero.)\n\nb) Ann and Enn got bored with writing the general form of the number again at the beginning of each game, and decided to change the rules as follows. First, Ann writes one digit to the blackboard, then Enn writes the second digit either to the right or to the left of it, and finally Ann completes the number with writing the third digit either to the left or to the right of the two digits already on the blackboard (writing between the digits is not allowed). Can Ann write digits in such a way that, irrespectively of Enn's move, the result would be a three-digit number (i.e., not starting with 0) that is divisible by 11?",
+  "solution_head": "a) Let Ann replace on her first move one of letters $B$ or $C$ with a digit $k$. If Enn now replaces the other one of $B$ and $C$ with digit $k$, too, the resulting number $\\overline{Akk}$ is divisible by 11 if and only if $\\overline{A00}$ is divisible by 11, which in turn is the case if $A$ is divisible by 11. The only such digit is 0 but $A$ cannot be replaced with 0. If Ann replaces on her first move the letter $A$ with a non-zero digit $k$ then Enn can replace $B$ with the digit $k-1$. The number resulting from Ann's second move differs from the number $kk0$ by less than 11, whence it cannot be divisible by 11.\n\nb) Let Ann write 9 on her first move. If Enn now writes before or after it a digit $k$ and Ann writes after or before of it, respectively, the digit $9-k$, then the resulting number is divisible by 11. Ann cannot make her last move in such a way only if Enn on his move has written either 9 to the end of the number or 0 to the beginning of the number. If Enn has written 9 to the end of the number, the blackboard contains digits 99 and Ann can construct a multiple of 11 by "
+ },
+ {
+  "mathnet_id": "07on",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "费马小定理与欧拉定理",
+   "数列与递推"
+  ],
+  "contest": "Irska 2014",
+  "problem": "Suppose $(a_n)$ is a sequence of integers such that $a_1$ and $a_2$ are two distinct digits of the number $2014$, and $a_n = a_{n-1}^{10} + a_{n-2}^{10}$ for all $n > 2$.\nLet $m = 20142014\\ldots2014$ be the number given by the string $2014$ repeated $2014$ times. Show that $m$ cannot be $a_n$ for any positive integer $n$.",
+  "solution_head": "Note first that\n$$\n\\begin{align*}\na_3 &= a_1^{10} + a_2^{10} \\le 2^{10} + 4^{10} < 2 \\cdot 4^{10} = 2^{21} < 10^{21} < m \\quad \\text{and} \\\\\na_4 &= a_2^{10} + a_3^{10} < 4^{10} + 10^{20} < 2 \\cdot 10^{20} < m.\n\\end{align*}\n$$\nHence, if $m = a_n$, then $n \\ge 5$.\nGiven the possible values for $a_1$ and $a_2$, we see that $a_3$ is congruent to either $1$ or $2$ modulo $3$, depending on whether or not we select $0$ as one of the two initial terms of the sequence. Similarly, $a_4$ is congruent to either $1$ or $2$ modulo $3$, depending on whether or not $a_2 = 0$. In any case, neither $a_3$ nor $a_4$ is divisible by $3$.\nBy the Little Theorem of Fermat, $a_k^{10} \\equiv 1 \\pmod{3}$ unless $a_k \\equiv 0 \\pmod{3}$.\nTherefore, if neither $a_{k-1}$ nor $a_{k-2}$ is divisible by $3$, then\n$$\na_k = a_{k-1}^{10} + a_{k-2}^{10} \\equiv 2 \\pmod{3}.\n$$\nBy induction it follows now that $a_n \\equiv 2 \\pmod{3}$ for all $n \\ge 5$.\nFinally, using that any integer is congruent to its sum of digits modulo $3$, we find that\n$$\nm \\equiv 2014 \\cdot (2 + 0 + 1 + 4) \\equiv 2014 \\equiv 1 \\pmod{3}\n$$\nand we conc"
+ }
+]

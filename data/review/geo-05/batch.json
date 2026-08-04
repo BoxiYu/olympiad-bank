@@ -1,0 +1,86 @@
+[
+ {
+  "mathnet_id": "0b7m",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "圆与四点共圆",
+   "射影几何与调和点列",
+   "共线共点定理"
+  ],
+  "contest": "NMO Selection Tests for the Balkan and International Mathematical Olympiads",
+  "problem": "Let $ABC$ be a scalene triangle. The tangents to the nine-point circle at the foot of the perpendicular dropped from $A$ on the line $BC$ and at the midpoint of the side $BC$ meet at the point $A'$; the points $B'$ and $C'$ are defined similarly. Prove that the lines $AA'$, $BB'$ and $CC'$ are concurrent.\n\nGazeta Matematică",
+  "solution_head": "The tangent at $A$ to the circumcircle $ABC$ meets the line $BC$ at the point $A''$; the points $B''$ and $C''$ are defined similarly. The points $A''$, $B''$ and $C''$ are collinear on Lemoine's line. We shall prove that the lines $AA'$, $BB'$ and $CC'$ are the polars of the points $A''$, $B''$ and $C''$, respectively, relative to the nine-point circle $\\gamma$, so they are indeed concurrent. Clearly, it is sufficient to prove that that $AA'$ is the polar of $A''$ with respect to $\\gamma$.\n\nLet $A_1, B_1$ and $C_1$ be the perpendicular feet dropped from $A, B$ and $C$, respectively, on the lines $BC, CA$ and $AB$, respectively. Let further $A_2$ be the midpoint of the side $BC$, and let $A_3$ be the midpoint of the segment joining $A$ to the orthocenter of the triangle $ABC$. It is easily seen that the line $A_2A_3$ is the perpendicular bisector of the segment $B_1C_1$, so it is perpendicular to the tangent at $A$ to the circumcircle $ABC$. Consequently, $A_3$ is the orthocenter of the triangle $AA''A_2$, so the lines $AA_2$ and $A''A_3$ are perpendicular; it is easily seen that the"
+ },
+ {
+  "mathnet_id": "0dgr",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "射影几何与调和点列"
+  ],
+  "contest": "Saudi Arabian IMO Booklet",
+  "problem": "Given $\\triangle ABC$, $D$ is on $BC$ and $P$ is on $AD$. A line $\\ell$ is passing through $D$ intersects $AB$, $PB$ at $M$, $E$ respectively, and intersects $AC$ extended and $PC$ extended at $F$, $N$ respectively. Let $DE = DF$. Prove that $DM = DN$.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0eva",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "射影几何与调和点列"
+  ],
+  "contest": "Korean Mathematical Olympiad Final Round",
+  "problem": "Let $ABC$ be an isosceles triangle with $AC = BC$. Let $D$ be a point on a line $BA$ such that $A$ lies between $B$ and $D$. Let $O_1$ be the circumcircle of triangle $DAC$. $O_1$ meets $BC$ at point $E$. Let $F$ be the point on the line $BC$ such that $FD$ is tangent to circle $O_1$, and let $O_2$ be the circumcircle of triangle $DBF$. Two circles $O_1, O_2$ meet at point $G$ ($G \\neq D$). Let $O$ be the circumcenter of triangle $BEG$. Prove that the line $FG$ is tangent to circle $O$ if and only if $DG$ is perpendicular to $FO$.",
+  "solution_head": "We first show that both $DB$ and $DE$ are tangent to circle $O$. Since $DFBG$ is concyclic, we have $\\angle FDG = \\angle GBE$. Since $FD$ is tangent to $O_1$, we have $\\angle DEG = \\angle FDG$. Hence $\\angle GBE = \\angle DEG$, which means that $DE$ is tangent to $O$. On the other hand, since $ACED$ is concyclic, $\\angle BAC = \\angle CED$. Since $ABC$ is an isosceles triangle, $\\angle BAC = \\angle ABC = \\angle DBE$. Thus we have $\\angle DBE = \\angle DEB$, that is, the triangle $DBE$ is an isosceles triangle with $DB = DE$, which means that $DB$ is also tangent to $O$.\n\nSince $DB$ and $DE$ are tangent to $O$, the line $FE$ is the polar of the pole $D$ with respect to $O$. By La Hire theorem, $D$ lies on the polar of $F$. Hence $FG$ is tangent to circle $O$ if and only if $DG$ is the polar of $F$, which is equivalent to the fact that $DG$ is perpendicular to $FO$."
+ },
+ {
+  "mathnet_id": "01t8",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "解析几何与向量复数法",
+   "射影几何与调和点列",
+   "根轴与幂"
+  ],
+  "contest": "66th Belarusian Mathematical Olympiad",
+  "problem": "Let $ABC$ be a triangle with $\\angle C = 90^\\circ$, and let $H$ be the foot of the altitude from $C$. A point $D$ is chosen inside the triangle $CBH$ so that $CH$ bisects $AD$. Let $P$ be the intersection point of the lines $BD$ and $CH$. Let $\\omega$ be the semicircle with diameter $BD$ that meets the segment $CB$ at an interior point. A line through $P$ is tangent to $\\omega$ at $Q$.\n\nProve that the lines $CQ$ and $AD$ meet on $\\omega$.\n\n(IMO-2015 Shortlist, Problem G3)",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0c0j",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "根轴与幂",
+   "射影几何与调和点列"
+  ],
+  "contest": "69th NMO Selection Tests for BMO and IMO",
+  "problem": "Let $\\triangle ABC$ be a triangle and let $\\omega$ be its $A$-excircle (excircle opposite vertex $A$). Let $D, E, F$ be the points where $\\omega$ touches the lines $BC, CA, AB$, respectively. The circle $AEF$ crosses the line $BC$ at $P$ and $Q$. Let $M$ be the midpoint of the line segment $AD$. Prove that the circles $\\omega$ and $MPQ$ are tangent.",
+  "solution_head": "For convenience, let $\\Omega$ and $\\gamma$ denote the circles $AEFPQ$ and $MPQ$, respectively. Letting the line $AD$ cross $\\omega$ again at $T$, we will show that $\\gamma$ and $\\omega$ are tangent at $T$.\n\nWe first prove that the points $M, P, Q, T$ are concyclic, so $T$ lies on $\\gamma$. Let $A'$ be the center of $\\omega$, and notice that $AA'$ is a diameter of $\\Omega$, since $A'E$ and $A'F$ are perpendicular to $AE$ and $AF$, respectively. Let $N$ be the midpoint of the line segment $DT$. Since $A'D = A'T$, the angle $A'NA$ is right, so $N$ also lies on $\\Omega$, and therefore $DP \\cdot DQ = DA \\cdot DN$; and since $DA = 2DM$ and $DT = 2DN$, it follows that $DP \\cdot DQ = DM \\cdot DT$, showing that $M, P, Q, T$ are indeed concyclic.\n\nIf $EF$ and $BC$ are parallel, then the triangle $ABC$ is isosceles with apex at $A$ and the conclusion follows by symmetry.\n\nOtherwise, the lines $PQ$ and $EF$ cross at a point $R$; these lines are the radical axes of $\\Omega, \\gamma$ and $\\Omega, \\omega$, respectively, so $R$ is the radical center of the three circles, and $RT$ is the radical axis "
+ },
+ {
+  "mathnet_id": "0kir",
+  "est": 3,
+  "conf": "mid",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "三角形五心与经典引理",
+   "解析几何与向量复数法",
+   "射影几何与调和点列"
+  ],
+  "contest": "HMMT Spring 2021 Team Round",
+  "problem": "Problem:\n\nLet $ABC$ be a right triangle with $\\angle A = 90^{\\circ}$. A circle $\\omega$ centered on $BC$ is tangent to $AB$ at $D$ and $AC$ at $E$. Let $F$ and $G$ be the intersections of $\\omega$ and $BC$ so that $F$ lies between $B$ and $G$. If lines $DG$ and $EF$ intersect at $X$, show that $AX = AD$.",
+  "solution_head": "Solution:\n\nIn all solutions, let $O$ be the center of $\\omega$. Then $\\angle DOE = 90^{\\circ}$, so $\\angle DFE = 45^{\\circ}$, so $\\angle DXE = 135^{\\circ}$. Let $\\Gamma$ be the circle centered at $A$ with radius $AD = AE$, and let $X' = \\overrightarrow{AX} \\cap \\Gamma$. Then $\\angle DXE = \\angle DX'E = 135^{\\circ}$, so $X = X'$.\n\n---\n\nSolution:\n\nLet $N$ be the midpoint of arc $FDEG$. Note that $DOEA$ is a square. Also, $DXEN$ is a parallelogram; one way to see this is that by considering inscribed angles, $\\angle NEX = \\angle NEF = 45^{\\circ}$, $\\angle NDX = \\angle NDG = 45^{\\circ}$, and $\\angle END = 135^{\\circ}$. This means that $\\triangle AXD \\cong \\triangle ONE$, because $AD = OE$, $XD = NE$, and $\\angle ADX = \\angle OEN$ by considering parallel lines. So $AX = ON = OE = AD$.\n\n---\n\nSolution:\n\nLet $Y = DF \\cap EG$. Since $GX \\perp FY$ and $FX \\perp GY$, $X$ is the orthocenter of $\\triangle FGY$. Since $(AODE)$ passes through the midpoint of $FG$, and the feet of altitudes from $F$ and $G$, $(AODE)$ is the nine-point circle of $\\triangle FGY$. Since $AO$ is the diameter of $(AODE)$"
+ }
+]

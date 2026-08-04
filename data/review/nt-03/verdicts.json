@@ -1,0 +1,16 @@
+[
+  {
+    "mathnet_id": "0dlo",
+    "short_title": "Divisor-Count Ratio and Prime-Factor Sum",
+    "difficulty_codex": 2,
+    "difficulty_reason": "Testing a prime power and applying Legendre's valuation formula gives the short but nontrivial counterexample n=64.",
+    "topics_verdict": "partial",
+    "topics_comment": "Factorial valuations and prime factorization are relevant, but LTE is not needed; the statement is instead exposed by a prime-power counterexample.",
+    "text_quality": "broken",
+    "text_comment": "The LaTeX problem text is legible, but the claim is false (n=64 gives 32/29 <= 3/4) and the official solution excerpt is entirely absent.",
+    "needs_figure": false,
+    "figure_comment": "The problem is fully stated algebraically and requires no figure.",
+    "recommend": "skip",
+    "recommend_reason": "Skip because the asserted inequality has a concrete counterexample and no sourced solution is provided."
+  }
+]

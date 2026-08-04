@@ -1,0 +1,78 @@
+[
+ {
+  "mathnet_id": "07c3",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "递推与生成结构",
+   "算法与过程类问题",
+   "函数方程"
+  ],
+  "contest": "Iranian Mathematical Olympiad",
+  "problem": "Let $f_1 : \\mathbb{N} \\to \\mathbb{N}$ be a function. Function $f_2$ is constructed from $f_1$ such that for each $k \\in \\mathbb{N}$, $f_2(k)$ is the number of times $k$ has appeared in the range of $f_1$, i.e. $f_2(k)$ is the number of natural numbers $n$ for which $f_1(n) = k$.\nSuppose that the range of $f_1$ is such that $f_2$ can be defined over all natural numbers, so no number appears in the range of $f_1$ an infinite or zero number of times. Similarly, function $f_3$ can be constructed from function $f_2$ and consequently for each natural number $i$, function $f_{i+1}$ can be constructed from function $f_i$.\n\na) Prove that for each natural number $T$, there exists a function $f_1$ such that for each natural number $i$, $f_i$ is definable and also the sequence $f_1, f_2, f_3, \\dots$ is periodic with period $T$, i.e. $T$ is the smallest number such that $f_{T+1} = f_1$.\n\nb) Does there exist a function $f_1$ such that for each natural number $i$, $f_i$ is definable and these functions are mutually unequal?",
+  "solution_head": "a) Consider a table with $T+1$ rows and an infinite number of columns (towards right) such that the first column is filled by numbers $1, 2, \\dots, T$ and $1$. An algorithm is introduced for filling the cells of the table, then $f_i(j)$ is defined as the value of the intersection cell of the $i^{th}$ row and the $j^{th}$ column of the table.\n\n| 1 |   |   | ... |\n|---|---|---|-----|\n| 2 |   |   | ... |\n| 3 |   |   | ... |\n|...|   |   | ... |\n| $T-1$ |   |   | ... |\n| $T$ |   |   | ... |\n| 1 |   |   | ... |\n\nLabel the cells of the table, except those of the first row, by $a_1, a_2, a_3, \\dots$, like the following table.\n\n|     |     |     |     |     |\n|-----|-----|-----|-----|-----|\n| $a_1$ | $a_3$ | $a_6$ | $a_{10}$ | ... |\n| $a_2$ | $a_5$ | $a_9$ |         | ... |\n| $a_4$ | $a_8$ |       |         | ... |\n| $a_7$ |       |       |         | ... |\n| ... |     |     |     | ... |\n|     |     |     |     |     |\n\nIn each step of the algorithm, some cells of the table are filled in a way that after the $j^{th}$ step $a_j$ is filled. Suppose that $a_j$ is at the intersection of the $k^{t"
+ },
+ {
+  "mathnet_id": "0hlg",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "算法与过程类问题"
+  ],
+  "contest": "Berkeley Math Circle Monthly Contest 1",
+  "problem": "Problem:\n\nA man has three pets: a mouse, a cat, and a dog. If the man leaves the cat and the dog alone, then the dog would kill the cat. If the man leaves the cat and the mouse alone, the cat would eat the mouse. One day the man decided to take his animals to the other side of the river. However, he has a small boat in which he can fit only one of the animals at a time. Show that it is possible for the man to take all of his animals to the other side of the river safely.",
+  "solution_head": "Solution:\n\nLet $A$ be the side of the river where the trip starts, and $B$ the other side. In the first trip the man should take the cat to the side $B$. He would leave the mouse and the dog together, but that is not dangerous. Then he will return back for a dog and take it to the side $B$. However when he brings the dog, then he returns the cat from $B$ to $A$. Then he takes the mouse from $A$ to $B$ and comes back to the side $A$ to finally take the cat."
+ },
+ {
+  "mathnet_id": "0875",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "算法与过程类问题"
+  ],
+  "contest": "Progetto Olimpiadi di Matematica GARA di SECONDO LIVELLO",
+  "problem": "Problem:\n\nA un tavolo, vi sono quattro persone: Luca, Maria, Nicola e Paola. Ognuno dei quattro mente sempre, oppure non mente mai. Inoltre non amano parlare di loro stessi, ma piuttosto dei loro amici; tant'è che quando gli viene chiesto chi di loro menta sempre, le loro risposte sono:\n\nLuca: \"ogni ragazza è sempre sincera\"\nMaria: \"ogni ragazzo è sempre bugiardo\"\nNicola: \"c'è una ragazza che mente sempre, l'altra è sempre sincera\"\nPaola: \"uno dei ragazzi è sempre sincero, l'altro mai\".\n\nSapreste dire quanti al tavolo sono sempre sinceri?\n\n(A) Nessuno\n(B) 1\n(C) 2\n(D) 3\n(E) tutti.",
+  "solution_head": "Solution:\n\nLa risposta è $\\mathbf{(C)}$. Certamente Luca non può essere sincero, in quanto le due ragazze si contraddicono, quindi non possono dire entrambe il vero. Se Maria dicesse il vero, Nicola mentirebbe; perciò, non è vero che c'è una ragazza sincera, e in particolare Maria non lo è, contraddizione. Quindi, Maria mente. C'è dunque almeno un ragazzo che dice sempre la verità, e si tratta necessariamente di Nicola. Quindi, per quello che dice, una delle due ragazze è sincera, e non potendo essere Maria, è Paola. D'altra parte, quest'ultima afferma che c'è un solo ragazzo che dice il vero, e da quanto dedotto prima, questa frase è vera. Quindi, a essere sinceri sono Nicola e Paola."
+ },
+ {
+  "mathnet_id": "05ob",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "染色与不变量",
+   "算法与过程类问题"
+  ],
+  "contest": "OLYMPIADES FRANÇAISES DE MATHÉMATIQUES",
+  "problem": "Problem:\n\nSoit $n \\geqslant 2$ un nombre entier. On dispose les $n^{2}$ nombres entiers $1,2, \\ldots, n^{2}$ dans les $n^{2}$ cases d'un échiquier $n \\times n$ comme suit : la première ligne contient les nombres $1,2, \\ldots, n$ (de gauche à droite), la deuxième ligne contient les nombres $n+1, n+2, \\ldots, 2 n$ et ainsi de suite. À chaque étape, on peut choisir deux cases ayant un côté commun, et ajouter ou soustraire un même entier aux deux nombres dans ces deux cases.\n\nTrouver toutes les valeurs de $n$ pour lesquelles il est possible d'obtenir la configuration où il n'y a que des 0, et dans ce cas trouver le nombre minimal d'étapes nécessaires pour y parvenir.",
+  "solution_head": "Solution:\n\nTout d'abord, on vérifie que la parité de la somme des nombres écrits ne change pas lorsqu'on effectue une étape. La somme des $n^{2}$ premiers entiers vaut $n^{2}(n^{2}+1)/2$, qui est paire si et seulement si $n$ est pair. Comme on veut obtenir la configuration où il n'y a que des 0 (dont la somme des nombres est paire), on voit que $n$ doit être pair.\n\nRéciproquement, si $n$ est pair, montrons qu'il est possible d'atteindre la configuration où il n'y a que des 0, et qu'il faut au moins $3 n^{2} / 4$ étapes pour y arriver. Supposons qu'on ait réussi à atteindre cette configuration en un certain nombre d'étapes. Considérons alors le graphe $G$ dont les sommets sont les cases et deux sommets sont adjacents si on a modifié leur contenu à une même étape. Soit $C$ une composante connexe de $G$. Alors $C$ possède au moins deux sommets (car tous les nombres sont non nuls au départ). De plus, $C$ ne peut pas avoir exactement deux sommets (car tous les nombres sont différents au départ). Supposons que $C$ a trois sommets. Dans ce cas, deux de ces sommets ont degré 1 et un a degré "
+ },
+ {
+  "mathnet_id": "0d7g",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "染色与不变量",
+   "算法与过程类问题"
+  ],
+  "contest": "SAUDI ARABIAN MATHEMATICAL COMPETITIONS",
+  "problem": "A lock has 16 keys arranged in a $4 \\times 4$ array, each key oriented either horizontally or vertically. In order to open it, all the keys must be vertically oriented. When a key is switched to another position, all the other keys in the same row and column automatically switch their positions too. Show that no matter what the starting positions are, it is always possible to open this lock. (Only one key at a time can be switched.)",
+  "solution_head": "The problem is solved if there is a way to change the orientation of any specified single key, without changing any of the others. This is equivalent to finding a way to switch the chosen key an odd number of times, while switching all other keys an even number of times.\nThis can be done by switching all keys on the same row and column of the chosen key (including the chosen key). To see why, choose a key $K$. If we switch it and all of its sisters that share the same row and column, $K$ will be switched 7 times. Now, examine the other 15 keys in the lock. There are two cases: either the key is a sister of $K$, or not.\nSuppose that $L$ is a sister of $K$, say, sharing a row with $K$. Then $L$ will be switched 4 times. For the other case, suppose $M$ is not a sister of $K$.\nThen $M$ will be switched twice, because among the 6 sisters of $K$ which are turned, exactly two of them share a row or column with $M$. Consequently, of all the keys in the lock, only $K$ is switched an odd number of times.\nAll other keys are switched either 2 or 4 times, leaving their orientation unchanged. Thus"
+ },
+ {
+  "mathnet_id": "0hfh",
+  "est": 3,
+  "conf": "mid",
+  "category": "combinatorics",
+  "topics": [
+   "算法与过程类问题"
+  ],
+  "contest": "62nd Ukrainian National Mathematical Olympiad, Third Round, Second Tour",
+  "problem": "There is a central train station at point $O$, which is connected to other train stations $A_1, A_2, \\dots, A_8$ with tracks. There is also a track between stations $A_i$ and $A_{i+1}$ for each $1 \\le i \\le 8$ (here $A_1 = A_9$). The length of each track $A_iA_{i+1}$ is equal to $1$, and the length of each track $OA_i$ is equal to $2$, for each $1 \\le i \\le 8$.\n\nThere are also $8$ trains $B_1, B_2, \\dots, B_8$, the speed of the train $B_j$ is $j$. Trains can move only by the tracks above, in both directions. No time is wasted on changing directions. If two or more trains meet at some point, they will move together from now on, with the speed equal to that of the fastest of them.\n\nIs it possible to arrange trains into stations $A_1, A_2, \\dots, A_8$ (each station has to contain one train initially), and to organize their movement in such a way, that all trains arrive at $O$ in time $t < \\frac{1}{2}$?",
+  "solution_head": "**Answer:** yes.\n\nArrange the trains clockwise as following: $B_8, B_1, B_7, B_2, B_6, B_3, B_5$ and $B_4$. Now let's show how they should move to meet in time.\n\nLet $B_8$ move through the station of $B_1$ (at this time $B_1$ stays at place and is waiting for $B_8$), and they arrive to $O$ in time $t_8 = \\frac{3}{8}$.\n\nLet train $B_7$ move through the station of $B_2$ (at this time $B_2$ stays at place and is waiting for $B_7$), and they arrive to $O$ in time $t_7 = \\frac{3}{7}$.\n\nLet train $B_6$ move through the station of $B_3$ (at this time $B_3$ stays at place and is waiting for $B_6$) and they arrive to $O$ in time $t_7 = \\frac{1}{2}$.\n\n$B_5$ goes to $O$ right away in time $t_5 = \\frac{2}{5}$.\n\n$B_4$ goes to $O$ right away in time $t_4 = \\frac{1}{2}$.\n\nNow we see that two groups — $B_6 + B_3$ and $B_4$ — arrive at the time $\\frac{1}{2}$, but the groups $B_8 + B_1$ and $B_7 + B_2$ arrive faster than in $\\frac{1}{2}$, and their speeds are larger than those of first groups. So, the group $B_8 + B_1$ upon its arrival to $O$ goes to the group $B_6 + B_3$, unites with it, and goes to "
+ }
+]

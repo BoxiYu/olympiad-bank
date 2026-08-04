@@ -1,0 +1,110 @@
+[
+ {
+  "mathnet_id": "0a3p",
+  "est": 4,
+  "conf": "mid",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆"
+  ],
+  "contest": "IMO Team Selection Test 3",
+  "problem": "Let $ABCD$ be a parallelogram and let $M$ be the intersection of its diagonals. The circumcircle of $\\triangle ABM$ intersects the line segment $AD$ in $E \\ne A$ and the circumcircle of $\\triangle EMD$ intersects the line segment $BE$ in the point $F \\ne E$.\nProve that $\\angle ACB = \\angle DCF$.",
+  "solution_head": "We first show that $CBFD$ is a cyclic quadrilateral. Note that\n$$\n\\angle BCD = \\angle BAD \\quad \\text{(parallelogram)}\n= \\angle BAE = 180^\\circ - \\angle EMB \\quad \\text{(EABM is cyclic)}\n= \\angle EMD = \\angle EFD \\quad \\text{(inscribed angle theorem in EFMD)}\n= 180^\\circ - \\angle BFD\n$$\nTherefore $CBFD$ is a cyclic quadrilateral. Using the inscribed angle theorem with respect to cyclic quadrilaterals $EABM$, $EFMD$, and $CBFD$ when necessary, we see that\n$$\n\\angle ACD = \\angle CAB = \\angle MAB = \\angle MEB = \\angle MEF \\\\\n= \\angle MDF = \\angle BDF = \\angle BCF.\n$$\nSo $\\angle ACF + \\angle FCD = \\angle ACD = \\angle BCF = \\angle BCA + \\angle ACF$. If we subtract $\\angle ACF$ from this we find that $\\angle ACB = \\angle DCF$, as required. $\\square$"
+ },
+ {
+  "mathnet_id": "044j",
+  "est": 5,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "组合几何",
+   "变换几何",
+   "不等式"
+  ],
+  "contest": "China National Team Selection Test",
+  "problem": "Find the smallest real number $\\alpha$, such that for any convex polygon $P$ of area $1$, there exists a point $M$ in the plane, such that the area of the convex hull of $P \\cup Q$ is at most $\\alpha$, where $Q$ is the central-symmetric figure of $P$ about $M$.\n(Contributed by Qu Zhenhua and Wu Yuchi)",
+  "solution_head": "(i) If $M$ is outside $P$ or on the boundary. Draw a line $l$ through $M$ such that $P$, $Q$ lie on different sides of $l$ (they have no common interior points). Then $S(P \\cup Q) \\ge S(P) + S(Q) \\ge 2$.\n\n(ii) If $M$ is inside $P$. Let $A', B', C'$ be the respective symmetric points of $A, B, C$ about $M$. Then $R = P \\cup Q = \\{A, B, C, A', B', C'\\}$, $R$ has a centre of symmetry, $R$ is a parallelogram or a hexagon. If $R$ is a parallelogram, say $R = ABA'B'$, then $C$ is inside or on the boundary, and\n$$\nS(R) = S(ABA'B') \\ge 2S(ABC) = 2.\n$$\nIf $R$ is a hexagon, $R = AC'BA'CB'$, then\n$$\n\\begin{aligned}\nS(R) &= S(AC'BM) + S(BA'CM) + S(CB'AM) \\\\\n&= (S(AMC) + S(BMC)) + (S(BMA) + S(CMA)) \\\\\n&\\quad + (S(CMB) + S(AMB)) = 2.\n\\end{aligned}\n$$\nNext, we prove $\\alpha = 2$ satisfies the problem statement in two ways. $\\square$"
+ },
+ {
+  "mathnet_id": "00fp",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆"
+  ],
+  "contest": "APMO",
+  "problem": "Let $ABC'$ be a triangle and $D$ the foot of the altitude from $A$. Let $E$ and $F$ be on a line passing through $D$ such that $AE$ is perpendicular to $BE$, $AF$ is perpendicular to $CF$, and $E$ and $F$ are different from $D$. Let $M$ and $N$ be the midpoints of the line segments $BC$ and $EF$, respectively. Prove that $AN$ is perpendicular to $NM$.",
+  "solution_head": "Let $P$ be such that $ADMP$ is a rectangle. Choose points $Q$ and $R$ on the line $AP$ such that $Q B D A$ and $A D C R$ are rectangles. Points $Q$, $B$ and $D$ lie on the circle of diameter $AB$, hence $ADEQ$ is a cyclic quadrilateral. Similarly, $R$, $C$ and $D$ lie on the circle of diameter $AC$, hence $ADFR$ is a cyclic quadrilateral.\n\nThe two quadrilaterals share a side, and have the same supporting lines for the other two sides. Since they are cyclic, the remaining two sides $EQ$ and $RF$ must be parallel. Thus $E$, $Q$, $R$ and $F$ are vertices of a trapezoid.\n\nOn the other hand, in rectangle $Q B C R$, $M$ is the midpoint of $BC$, and $MP$ is parallel to $QB$, so $P$ is the midpoint of $QR$. Since $N$ is the midpoint of $EF$, we obtain that, in trapezoid $Q E F R$, $NP$ is parallel to $QE$.\n\nThis implies that quadrilateral $ADNP$ is cyclic, having the sides parallel to the sides of $ADFR$. Moreover, $A$ lies on the circle circumscribed to this quadrilateral, because the other three vertices of the rectangle $ADMP$ lie on it. Hence the quadrilateral $ADMN$ is cyclic.\n\nConseque"
+ },
+ {
+  "mathnet_id": "0cm3",
+  "est": 5,
+  "conf": "mid",
+  "category": "geometry",
+  "topics": [
+   "不等式",
+   "解析几何与向量复数法",
+   "抽屉原理"
+  ],
+  "contest": "The 7th Romanian Master of Mathematics Competition",
+  "problem": "Problem:\nGiven a positive integer $n$, determine the largest real number $\\mu$ satisfying the following condition: for every $4n$-point configuration $C$ in an open unit square $U$, there exists an open rectangle in $U$, whose sides are parallel to those of $U$, which contains exactly one point of $C$, and has an area greater than or equal to $\\mu$.",
+  "solution_head": "Solution:\nThe required maximum is $\\frac{1}{2n+2}$. To show that the condition in the statement is not met if $\\mu > \\frac{1}{2n+2}$, let $U = (0,1) \\times (0,1)$, choose a small enough positive $\\epsilon$, and consider the configuration $C$ consisting of the $n$ four-element clusters of points $\\left(\\frac{i}{n+1} \\pm \\epsilon\\right) \\times \\left(\\frac{1}{2} \\pm \\epsilon\\right)$, $i = 1, \\ldots, n$, the four possible sign combinations being considered for each $i$. Clearly, every open rectangle in $U$, whose sides are parallel to those of $U$, which contains exactly one point of $C$, has area at most $\\left(\\frac{1}{n+1} + \\epsilon\\right) \\cdot \\left(\\frac{1}{2} + \\epsilon\\right) < \\mu$ if $\\epsilon$ is small enough.\n\nWe now show that, given a finite configuration $C$ of points in an open unit square $U$, there always exists an open rectangle in $U$, whose sides are parallel to those of $U$, which contains exactly one point of $C$, and has an area greater than or equal to $\\mu_0 = \\frac{2}{|C|+4}$.\n\nTo prove this, usage will be made of the following two lemmas whose proofs are left "
+ },
+ {
+  "mathnet_id": "073c",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "不等式",
+   "根与系数",
+   "三角形五心与经典引理",
+   "三角形与四边形基本性质"
+  ],
+  "contest": "INMO",
+  "problem": "Problem:\nIf $x, y, z$ are positive real numbers, prove that\n$$\n(x+y+z)^{2}(y z+z x+x y)^{2} \\leq 3\\left(y^{2}+y z+z^{2}\\right)\\left(z^{2}+z x+x^{2}\\right)\\left(x^{2}+x y+y^{2}\\right)\n$$",
+  "solution_head": "Solution:\nWe begin with the observation that\n$$\nx^{2}+x y+y^{2}=\\frac{3}{4}(x+y)^{2}+\\frac{1}{4}(x-y)^{2} \\geq \\frac{3}{4}(x+y)^{2}\n$$\nand similar bounds for $y^{2}+y z+z^{2}, z^{2}+z x+x^{2}$. Thus\n$$\n3\\left(x^{2}+x y+y^{2}\\right)\\left(y^{2}+y z+z^{2}\\right)\\left(z^{2}+z x+x^{2}\\right) \\geq \\frac{81}{64}(x+y)^{2}(y+z)^{2}(z+x)^{2}\n$$\nThus it is sufficient to prove that\n$$\n(x+y+z)(x y+y z+z x) \\leq \\frac{9}{8}(x+y)(y+z)(z+x)\n$$\nEquivalently, we need to prove that\n$$\n8(x+y+z)(x y+y z+z x) \\leq 9(x+y)(y+z)(z+x)\n$$\nHowever, we note that\n$$\n(x+y)(y+z)(z+x)=(x+y+z)(y z+z x+x y)-x y z\n$$\nThus the required inequality takes the form\n$$\n(x+y)(y+z)(z+x) \\geq 8 x y z\n$$\nThis follows from AM-GM inequalities;\n$$\nx+y \\geq 2 \\sqrt{x y}, \\quad y+z \\geq 2 \\sqrt{y z}, \\quad z+x \\geq 2 \\sqrt{z x}\n$$\n\n---\n\nSolution:\nLet us introduce $x+y=c, y+z=a$ and $z+x=b$. Then $a, b, c$ are the sides of a triangle. If $s=(a+b+c) / 2$, then it is easy to calculate $x=s-a, y=s-b, z=s-c$ and $x+y+z=s$. We also observe that\n$x^{2}+x y+y^{2}=(x+y)^{2}-x y=c^{2}-\\frac{1}{4}(c+a-b)(c+b-a)=\\frac{3}{4} c^{2}+\\frac{1}{4}(a-b"
+ },
+ {
+  "mathnet_id": "0jfh",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "面积法与三角法"
+  ],
+  "contest": "HMIC",
+  "problem": "Problem:\n\nTriangle $ABC$ is inscribed in a circle $\\omega$ such that $\\angle A = 60^\\circ$ and $\\angle B = 75^\\circ$. Let the bisector of angle $A$ meet $BC$ and $\\omega$ at $E$ and $D$, respectively. Let the reflections of $A$ across $D$ and $C$ be $D'$ and $C'$, respectively. If the tangent to $\\omega$ at $A$ meets line $BC$ at $P$, and the circumcircle of $APD'$ meets line $AC$ at $F \\neq A$, prove that the circumcircle of $C'FE$ is tangent to $BC$ at $E$.",
+  "solution_head": "Solution:\n\nWe will show that $CE^2 = (CF)(CC')$. By a simple computation using the given angles, one may find that this is equivalent to $CF = AC - AB$, or $AF = 2AC - AB$.\n\nWe compute $AF$ by trigonometry. Assume for simplicity that $AC = \\frac{1}{2}$, so $AD' = 2AD = 2AC = 1$ because $\\triangle ACD$ is isosceles by angle chasing. We first compute $PD'$ by the law of cosines on triangle $APD'$, which yields\n$$\nPD'^2 = AP^2 + AD'^2 - 2(AP)(AD') \\cos 75 = AP^2 + 1 - 2AP \\cos 75.\n$$\nWe may easily compute $AP$ by the law of sines in triangle $BAP$ to be $\\frac{1}{\\sqrt{2}}$. Thus,\n$$\nPD'^2 = \\frac{1}{2} + 1 - \\sqrt{2} \\cdot \\frac{\\sqrt{6} - \\sqrt{2}}{4} = \\frac{4 - \\sqrt{3}}{2}.\n$$\nBy the law of sines within the circumcircle of $APD'F$, we have\n$$\n\\frac{FD'}{\\sin 30} = \\frac{PD'}{\\sin 75}.\n$$\nFrom this, we find that\n$$\nFD' = \\frac{PD' \\sin 30}{\\sin 75} = \\frac{4 - \\sqrt{3}}{\\sqrt{2} + \\sqrt{6}}.\n$$\nThus, we have by the law of cosines on triangle $D'AF$ that\n$$\nAF^2 + AD'^2 - 2(AF)(AD') \\cos 30 = AF^2 + 1 - \\sqrt{3} AF = FD'^2 = \\frac{4 - \\sqrt{3}}{4 + 2\\sqrt{3}}.\n$$\nFinally, solving for"
+ },
+ {
+  "mathnet_id": "0a20",
+  "est": 4,
+  "conf": "mid",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "圆与四点共圆",
+   "变换几何"
+  ],
+  "contest": "IMO Team Selection Test 2",
+  "problem": "Let $\\triangle ABC$ be a triangle with orthocentre $H$ and circumcircle $\\Gamma$. Let $D$ be the reflection of $A$ across the point $B$, and let $E$ be the reflection of $A$ across the point $C$. Let $M$ be the midpoint of segment $DE$.\nProve that the tangent to $\\Gamma$ at $A$ is perpendicular to $HM$.",
+  "solution_head": "Let $A'$ be the reflection of $H$ across the midpoint of $BC$ and $A''$ the reflection of $H$ across $BC$. Then by angle chasing, we find that $\\angle BHC = \\angle ABC + \\angle BCA = 180^\\circ - \\angle CAB$. This angle is also equal to $\\angle BA'C$ and $\\angle BA''C$. Therefore, both $A'$ and $A''$ lie on the circle. Moreover, $A'A''$ is parallel to $BC$, which in turn is perpendicular to $AA''$. Hence, $\\angle A'A''A = 90^\\circ$ and $A'A$ is a diameter of the circle. Therefore $A'A$ is perpendicular to the tangent to $\\Gamma$ at $A$. Since $A$ is the reflection of $M$ across the midpoint of $BC$, we note that $A'A$ is parallel to $HM$ (because these line segments are transformed to each other under the reflection). Therefore $HM$ is also perpendicular to the tangent to $\\Gamma$ at $A$. $\\square$"
+ },
+ {
+  "mathnet_id": "0dsw",
+  "est": 4,
+  "conf": "mid",
+  "category": "geometry",
+  "topics": [
+   "解析几何与向量复数法",
+   "面积法与三角法",
+   "不等式"
+  ],
+  "contest": "Singapore International Mathematical Olympiad",
+  "problem": "Let $x_1$, $x_2$, $x_3$, $y_1$, $y_2$, $y_3$ be real numbers in $[-1, 1]$. Find the maximum value of\n$$\n(x_1y_2 - x_2y_1)(x_2y_3 - x_3y_2)(x_3y_1 - x_1y_3)\n$$",
+  "solution_head": ""
+ }
+]

@@ -1,0 +1,172 @@
+[
+ {
+  "id": "G-005",
+  "title": "Dodecahedron Solid Diagonals",
+  "difficulty": 2,
+  "topics": [
+   "立体几何",
+   "计数与容斥"
+  ],
+  "problem": "Problem:\n\nUn dodecaedro è un solido regolare con 12 facce pentagonali. Una diagonale di un solido è un segmento che ha per estremi due vertici del solido che non appartengono ad una stessa faccia. Quante sono le diagonali del dodecaedro?",
+  "answer": "100",
+  "solution": "Solution:\n\nLa risposta è 100. È necessario contare le coppie (non ordinate) di vertici non appartenenti ad una stessa faccia. In ogni vertice si incontrano 3 facce e in ciascuna di esse ci sono 2 vertici che non sono su una faccia che contiene anche il vertice iniziale (totale 6) più 2 in comune con un'altra faccia (che sono contati due volte e sono quindi in realtà in totale 3) più il vertice stesso: quindi dobbiamo escludere dal conto 10 vertici che non danno luogo a diagonali. Ma i vertici del dodecaedro sono $12 \\cdot 5 / 3 = 20$ (12 facce pentagonali, ma che si incontrano a 3 a 3), quindi per ognuno di questi dobbiamo considerare $20 - 10 = 10$ vertici possibili come altro estremo di una diagonale. In totale le diagonali sono $20 \\cdot 10 / 2 = 100$, dove si è diviso per 2 poiché, moltiplicando, ogni diagonale viene contata due volte."
+ },
+ {
+  "id": "G-006",
+  "title": "Maximum Dragoon Firing Formation",
+  "difficulty": 2,
+  "topics": [
+   "解析几何与向量复数法",
+   "不等式"
+  ],
+  "problem": "Problem:\n\nDragoons take up $1 \\times 1$ squares in the plane with sides parallel to the coordinate axes such that the interiors of the squares do not intersect. A dragoon can fire at another dragoon if the difference in the $x$-coordinates of their centers and the difference in the $y$-coordinates of their centers are both at most $6$, regardless of any dragoons in between. For example, a dragoon centered at $(4,5)$ can fire at a dragoon centered at the origin, but a dragoon centered at $(7,0)$ can not. A dragoon cannot fire at itself. What is the maximum number of dragoons that can fire at a single dragoon simultaneously?",
+  "answer": "168",
+  "solution": "Solution:\n\nAssign coordinates in such a way that the dragoon being fired on is centered at $(0,0)$. Any dragoon firing at it must have a center with $x$-coordinates and $y$-coordinates that are no smaller than $-6$ and no greater than $6$. That means that every dragoon firing at it must lie entirely in the region bounded by the lines $x=-6.5$, $x=6.5$, $y=-6.5$, and $y=6.5$. This is a square with sides of length $13$, so there is room for exactly $169$ dragoons in it. One of them is the dragoon being fired on, so there are at most $168$ dragoons firing at it."
+ },
+ {
+  "id": "G-007",
+  "title": "Cyclic Circumcenter Quadrilateral",
+  "difficulty": 2,
+  "topics": [
+   "圆与四点共圆",
+   "三角形五心与经典引理"
+  ],
+  "problem": "Problem:\n\nSia $ABC$ un triangolo isoscele su base $BC$ e siano $D, E$ punti sui lati $AB, BC$ rispettivamente, tali che che le rette $DE$ e $AC$ risultino parallele. Si consideri inoltre il punto $F$ sulla retta $DE$ che si trova dalla parte opposta di $D$ rispetto ad $E$ ed è tale che $FE$ sia congruente ad $AD$. Detto $O$ il circocentro del triangolo $BDE$, dimostrare che i punti $O, F, A, D$ giacciono su una circonferenza.",
+  "answer": "证明题",
+  "solution": "Solution:\n\nNotiamo che il triangolo $BDE$ è isoscele su base $BE$. Infatti, considerando i segmenti paralleli $ED, CA$ e il segmento $CB$, abbiamo $\\widehat{ACB} = \\widehat{DEB}$. Quindi, dato che $\\widehat{ACB} = \\widehat{CBA}$, otteniamo $\\widehat{DEB} = \\widehat{CBA}$.\n\nConsideriamo ora i triangoli $OED$ e $ODB$: sono congruenti perché $ED = DB$, $OE = OD$, $OD = OB$. In particolare, $\\widehat{DEO} = \\widehat{BDO}$.\n\nOsserviamo infine i triangoli $FEO$ e $ADO$: hanno $\\widehat{OEF} = \\widehat{ODA}$ (perché supplementari di angoli congruenti), $OE = OD$ e $EF = AD$. Dunque i due triangoli sono congruenti, ed in particolare $\\widehat{EFO} = \\widehat{DAO}$, da cui $\\widehat{DFO} = \\widehat{DAO}$. Dato che $F$ ed $A$ si trovano dalla stessa parte della retta $DO$, questo mostra che il quadrilatero $O F A D$ è inscrivibile in una circonferenza."
+ },
+ {
+  "id": "G-008",
+  "title": "Four Pedal Points Concyclic",
+  "difficulty": 2,
+  "topics": [
+   "圆与四点共圆"
+  ],
+  "problem": "Let $ABC$ be an arbitrary triangle. A circle passes through $B$ and $C$ and intersects the lines $AB$ and $AC$ in $D$ and $E$, respectively. The projections of the points $B$ and $E$ on $CD$ are denoted by $B'$ and $E'$, respectively. The projections of the points $D$ and $C$ on $BE$ are denoted by $D'$ and $C'$, respectively.\n\nProve that the points $B'$, $D'$, $E'$ and $C'$ lie on the same circle.",
+  "answer": "证明题",
+  "solution": "Let $I$ be the intersection point of the lines $BE$ and $CD$. The quadrilaterals $BD'B'D$ and $CE'C'E$ are cyclic, so $\\overline{BDB'} = \\overline{B'D'I}$ and $\\overline{CEC'} = \\overline{IE'C'}$. Since $BDEC$ is also cyclic, $\\overline{BDB'} = \\overline{CEC'}$. It follows that $\\overline{B'D'I} = \\overline{IE'C'}$, so $B'D'E'C'$ is a cyclic quadrilateral.\n\n---\n\nUsing the power of a point theorem, one has:\n$$\nIB' \\cdot ID = ID' \\cdot IB\n$$\n$$\nIC' \\cdot IE = IE' \\cdot IC\n$$\n$$\nIE \\cdot IB = ID \\cdot IC\n$$\nFrom these one easily obtains\n$$\nIB' \\cdot IE' = ID' \\cdot IC'\n$$\nwhich proves that the quadrilateral $B'D'E'C'$ is cyclic, using the reciprocal of the power of a point theorem."
+ },
+ {
+  "id": "G-009",
+  "title": "Colored Triangles in Polygon Triangulations",
+  "difficulty": 2,
+  "topics": [
+   "计数与容斥",
+   "组合几何"
+  ],
+  "problem": "Problem:\n\nA polygon having $n$ sides is arbitrarily decomposed in triangles having all the vertices among the vertices of the polygon. We paint in black the triangles that have two sides that are also sides of the polygon, in red if only one side of the triangle is side of the polygon and white those triangles that have in common with the polygon only vertices.\nProve that there are 2 more black triangles than white ones.",
+  "answer": "证明题",
+  "solution": "Solution:\n\nDenote by $b, r, w$ the number of black, red, and white triangles respectively.\nIt is easy to prove that the polygon is divided into $n-2$ triangles, hence\n$$\nb + r + w = n - 2\n$$\nEach side of the polygon is a side of exactly one triangle of the decomposition, and thus\n$$\n2b + r = n\n$$\nSubtracting the two relations yields $w = b - 2$, as needed."
+ },
+ {
+  "id": "G-010",
+  "title": "Maximum Acute Cyclic Triangles",
+  "difficulty": 2,
+  "topics": [
+   "计数与容斥",
+   "不等式"
+  ],
+  "problem": "Let $A_1A_2\\cdots A_n$ be a cyclic polygon ($n \\ge 3$). Find the maximum number of distinct acute-angled triangles whose vertices are chosen from $A_1, A_2, \\dots, A_n$.",
+  "answer": "Maximum number of acute triangles equals n(n-1)(n+1)/24 for odd n and n(n-2)(n+2)/24 for even n.",
+  "solution": "The maximum number of acute-angled triangles is $\\frac{n(n-1)(n+1)}{24}$ if $n$ is odd and is $\\frac{n(n-2)(n+2)}{24}$ if $n$ is even.\n\nWe first count the number $N_1$ of non-acute triangles with $A_1$ as one vertex such that $\\angle A_1 < 90^\\circ$. Let $\\ell$ be the diameter of the circle which passes through $A_1$. Then for points $B, C$ on the circle, $\\triangle A_1BC$ is not acute with $\\angle BA_1C < 90^\\circ$ if and only if $B$ and $C$ lie on the same side of $\\ell$ (possibly on $\\ell$). Suppose there are $a$ points on one side of $\\ell$ and $b$ points on the other side of $\\ell$ other than $A_1$. Note that the two sides share at most one common point which is the other intersection of $\\ell$ and the circle. Therefore, we must have $a+b=n-1$ or $a+b=n$. We find that\n$$\nN_1 = \\binom{a}{2} + \\binom{b}{2}.\n$$\nWe have to minimize $N_1$. Note that $b \\ge n-1-a$ so that $\\binom{b}{2} \\ge \\binom{n-1-a}{2}$.\nWLOG assume $a \\ge n-1-a$. If $n$ is odd, then $(a, n-1-a) > \\left(\\frac{n-1}{2}, \\frac{n-1}{2}\\right)$.\nApplying the majorization inequality, we obtain\n$$\nN_1 \\ge \\binom{a}{2} + \\binom{n-1-a}{2} \\ge \\left(\\frac{n-1}{2}\\right) + \\left(\\frac{n-1}{2}\\right) = \\frac{(n-1)(n-3)}{4}.\n$$\nThe same bound holds if we replace $A_1$ by any other vertex $A_j$. We sum up all the lower bounds. Note that each non-acute triangle is counted twice in\n\nthis sum (one corresponding to each acute angle). Therefore, the number of non-acute triangles is at least\n$$\nn \\cdot \\frac{(n-1)(n-3)}{4} \\cdot \\frac{1}{2} = \\frac{n(n-1)(n-3)}{8}.\n$$\nThus, the number of acute triangles is at most\n$$\n\\binom{n}{3} - \\frac{n(n-1)(n-3)}{8} = \\frac{n(n-1)(n+1)}{24}.\n$$\nThis can be attained when $A_1A_2\\cdots A_n$ is a regular polygon (since in that case all inequalities used become equalities).\n\nSimilarly, if $n$ is even, then $(a, n-1-a) > \\left(\\frac{n}{2}, \\frac{n-2}{2}\\right)$. Applying the majorization inequality, we obtain\n$$\nN_1 \\ge \\binom{a}{2} + \\binom{n-1-a}{2} \\ge \\binom{\\frac{n}{2}}{2} + \\binom{\\frac{n-2}{2}}{2} = \\frac{(n-2)^2}{4}.\n$$\nThus, the number of acute triangles is at most\n$$\n\\binom{n}{3} - n \\cdot \\frac{(n-2)^2}{4} \\cdot \\frac{1}{2} = \\frac{n(n-2)(n+2)}{24}.\n$$\nThe regular polygon case does not yield equality. Indeed, we first consider a regular polygon $B_1B_2\\cdots B_n$. Then we rotate half of the points, say $B_1, B_2, \\dots, B_{\\frac{n}{2}}$, anticlockwise about the centre of the circle with a sufficiently small angle $\\theta$ to points $C_1, C_2, \\dots, C_{\\frac{n}{2}}$. Then $C_1C_2\\cdots C_{\\frac{n}{2}}B_{\\frac{n}{2}+1}B_{\\frac{n}{2}+2}\\cdots B_n$ is one possible case which gives the upper bound $\\frac{n(n-2)(n+2)}{24}$."
+ },
+ {
+  "id": "G-011",
+  "title": "Opposite Triangle Incenters",
+  "difficulty": 2,
+  "topics": [
+   "三角形与四边形基本性质",
+   "三角形五心与经典引理",
+   "圆与四点共圆"
+  ],
+  "problem": "Problem:\n\nLet $ABCD$ be a convex quadrilateral. Let $I_{A}$ be the incenter of $BCD$ and define $I_{B}, I_{C}, I_{D}$ similarly. Show that $AC \\perp I_{B}I_{D}$ if and only if $I_{A}I_{C} \\perp BD$.",
+  "answer": "证明题",
+  "solution": "Solution:\n\nWe show that both are true if and only if $AB + CD = BC + DA$.\n\nLet's first consider the triangle $ABD$. We know the incircle of $ABD$ is centered at $I_{C}$. Let $X, Y, T_{A}$ denote the points where the incircle is tangent to $AB$, $AD$, and $BD$, respectively. We have that $AX = AY$, $BX = BT_{A}$, and $DT_{A} = DY$ since each of these are segments tangent to the incircle from a common point. Thus,\n$$\nAB - AD = (AX + XB) - (AY + YD) = BX - CY = BT_{A} - DT_{A}.\n$$\nWe now include the triangle $BCD$. Let $T_{C}$ denote the point at which the incircle of $BCD$, centered at $I_{A}$, is tangent to $BD$. Replicating the argument for $ABD$, we see that $BT_{C} - DT_{C} = BC - CD$. Now, $I_{A}I_{C} \\perp BD$ iff $T_{A} = T_{C}$, since the altitudes from $I_{A}$ and $I_{C}$ to diagonal $BD$ must meet at a point. Hence, $I_{A}I_{C} \\perp BD$ is equivalent to\n$$\nBA - DA = BT_{A} - DT_{A} = BT_{C} - DT_{C} = BC - CD,\n$$\nwhich in turn is equivalent to $AB + CD = AD + BC$.\n\nWe use a symmetric argument, but this time considering triangles $ABC$ and $ABD$, to show that a necessary and sufficient condition for $I_{B}I_{D} \\perp AC$ is also $AB + CD = AD + BC$. Since $AC \\perp I_{B}I_{D}$ and $I_{A}I_{C} \\perp BD$ are both equivalent to $AB + CD = AD + BC$, we have $AC \\perp I_{B}I_{D} \\Longleftrightarrow I_{A}I_{C} \\perp BD$."
+ },
+ {
+  "id": "G-012",
+  "title": "Parallel Incircle Tangent Inequality",
+  "difficulty": 3,
+  "topics": [
+   "三角形五心与经典引理",
+   "圆与四点共圆",
+   "相似位似与全等",
+   "三角形与四边形基本性质",
+   "不等式"
+  ],
+  "problem": "Let $k$ be the incircle of a $\\triangle ABC$. A line, parallel to $BC$ touches $k$ and intersects the sides $AB$ and $AC$ at points $A_1$ and $A_2$. Define the points $B_1, B_2$ and $C_1, C_2$ in a similar way. Prove that\n$$\n9(\\overline{AA_1} \\cdot \\overline{AA_2} + \\overline{BB_1} \\cdot \\overline{BB_2} + \\overline{CC_1} \\cdot \\overline{CC_2}) \\ge \\overline{AB}^2 + \\overline{BC}^2 + \\overline{CA}^2.\n$$",
+  "answer": "证明题",
+  "solution": "Let $D, E$ and $F$ be the common points of with the sides $BC, CA$ and $AB$, respectively, and let $AE = AF = x$, $BF = BD = y$ and $CD = CE = z$.\nSince $\\triangle AA_1A_2 \\sim \\triangle ABC$, then $\\frac{AA_1}{AB} = \\frac{AA_2}{AC} = \\frac{P_{AA_1A_2}}{P_{ABC}} = \\frac{x}{x+y+z}$ and hence $AA_1 = \\frac{x(x+y)}{x+y+z}$ and $AA_2 = \\frac{x(x+z)}{x+y+z}$. Analogously, $BB_1 = \\frac{y(y+z)}{x+y+z}$, $BB_2 = \\frac{y(y+x)}{x+y+z}$, $CC_1 = \\frac{z(z+x)}{x+y+z}$ and $CC_2 = \\frac{z(z+y)}{x+y+z}$.\nThen the given inequality is equivalent to\n$$\n9 \\sum x^2 (x+y)(x+z) \\ge (x+y+z)^2 \\sum (x+y)^2,\n$$\ni.e.\n$$\n9 \\sum x^4 + 2(\\sum x^2)(\\sum xy) \\ge 2(\\sum x^2)^2 + 4(\\sum xy)^2,\n$$\n\nThe last inequality follows by the well-known inequalities\n$$\n3(x^4 + y^4 + z^4) \\geq (x^2 + y^2 + z^2)^2 \\text{ and } x^2 + y^2 + z^2 \\geq xy + yz + zx.\n$$"
+ },
+ {
+  "id": "G-013",
+  "title": "Chord Through Two Interior Points",
+  "difficulty": 2,
+  "topics": [
+   "根轴与幂"
+  ],
+  "problem": "Problem:\n\nLet $A$, $B$, $C$, and $D$ be points on a circle such that $AB = 11$ and $CD = 19$. Point $P$ is on segment $AB$ with $AP = 6$, and $Q$ is on segment $CD$ with $CQ = 7$. The line through $P$ and $Q$ intersects the circle at $X$ and $Y$. If $PQ = 27$, find $XY$.",
+  "answer": "31",
+  "solution": "Solution:\n\nSuppose $X$, $P$, $Q$, $Y$ lie in that order. Let $PX = x$ and $QY = y$. By power of a point from $P$, $x \\cdot (27 + y) = 30$, and by power of a point from $Q$, $y \\cdot (27 + x) = 84$. Subtracting the first from the second, $27 \\cdot (y - x) = 54$, so $y = x + 2$. Now, $x \\cdot (29 + x) = 30$, and we find $x = 1, -30$. Since $-30$ makes no sense, we take $x = 1$ and obtain $XY = 1 + 27 + 3 = 31$."
+ },
+ {
+  "id": "G-014",
+  "title": "Square Side-Point Orthocenter",
+  "difficulty": 2,
+  "topics": [
+   "三角形五心与经典引理"
+  ],
+  "problem": "On the sides $AB$ and $BC$ of the square $ABCD$ we marked points $K$ and $L$ correspondingly so that $KB = LC$. Segments $AL$ and $CK$ intersect at point $P$. Prove that lines $DP$ and $KL$ are perpendicular.",
+  "answer": "证明题",
+  "solution": "By construction $\\Delta ADK = \\Delta BAL$. Then $\\angle BAL + \\angle ALB = \\angle BAL + \\angle AKD = 90^\\circ$, and $\\Delta AMK$ has a right angle $M$, so $AL \\perp DK$ (fig. 14).\n\nSimilarly $DL \\perp CK$. Then lines $AL$ and $CK$, which intersect at point $P$, contain two altitudes of the $\\Delta DKL$, and therefore the line $DP$ has to contain the third altitude, so $KL \\perp DP$, as desired."
+ },
+ {
+  "id": "G-015",
+  "title": "Centrally Symmetric Cube Projection",
+  "difficulty": 2,
+  "topics": [
+   "立体几何",
+   "解析几何与向量复数法"
+  ],
+  "problem": "Problem:\n\nIs it possible for the projection of the set of points $(x, y, z)$ with $0 \\leq x, y, z \\leq 1$ onto some two-dimensional plane to be a simple convex pentagon?",
+  "answer": "No",
+  "solution": "Solution:\n\nIt is not possible. Consider $P$, the projection of $\\left(\\frac{1}{2}, \\frac{1}{2}, \\frac{1}{2}\\right)$ onto the plane. Since for any point $(x, y, z)$ in the cube, $(1-x, 1-y, 1-z)$ is also in the cube, and the midpoint of their projections will be the projection of their midpoint, which is $P$, the projection of the cube onto this plane will be a centrally symmetric region around $P$, and thus cannot be a pentagon."
+ },
+ {
+  "id": "G-016",
+  "title": "Symmedian Circumcircle Segment Bisection",
+  "difficulty": 3,
+  "topics": [
+   "圆与四点共圆",
+   "三角形五心与经典引理"
+  ],
+  "problem": "Problem:\n\nLet $ABC$ be an acute-angled triangle with $AB \\neq AC$, circumcentre $O$ and circumcircle $\\Gamma$. Let the tangents to $\\Gamma$ through $B$ and $C$ meet each other at $D$, and let the line $AO$ intersect $BC$ at $E$. Denote the midpoint of $BC$ by $M$ and let $AM$ meet $\\Gamma$ again at $N \\neq A$. Finally, let $F \\neq A$ be a point on $\\Gamma$ such that $A, M, E$ and $F$ are concyclic. Prove that $FN$ bisects the segment $MD$.",
+  "answer": "证明题",
+  "solution": "Solution:\n\nWe may suppose $AB < AC$. It is known that $AD$ is a symmedian of triangle $ABC$. Let $Q$ be its second point of intersection with $k$. The triangles $ABM$ and $AQC$ are similar to each other, since their corresponding angles are equal, and it follows that\n$$\n\\angle AFQ = \\angle ACQ = \\angle AMB = \\angle AFE.\n$$\nHence the points $Q, E$, and $F$ are collinear.\n\nNow let $R \\neq F$ denote the point where $FD$ intersects $k$ again. As before, $FD$ is a symmedian of triangle $FBC$, the triangles $CFM$ and $RFB$ are similar,\n$$\n\\angle EAF = \\angle EMF = \\angle RBF = \\angle RAF,\n$$\nand the points $A, O$, and $R$ are collinear as well. So $AR$ is a diameter of $k$ and thus $\\angle AFD = 90^\\circ$.\n\nNow let $X$ be the midpoint of $AD$ and put $J = MD \\cap FN$. As we have just seen, the triangle $AXF$ is isosceles at $X$, the angle at its base being $\\angle XAF = \\angle QNJ$. But since $AM$ is a median in triangle $ABC$ and $AQ$ the corresponding symmedian, we have $QN \\parallel BC \\perp OD$, so the triangle $QJN$ is likewise isosceles. As we have just seen, it has the same angle at its base. We thus have two similar isosceles triangles and looking at their remaining angles we learn $\\angle FXA = \\angle NJQ$. This implies that the quadrilateral $XQJF$ is cyclic.\n\nThus $\\angle QXJ = \\angle QFJ = \\angle QFN = \\angle QAN$ or in other words, the lines $XJ$ and $AM$ are parallel. Since $X$ was defined to be the midpoint of $AD$, this tells us that $J$ is the midpoint of $MD$, as desired.\n\n---\n\nSolution:\n\nAs in the first solution we restrict our attention to the case $AB < AC$, define the points $Q$ and $J$, and remark that the points $Q, E$, and $F$ are collinear.\n\nOur next step is to prove the similarity of the triangles $JFM$ and $JMN$. Evidently their angles at $J$ coincide and in view of\n$$\n\\angle MFJ = \\angle MFQ + \\angle QFN = \\angle MAE + \\angle QAM = \\angle QAO\n$$\nit remains to be shown that $\\angle QAO = \\angle JMN$. To this end we notice that because of $DM \\cdot DO = DB^2 = DQ \\cdot DA$ the quadrilateral $AQMO$ is cyclic, and deduce that $\\angle QAO = \\angle OQA = \\angle OMA = \\angle JMN$ is indeed the case. This concludes the proof of $\\triangle JFM \\sim \\triangle JMN$. Now $JM^2 = JN \\cdot JF$ has become clear. Writing $r$ for the radius of $k$ and considering the power of $J$ with respect to this circle we obtain\n$$\nJN \\cdot JF = JO^2 - r^2 = JO^2 - OM \\cdot OD,\n$$\nso altogether we have\n$$\nOM \\cdot OD = JO^2 - JM^2 = (JO - JM)(JO + JM) = OM \\cdot (2JM + OM).\n$$\nThis simplifies immediately to $2JM = MD$, whereby the problem is solved."
+ },
+ {
+  "id": "G-017",
+  "title": "Distance Between Derived Circumcenters",
+  "difficulty": 2,
+  "topics": [
+   "三角形五心与经典引理",
+   "圆与四点共圆",
+   "面积法与三角法"
+  ],
+  "problem": "Problem:\n\nLet $ABC$ be a triangle with $AB = 13$, $BC = 14$, $CA = 15$. Let $O$ be the circumcenter of $ABC$. Find the distance between the circumcenters of triangles $AOB$ and $AOC$.",
+  "answer": "91/6",
+  "solution": "Solution:\n\nLet $S$, $T$ be the intersections of the tangents to the circumcircle of $ABC$ at $A$, $C$ and at $A$, $B$ respectively. Note that $ASCO$ is cyclic with diameter $SO$, so the circumcenter of $AOC$ is the midpoint of $OS$, and similarly for the other side. So the length we want is $\\frac{1}{2} ST$. The circumradius $R$ of $ABC$ can be computed by Heron's formula and $K = \\frac{abc}{4R}$, giving $R = \\frac{65}{8}$. A few applications of the Pythagorean theorem and similar triangles gives $AT = \\frac{65}{6}$, $AS = \\frac{39}{2}$, so the answer is $\\frac{91}{6}$."
+ },
+ {
+  "id": "G-018",
+  "title": "Five Unit Disks in a Square",
+  "difficulty": 2,
+  "topics": [
+   "不等式",
+   "抽屉原理"
+  ],
+  "problem": "Problem:\nFind the smallest number $a$ such that a square of side $a$ can contain five disks of radius $1$ so that no two of the disks have a common interior point.",
+  "answer": "2 + 2√2",
+  "solution": "Solution:\nLet $PQRS$ be a square which has the property described in the problem. Clearly, $a > 2$. Let $P'Q'R'S'$ be the square inside $PQRS$ whose sides are at distance $1$ from the sides of $PQRS$, and, consequently, are of length $a - 2$. Since all the five disks are inside $PQRS$, their centres are inside $P'Q'R'S'$. Divide $P'Q'R'S'$ into four congruent squares of side length $\\frac{a}{2} - 1$. By the pigeonhole principle, at least two of the five centres are in the same small square. Their distance, then, is at most $\\sqrt{2}\\left(\\frac{a}{2} - 1\\right)$. Since the distance has to be at least $2$, we have $a \\geq 2 + 2\\sqrt{2}$. On the other hand, if $a = 2 + 2\\sqrt{2}$, we can place the five disks in such a way that one is centred at the centre of $PQRS$ and the other four have centres at $P'$, $Q'$, $R'$ and $S'$."
+ }
+]

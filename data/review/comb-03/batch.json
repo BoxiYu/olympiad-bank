@@ -1,0 +1,76 @@
+[
+ {
+  "mathnet_id": "00wa",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "组合博弈与策略"
+  ],
+  "contest": "Baltic Way",
+  "problem": "Problem:\n\nIn two piles there are $72$ and $30$ sweets respectively. Two students take, one after another, some sweets from one of the piles. Each time the number of sweets taken from a pile must be an integer multiple of the number of sweets in the other pile. Is it the beginner of the game or his adversary who can always assure taking the last sweet from one of the piles?",
+  "solution_head": "Solution:\n\nNote that one of the players must have a winning strategy. Assume that it is the player making the second move who has it. Then his strategy will assure taking the last sweet also in the case when the beginner takes $2 \\cdot 30$ sweets as his first move. But now, if the beginner takes $1 \\cdot 30$ sweets then the second player has no choice but to take another $30$ sweets from the same pile, and hence the beginner can use the same strategy to assure taking the last sweet himself. This contradiction shows that it must be the beginner who has the winning strategy."
+ },
+ {
+  "mathnet_id": "08sr",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "组合博弈与策略",
+   "代数变换技巧"
+  ],
+  "contest": "Japan Mathematical Olympiad",
+  "problem": "Currently circulating coins in Japanese currency come in 6 different denominations: 500 yen, 100 yen, 50 yen, 10 yen, 5 yen and 1 yen. Taro had 1 each of 1000 yen note, 100 yen coin, 10 yen coin and 1 yen coin. He made a certain purchase from a merchant and handed him all he had and received some change. Assume that Taro made the payment in such a way that he would not receive in the change any coins of the denominations same as what he had had to begin with, nor a 1000 yen note. Furthermore, he chose the method of the payment so that he would end up with the minimum possible number of coins when he received his change. Assume also that the merchant gave Taro the change with minimum possible number of coins. Count the case of no change as a possibility for the purchase price also. Under these conditions how many distinct purchase prices are possible?",
+  "solution_head": "To begin with, we note that two or more of 500 yen coins, or of 50 yen coins, or of 5 yen coins could not be included in the change Taro received. This is because if two or more of any of these coins were in the change, two of them could be exchanged for one 1000 yen note, or one 100 yen coin or one 10 yen coin to reduce the total number of coins in the change. Also, the change did\n\nnot include 1000 yen note, 100 yen coin, 10 yen coin or 1 yen coin, since Taro used all of these in his payment. Therefore, the change must have consisted of zero or one piece each of 500 yen, 50 yen and 5 yen coins. Consequently, the purchase price must have been of the form: $1111 - (500a + 50b + 5c)$ yen, where each of $a$, $b$, $c$ being either 0 or 1.\n\nConversely, let us show that if the purchase price is of the form $1111 - (500a + 50b + 5c)$ yen, with each one of $a$, $b$, $c$ being 0 or 1, then Taro would make his payment in the way specified in the statement of the problem. Note that as each of $a$, $b$, $c$ is either 0 or 1, a 500 yen, b 50 yen and c 5 yen coins together would yield the method o"
+ },
+ {
+  "mathnet_id": "07ri",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "组合博弈与策略",
+   "代数变换技巧"
+  ],
+  "contest": "Irish",
+  "problem": "Two players, Abigail and Zoe, play a game. Abigail chooses an odd number less than $800$ and writes it on the blackboard. Zoe now chooses a different odd number less than $1200$ and writes it on the blackboard. Each in turn replaces their number by the difference between their number and the smallest power of $2$ bigger than their number. If both players reach $1$ on the same move the game is drawn. If not, the player who first reaches $1$ loses.\nWho has the winning strategy?",
+  "solution_head": "Let $n$ be the current number of one of the players. Because both players start with an odd number, $n$ will be odd as it remains positive throughout the game. If $n = \\sum_{i=0}^{k} b_i 2^i$ with $b_i \\in \\{0, 1\\}$ is the binary representation of $n$, then $b_0 = 1$. If we assume $b_k = 1$, then the smallest power of $2$ that is bigger than $n$ is $2^{k+1}$, hence, the next number for this player will be\n$$\n2^{k+1} - n = 1 + \\sum_{i=0}^{k} 2^i - \\sum_{i=0}^{k} b_i 2^i = 1 + \\sum_{i=0}^{k} (1 - b_i) 2^i = \\sum_{i=0}^{k-1} c_i 2^i,\n$$\nwhere $c_i = 1 - b_i$ for $1 \\le i < k$ and $c_0 = 1$. More visually, the effect of one turn is\n$$\n(1 b_{k-1} b_{k-2} \\cdots b_2 b_1 1)^2 \\mapsto (\\overline{b_{k-1} b_{k-2} \\cdots b_2 b_1} 1)^2\n$$\nwhere $\\overline{0} = 1$ and $\\overline{1} = 0$. This new number has at most $k$ binary digits, but it may have fewer if $b_{k-1}$ was equal to $1$.\nIn general, all the leading digits $1$ will be lost, i.e. if $b_k = b_{k-1} = \\dots = b_{k-j+1} = 1$ and $b_{k-j} = 0$ then the new number will have $j$ digits less than $n$. Therefore, the number of turns to reach"
+ },
+ {
+  "mathnet_id": "08cp",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "组合博弈与策略"
+  ],
+  "contest": "Progetto Olimpiadi della Matematica - GARA di FEBBRAIO",
+  "problem": "Problem:\n\nAlice e Barbara hanno inventato il seguente gioco. Hanno una griglia $1 \\times 2018$, con le caselle numerate da $1$ a $2018$ da sinistra verso destra, e $2018$ tessere numerate anch'esse da $1$ a $2018$. La partita inizia con la griglia vuota, e le due giocatrici si alternano nel fare mosse; la giocatrice di turno può scegliere fra:\n- selezionare una tessera non ancora collocata sulla griglia e porla su una casella libera, a patto che i numeri sulle tessere collocate, se letti da sinistra verso destra, siano in ordine crescente;\n- selezionare una tessera già collocata sulla griglia e spostarla in una casella adiacente in modo che la tessera si avvicini alla casella che reca lo stesso numero della tessera, a patto che la casella di arrivo sia libera (esempio: se la tessera col numero $7$ si trova sulla casella numero $12$, la si può spostare a sinistra, ma non a destra; se invece una tessera si trova già nella casella col suo stesso numero, non potrà più essere spostata).\n(a) Dimostrare che a ogni turno, se le tessere non sono tutte sulla griglia, esiste una mossa lecita.\n(b) Se inizia Alice e vince chi colloca l'ultima tessera, chi ha una strategia vincente?",
+  "solution_head": "Solution:\n\n(a) Se $C_{1}$ è libera, $T_{1}$ può essere spostata a sinistra oppure collocata su $C_{1}$, a seconda che sia già sulla griglia o no; lo stesso ragionamento vale per $C_{2018}$, quindi d'ora in poi supporremo che $C_{1}$ e $C_{2018}$ siano entrambe occupate. Scelta una casella libera $C_{k}$, chiamiamo $T_{a}$ e $T_{b}$ le prime tessere che si incontrano partendo da $C_{k}$ e procedendo rispettivamente verso sinistra e verso destra (da cui $a < b$): se $k \\leq a$ si può spostare $T_{a}$ a destra, così come se $k \\geq b$ si può spostare $T_{b}$ a sinistra; infine, se $a < k < b$, si può collocare $T_{k}$ su $C_{k}$.\n\n(b) Dimostriamo per induzione su $N$ che, giocando su una griglia $1 \\times N$, Alice ha una strategia vincente la cui prima mossa consiste nel collocare $T_{1}$ su $C_{N}$ (o equivalentemente, se c'è solo $T_{1}$ su $C_{N}$ ed è il turno di Barbara, Alice ha una strategia vincente).\nSe $N=2$, Barbara deve necessariamente spostare $T_{1}$ su $C_{1}$, dopodiché Alice vince collocando $T_{2}$ su $C_{2}$.\nSupponiamo ora che la tesi sia vera per un certo $N \\geq 2"
+ },
+ {
+  "mathnet_id": "0l85",
+  "est": 3,
+  "conf": "mid",
+  "category": "combinatorics",
+  "topics": [
+   "组合博弈与策略"
+  ],
+  "contest": "USA TST Selection Test for 67th IMO and 15th EGMO",
+  "problem": "Problem:\n\nTwo players, Alice and Bob, play a game on $n$ vertices labelled $1, 2, \\dots, n$. Alice and Bob take turns adding edges $\\{i, j\\}$, with Alice going first. Both players are banned from creating a cycle, and the game ends after $n-1$ total turns.\nLet the weight of the edge $\\{i, j\\}$ be $|i - j|$, and let $W$ be the total weight of all edges at the end of the game. If Alice plays to maximize $W$ and Bob plays to minimize $W$, what will $W$ be?",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "023s",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "组合博弈与策略"
+  ],
+  "contest": "NÍVEL 3",
+  "problem": "Problem:\n\nAna, Beto e Carolina vão participar do programa de televisão \"Descubra a cor do seu chapéu\". No programa, eles se posicionam em roda e sobre a cabeça de cada um será colocado um chapéu azul ou verde. Cada um pode ver os chapéus dos outros, mas não a cor do seu próprio chapéu. Em seguida, cada um deles escreve em um papel uma dentre três opções \"azul\", \"verde\" ou \"passo\". Se todos os que escreveram cores \"azul\" ou \"verde\" acertarem a cor do seu chapéu, eles ganham um carro $0 \\mathrm{~km}$. Se algum deles chutar a cor do chapéu, \"azul\" ou \"verde\", e errar, os três perdem. Se todos eles escreverem \"passo\", então os três também perdem. Vale ressaltar que eles não podem combinar sinais e não podem ver os papéis dos outros participantes. Os três se reúnem para tentar combinar uma estratégia. Carolina começa 'nenhum de nós deve escrever 'passo', devemos chutar entre 'azul' e 'verde', pois se todos passarmos perderemos\". Beto reage dizendo \"discordo, melhor apenas Ana chutar a cor do seu chapéu, enquanto eu e Carolina escrevemos 'passo'. Neste caso, a chance de ganhar será maior\". Ana se pronuncia \"tive uma ideia, se usarmos a minha estratégia teremos a probabilidade de $\\frac{3}{4}$ de ganhar o carro\".\n\n(a) Seguindo a ideia de Carolina, qual a probabilidade de ganhar o carro?\n\n(b) Mudando para a ideia de Beto, qual passa a ser a probabilidade de ganhar o carro?\n\n(c) Dê um exemplo da possível estratégia de Ana que faz a probabilidade de ganhar o carro $\\operatorname{ser} \\frac{3}{4}$.",
+  "solution_head": "Solution:\n\n(a) Seguindo a ideia de Carolina, cada pessoa tem duas cores possíveis de chapéu, no total há $2 \\cdot 2 \\cdot 2=8$ possibilidades de chutes. Entre eles, há apenas um caso favorável: acertarem seus chutes. Portanto, a probabilidade de ganhar o carro é $\\frac{1}{8}$.\n\n(b) Com a ideia de Beto, há agora apenas duas possibilidades: o chapéu de Ana é azul ou verde. Com um chute, ela terá probabilidade $\\frac{1}{2}$ de acertar e os três ganharem. Veja que Beto e Carolina não influenciarão o resultado, pois eles vão simplesmente passar.\n\n(c) Cada pessoa olha as cores dos chapéus dos seus dois companheiros. Se forem de cores diferentes, esta pessoa deve passar. Se forem da mesma cor, então esta pessoa chuta que seu chapéu é da outra cor. Por exemplo, se os chapéus de Ana, Beto e Carolina forem azul, azul e verde, respectivamente, então Ana e Beto devem escrever \"passo\", pois enxergam chapéus de cores diferentes, enquanto Carolina deve escrever \"verde\" que é a cor diferente da cor dos dois chapéus que ela vê. Neste caso os três ganhariam o carro. No total há 8 possibilidades para a"
+ }
+]

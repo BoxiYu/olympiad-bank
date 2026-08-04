@@ -1,0 +1,175 @@
+[
+ {
+  "mathnet_id": "04td",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "染色与不变量"
+  ],
+  "contest": "65th Czech and Slovak Mathematical Olympiad",
+  "problem": "Mathematics clubs are very popular in a certain city. Any two of them have at least one common member. Prove that one can distribute rulers and compasses to the citizens in such a way that only one citizen gets both (compass and ruler) and any club has at its disposal both, compass and ruler, from its members.",
+  "solution_head": "Let us consider the club $K$ with the least number of its members (in case there is more such clubs, we take any). We give to one of its members (let us call him Jacob) both a compass and a ruler. Each of the other members of the club will get a compass. Any other citizen will get a ruler. We show that this distribution complies with the conditions of the problem:\n\nAny club which has Jacob as its member has certainly both instruments.\n\nIf there is a club where Jacob does not belong, then it has at least one common member with the club $K$, that is, there is at least a compass at disposal in the club. If there were no ruler in the club, it would mean that it is a “subclub” of $K$ and therefore has at least one member (Jacob) less than $K$, which is a contradiction with the choice of $K$. The described distribution really satisfies the conditions of the problem."
+ },
+ {
+  "mathnet_id": "0fnl",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "计数与容斥"
+  ],
+  "contest": "L Olimpiada Matemática Española",
+  "problem": "Problem:\n\nEs posible disponer sobre una circunferencia los números $0, 1, 2, \\ldots, 9$ de tal manera que la suma de tres números sucesivos cualesquiera sea, como mucho\n\na) $13$,\nb) $14$,\nc) $15$?",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0f47",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "算法与过程类问题"
+  ],
+  "contest": "15th ASU",
+  "problem": "Problem:\n\nEach of the numbers from $100$ to $999$ inclusive is written on a separate card. The cards are arranged in a pile in random order. We take cards off the pile one at a time and stack them into $10$ piles according to the last digit. We then put the $1$ pile on top of the $0$ pile, the $2$ pile on top of the $1$ pile and so on to get a single pile. We now take them off one at a time and stack them into $10$ piles according to the middle digit. We then consolidate the piles as before. We then take them off one at a time and stack them into $10$ piles according to the first digit and finally consolidate the piles as before. What can we say about the order in the final pile?",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0fij",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "抽屉原理"
+  ],
+  "contest": "Olimpiada Matemática Española",
+  "problem": "Problem:\n\nUna caja contiene 900 tarjetas numeradas del 100 al 999. Se sacan al azar (sin reposición) tarjetas de la caja y se anota la suma de los dígitos de cada tarjeta extraída. ¿Cuál es la menor cantidad de tarjetas que se deben sacar, para garantizar que al menos tres de esas sumas sean iguales?",
+  "solution_head": "Solution:\n\nHay 27 posibles resultados para la suma de dígitos (de 1 a 27). Las sumas 1 y 27 sólo se pueden obtener de un modo (100 y 999).\n\nEn el caso más desfavorable, al sacar 52 ($27 + 25$) tarjetas, todas repetirán suma dos veces y en la siguiente (extracción 53) una de ellas aparecerá por tercera vez.\n\nPor tanto, el número pedido es $27 + 25 + 1 = 53$."
+ },
+ {
+  "mathnet_id": "05ds",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "染色与不变量"
+  ],
+  "contest": "EGMO",
+  "problem": "Problem:\n\nThe $n$ contestants of an EGMO are named $C_{1}, \\ldots, C_{n}$. After the competition they queue in front of the restaurant according to the following rules.\n- The Jury chooses the initial order of the contestants in the queue.\n- Every minute, the Jury chooses an integer $i$ with $1 \\leq i \\leq n$.\n- If contestant $C_{i}$ has at least $i$ other contestants in front of her, she pays one euro to the Jury and moves forward in the queue by exactly $i$ positions.\n- If contestant $C_{i}$ has fewer than $i$ other contestants in front of her, the restaurant opens and the process ends.\n\na. Prove that the process cannot continue indefinitely, regardless of the Jury's choices.\n\nb. Determine for every $n$ the maximum number of euros that the Jury can collect by cunningly choosing the initial order and the sequence of moves.\n\n(Hungary)",
+  "solution_head": "Solution:\n\nThe maximal number of euros is $2^{n}-n-1$.\n\nTo begin with, we show that it is possible for the Jury to collect this number of euros. We argue by induction. Let us assume that the Jury can collect $M_{n}$ euros in a configuration with $n$ contestants. Then we show that the Jury can collect at least $2 M_{n}+n$ moves in a configuration with $n+1$ contestants. Indeed, let us begin with all the contestants lined up in reverse order. In the first $M_{n}$ moves the Jury keeps $C_{n+1}$ in first position and reverses the order of the remaining contestants, then in the next $n$ moves all contestants $C_{1}, \\ldots, C_{n}$ (in this order) jump over $C_{n+1}$ and end up in the first $n$ positions of the line in reverse order, and finally in the last $M_{n}$ moves the Jury rearranges the first $n$ positions.\n\nSince $M_{1}=0$ and $M_{n+1} \\geq 2 M_{n}+n$, an easy induction shows that $M_{n} \\geq 2^{n}-n-1$.\n\nLet us show now that at most $2^{n}-n-1$ moves are possible. To this end, let us identify a line of contestants with a permutation $\\sigma$ of $\\{1, \\ldots, n\\}$. To each permuta"
+ },
+ {
+  "mathnet_id": "02uz",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "染色与不变量"
+  ],
+  "contest": "Brazilian Mathematical Olympiad",
+  "problem": "Problem:\n\nEm uma circunferência são escritos 99 números naturais. Se $a$ e $b$ são dois números vizinhos na circunferência, então $\\frac{a}{b}=2$, $a-b=1$ ou $a-b=2$. Prove que existe algum número na circunferência que é divisível por 3.",
+  "solution_head": "Solution:\n\nSejam $a_{1}, a_{2}, \\ldots, a_{99}$ os números na circunferência, escritos em ordem, e suponha, por absurdo, que nenhum deles é múltiplo de 3. Daí, se dois vizinhos $a$ e $b$ deixarem o mesmo resto na divisão por 3, como 3 não pode dividir as diferenças 1 e 2, segue que $a=2b$ ou $b=2a$. Sabendo que 3 divide $a-b$, em ambas as situações anteriores poderíamos concluir que um deles, e portanto os dois, deve ser múltiplo de 3. Isso contradiz nossa suposição inicial. Uma vez que $a$ e $b$ não são múltiplos de 3 e os seus restos são distintos, um deles deve deixar resto 1 e o outro deve deixar resto 2 na divisão por 3. Isso nos diz que $a_{i}+a_{i+1}$ é um múltiplo de 3 para todo $i \\leq 98$. Podemos escrever:\n$$\n\\begin{aligned}\n& S=\\left(a_{1}+a_{2}\\right)+\\ldots+\\left(a_{97}+a_{98}\\right)+a_{99} \\\\\n& S=a_{1}+\\left(a_{2}+a_{3}\\right)+\\ldots+\\left(a_{98}+a_{99}\\right)\n\\end{aligned}\n$$\nComo as somas em cada parênteses são múltiplas de 3, podemos concluir que $a_{1}$ e $a_{99}$ deixam o mesmo resto na divisão por 3. Entretanto, isso é uma contradição, pois números vizinhos não d"
+ },
+ {
+  "mathnet_id": "0dph",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "递推与生成结构",
+   "计数与容斥"
+  ],
+  "contest": "XV Silk Road Mathematics Competition",
+  "problem": "Let $P(n)$ be the number of ways of partitioning a positive integer number $n$ as a sum of powers of $2$, where the order of summands is not important. For example, $P(5) = 4$, since $5 = 4+1 = 2+2+1 = 2+1+1+1 = 1+1+1+1+1$. Prove that for each positive integer $n$ the following identity holds:\n$$\nP(n) + (-1)^{a_1}P(n-1) + (-1)^{a_2}P(n-2) + \\dots + (-1)^{a_{n-1}}P(1) + (-1)^{a_n} = 0,\n$$\nwhere $a_k$ is the number of ones in the binary notation of $k$.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0f1k",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "递推与生成结构"
+  ],
+  "contest": "ASU",
+  "problem": "Problem:\n\nShow that there are $2^{n + 1}$ numbers each with $2^{n}$ digits, all $1$ or $2$, so that every two numbers differ in at least half their digits.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0i0d",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "数列与递推",
+   "递推与生成结构"
+  ],
+  "contest": "Harvard-MIT Math Tournament",
+  "problem": "Problem:\nLet $\\frac{1}{1-x-x^{2}-x^{3}}=\\sum_{i=0}^{\\infty} a_{n} x^{n}$, for what positive integers $n$ does $a_{n-1}=n^{2}$?",
+  "solution_head": "Solution:\nMultiplying both sides by $1-x-x^{2}-x^{3}$ the right hand side becomes $a_{0}+(a_{1}-a_{0}) x+(a_{2}-a_{1}-a_{0}) x^{2}+\\ldots$, and setting coefficients of $x^{n}$ equal to each other we find that $a_{0}=1$, $a_{1}=1$, $a_{2}=2$, and $a_{n}=a_{n-1}+a_{n-2}+a_{n-3}$ for $n \\geq 3$. Thus the sequence of $a_{n}$'s starts $1,1,2,4,7,13,24,44,81,149,\\ldots$. So we now see that $a_{0}=1^{2}$ and $a_{8}=9^{2}$. What makes it impossible for this to happen again is that the sequence is growing exponentially. It will suffice to show that $a_{n}>1.5^{n}$ for $n>2$, since $n^{2}/(n-1)^{2}<1.5$ for $n \\geq 6$, thus when $a_{n-1}$ exceeds $n^{2}$ at $n=10$ there can be no more solutions to $a_{n-1}=n^{2}$. Observe that $a_{n}>1.5 a_{n-1}$ for $n=3,4,5$. By way of induction, assume it for $n-2$, $n-1$, and $n$, then $a_{n+1}=a_{n}+a_{n-1}+a_{n-2}>1.5^{n}+1.5^{n-1}+1.5^{n-2}=1.5^{n-2}(1+1.5+1.5^{2})>1.5^{n+1}$. Thus, by induction, $a_{n}>1.5^{n}$ for $n>2$, so the only solutions are $\\mathbf{1, 9}$."
+ },
+ {
+  "mathnet_id": "0cpk",
+  "est": 4,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "计数与容斥",
+   "图论"
+  ],
+  "contest": "Russian Mathematical Olympiad",
+  "problem": "A grid square $2010 \\times 2010$ is decomposed into «corners» (i.e. L-shaped figures consisting of 3 cells each). Prove that it is possible to mark one cell in each corner so that each row and each column would contain the same number of marked cells.\n\nКлетчатый квадрат $2010 \\times 2010$ разрезан на трёхклеточные уголки. Докажите, что можно в каждом уголке отметить по клетке так, чтобы в каждой вертикали и в каждой горизонтали было поровну отмеченных клеток.",
+  "solution_head": "Обозначим $n = 2010/3 = 670$. Назовём линией строку или столбец; пронумеруем строки сверху вниз, а столбцы — слева направо. Заметим, что для выполнения условий задачи достаточно, чтобы при любом $k$ в левых $k$ столбцах и в верхних $k$ строках содержалось бы по $kn$ отмеченных клеток.\n\nСкажем, что уголок смотрит из $i$-й вертикали влево, если две его клетки находятся в $i$-й вертикали, а третья — левее. Аналогично определим взгляд в других трёх направлениях; каждый уголок, таким образом, смотрит в двух направлениях.\n\nОтметим для начала в каждом уголке среднюю клетку. Теперь в каждом уголке можно либо оставить клетку на месте, либо сдвинуть её ровно в одном из двух направлений, в которые этот уголок смотрит. Выясним, сколько таких сдвигов надо сделать.\n\nНаложим дополнительное условие: между каждыми двумя соседними линиями все сдвиги должны идти в одну сторону. Рассмотрим, скажем, два соседних столбца: $k$-й и $(k+1)$-й. Предположим, что в левых $k$ столбцах сейчас содержится $d_k \\ge nk$ отмеченных клеток. Далее, пусть в $k$-м столбце есть $a_k$ уголков, смотрящих вправо, а в $(k+1)$-"
+ },
+ {
+  "mathnet_id": "054u",
+  "est": 3,
+  "conf": "mid",
+  "category": "combinatorics",
+  "topics": [
+   "计数与容斥"
+  ],
+  "contest": "National Olympiad Final Round",
+  "problem": "Find the number of solutions of the equation $|a - b| = |b - c|$ in integers from $0$ to $36$.",
+  "solution_head": "The equation $|a - b| = |b - c|$ is satisfied if and only if either $a - b = b - c$ or $a - b = c - b$. The first equality is equivalent to $a + c = 2b$, the second is equivalent to $a = c$.\n\nTo fulfill the condition $a + c = 2b$, the numbers $a$ and $c$ must have the same parity. Then their sum is even and $b$ lies between $a$ and $c$, whence it also falls between the required bounds. There are $19$ possibilities for choosing $a$ or $c$ as an even number ($0, 2, \\ldots, 36$ are suitable) which gives $361$ possibilities in total. The number of possibilities to choose an odd number $a$ or $c$ is $18$ ($1, 3, \\ldots, 35$ are suitable) which gives $324$ possibilities in total. There are therefore $685$ triples satisfying $a + c = 2b$.\n\nThe number of triples satisfying $a = c$ is $1369$, since $a$ and $b$ can be chosen arbitrarily. There are $37$ solutions that satisfy both $a + c = 2b$ and $a = c$ and hence being counted twice, since these two conditions hold simultaneously if and only if $a = b = c$.\n\nConsequently, the total number of solutions meeting the conditions of the problem is "
+ },
+ {
+  "mathnet_id": "03jp",
+  "est": 4,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "递推与生成结构",
+   "计数与容斥"
+  ],
+  "contest": "Canadian Mathematical Olympiad",
+  "problem": "Problem:\nThe integers $1, 2, \\ldots, n$ are placed in order so that each value is either strictly bigger than all the preceding values or is strictly smaller than all preceding values. In how many ways can this be done?",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0fhy",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "三角形与四边形基本性质",
+   "计数与容斥"
+  ],
+  "contest": "Olimpiada Matemática Española",
+  "problem": "Problem:\n\nSe consideran conjuntos $A$ de cien números naturales distintos, que tengan la propiedad de que si $a, b, c$ son elementos cualesquiera (iguales o distintos) de $A$, existe un triángulo no obtusángulo cuyos lados miden $a, b$ y $c$ unidades.\nSe denomina $S(A)$ a la suma de los perímetros considerados en la definición de $A$. Calcular el valor mínimo de $S(A)$.",
+  "solution_head": "Solution:\n\nSea $A$ un conjunto que cumpla las condiciones del enunciado. Queremos calcular la suma de los perímetros de los triángulos, y lo haremos por dos procedimientos distintos.\n\nPrimer procedimiento\n\nSea $k \\in A$ y contemos el número de triángulos que tienen lado $k$ y su contribución a la suma de perímetros.\n\nHay un solo triángulo equilátero de lado $k$, y contribuye con el valor $3k$.\n\nHay $99$ triángulos isósceles de lados $k, r, r$ ($k \\neq r$) y el lado $k$ contribuye con $99k$.\n\nHay $99$ triángulos isósceles de lados $k, k, r$ ($k \\neq r$) y el lado $k$ contribuye con $2 \\cdot 99k$.\n\nHay $\\binom{99}{2} = 99 \\cdot 49$ triángulos escalenos de tipo $k, r, s$ (con $k, r, s$ distintos), y su contribución es $99 \\cdot 49k$.\n\nEn total, la contribución de $k \\in A$ es de\n$$\nk(3 + 99 + 2 \\cdot 99 + 49 \\cdot 99) = 5151k\n$$\n\nSegundo procedimiento\n\nDebemos escoger de $A$ tres elementos con posibles repeticiones. El número total de formas de hacerlo corresponde al número de combinaciones con repetición de $100$ elementos tomados $3$ a tres,\n$$\nCR_{100}^3 = \\binom{100 + 3 - 1}{3} = \\b"
+ },
+ {
+  "mathnet_id": "0id0",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "染色与不变量"
+  ],
+  "contest": "Harvard-MIT Mathematics Tournament",
+  "problem": "Problem:\nA binary string of length $n$ is a sequence of $n$ digits, each of which is $0$ or $1$. The distance between two binary strings of the same length is the number of positions in which they disagree; for example, the distance between the strings $01101011$ and $00101110$ is $3$ since they differ in the second, sixth, and eighth positions.\n\nFind as many binary strings of length $8$ as you can, such that the distance between any two of them is at least $3$. You get one point per string.",
+  "solution_head": "Solution:\nThe maximum possible number of such strings is $20$. An example of a set attaining this bound is\n\n| 00000000 | 00110101 |\n| :--- | :--- |\n| 11001010 | 10011110 |\n| 11100001 | 01101011 |\n| 11010100 | 01100110 |\n| 10111001 | 10010011 |\n| 01111100 | 11001101 |\n| 00111010 | 10101100 |\n| 01010111 | 11110010 |\n| 00001111 | 01011001 |\n| 10100111 | 11111111 |\n\nThis example is taken from page 57 of F. J. MacWilliams and N. J. A. Sloane, *The Theory of Error Correcting Codes* (New York: Elsevier Publishing, 1977). The proof that $20$ is the best possible is elementary but too long to reproduce here; see pages 537-541 of MacWilliams and Sloane for details.\n\nIn general, a set of $M$ strings of length $n$ such that any two have a distance of at least $d$ is called an $(n, M, d)$-code. These objects are of basic importance in coding theory, which studies how to transmit information through a channel with a known error rate. For example, since the code given above has minimum distance $3$, I can transmit to you a message consisting of strings in this code, and even if there is a possible "
+ }
+]

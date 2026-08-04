@@ -1,0 +1,131 @@
+[
+ {
+  "id": "C-039",
+  "title": "Distinct-Sum Disjoint Pairs",
+  "difficulty": 4,
+  "topics": [
+   "计数与容斥",
+   "不等式"
+  ],
+  "problem": "Let $n \\geq 1$ be an integer. What is the maximum number of disjoint pairs of elements of the set $\\{1,2, \\ldots, n\\}$ such that the sums of the different pairs are different integers not exceeding $n$?",
+  "answer": "floor((2n−1)/5)",
+  "solution": "Consider $x$ such pairs in $\\{1,2, \\ldots, n\\}$. The sum $S$ of the $2x$ numbers in them is at least $1+2+\\cdots+2x$ since the pairs are disjoint. On the other hand $S \\leq n+(n-1)+\\cdots+(n-x+1)$ because the sums of the pairs are different and do not exceed $n$. This gives the inequality\n$$\n\\frac{2x(2x+1)}{2} \\leq nx-\\frac{x(x-1)}{2}\n$$\nwhich leads to $x \\leq \\frac{2n-1}{5}$. Hence there are at most $\\left\\lfloor\\frac{2n-1}{5}\\right\\rfloor$ pairs with the given properties.\n\nWe show a construction with exactly $\\left\\lfloor\\frac{2n-1}{5}\\right\\rfloor$ pairs. First consider the case $n=5k+3$ with $k \\geq 0$, where $\\left\\lfloor\\frac{2n-1}{5}\\right\\rfloor=2k+1$. The pairs are displayed in the following table.\n\n| Pairs | $3k+1$ | $3k$ | $\\cdots$ | $2k+2$ | $4k+2$ | $4k+1$ | $\\cdots$ | $3k+3$ | $3k+2$ |\n| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |\n|       | 2     | 4     | $\\cdots$ | $2k$   | 1     | 3     | $\\cdots$ | $2k-1$ | $2k+1$ |\n| Sums  | $3k+3$ | $3k+4$ | $\\cdots$ | $4k+2$ | $4k+3$ | $4k+4$ | $\\cdots$ | $5k+2$ | $5k+3$ |\n\nThe $2k+1$ pairs involve all numbers from $1$ to $4k+2$; their sums are all numbers from $3k+3$ to $5k+3$. The same construction works for $n=5k+4$ and $n=5k+5$ with $k \\geq 0$. In these cases the required number $\\left\\lfloor\\frac{2n-1}{5}\\right\\rfloor$ of pairs equals $2k+1$ again, and the numbers in the table do not exceed $5k+3$. In the case $n=5k+2$ with $k \\geq 0$ one needs only $2k$ pairs. They can be obtained by ignoring the last column of the table (thus removing $5k+3$). Finally, $2k$ pairs are also needed for the case $n=5k+1$ with $k \\geq 0$. Now it suffices to ignore the last column of the table and then subtract $1$ from each number in the first row."
+ },
+ {
+  "id": "C-040",
+  "title": "Acute Triangles on a Circle",
+  "difficulty": 2,
+  "topics": [
+   "计数与容斥"
+  ],
+  "problem": "Problem:\n\nOne marks 16 points on a circle. What is the maximum number of acute triangles with vertices in these points?",
+  "answer": "168",
+  "solution": "Solution:\n\nConsider the set of all angles $M_{1} M_{2} M_{3}$, where $M_{1}$, $M_{2}$ and $M_{3}$ is an arbitrary triple of selected points. There are $\\frac{16 \\cdot 15 \\cdot 14}{2} = 1680$ different angles in this set. Suppose $n$ of them are not acute. We shall prove $n \\geq 392$.\n\nFor each integer $m$ between 1 and 7, take a chord with endpoints among the selected points such that there are exactly $m$ selected points to one side of the chord (not including the endpoints). We will call such a chord an $m$-chord. Each $m$-chord subtends not less than $m$ nonacute angles with vertices among the marked points. For each $m \\leq 6$ there are exactly $16$ $m$-chords, and for $m=7$ there are exactly $8$ of them. So the total number of nonacute angles is at least $16(1+2+\\ldots+6) + 8 \\times 7 = 392$.\n\nThere are $\\frac{16 \\cdot 15 \\cdot 14}{6} = 560$ triangles with vertices among the marked points. Each nonacute angle will \"spoil\" exactly one triangle, so the number of acute triangles is not greater than $560 - 392 = 168$.\n\nIt is only left to construct an example with exactly 168 acute triangles. Mark eight consecutive vertices of a right 16-gon $V_{1}, \\ldots, V_{8}$. Draw a line through the center of the 16-gon not parallel to $V_{1} V_{8}$, such that all $V$'s lie on the same side of that line (and not on the line). Reflecting the $V$'s with respect to that line we get points $V_{1}' , \\ldots, V_{8}'$. We claim that the set $V_{1}, \\ldots, V_{8}, V_{1}', \\ldots, V_{8}'$ is as wanted. Indeed, there are no diametrically opposite points in this set (otherwise we would get $V_{1} V_{1}' = 0$ or $V_{8} V_{8}' = 0$), and so for $m=7$ each $m$-chord subtends exactly 8 nonacute angles. Moreover, for each $m \\leq 6$ each $m$-chord subtends exactly $m$ nonacute angles, and so $n=392$, and the number of acute triangles is 168."
+ },
+ {
+  "id": "C-041",
+  "title": "Distinct Entries in a Table",
+  "difficulty": 3,
+  "topics": [
+   "抽屉原理"
+  ],
+  "problem": "Problem:\nIn a $16 \\times 16$ table of integers, each row and column contains at most 4 distinct integers. What is the maximum number of distinct integers that there can be in the whole table?",
+  "answer": "49",
+  "solution": "Solution:\nAnswer: 49\n\nFirst, we show that 50 is too big. Assume for sake of contradiction that a labeling with at least 50 distinct integers exists. By the Pigeonhole Principle, there must be at least one row, say the first row, with at least 4 distinct integers in it; in this case, that is exactly 4, since that is the maximum number of distinct integers in one row. Then, in the remaining 15 rows there must be at least 46 distinct integers (these 46 will also be distinct from the 4 in the first row). Using Pigeonhole again, there will be another row, say the second row, with 4 distinct integers in it. Call the set of integers in the first and second rows $S$. Because the 4 distinct integers in the second row are distinct from the 4 in the first row, there are 8 distinct values in the first two rows, so $|S|=8$.\n\nNow consider the subcolumns containing the cells in rows 3 to 16. In each subcolumn, there are at most 2 values not in $S$, because there are already two distinct values in that column from the cells in the first two rows. So, the maximum number of distinct values in the table is $16 \\cdot 2 + 8 = 40$, a contradiction. So a valid labeling must have fewer than 50 distinct integers.\n\nBelow, we show by example that 49 is attainable.\n\n| 1 | 17 | 33 | - | - | - | - | - | - | - | - | - | - | - | - | - |\n| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |\n| - | 2 | 18 | 34 | - | - | - | - | - | - | - | - | - | - | - | - |\n| - | - | 3 | 19 | 35 | - | - | - | - | - | - | - | - | - | - | - |\n| - | - | - | 4 | 20 | 36 | - | - | - | - | - | - | - | - | - | - |\n| - | - | - | - | 5 | 21 | 37 | - | - | - | - | - | - | - | - | - |\n| - | - | - | - | - | 6 | 22 | 38 | - | - | - | - | - | - | - | - |\n| - | - | - | - | - | - | 7 | 23 | 39 | - | - | - | - | - | - | - |\n| - | - | - | - | - | - | - | 8 | 24 | 40 | - | - | - | - | - | - |\n| - | - | - | - | - | - | - | - | 9 | 25 | 41 | - | - | - | - | - |\n| - | - | - | - | - | - | - | - | - | 10 | 26 | 42 | - | - | - | - |\n| - | - | - | - | - | - | - | - | - | - | 11 | 27 | 43 | - | - | - |\n| - | - | - | - | - | - | - | - | - | - | - | 12 | 28 | 44 | - | - |\n| - | - | - | - | - | - | - | - | - | - | - | - | 13 | 29 | 45 | - |\n| - | - | - | - | - | - | - | - | - | - | - | - | - | 14 | 30 | 46 |\n| 47 | - | - | - | - | - | - | - | - | - | - | - | - | - | 15 | 31 |\n| 32 | 48 | - | - | - | - | - | - | - | - | - | - | - | - | - | 16 |\n\nCells that do not contain a number are colored with color 49."
+ },
+ {
+  "id": "C-042",
+  "title": "Sparse Multiple of x⁷−1",
+  "difficulty": 2,
+  "topics": [
+   "多项式"
+  ],
+  "problem": "The monic polynomial $P(x)$ is called “nice” if its coefficients are in $\\{-1, 0, 1\\}$. Given a nice polynomial $P(x)$ of degree $2025$ and it is divisible by $x^7 - 1$, what is the maximum number of non-zero coefficients in $P(x)$?",
+  "answer": "2022",
+  "solution": "Let $f(x) = x^7 - 1$. We have $x^{7k+r} \\equiv x^r \\pmod{f(x)}$ for all $r = 0, 1, \\ldots, 6$ and $k$ is a positive integer. We will group together all exponents divided by $7$ with remainder $r$. We have\n$$\n\\begin{aligned}\nP(x) &= a_{2025}x^{2025} + \\cdots + a_2x^2 + a_1x + a_0 \\\\\n&\\equiv (a_0 + a_7 + \\cdots + a_{2023}) + (a_1 + a_8 + \\cdots + a_{2024})x + \\cdots \\\\\n&\\quad + (a_6 + a_{13} + \\cdots + a_{2022})x^6 \\pmod{f(x)}.\n\\end{aligned}\n$$\nWe see that the right-hand side is a polynomial of degree not exceeding $6$, so to have congruence $0$ modulo $f(x)$, we need the right-hand side to be identically $0$. From that, we will get\n$$\n\\sum_{i=0}^{289} a_{7i} = \\sum_{i=0}^{289} a_{7i+1} = \\sum_{i=0}^{289} a_{7i+2} = \\sum_{i=0}^{288} a_{7i+3} = \\sum_{i=0}^{288} a_{7i+4} = \\sum_{i=0}^{288} a_{7i+5} = \\sum_{i=0}^{288} a_{7i+6} = 0.\n$$\nWe see that in the first three sums, there are $290$ terms and in the remaining sums, there are $289$ terms. So in the first three sums, we choose $145$ number $1$ and $145$ number $-1$, and the remaining sums have at least one $0$ (otherwise the sum of $289$ odd numbers cannot be zero). Thus, there are at least $4$ coefficients equal to $0$, so there are at most $2026 - 4 = 2022$ non-zero coefficients.\n\nTo construct, we just choose the coefficients based on the above idea with $a_{2025} \\neq 0$. The answer is $2022$.\n\n$\\boxed{2022}$"
+ },
+ {
+  "id": "C-043",
+  "title": "Binary Families Without Shattered Coordinates",
+  "difficulty": 3,
+  "topics": [
+   "递推与生成结构"
+  ],
+  "problem": "Let $n, k$ be positive integers such that $n \\ge k$. Find the maximum number of binary sequences of length $n$ such that by fixing any arbitrary $k$ bits, the achieved sequences do not produce all binary sequences of length $k$. For example if $k = 1$, we can only have one sequence, otherwise they will differ in at least one bit which means that fixing that bit produces all binary sequences of length 1.",
+  "answer": "sum_{i=0}^{k-1} binom(n,i)",
+  "solution": "Let the answer be $f(n,k)$. We will prove by induction on $n+k$ that\n$$\nf(n,k) = \\sum_{i=0}^{k-1} \\binom{n}{i}.\n$$\nCase $n=k=1$ is obvious.\n\nAssume that $S$ is the maximum set of the desired sequences and let $T$ be the set of all binary sequences of length $n-1$. Define the sets $A, B, C$ as follows:\n$$\n\\begin{align*}\nA &= \\{a \\in T \\mid \\text{there exists } b \\in S \\text{ with } b = \\overline{0a}, \\text{ but there is no } c \\in S \\text{ with } c = \\overline{1a}\\} \\\\\nB &= \\{a \\in T \\mid \\text{there exists } b \\in S \\text{ with } b = \\overline{1a}, \\text{ but there is no } c \\in S \\text{ with } c = \\overline{0a}\\} \\\\\nC &= \\{a \\in T \\mid \\text{there exists } b, c \\in S \\text{ with } b = \\overline{0a}, c = \\overline{1a}\\}.\n\\end{align*}\n$$\nClearly, $f(n,k) = |A| + |B| + 2|C|$. Because we can't choose $k$ bits from the last $n-1$ bits of the sequences that produce all the binary sequences of length $k$, we have $|A| + |B| + |C| \\le f(n-1,k)$. Now consider the set $C$. If $|C| \\ge f(n-1,k-1)$, we can fix $k-1$ bits from the last $n-1$ bits to produce all sequences of length $k-1$. So because of the definition of $C$, by fixing these $k-1$ bits and the first bit, all sequences of length $k$ are produced, which is a contradiction. So we have\n$$\nf(n,k) = |A| + |B| + 2|C| \\le f(n-1,k) + f(n-1,k-1).\n$$\nBy induction and using Pascal's identity we get\n$$\n\\begin{align*}\nf(n,k) &\\le \\sum_{i=0}^{k-1} \\binom{n-1}{i} + \\sum_{i=0}^{k-2} \\binom{n-1}{i} \\\\\n&= 1 + \\sum_{i=1}^{k-1} \\binom{n-1}{i} + \\sum_{i=0}^{k-2} \\binom{n-1}{i} \\\\\n&= 1 + \\sum_{i=1}^{k-1} \\left( \\binom{n-1}{i} + \\binom{n-1}{i-1} \\right) \\\\\n&= \\binom{n}{0} + \\sum_{i=1}^{k-1} \\binom{n}{i} = \\sum_{i=0}^{k-1} \\binom{n}{i}.\n\\end{align*}\n$$\nFor the equality example, simply choose all binary sequences with at most $k-1$ zeros. This way, by fixing any $k$ bits, the sequence with $k$ zeros will never be produced and we're done. ■"
+ },
+ {
+  "id": "G-050",
+  "title": "Perpendicular Incenter-Circumcenter Area",
+  "difficulty": 3,
+  "topics": [
+   "三角形五心与经典引理",
+   "圆与四点共圆",
+   "根轴与幂",
+   "解析几何与向量复数法",
+   "面积法与三角法"
+  ],
+  "problem": "Problem:\n\nLet $ABC$ be an acute triangle with incenter $I$ and circumcenter $O$. Assume that $\\angle OIA = 90^\\circ$. Given that $AI = 97$ and $BC = 144$, compute the area of $\\triangle ABC$.",
+  "answer": "14040",
+  "solution": "Solution:\n\nWe present five different solutions and outline a sixth and seventh one. In what follows, let $a = BC$, $b = CA$, $c = AB$ as usual, and denote by $r$ and $R$ the inradius and circumradius. Let $s = \\frac{1}{2}(a + b + c)$. In the first five solutions we will only prove that\n$$\n\\angle AIO = 90^\\circ \\Longrightarrow b + c = 2a\n$$\nLet us see how this solves the problem. This lemma implies that $s = 216$. If we let $E$ be the foot of $I$ on $AB$, then $AE = s - BC = 72$, consequently the inradius is $r = \\sqrt{97^2 - 72^2} = 65$. Finally, the area is $sr = 216 \\cdot 65 = 14040$.\n\nFirst Solution.\nSince $OI \\perp DA$, $AI = DI$. Now, it is a well-known fact that $DI = DB = DC$ (this is occasionally called \"Fact 5\"). Then by Ptolemy's Theorem,\n$$\nDB \\cdot AC + DC \\cdot AB = DA \\cdot BC \\Longrightarrow AC + AB = 2BC\n$$\n\nSecond Solution.\nAs before note that $I$ is the midpoint of $AD$. Let $M$ and $N$ be the midpoints of $AB$ and $AC$, and let the reflection of $M$ across $BI$ be $P$; thus $BM = BP$. Also, $MI = PI$, but we know $MI = NI$ as $I$ lies on the circumcircle of triangle $AMN$. Consequently, we get $PI = NI$; moreover by angle chasing we have\n$$\n\\angle INC = \\angle AMI = 180^\\circ - \\angle BPI = \\angle IPC\n$$\nThus triangles $INC$ and $PIC$ are congruent ($CI$ is a bisector) so we deduce $PC = NC$. Thus,\n$$\nBC = BP + PC = BM + CN = \\frac{1}{2}(AB + AC)\n$$\n\nThird Solution.\nWe appeal to Euler's Theorem, which states that $IO^2 = R(R - 2r)$.\nThus by the Pythagorean Theorem on $\\triangle AIO$ (or by Power of a Point) we may write\n$$\n(s - a)^2 + r^2 = AI^2 = R^2 - IO^2 = 2Rr = \\frac{abc}{2s}\n$$\nwith the same notations as before. Thus, we derive that\n$$\n\\begin{aligned}\nabc & = 2s\\left((s - a)^2 + r^2\\right) \\\\\n& = 2(s - a)(s(s - a) + (s - b)(s - c)) \\\\\n& = \\frac{1}{2}(s - a)\\left((b + c)^2 - a^2 + a^2 - (b - c)^2\\right) \\\\\n& = 2bc(s - a)\n\\end{aligned}\n$$\nFrom this we deduce that $2a = b + c$, and we can proceed as in the previous solution.\n\nFourth Solution.\nFrom Fact 5 again ($DB = DI = DC$), drop perpendicular from $I$ to $AB$ at $E$; call $M$ the midpoint of $BC$. Then, by $AAS$ congruency on $AIE$ and $CDM$, we immediately get that $CM = AE$. As $AE = \\frac{1}{2}(AB + AC - BC)$, this gives the desired conclusion.\n\nFifth Solution.\nThis solution avoids angle-chasing and using the fact that $BI$ and $CI$ are angle bisectors. Recall the perpendicularity lemma, where\n$$\nWX \\perp YZ \\Longleftrightarrow WY^2 - WZ^2 = XY^2 - XZ^2\n$$\nLet $B'$ be on the extension of ray $CA$ such that $AB' = AB$. Of course, as in the proof of the angle bisector theorem, $BB' \\parallel AI$, meaning that $BB' \\perp IO$. Let $I'$ be the reflection of $I$ across $A$; of course, $I'$ is then the incenter of triangle $AB'C'$. Now, we have $B'I^2 - BI^2 = B'O^2 - BO^2$ by the perpendicularity and by power of a point $B'O^2 - BO^2 = B'A \\cdot B'C$. Moreover $BI^2 + B'I^2 = BI^2 + BI'^2 = 2BA^2 + 2AI^2$ by the median formula. Subtracting, we get $BI^2 = AI^2 + \\frac{1}{2}(AB)(AB - AC)$. We have a similar expression for $CI$, and subtracting the two results in $BI^2 - CI^2 = \\frac{1}{2}(AB^2 - AC^2)$. Finally,\n$$\nBI^2 - CI^2 = \\frac{1}{4}\\left[(BC + AB - AC)^2 - (BC - AB + AC)^2\\right]\n$$\nfrom which again, the result $2BC = AB + AC$ follows.\n\nSixth Solution, outline.\nUse complex numbers, setting $I = ab + bc + ca$, $A = -a^2$, etc. on the unit circle (scale the picture to fit in a unit circle; we calculate scaling factor later). Set $a = 1$, and let $u = b + c$ and $v = bc$. Write every condition in terms of $u$ and $v$, and the area in terms of $u$ and $v$ too. There should be two equations relating $u$ and $v$: $2u + v + 1 = 0$ and $u^2 = \\left(\\frac{130}{97}\\right)^2 v$ from the right angle and the 144 to 97 ratio, respectively. The square area can be computed in terms of $u$ and $v$, because the area itself is antisymmetric so squaring it suffices. Use the first condition to homogenize (not coincidentally the factor $(1 - b^2)(1 - c^2) = (1 + bc)^2 - (b + c)^2 = (1 + v)^2 - u^2$ from the area homogenizes perfectly... because $AB \\cdot AC = AI \\cdot AI_A$, where $I_A$ is the $A$-excenter, and of course the way the problem is set up $AI_A = 3AI$), and then we find the area of the scaled down version. To find the scaling factor simply determine $|b - c|$ by squaring it, writing in terms again of $u$ and $v$, and comparing this to the value of 144.\n\nSeventh Solution, outline.\nTrigonometric solutions are also possible. One can write everything in terms of the angles and solve the equations; for instance, the $\\angle AIO = 90^\\circ$ condition can be rewritten as $\\frac{1}{2} \\cos \\frac{B - C}{2} = 2 \\sin \\frac{B}{2} \\sin \\frac{C}{2}$ and the 97 to 144 ratio condition can be rewritten as $\\frac{2 \\sin \\frac{B}{2} 2 \\sin \\frac{C}{2}}{\\sin A} = \\frac{97}{144}$. The first equation implies $\\sin \\frac{A}{2} = 2 \\sin \\frac{B}{2} \\sin \\frac{C}{2}$, which we can plug into the second equation to get $\\cos \\frac{A}{2}$."
+ },
+ {
+  "id": "G-051",
+  "title": "Parallel Incenter Cross-Section",
+  "difficulty": 2,
+  "topics": [
+   "三角形五心与经典引理"
+  ],
+  "problem": "Problem:\n\nLet $\\triangle ABC$ be a right triangle with right angle $C$. Let $I$ be the incenter of $ABC$, and let $M$ lie on $AC$ and $N$ on $BC$, respectively, such that $M$, $I$, $N$ are collinear and $\\overline{MN}$ is parallel to $AB$. If $AB = 36$ and the perimeter of $CMN$ is $48$, find the area of $ABC$.",
+  "answer": "252",
+  "solution": "Solution:\n\nAnswer: $252$\n\nNote that $\\angle MIA = \\angle BAI = \\angle CAI$, so $MI = MA$. Similarly, $NI = NB$. As a result, $CM + MN + NC = CM + MI + NI + NC = CM + MA + NB + NC = AC + BC = 48$.\n\nFurthermore, $AC^2 + BC^2 = 36^2$. As a result, we have $AC^2 + 2AC \\cdot BC + BC^2 = 48^2$, so $2AC \\cdot BC = 48^2 - 36^2 = 12 \\cdot 84$, and so $\\dfrac{AC \\cdot BC}{2} = 3 \\cdot 84 = 252$."
+ },
+ {
+  "id": "G-052",
+  "title": "Nested Incircles and Chord Midpoint",
+  "difficulty": 3,
+  "topics": [
+   "三角形五心与经典引理",
+   "圆与四点共圆"
+  ],
+  "problem": "Let $ABC$ be a triangle with $m(\\angle B) = 90^\\circ$. The incircle of $\\triangle ABC$ is tangent to the side $BC$ at point $D$. Let the intersection of lines $XZ$ and $AD$ be $K$, where $X$ and $Z$ are the centers of incircles of $\\triangle ABD$ and $\\triangle ADC$, respectively. $XZ$ intersects the circumscribed circle of $\\triangle ABC$ at $U$ and $V$ and the midpoint of segment $[UV]$ is $M$. Let $Y$ be the point of intersection of the line $AD$ with the circumscribed circle of $\\triangle ABC$ different from $A$. Prove that $|CY| = 2|MK|$. (Cafer Tayyar Yıldırım).",
+  "answer": "证明题",
+  "solution": "Let the incircle of $\\triangle ABD$ be tangent to $BC$ at $T$ and the incircle of $\\triangle ADC$ be tangent to $BC$ at $S$. The radii of incircles of $\\triangle ABD$ and $\\triangle ADC$ are $r_1$ and $r_2$, respectively. Then\n$$\n\\begin{aligned}\nDS &= \\frac{AD + DC - AC}{2} = \\frac{AD + BC - BD - AC}{2} \\\\\n&= \\frac{AD - BD - AB + AB + BC - AC}{2} \\\\\n&= \\frac{AB + BC - AC}{2} - \\frac{AB + BD - AD}{2} \\\\\n&= BD - BT = TD.\n\\end{aligned}\n$$\nSince $X$ and $Z$ are centers of incircles, $XD \\perp DZ$. Therefore,\n$$\nXZ^2 = XD^2 + DZ^2 = r_1^2 + TD^2 + r_2^2 + TD^2.\n$$\nand since\n$$\nXZ^2 = (r_1 - r_2)^2 + TS^2 = (r_1 - r_2)^2 + 4TD^2\n$$\nwe have\n$$\n\\begin{aligned}\nr_1^2 + r_2^2 + 2TD^2 &= (r_1 - r_2)^2 + 4TD^2 \\\\\n2r_1r_2 &= 2TD^2.\n\\end{aligned}\n$$\nThus,\n$$\n\\begin{aligned}\nXZ^2 &= r_1^2 + r_2^2 + 2TD^2 = (r_1 + r_2)^2 \\\\\nXZ &= r_1 + r_2.\n\\end{aligned}\n$$\nObviously, $XK \\ge r_1$ and $ZK \\ge r_2$. Since $XK + ZK = r_1 + r_2$, $XK = r_1$, $ZK = r_2$ and $XZ \\perp AD$. Let $O$ be the center of circumscribed circle of $\\triangle ABC$ (the midpoint of the segment $AC$). Then $OM \\perp UV$. Since $AC$ is a radius $CY \\perp AY$. Thus, $UV$ and $CY$ are parallel. Suppose $OM \\cap CY = N$. Then $ON \\perp CY$ and $YN = NC$. In the rectangle $KYNM$, $MK = NY$. Therefore, $CY = 2MK$. Done."
+ },
+ {
+  "id": "G-053",
+  "title": "Right-Triangle Equal-Leg Configuration",
+  "difficulty": 3,
+  "topics": [
+   "三角形与四边形基本性质"
+  ],
+  "problem": "Let $ABC$ be a right triangle with $\\angle ABC = 90^\\circ$. Points $P, Q, R$ lie on the sides $BC, CA, AB$, respectively, in such a way that conditions\n$$\nAQ : QC = 2 : 1, \\quad AR = AQ, \\quad QP = QR, \\quad \\angle PQR = 90^\\circ\n$$\nare satisfied. Find the value of $AR$ if $CP = 1$. Here for a line segment $XY$ its length is also represented by $XY$.",
+  "answer": "2√5 + 4",
+  "solution": "Take a point $C'$ on the line $AR$ in such a way that the points $A, R, C'$ lie on the line in this order and $RC' = 1$ is satisfied. From the hypothesis of the problem, it then follows that $RC' = PC, RQ = PQ$ are satisfied, and furthermore, we obtain the fact that the triangles $C'RQ$ and $CPQ$ are congruent since\n$$\n\\begin{aligned}\n\\angle C'RQ &= 360^\\circ - (\\angle RQP + \\angle QPB + \\angle PBR) = 360^\\circ - (90^\\circ + \\angle QPB + 90^\\circ) \\\\\n&= 180^\\circ - \\angle QPB = \\angle CPQ.\n\\end{aligned}\n$$\nConsequently, we have $\\angle AQC' = \\angle AQR + \\angle RQC' = \\angle AQR + \\angle PQC = 90^\\circ$. Let $AR = AQ = 2x$. Then, we have $QC = QC' = x$, and by applying the Pythagorean Theorem to the triangle $AQC'$, we get $AC' = \\sqrt{AQ^2 + (QC')^2} = \\sqrt{5}x$. From $1 = RC' - AR = (\\sqrt{5} - 2)x$ we have $x = \\frac{1}{\\sqrt{5}-2}$, and therefore,\n$$\nAR = 2x = \\frac{2}{\\sqrt{5}-2} = 2\\sqrt{5} + 4.\n$$"
+ },
+ {
+  "id": "G-054",
+  "title": "Altitude-Foot Reflection",
+  "difficulty": 3,
+  "topics": [
+   "圆与四点共圆",
+   "三角形五心与经典引理"
+  ],
+  "problem": "In an acute triangle $ABC$, the altitudes $AA_1$, $BB_1$, $CC_1$ are drawn. A perpendicular to $AC$ passing through $A_1$ intersects line $B_1C_1$ at $D$. Prove that $\\angle ADC = 90^\\circ$.",
+  "answer": "证明题",
+  "solution": "Let $K$ be the intersection point of segments $A_1D$ and $AC$ (see Figure 5).\n\nFrom the equality $\\angle AB_1B = \\angle AA_1B = 90^\\circ$, it follows that the quadrilateral $AB_1A_1B$ is inscribed in a circle (with diameter $AB$), so $\\angle A_1B_1K = 180^\\circ - \\angle A_1B_1A = \\angle ABC$.\n\nSimilarly, the quadrilateral $BC_1B_1C$ is inscribed in a circle (with diameter $BC$); therefore, $\\angle DB_1K = 180^\\circ - \\angle C_1B_1C = \\angle ABC$.\n\nWe obtain that $\\angle A_1B_1K = \\angle DB_1K$. From the condition, $\\angle A_1KB_1 = \\angle DKB_1 = 90^\\circ$; hence, the right triangles $A_1B_1K$ and $DB_1K$ are congruent (by a leg and an acute angle), whence $A_1K = DK$.\n\nThe last equality means that points $A_1$ and $D$ are symmetric with respect to the line $AC$; therefore, triangles $A_1AC$ and $DAC$ are symmetric with respect to this line. Then $\\angle ADC = \\angle AA_1C = 90^\\circ$, as required."
+ },
+ {
+  "id": "G-055",
+  "title": "Incircle Contact-Line Identities",
+  "difficulty": 3,
+  "topics": [
+   "三角形五心与经典引理",
+   "圆与四点共圆"
+  ],
+  "problem": "Consider a triangle $ABC$, such that $\\angle B = 90^\\circ$. Denote by $I$ the in-center and let $F$, $D$ and $E$ be the points where the incircle touches sides $[AB]$, $[BC]$, and $[AC]$ respectively. If $CI \\cap EF = \\{M\\}$ and $DM \\cap AB = \\{N\\}$, show that:\n\na) $AI = ND$;\n\nb) $FM = \\frac{EI \\cdot EM}{EC}$.",
+  "answer": "证明题",
+  "solution": "a. Triangle $AFE$ is isosceles with $AE = AF$, and $AI \\perp FE$, hence $\\angle AEF = 90^\\circ - \\angle A/2$. In the same way from the isosceles triangle $CDE$ we get $\\angle DEC = 90^\\circ - \\angle C/2$. As a consequence $\\overline{MED} = 180^\\circ - \\overline{AEF} - \\overline{DEC} = 180^\\circ - (180^\\circ - (\\hat{A} + \\hat{C})/2) = 45^\\circ$. (*)\n\nAs $\\triangle MDC \\equiv \\triangle MEC$, we obtain $MD = ME$ (**). By (*) and (**), the triangle $\\triangle MED$ is right angled and isosceles. As a consequence $DN \\perp EF$ and, because $AI \\perp EF$, we obtain $DN \\parallel AI$. As $AN \\parallel ID$ we conclude that the quadrilateral $ANDI$ is a parallelogram, so $AI = ND$.\n\nb. We have $\\overline{EFD} = 180^\\circ - \\overline{AFE} - \\overline{BFD} = (\\hat{A} + \\hat{B})/2 = 90^\\circ - \\hat{C}/2 = \\overline{DIC}$ so $\\triangle FMD \\sim \\triangle IDC$. We conclude $\\frac{FM}{ID} = \\frac{MD}{DC}$ which implies\n$$\nFM = \\frac{ID \\cdot MD}{DC} = \\frac{EI \\cdot EM}{EC}.\n$$"
+ }
+]

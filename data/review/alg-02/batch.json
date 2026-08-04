@@ -1,0 +1,178 @@
+[
+ {
+  "mathnet_id": "0ide",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "方程与设元"
+  ],
+  "contest": "Harvard-MIT Mathematics Tournament",
+  "problem": "Problem:\nFind the ordered quadruple of digits $(A, B, C, D)$, with $A > B > C > D$, such that\n$$\n\\begin{aligned}\n& ABCD \\\\\n- & DCBA \\\\\n= & BDAC .\n\\end{aligned}\n$$",
+  "solution_head": "Solution:\nSince $D < A$, when $A$ is subtracted from $D$ in the ones' column, there will be a borrow from $C$ in the tens' column. Thus, $D + 10 - A = C$.\n\nNext, consider the subtraction in the tens' column, $(C - 1) - B$. Since $C < B$, there will be a borrow from the hundreds' column, so $(C - 1 + 10) - B = A$.\n\nIn the hundreds' column, $B - 1 \\geq C$, so we do not need to borrow from $A$ in the thousands' column. Thus, $(B - 1) - C = D$ and $A - D = B$.\n\nWe thus have a system of four equations in four variables $A, B, C, D$, and solving by standard methods (e.g. substitution) produces $(A, B, C, D) = (7, 6, 4, 1)$."
+ },
+ {
+  "mathnet_id": "004a",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "不等式"
+  ],
+  "contest": "XV Olimpiada Matemática Rioplatense",
+  "problem": "Para cada permutación $(x_1, x_2, \\dots, x_{99})$ de $\\{1, 2, \\dots, 99\\}$, sea\n$$\nL = |x_1 - x_2\\sqrt{3}| + |x_2 - x_3\\sqrt{3}| + \\dots + |x_{98} - x_{99}\\sqrt{3}| + |x_{99} - x_1\\sqrt{3}|.\n$$\nDeterminar el valor máximo de $L$, y para cuántas permutaciones de $\\{1, 2, \\dots, 99\\}$ se alcanza este valor.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0ity",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "数列与递推"
+  ],
+  "contest": "12th Annual Harvard-MIT Mathematics Tournament",
+  "problem": "Problem:\nCompute\n$$\n1 \\cdot 2^{2} + 2 \\cdot 3^{2} + 3 \\cdot 4^{2} + \\cdots + 19 \\cdot 20^{2}\n$$",
+  "solution_head": "Solution:\nWe can write this as\n$$\n(1^{3} + 2^{3} + \\cdots + 20^{3}) - (1^{2} + 2^{2} + \\cdots + 20^{2})\n$$\nwhich is equal to\n$$\n44100 - 2870 = 41230\n$$"
+ },
+ {
+  "mathnet_id": "0h46",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "多项式",
+   "根与系数"
+  ],
+  "contest": "Ukrainian Mathematical Olympiad",
+  "problem": "$$\n\\begin{cases} (x+y)(1+xy) + (x-y)^2 = 2, \\\\ x^3 + y^3 = 1. \\end{cases}\n$$",
+  "solution_head": "Перше рівняння системи запишемо, з урахуванням рівності $x^3 + y^3 = 1$, у вигляді $(x + y)(1 + xy) + (x - y)^2 - (x + y)(x^2 - xy + y^2) - 1 = 0$, тобто $(x + y - 1)(1 - (x - y)^2) = 0$. Подальші міркування є очевидними.\n\nВідповідь: $(1; 0)$, $(0; 1)$."
+ },
+ {
+  "mathnet_id": "00tu",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "不等式",
+   "根与系数"
+  ],
+  "contest": "BMO 2022 shortlist",
+  "problem": "Let $a$, $b$, $c$, $d$ be non-negative real numbers such that\n$$\n\\frac{1}{a+1} + \\frac{1}{b+1} + \\frac{1}{c+1} + \\frac{1}{d+1} = 3.\n$$\nProve that\n$$\n3(ab + ac + ad + bc + bd + cd) + \\frac{4}{a+b+c+d} \\le 5.\n$$",
+  "solution_head": "Let $S = a + b + c + d$. By AM-HM (or Cauchy-Schwarz) we have\n$$\nS + 4 = (a + 1) + (b + 1) + (c + 1) + (d + 1) \\ge \\frac{16}{\\frac{1}{a+1} + \\frac{1}{b+1} + \\frac{1}{c+1} + \\frac{1}{d+1}} = \\frac{16}{3}\n$$\ngiving $S \\ge \\frac{4}{3}$.\nMultiplying the given equality by $(a+1)(b+1)(c+1)(d+1)$ we get\n$$\n\\sum abc + 2 \\sum ab + 3S + 4 = 3 \\left(abcd + \\sum abc + \\sum ab + S + 1\\right)\n$$\ngiving\n$$\n3abcd + 2 \\sum abc + \\sum ab = 1.\n$$\nIn particular $ab + ac + ad + bc + bd + cd \\le 1$. So we may assume that $S < 2$ as otherwise the inequality is immediate.\nThe given equality transforms to\n$$\n\\frac{a}{a+1} + \\frac{b}{b+1} + \\frac{c}{c+1} + \\frac{d}{d+1} = 1,\n$$\nand so by Cauchy-Schwarz\n$$\n\\sum a(a+1) \\sum \\frac{a}{a+1} \\ge S^2.\n$$\nThus\n$$\nS^2 \\le a^2 + b^2 + c^2 + d^2 + S = S^2 - 2 \\sum ab + S.\n$$\nSo $\\sum ab \\le S/2$ and it is enough to prove that\n$$\n\\frac{3S}{2} + \\frac{4}{S} \\le 5.\n$$\nThis is equivalent to $3S^2 - 10S + 8 \\le 0$ which in turn is equivalent to $(S - 2)(3S - 4) \\le 0$. Since $S \\ge 4/3$ and we are also assuming that $S < 2$, then the inequality is true and the result follows"
+ },
+ {
+  "mathnet_id": "0187",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "数列与递推"
+  ],
+  "contest": "Baltic Way 2011 Problem Shortlist",
+  "problem": "For any real number $a$ we define a sequence $x_0, x_1, \\dots$ such that $x_0 = a$ and $x_{i+1} = 3x_i - x_i^3$ for all $i \\ge 0$. Determine the number of reals $a$ for which $x_{2011} = x_0$.",
+  "solution_head": "If $|x_i| > 2$ then $|x_{i+1}| = |x_i| \\cdot |3 - x_i^2| > |x_i|$ it follows that the sequence $(|x_i|)$ is strictly increasing therefore the sequence $(|x_i|)$ cannot be periodic. It is thus enough to consider the case when $|a| \\le 2$.\nDenote $x_i = 2 \\sin \\alpha$, where $-\\frac{\\pi}{2} \\le \\alpha \\le \\frac{\\pi}{2}$. Then\n$$\n\\begin{aligned}\nx_{i+1} &= 6 \\sin \\alpha - 8 \\sin^3 \\alpha \\\\\n&= 2 \\sin \\alpha (3 - 4 \\sin^2 \\alpha) \\\\\n&= 2 \\sin \\alpha (3 \\cos^2 \\alpha - \\sin^2 \\alpha) \\\\\n&= 4 \\sin \\alpha \\cos^2 \\alpha + 2 \\sin \\alpha (\\cos^2 \\alpha - \\sin^2 \\alpha) \\\\\n&= 2 \\sin(2\\alpha) \\cos \\alpha + 2 \\sin \\alpha \\cos(2\\alpha) \\\\\n&= 2 \\sin(3\\alpha).\n\\end{aligned}\n$$\nBy an easy induction it follows that if $x_0 = 2 \\sin \\alpha$ then $x_n = 2 \\sin(3^n \\alpha)$. The equation $x_0 = x_{2011}$ now transforms to $\\sin \\alpha = \\sin(3^{2011}\\alpha)$, this equation has two sets of solutions:\n$$\n\\{\\alpha \\mid 3^{2011}\\alpha = \\alpha + 2\\pi n,\\ n \\in \\mathbb{Z}\\}\n$$\nand\n$$\n\\{\\alpha \\mid 3^{2011}\\alpha = \\pi - \\alpha + 2\\pi m,\\ m \\in \\mathbb{Z}\\}.\n$$\nThis can be transformed to\n$$\n\\{\\alpha \\mid \\alph"
+ },
+ {
+  "mathnet_id": "09cd",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "图论",
+   "整除与同余",
+   "复数与三角",
+   "根与系数"
+  ],
+  "contest": "Mongolian Mathematical Olympiad 46",
+  "problem": "$2 < p \\in \\mathbb{P}$, $a_1, \\dots, a_s$-нь $\\mathbb{Z}_p$-ийн ялгаатай элементүүд, $b_1, \\dots, b_s$ нь мөн $\\mathbb{Z}_p$-ийн ялгаатай элементүүд бол $a_1 + b_{\\sigma(1)}, \\dots, a_s + b_{\\sigma(s)}$ нь $\\mathbb{Z}_p$-ийн ялгаатай элементүүд байх тийм сэлгэмэл $\\sigma \\in S_s$ олдохыг үзүүл.",
+  "solution_head": "**ДБ-В3.** Энэ бодлогын бодолтыг хараахан хийж амжаагүй байна."
+ },
+ {
+  "mathnet_id": "0gxp",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "多项式",
+   "根与系数"
+  ],
+  "contest": "49th Mathematical Olympiad in Ukraine",
+  "problem": "Solve the system of equations over real numbers:\n$$\n\\begin{cases}\nx^3 = 2y^3 + z - 2, \\\\\ny^3 = 2z^3 + x - 2, \\\\\nz^3 = 2x^3 + y - 2.\n\\end{cases}\n$$",
+  "solution_head": "From the first two equations of our system we obtain: $x^3 - y^3 = 2y^3 - 2z^3 + y - z = (y-z)(2y^2 + 2yz + 2z^2 + 1)$, analogously, we can easily get equalities: $y^3 - z^3 = (z-x)(2z^2 + 2zx + 2x^2 + 1)$, $z^3 - x^3 = (x-y)(2x^2 + 2xy + 2y^2 + 1)$. It is easy to see that $(2y^2 + 2yz + 2z^2 + 1) = y^2 + z^2 + (y+z)^2 + 1 > 0$. If we suppose that $y > z$, then from the first equality we have that $x > y$, then applying third equality we conclude: $z > x > y > z$ - contradiction. The case when $y < z$ is completely analogous. Hence we obtain $x = y = z$. and solving the equation we get the answer $(1,1,1)$."
+ },
+ {
+  "mathnet_id": "0kgc",
+  "est": 3,
+  "conf": "mid",
+  "category": "algebra",
+  "topics": [
+   "代数变换技巧"
+  ],
+  "contest": "HMMT Spring 2021 Team Round",
+  "problem": "Problem:\n\nLet $a$ and $b$ be positive integers with $a > b$. Suppose that\n$$\n\\sqrt{\\sqrt{a} + \\sqrt{b}} + \\sqrt{\\sqrt{a} - \\sqrt{b}}\n$$\nis an integer.\n\na. Must $\\sqrt{a}$ be an integer?\n\nb. Must $\\sqrt{b}$ be an integer?",
+  "solution_head": "Solution:\n\nLet $r = \\sqrt{\\sqrt{a} + \\sqrt{b}}$ and $s = \\sqrt{\\sqrt{a} - \\sqrt{b}}$. We know $r^{2} + s^{2} = 2 \\sqrt{a}$ and $r^{2} - s^{2} = 2 \\sqrt{b}$. If $r + s$ is an integer $k$, then\n$$\n\\sqrt{a} = \\frac{r^{2} + s^{2}}{2} = \\frac{(r + s)^{2} + (r - s)^{2}}{4} = \\frac{k^{2} + 4b / k^{2}}{4},\n$$\nwhich is rational. Recall that since $a$ is a positive integer, $\\sqrt{a}$ is either an integer or an irrational number. (Proof: if $\\sqrt{a} = p / q$ for relatively prime positive integers $p, q$, then $p^{2} / q^{2}$ is an integer, which implies $q = 1$.) Thus the answer to part (a) is yes.\n\nThe answer to part (b) is no because\n$$\n(2 \\pm \\sqrt{2})^{2} = 6 \\pm \\sqrt{32}\n$$\nmeaning that setting $a = 36$ and $b = 32$ is a counterexample.\n\n---\n\nSolution:\n\nSecond solution for part (a): Squaring $\\sqrt{\\sqrt{a} + \\sqrt{b}} + \\sqrt{\\sqrt{a} - \\sqrt{b}}$, we see that $2 \\sqrt{a} + 2 \\sqrt{a - b}$ is an integer. Hence $\\sqrt{a - b} = m - \\sqrt{a}$ for some rational number $m$. Squaring both sides of this, we see that $a - b = m^{2} - 2m \\sqrt{a} + a$, so $\\sqrt{a} = \\frac{m^{2} + b}{2m}$, a ra"
+ },
+ {
+  "mathnet_id": "02mx",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "数列与递推"
+  ],
+  "contest": "Brazilian Mathematical Olympiad",
+  "problem": "Problem:\n\nDeterminando uma sequência - Numa certa sequência de 80 números, qualquer termo, salvo as duas extremidades, é igual ao produto de seus termos vizinhos. O produto dos 40 primeiros termos da sequência é $8$ e o produto de todos os termos também é $8$. Determine os termos da sequência.",
+  "solution_head": "Solution:\n\nSeja a sequência $a_1, a_2, \\ldots, a_{80}$.\n\nDado que, para $2 \\leq k \\leq 79$, temos:\n$$\na_k = a_{k-1} \\cdot a_{k+1}\n$$\n\nIsso implica que:\n$$\na_{k+1} = \\frac{a_k}{a_{k-1}}\n$$\n\nPortanto, a sequência é recorrente e depende dos dois primeiros termos.\n\nVamos calcular os primeiros termos explicitamente:\n\n- $a_1$\n- $a_2$\n- $a_3 = \\frac{a_2}{a_1}$\n- $a_4 = \\frac{a_3}{a_2} = \\frac{a_2}{a_1 a_2} = \\frac{1}{a_1}$\n- $a_5 = \\frac{a_4}{a_3} = \\frac{1/a_1}{a_2/a_1} = \\frac{1}{a_2}$\n- $a_6 = \\frac{a_5}{a_4} = \\frac{1/a_2}{1/a_1} = \\frac{a_1}{a_2}$\n- $a_7 = \\frac{a_6}{a_5} = \\frac{a_1/a_2}{1/a_2} = a_1$\n- $a_8 = \\frac{a_7}{a_6} = \\frac{a_1}{a_1/a_2} = a_2$\n\nPortanto, a sequência é periódica de período $6$:\n$$\na_1,\\ a_2,\\ \\frac{a_2}{a_1},\\ \\frac{1}{a_1},\\ \\frac{1}{a_2},\\ \\frac{a_1}{a_2},\\ a_1,\\ a_2,\\ \\ldots\n$$\n\nVamos verificar o período:\n- $a_7 = a_1$\n- $a_8 = a_2$\n- $a_9 = \\frac{a_2}{a_1}$\n\nPortanto, a sequência repete a cada $6$ termos.\n\nComo $80 = 6 \\times 13 + 2$, temos $13$ períodos completos e mais dois termos.\n\nAgora, calculemos o produto dos $40$ primeiros termos.\n\nEm cada períod"
+ },
+ {
+  "mathnet_id": "0931",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "多项式",
+   "根与系数",
+   "不等式"
+  ],
+  "contest": "Middle European Mathematical Olympiad",
+  "problem": "Problem:\nDetermine the smallest possible real constant $C$ such that the inequality\n$$\n\\left|x^{3}+y^{3}+z^{3}+1\\right| \\leqslant C\\left|x^{5}+y^{5}+z^{5}+1\\right|\n$$\nholds for all real numbers $x, y, z$ satisfying $x+y+z=-1$.",
+  "solution_head": "Solution:\nThe key for our solution is the replacement of $1$ by $-(x+y+z)^{3}$ and $-(x+y+z)^{5}$ on the LHS and RHS, respectively, of the inequality under consideration. Thus we have to deal with the equivalent inequality\n$$\n\\left|x^{3}+y^{3}+z^{3}-(x+y+z)^{3}\\right| \\leqslant C \\cdot\\left|x^{5}+y^{5}+z^{5}-(x+y+z)^{5}\\right|.\n$$\nNow, for instance $z=-x$ shows that the expressions on either side of our inequality are $0$. Therefore, both expressions have $(x+z)$ as a factor. Similarly, $(x+y)$ and $(y+z)$ are factors, too. A bit of moderate algebra yields\n$$\n|3(x+y)(x+z)(y+z)| \\leqslant C \\cdot\\left|5(x+y)(x+z)(y+z)\\left(x^{2}+y^{2}+z^{2}+x y+x z+y z\\right)\\right|.\n$$\nTherefore, $(x+y)(x+z)(y+z)=0$ certainly implies equality in our inequality. We thus let further on be $(x+y)(x+z)(y+z) \\neq 0$ and thus have to deal with\n$$\n3 \\leqslant 5 C \\cdot\\left|x^{2}+y^{2}+z^{2}+x y+x z+y z\\right|.\n$$\nBecause of $\\left|x^{2}+y^{2}+z^{2}+x y+x z+y z\\right|=x^{2}+y^{2}+z^{2}+x y+x z+y z$, this is equivalent to\n$$\n\\begin{aligned}\n& \\frac{3}{5 C} & \\leqslant x^{2}+y^{2}+z^{2}+x y+x z+y z, \\\\\n\\Leftr"
+ },
+ {
+  "mathnet_id": "073o",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "代数变换技巧"
+  ],
+  "contest": "INMO",
+  "problem": "Problem:\nLet $A$ be a set of real numbers such that $A$ has at least four elements. Suppose $A$ has the property that $a^{2} + b c$ is a rational number for all distinct numbers $a, b, c$ in $A$. Prove that there exists a positive integer $M$ such that $a \\sqrt{M}$ is a rational number for every $a$ in $A$.",
+  "solution_head": "Solution:\nSuppose $0 \\in A$. Then $a^{2} = a^{2} + 0 \\times b$ is rational and $a b = 0^{2} + a b$ is also rational for all $a, b$ in $A$, $a \\neq 0$, $b \\neq 0$, $a \\neq b$. Hence $a = a_{1} \\sqrt{M}$ for some rational $a_{1}$ and natural number $M$. For any $b \\neq 0$, we have\n$$\nb \\sqrt{M} = \\frac{a b}{a_{1}}\n$$\nwhich is a rational number.\nHence we may assume $0$ is not in $A$. If there is a number $a$ in $A$ such that $-a$ is also in $A$, then again we can get the conclusion as follows. Consider two other elements $c, d$ in $A$. Then $c^{2} + d a$ is rational and $c^{2} - d a$ is also rational. It follows that $c^{2}$ is rational and $d a$ is rational. Similarly, $d^{2}$ and $c a$ are also rationals. Thus $d / c = (d a) / (c a)$ is rational. Note that we can vary $d$ over $A$ with $d \\neq c$ and $d \\neq a$. Again $c^{2}$ is rational implies that $c = c_{1} \\sqrt{M}$ for some rational $c_{1}$ and natural number $M$. We observe that $c \\sqrt{M} = c_{1} M$ is rational, and\n$$\na \\sqrt{M} = \\frac{c a}{c_{1}}\n$$\nso that $a \\sqrt{M}$ is a rational number. Similarly is the case with $-a "
+ },
+ {
+  "mathnet_id": "0fxw",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "函数方程"
+  ],
+  "contest": "IMO Selektion",
+  "problem": "Problem:\nFinde alle Funktionen $f: \\mathbb{R} \\rightarrow \\mathbb{R}$, sodass für alle reellen $x, y$ gilt\n$$\nf(f(x)-f(y))=(x-y)^2 f(x+y)\n$$",
+  "solution_head": "Solution:\nMit $x=y$ folgt $f(0)=0$. Mit $x=0$ respektive $y=0$ erhält man die beiden Gleichungen $f(-f(y))=y^2 f(y)$ und $f(f(x))=x^2 f(x)$ und durch Kombination weiter\n$$\nf(f(x))=f(-f(x)) \\quad \\forall x \\in \\mathbb{R}\n$$\nOffenbar ist die Nulfunktion $f \\equiv 0$ eine Lösung, wir nehmen daher im Folgenden an, dass $f(a) \\neq 0$ gilt für ein $a \\in \\mathbb{R}$. Mit $y=a-x$ erhält man dann\n$$\nf(f(x)-f(a-x))=(2x-a)^2 f(a)\n$$\nund hier nimmt die rechte Seite alle positiven respektive alle negativen reellen Werte an, je nach Vorzeichen von $f(a)$. Dasselbe gilt für die linke Seite und somit auch für $f$. Zusammen mit (4) zeigt das in beiden Fällen, dass $f$ eine gerade Funktion ist.\n\nErsetzt man nun in der ursprünglichen Gleichung $y$ durch $-y$, dann ändert sich die linke Seite nicht, und ein Vergleich der alten und neuen rechten Seite ergibt die Gleichung\n$$\n(x-y)^2 f(x+y)=(x+y)^2 f(x-y)\n$$\nSetzt man hier schliesslich noch $y=x-1$, dann folgt $f(2x-1)=(2x-1)^2 f(1)$, also sind alle Lösungen von der Gestalt $f(x)=c x^2$ für eine Konstante $c \\neq 0$. Einsetzen zeigt $c= \\pm 1$ und die dr"
+ },
+ {
+  "mathnet_id": "04w6",
+  "est": 3,
+  "conf": "mid",
+  "category": "algebra",
+  "topics": [
+   "不等式"
+  ],
+  "contest": "First Round of the 73rd Czech and Slovak Mathematical Olympiad (take-home part)",
+  "problem": "Let $a$, $b$, $c$, $d$ be positive real numbers lying in the interval $[1, 2]$ that also satisfy the equation $(a + c)(b + d) = 8$. Prove that the inequality\n$$\n\\frac{1}{a^2 + b^2 - 1} + \\frac{1}{b^2 + c^2 - 1} + \\frac{1}{c^2 + d^2 - 1} + \\frac{1}{d^2 + a^2 - 1} \\geq 1,\n$$\nis satisfied for all such quadruples and determine all the cases when the equality holds.",
+  "solution_head": "To begin with, note that all the numbers are greater or equal to one, so the denominators are positive and the question is well-posed.\n\nAs a first step in our solution, let's observe that since $a$ and $b$ lie in a closed interval of length $1$, we must have $(a - b)^2 \\le 1$, which can be rearranged to\n$$\n\\frac{1}{a^2 + b^2 - 1} \\ge \\frac{1}{2ab}.\n$$\nApplying similar bounds to all four terms, we see that it suffices to prove the inequality\n$$\n\\frac{1}{ab} + \\frac{1}{bc} + \\frac{1}{cd} + \\frac{1}{da} \\ge 2.\n$$\n\nBut since the condition $(a + c)(b + d) = 8$ is equivalent to $ab + bc + cd + da = 8$, this follows from the inequality between the arithmetic and harmonic means (or, if one prefers, from the Cauchy-Schwarz inequality).\n\nIn order for equality to be attained, we must have equality in both our estimates. From the first one, we can infer that\n$$\n|a - b| = |b - c| = |c - d| = |d - a| = 1.\n$$\nSince all the numbers lie in an interval of length $1$, this leaves us with only two options where equality can be attained, $(1, 2, 1, 2)$ and $(2, 1, 2, 1)$, with an easy check confirming th"
+ }
+]

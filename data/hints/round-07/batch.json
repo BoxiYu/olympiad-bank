@@ -1,0 +1,135 @@
+[
+ {
+  "id": "N-024",
+  "title": "Base-b Numerals Divisible by Sixteen",
+  "difficulty": 2,
+  "topics": [
+   "素数与算术基本定理",
+   "整除与同余",
+   "多项式"
+  ],
+  "problem": "There are exactly $K$ positive integers $b$ with $5 \\le b \\le 2024$ such that the base-$b$ integer $2024_b$ is divisible by 16 (where 16 is in base ten). What is the sum of the digits of $K$?\n(A) 16 (B) 17 (C) 18 (D) 20 (E) 21",
+  "answer": "D",
+  "solution": "Notice that $2024_b = 2b^3 + 2b + 4 = 2(b+1)(b^2 - b + 2)$, and consider the residue classes of this number modulo 8. If $b \\equiv 7 \\pmod{8}$, then $b+1 \\equiv 0 \\pmod{8}$, and if $b \\equiv 3 \\pmod{8}$, then $b^2 - b + 2 \\equiv 0 \\pmod{8}$. In each case $2024_b$ is divisible by 16.\nIn all other cases $2024_b$ is not divisible by 16. Indeed, if $b \\equiv 0, 2, \\text{ or } 4 \\pmod{8}$, then $b+1$ is odd, and $b^2 - b + 2 \\equiv b + 2 \\pmod{8}$, so $2024_b$ is divisible by no power of 2 greater than $2^3$. If $b \\equiv 1 \\pmod{8}$, then $b+1$ and $b^2 - b + 2$ are both odd multiples of 2, so $2024_b$ is divisible by 8, but not by 16.\nBecause $2024 = 253 \\cdot 8$, there are $253 \\cdot 3 = 759$ positive integers $b \\le 2024$ that are congruent to 3, 6, or 7 modulo 8. The number 3 must be excluded from this total, because the problem statement requires $b$ to be at least 5. Thus $K = 759 - 1 = 758$, and the sum of the digits of $K$ is $7+5+8 = 20$."
+ },
+ {
+  "id": "N-025",
+  "title": "Five-Digit Numbers with Digit Product 180",
+  "difficulty": 2,
+  "topics": [
+   "计数与容斥",
+   "素数与算术基本定理"
+  ],
+  "problem": "Problem:\nThe product of the digits of a 5-digit number is $180$. How many such numbers exist?",
+  "answer": "360",
+  "solution": "Solution:\nLet the digits be $a, b, c, d, e$. Then $a b c d e = 180 = 2^{2} \\cdot 3^{2} \\cdot 5$. We observe that there are 6 ways to factor $180$ into digits $a, b, c, d, e$ (ignoring differences in ordering):\n$$\n180 = 1 \\cdot 1 \\cdot 4 \\cdot 5 \\cdot 9 = 1 \\cdot 1 \\cdot 5 \\cdot 6 \\cdot 6 = 1 \\cdot 2 \\cdot 2 \\cdot 5 \\cdot 9 = 1 \\cdot 2 \\cdot 3 \\cdot 5 \\cdot 6 = 1 \\cdot 3 \\cdot 3 \\cdot 4 \\cdot 5 = 2 \\cdot 2 \\cdot 3 \\cdot 3 \\cdot 5.\n$$\nThere are (respectively) $60, 30, 60, 120, 60$, and $30$ permutations of these breakdowns, for a total of $360$ numbers."
+ },
+ {
+  "id": "N-026",
+  "title": "Reversible Squares of Three-Digit Numbers",
+  "difficulty": 2,
+  "topics": [
+   "代数变换技巧"
+  ],
+  "problem": "Problem:\n\n$\\overline{a_{1} a_{2} a_{3}}$ and $\\overline{a_{3} a_{2} a_{1}}$ are two three-digit decimal numbers, with $a_{1}, a_{3}$ being different non-zero digits. The squares of these numbers are five-digit numbers $\\overline{b_{1} b_{2} b_{3} b_{4} b_{5}}$ and $\\overline{b_{5} b_{4} b_{3} b_{2} b_{1}}$ respectively. Find all such three-digit numbers.",
+  "answer": "301, 311, 201, 211, 221",
+  "solution": "Solution:\n\nAssume $a_{1} > a_{3} > 0$. As the square of $\\overline{a_{1} a_{2} a_{3}}$ must be a five-digit number we have $a_{1} \\leq 3$. Now a straightforward case study shows that $\\overline{a_{1} a_{2} a_{3}}$ can be 301, 311, 201, 211 or 221."
+ },
+ {
+  "id": "N-027",
+  "title": "Uniform Digit-Sum Ratios over Subsets",
+  "difficulty": 5,
+  "topics": [
+   "代数变换技巧",
+   "染色与不变量"
+  ],
+  "problem": "Let $S(k)$ denote the sum of all digits of $k$ in base 10. Find all integers $n \\ge 2$ and rational numbers $\\beta \\in (0,1)$, such that there exist $n$ distinct positive integers $a_1, a_2, \\dots, a_n$ that satisfy: for any subset $I \\subseteq \\{1, 2, \\dots, n\\}$ with two or more elements,\n$$ S\\left(\\sum_{i \\in I} a_i\\right) = \\beta \\cdot \\sum_{i \\in I} S(a_i). $$",
+  "answer": "All integers n from 2 to 10 inclusive, with any rational beta in the open interval (0, 1).",
+  "solution": "The desired are integers $n \\in \\{2, 3, \\dots, 10\\}$ and all rational numbers $\\beta \\in (0, 1)$.\n\nFirst, for integer $n \\in \\{2, 3, \\dots, 10\\}$ and rational $\\beta \\in (0, 1)$, construct $a_1, a_2, \\dots, a_n$ as follows. Let $c$ and $s$ be positive integers that will be determined later. For $k = 1, \\dots, n$, define\n$$\na_k = 2 \\cdot 10^{cn+sk} - 10^{cn+s(k-1)+1} + \\sum_{\\substack{i \\in \\{1, \\dots, n\\} \\\\ i \\neq k}} 10^{cn+s(i-1)+1} + 10^{k-1} \\cdot \\sum_{i=0}^{c-1} 10^{ni}\n$$\nHere, among the last $cn$ places of $a_1, a_2, \\dots, a_n$, each place corresponds to a unique $a_i$ whose digit at that place is nonzero, and that digit is 1; for the next (to the left) $s$ places, $a_1$ has $199\\dots9$ ($s-1$ of 9's), while all other $a_i$'s have $00\\dots01$; for the next $s$ places, $a_2$ has $199\\dots9$ ($s-1$ of 9's), while all other $a_i$'s have $00\\dots01$; and so on.\n\nFor every $1 \\le i \\le n$, $S(a_i) = n + 9(s - 1) + c$; for every\n$$\nI \\subseteq \\{1, 2, \\dots, n\\} \\ (|I| \\ge 2),\n$$\nit is easy to check that\n$$\nS\\left(\\sum_{i \\in I} a_i\\right) = n \\cdot |I| + c \\cdot |I|.\n$$\nAs long as $s, c \\in \\mathbb{N}_+$ are suitably chosen such that\n$$\n(n + 9(s - 1) + c) \\cdot \\beta = n + c,\n$$\nthe problem requirements are all met.\n\nNext, we prove $n \\le 10$. Assume $n = 11$. If\n$$\nI_1, I_2 \\subseteq \\{1, \\dots, n\\}\n$$\nsatisfy $I_1 \\cap I_2 = \\emptyset$ and $|I_1| \\ge 2$, $|I_2| \\ge 2$, then\n$$\nS\\left(\\sum_{i \\in I_1 \\cup I_2} a_i\\right) = \\beta \\cdot \\sum_{i \\in I_1 \\cup I_2} S(a_i) = S\\left(\\sum_{i \\in I_1} a_i\\right) + S\\left(\\sum_{i \\in I_2} a_i\\right).\n$$\nIn other words, no carry occurs in the summing of $\\sum_{i \\in I_1} a_i$ and $\\sum_{i \\in I_2} a_i$. However, from $\\beta < 1$ we see that a carry occurs in the summing of $a_i$ and $a_j$, for every $1 \\le i < j \\le 11$.\n\nSuppose $T$ is the least positive integer that the summing $a_1 + a_2 + \\cdots + a_{11}$ involves a carry in the $T$th place (from the right). Let the $T$th place digits of $a_1, a_2, \\ldots, a_{11}$ be $x_1, x_2, \\ldots, x_{11}$, respectively. For any subset\n$$\nI \\subseteq \\{1, 2, \\ldots, 11\\},\n$$\nthe $T$th place digit of $\\sum_{i \\in I} a_i$ is the ones place digit of $\\sum_{i \\in I} x_i$. Without loss of generality, assume\n$$\n9 \\ge x_1 \\ge x_2 \\ge \\cdots \\ge x_{11} \\ge 0.\n$$\nThen $x_1 + x_2 + \\cdots + x_{11} \\ge 10$. We assert that there exist $I_1, I_2 \\subseteq \\{1, 2, \\ldots, 11\\}$, $I_1 \\cap I_2 = \\emptyset$, $|I_1| \\ge 2$, $|I_2| \\ge 2$, such that the sum of the ones place digits of $\\sum_{i \\in I_1} x_i$ and $\\sum_{i \\in I_2} x_i$ is greater than or equal to 10.\n\nIf $x_{11} = 0$, starting at $x_{10} + x_9$, add one number at a time by $x_8, x_7, \\ldots, x_1$. There must be a time that a carry occurs in the ones place: for some $k \\in \\{1, 2, \\ldots, 8\\}$, the summing $(x_{10}+x_9+\\cdots+x_{k+1})+x_k$ involves a carry in the ones place, and so does $(x_{10} + x_9 + \\cdots + x_{k+1}) + (x_k + x_{11})$, a contradiction.\n\nIf $x_{11} > 0$, try to make $x_1, x_2, \\ldots, x_{11}$ into as many pairs as possible, such that the sum of each pair ends with a digit greater than or equal to 2. If five pairs are made, then the summing involves a carry in the ones place, a contradiction. Assume at most four pairs are made, leaving three or more unpaired numbers, which include at most one number less than 5 and one number greater than 5, as otherwise two such numbers can be paired. This indicates there is at least one 5, and furthermore, no unpaired number is less than 5, and hence there are at least two 5s, say $x_a$ and $x_b$. Take the third unpaired number $x_c \\ge 5$. Now, starting at any $x_d+x_e$ (not involving $x_a, x_b, x_c$), add one number at a time by the other numbers except $x_a, x_b$. Since $x_c \\ge 5$, the summing must involve a carry in the ones place at some moment, say $(\\sum_{i} x_{i}) + x_{f}$. Then we are led to contradiction by taking\n$$ (\\sum_{i} x_{i}) + (x_{f} + x_{a} + x_{b}). $$\n\nBased on the above argument, when $n \\ge 11$, no positive integers $a_1, a_2, \\dots, a_n$ satisfy the problem condition. $\\square$"
+ },
+ {
+  "id": "N-028",
+  "title": "Three-Digit Divisibility Game",
+  "difficulty": 3,
+  "topics": [
+   "整除与同余"
+  ],
+  "problem": "a) The general form $\\overline{ABC}$ of a three-digit number is initially written on a blackboard. Ann and Enn replace by turns letters with digits, exactly one at a time, with Ann starting. Can Ann write digits in such a way that, irrespectively of Enn's move, the resulting three-digit number would be divisible by 11? (Different letters may be replaced with equal digits but the letter $A$ must not be replaced with zero.)\n\nb) Ann and Enn got bored with writing the general form of the number again at the beginning of each game, and decided to change the rules as follows. First, Ann writes one digit to the blackboard, then Enn writes the second digit either to the right or to the left of it, and finally Ann completes the number with writing the third digit either to the left or to the right of the two digits already on the blackboard (writing between the digits is not allowed). Can Ann write digits in such a way that, irrespectively of Enn's move, the result would be a three-digit number (i.e., not starting with 0) that is divisible by 11?",
+  "answer": "a) No. b) Yes.",
+  "solution": "a) Let Ann replace on her first move one of letters $B$ or $C$ with a digit $k$. If Enn now replaces the other one of $B$ and $C$ with digit $k$, too, the resulting number $\\overline{Akk}$ is divisible by 11 if and only if $\\overline{A00}$ is divisible by 11, which in turn is the case if $A$ is divisible by 11. The only such digit is 0 but $A$ cannot be replaced with 0. If Ann replaces on her first move the letter $A$ with a non-zero digit $k$ then Enn can replace $B$ with the digit $k-1$. The number resulting from Ann's second move differs from the number $kk0$ by less than 11, whence it cannot be divisible by 11.\n\nb) Let Ann write 9 on her first move. If Enn now writes before or after it a digit $k$ and Ann writes after or before of it, respectively, the digit $9-k$, then the resulting number is divisible by 11. Ann cannot make her last move in such a way only if Enn on his move has written either 9 to the end of the number or 0 to the beginning of the number. If Enn has written 9 to the end of the number, the blackboard contains digits 99 and Ann can construct a multiple of 11 by writing 0 to the end. If Enn has written 0 to the beginning of the number, Ann can write 2 to the very beginning which results in 209, again a multiple of 11."
+ },
+ {
+  "id": "N-029",
+  "title": "Power Recurrence Avoiding a Repeated-Block Integer",
+  "difficulty": 2,
+  "topics": [
+   "费马小定理与欧拉定理",
+   "数列与递推"
+  ],
+  "problem": "Suppose $(a_n)$ is a sequence of integers such that $a_1$ and $a_2$ are two distinct digits of the number $2014$, and $a_n = a_{n-1}^{10} + a_{n-2}^{10}$ for all $n > 2$.\nLet $m = 20142014\\ldots2014$ be the number given by the string $2014$ repeated $2014$ times. Show that $m$ cannot be $a_n$ for any positive integer $n$.",
+  "answer": "证明题",
+  "solution": "Note first that\n$$\n\\begin{align*}\na_3 &= a_1^{10} + a_2^{10} \\le 2^{10} + 4^{10} < 2 \\cdot 4^{10} = 2^{21} < 10^{21} < m \\quad \\text{and} \\\\\na_4 &= a_2^{10} + a_3^{10} < 4^{10} + 10^{20} < 2 \\cdot 10^{20} < m.\n\\end{align*}\n$$\nHence, if $m = a_n$, then $n \\ge 5$.\nGiven the possible values for $a_1$ and $a_2$, we see that $a_3$ is congruent to either $1$ or $2$ modulo $3$, depending on whether or not we select $0$ as one of the two initial terms of the sequence. Similarly, $a_4$ is congruent to either $1$ or $2$ modulo $3$, depending on whether or not $a_2 = 0$. In any case, neither $a_3$ nor $a_4$ is divisible by $3$.\nBy the Little Theorem of Fermat, $a_k^{10} \\equiv 1 \\pmod{3}$ unless $a_k \\equiv 0 \\pmod{3}$.\nTherefore, if neither $a_{k-1}$ nor $a_{k-2}$ is divisible by $3$, then\n$$\na_k = a_{k-1}^{10} + a_{k-2}^{10} \\equiv 2 \\pmod{3}.\n$$\nBy induction it follows now that $a_n \\equiv 2 \\pmod{3}$ for all $n \\ge 5$.\nFinally, using that any integer is congruent to its sum of digits modulo $3$, we find that\n$$\nm \\equiv 2014 \\cdot (2 + 0 + 1 + 4) \\equiv 2014 \\equiv 1 \\pmod{3}\n$$\nand we conclude that $m \\neq a_n$ for all $n \\ge 1$."
+ },
+ {
+  "id": "N-030",
+  "title": "Factorial Divisibility Product",
+  "difficulty": 4,
+  "topics": [
+   "费马小定理与欧拉定理",
+   "素数与算术基本定理"
+  ],
+  "problem": "Problem:\n\nBepaal het product van alle positieve gehele getallen $n$ waarvoor $3(n!+1)$ deelbaar is door $2 n-5$.",
+  "answer": "2016",
+  "solution": "Solution:\n\nDe getallen $n=1$ tot en met $n=4$ voldoen, want $2 n-5$ is dan gelijk aan respectievelijk $-3,-1,1$ en $3$, dus altijd een deler dan $3(n!+1)$. Vanaf nu bekijken we alleen $n>4$ en dan is $2 n-5>3$.\n\nWe bewijzen eerst dat als $n$ voldoet, dan $2 n-5$ priem moet zijn. We onderscheiden twee gevallen. Stel eerst dat $2 n-5$ niet priem is en een priemdeler $p>3$ heeft. Omdat $p \\neq 2 n-5$ en omdat $2 n-5$ oneven is, geldt $p \\leq \\frac{2 n-5}{3}<n$. Dus $p \\mid n!$, maar dan $p \\nmid n!+1$ en dus ook $p \\nmid 3(n!+1)$ aangezien $p \\neq 3$. Dus $2 n-5 \\nmid 3(n!+1)$, wat betekent dat $n$ niet voldoet. Stel nu dat $2 n-5$ niet priem is, maar alleen priemdelers $3$ heeft; dan is het dus een driemacht groter dan $3$. Echter, voor $n>4$ is $3 \\nmid n!+1$, dus $3(n!+1)$ is deelbaar door precies één factor $3$ en niet meer. We zien dat $n$ ook in dit geval niet kan voldoen.\n\nVoor een $n>4$ die voldoet, weten we nu dat $2 n-5$ een priemgetal groter dan $3$ is. Schrijf $q=2 n-5$. Dan $q \\mid n!+1$, oftewel $n!\\equiv-1 \\bmod q$. Verder zegt de stelling van Wilson dat $(q-1)!\\equiv-1 \\bmod q$. Dus\n$$\n\\begin{aligned}\n-1 & \\equiv (2 n-6)! \\\\\n& \\equiv (2 n-6)(2 n-7) \\cdots (n+1) \\cdot n! \\\\\n& \\equiv (-1) \\cdot (-2) \\cdots (-n+6) \\cdot n! \\\\\n& \\equiv (-1)^{n-6} \\cdot (n-6)! \\cdot n! \\\\\n& \\equiv (-1)^{n} \\cdot (n-6)! \\cdot -1 \\quad \\bmod q .\n\\end{aligned}\n$$\nDus $(n-6)!\\equiv(-1)^{n} \\bmod q$. Omdat $n!\\equiv-1 \\bmod q$, volgt daaruit $n \\cdot(n-1) \\cdots (n-5) \\equiv (-1)^{n-1} \\bmod q$. We vermenigvuldigen dit met $2^{6}$ :\n$$\n2 n \\cdot (2 n-2) \\cdot (2 n-4) \\cdot (2 n-6) \\cdot (2 n-8) \\cdot (2 n-10) \\equiv (-1)^{n-1} \\cdot 64 \\bmod q .\n$$\nModulo $q=2 n-5$ staat links $5 \\cdot 3 \\cdot 1 \\cdot -1 \\cdot -3 \\cdot -5 = -225$.\n\nStel $n$ is oneven. Dan hebben we dus $-225 \\equiv 64 \\bmod q$, dus $q \\mid -225-64 = -289 = -17^{2}$. Dus $q=17$ en dan $n=\\frac{17+5}{2}=11$.\n\nStel nu $n$ is even. Dan hebben we $-225 \\equiv -64 \\bmod q$, dus $q \\mid -225+64 = -161 = -7 \\cdot 23$. Dus $q=7$ of $q=23$ en dat geeft respectievelijk $n=6$ en $n=14$.\n\nWe controleren deze drie mogelijkheden.\n\nVoor $n=11$ en $2 n-5=17$ :\n$$\n\\begin{aligned}\n11! & =1 \\cdot (2 \\cdot 9) \\cdot (3 \\cdot 6) \\cdot (5 \\cdot 7) \\cdot 4 \\cdot 8 \\cdot 10 \\cdot 11 \\\\\n& \\equiv 4 \\cdot 8 \\cdot 10 \\cdot 11 = 88 \\cdot 40 \\equiv 3 \\cdot 6 \\equiv 1 \\quad \\bmod 17\n\\end{aligned}\n$$\ndus $n=11$ voldoet niet.\n\nVoor $n=14$ en $2 n-5=23$ :\n$$\n\\begin{aligned}\n14! & =1 \\cdot (2 \\cdot 12) \\cdot (3 \\cdot 8) \\cdot (4 \\cdot 6) \\cdot (5 \\cdot 14) \\cdot (7 \\cdot 10) \\cdot 9 \\cdot 11 \\cdot 13 \\\\\n& \\equiv 9 \\cdot 11 \\cdot 13 = 117 \\cdot 11 \\equiv 2 \\cdot 11 \\equiv -1 \\quad \\bmod 23\n\\end{aligned}\n$$\ndus $n=14$ voldoet.\n\nVoor $n=6$ en $2 n-5=7$ ten slotte volgt $6!\\equiv-1 \\bmod 7$ uit de stelling van Wilson, dus $n=6$ voldoet ook.\n\nWe concluderen dat de getallen $n$ die voldoen, zijn: $1,2,3,4,6$ en $14$. Het product daarvan is $2016$."
+ },
+ {
+  "id": "N-031",
+  "title": "Perfect-Power Products Between Consecutive Powers",
+  "difficulty": 4,
+  "topics": [
+   "素数与算术基本定理",
+   "不定方程",
+   "数列与递推",
+   "不等式"
+  ],
+  "problem": "(a) Given a positive integer $k$, prove that there do not exist two distinct integers in the open interval $(k^2, (k+1)^2)$ whose product is a perfect square.\n\n(b) Given an integer $n > 2$, prove that there exist $n$ distinct integers in the open interval $(k^n, (k+1)^n)$ whose product is the $n$-th power of an integer, for all but a finite number of positive integers $k$.",
+  "answer": "证明题",
+  "solution": "(a) Suppose that two such integers, $a < b$, exist. Let $m$ be the squarefree part of $a$; $a = ms^2$, $s \\in \\mathbb{Z}$. Then $mb$ is a square, so since $m$ is squarefree, $b = mt^2$ for some integer $t \\ge s + 1$. Hence\n$$\n\\left(1 + \\frac{1}{s}\\right)^2 \\le \\frac{t^2}{s^2} = \\frac{b}{a} < \\frac{(k+1)^2}{k^2} = \\left(1 + \\frac{1}{k}\\right)^2,\n$$\nso $s > k$. Consequently, $b = mt^2 \\ge m(s+1)^2 > (k+1)^2$ – a contradiction.\n\n(b) We show that the statement holds whenever $k \\ge 3^{n-1}$; if $n$ is odd, the weaker condition $k \\ge 2^{n-1}$ suffices. We require a LEMMA whose proof offers no difficulty.\nLEMMA. If $C > 0$ and $n \\ge 2$, then $(k+1)^n > (k^{n/(n-1)} + C)^{n-1}$ for all $k \\ge C^{n-1}$.\nNow let $n$ be odd, let $a$ be the smallest integer greater than $k^{n/(n-1)}$, and let $b = a+1$. The $n$ integers $a^{n-i-1}b^i$, $i = 0, 1, 2, \\dots, n-1$, are distinct, and their product is the $n$-th power of $(ab)^{(n-1)/2}$. The smallest of them, $a^{n-1}$, exceeds $k^n$, and the largest, $b^{n-1}$, is at most $(k^{n/(n-1)} + 2)^{n-1}$. By the LEMMA, this is at most $(k+1)^n$ when $k \\ge 2^{n-1}$.\nNext, we turn to the case of even $n$. Let again $a$ be the smallest integer greater than $k^{n/(n-1)}$, and let $b = a+1$ and $c = a+2$. Let further $x_i = a^{n-i}b^i$ and $y_i = b^{i-1}c^{n-i}$, $i = 1, 2, \\dots, n-1$. Note that\n$$\nk^n < x_1 < x_2 < x_3 < \\dots < x_{n-1} < y_{n-1} < y_{n-2} < \\dots < y_2 < y_1 \\le (k^{n/(n-1)} + 3)^{n-1},\n$$\nso these $2n-2$ integers are distinct, and by the LEMMA they are in the proper range when $k \\ge 3^{n-1}$. We end the proof by showing that we can choose $n$ of these integers so that the product is a perfect $n$-th power.\nIf $n$ is divisible by 4, say $n = 4m$, choose\n$x_1, x_3, x_5, \\dots, x_{4m-1}, y_1, y_3, y_5, \\dots, y_{4m-1}$;\ntheir product is the $n$-th power of $a^m b^{2m-1} c^m$.\nIf $n = 8m + 2$, $m > 0$, take\n$x_2, x_3, x_4, \\dots, x_{4m+2}, y_2, y_3, y_4, \\dots, y_{4m+2}$;\nthe product of these is the $n$-th power of $a^{3m}b^{2m+1}c^{3m}$.\nFinally, if $n = 8m + 6$, select\n$$\nx_1, x_2, x_3, \\dots, x_{4m+3}, y_1, y_2, y_3, \\dots, y_{4m+3},\n$$\nin which case the product is the $n$-th power of $a^{3m+2}b^{2m+1}c^{3m+2}$."
+ },
+ {
+  "id": "N-032",
+  "title": "Multiplicative Partition Bound",
+  "difficulty": 4,
+  "topics": [
+   "素数与算术基本定理",
+   "数论函数与阶乘估计"
+  ],
+  "problem": "For positive integer $k > 1$, let $f(k)$ be the number of ways of factoring $k$ into product of positive integers greater than 1 (The order of factors are not counted, for example $f(12) = 4$, as $12$ can be factored in these 4 ways: $12$, $2 \\times 6$, $3 \\times 4$, $2 \\times 2 \\times 3$).\n\n**Prove:** If $n$ is a positive integer greater than 1, $p$ is a prime factor of $n$, then $f(n) \\le \\frac{n}{p}$.",
+  "answer": "证明题",
+  "solution": "Let $P(n)$ stand for the biggest prime divisor of $n$, and define $P(1) = f(1) = 1$. We first prove two lemmas.\n\nLemma 1: For positive integer $n$ and prime $p \\mid n$, we have $f(n) \\le \\sum_{d|\\frac{n}{p}} f(d)$.\n\n**Proof of Lemma 1:** For any factoring of $n$, write $n = n_1 n_2 \\cdots n_k$. Since $p \\mid n$, there exists $i \\in \\{1, \\cdots, k\\}$ such that $p \\mid n_i$ (if there are more than one such $i$, choose any one of them), without loss of generality, assume $i = 1$. Map this factoring to a factoring of $d = \\frac{n}{n_1}$, $d = n_2 n_3 \\cdots n_k$.\n\nFor two different factorings of $n$, $n = n_1 n_2 \\cdots n_k$ and $n = n'_1 n'_2 \\cdots n'_k$ (where $p$ divides $n_1$ and $n'_1$):\n- If $n_1 = n'_1$, then $d = n_2 \\cdots n_k$ and $d = n'_2 \\cdots n'_k$ are two different factorings of $d$ ($d$ is a divisor of $\\frac{n}{p}$).\n- If $n_1 \\ne n'_1$, then $d = \\frac{n}{n_1} \\ne \\frac{n}{n'_1} = d'$, so these two factorings map to a factoring of $d$ and $d'$ respectively ($d$ and $d'$ are divisors of $\\frac{n}{p}$).\n\nThus $f(n) \\le \\sum_{d|\\frac{n}{p}} f(d)$. Lemma 1 is proved.\n\nLemma 2: For positive integer $n$, let $g(n) = \\sum_{d|n} \\frac{d}{P(d)}$, then $g(n) \\le n$.\n\n**Proof of Lemma 2:** Induce on the number of different prime divisors of $n$.\n- When $n = 1$, $g(1) = 1$.\n- When $n = p^a$ is a prime power,\n  $$\n  g(n) = 1 + 1 + p + \\cdots + p^{a-1} = 1 + \\frac{p^a - 1}{p-1} \\le 1 + p^a - 1 = n.\n  $$\n\nAssume when the number of different prime divisors of $n$ is $k$, we have $g(n) \\le n$. Consider the situation when $n$ has $k+1$ different prime divisors. Let the prime factorization of $n$ be $n = p_1^{a_1} \\cdots p_k^{a_k} p_{k+1}^{a_{k+1}}$, where $p_1 < \\cdots < p_k < p_{k+1}$, and write $n = m p_{k+1}^{a_{k+1}}$. So\n  $$\n  g(n) = g(m) + \\sum_{d|m} \\sum_{i=1}^{a_{k+1}} \\frac{d p_{k+1}^i}{p_{k+1}} = g(m) + \\sigma(m) \\frac{p_{k+1}^{a_{k+1}} - 1}{p_{k+1} - 1},\n  $$\nwhere $\\sigma(m)$ stands for the sum of positive divisors of $m$. By assumption, $g(m) \\le m$.\n\nSince\n$$\n\\begin{align*}\n\\sigma(m) \\frac{p_{k+1}^{a_{k+1}} - 1}{p_{k+1} - 1} &= \\left( \\prod_{i=1}^k \\frac{p_i^{a_i+1} - 1}{p_i - 1} \\right) \\frac{p_{k+1}^{a_{k+1}} - 1}{p_{k+1} - 1} \\\\\n&\\le \\left( \\prod_{i=1}^k \\frac{p_i^{a_i+1} - 1}{p_{i+1} - 1} \\right) (p_{k+1}^{a_{k+1}} - 1) \\\\\n&\\le \\left( \\prod_{i=1}^k \\frac{p_i^{a_i+1} - 1}{p_i} \\right) (p_{k+1}^{a_{k+1}} - 1) \\\\\n&\\le \\left( \\prod_{i=1}^k p_i^{a_i} \\right) (p_{k+1}^{a_{k+1}} - 1) \\\\\n&= n - m,\n\\end{align*}\n$$\nso $g(n) \\le n$. Lemma 2 is proved.\n\nBack to the problem, it is sufficient to prove, for positive integer $n$, $f(n) \\le \\frac{n}{P(n)}$ holds.\n\nInduce on $n$. When $n=1$, the equality holds. Assume for $n=1, 2, \\dots, k$, we have $f(n) \\le \\frac{n}{P(n)}$. Then when $n=k+1$, by Lemma 1, Lemma 2, and the assumption,\n$$\nf(k+1) \\le \\sum_{d|\\frac{k+1}{P(k+1)}} f(d) \\le \\sum_{d|\\frac{k+1}{P(k+1)}} \\frac{d}{P(d)} = g\\left(\\frac{k+1}{P(k+1)}\\right) \\le \\frac{k+1}{P(k+1)}.\n$$"
+ },
+ {
+  "id": "N-033",
+  "title": "Square-Sum Permutation",
+  "difficulty": 3,
+  "topics": [
+   "递推与生成结构"
+  ],
+  "problem": "Decide if there is a permutation $a_1, a_2, \\dots, a_{6666}$ of the numbers $1, 2, \\dots, 6666$ with the property that the sum $k + a_k$ is a perfect square for all $k = 1, 2, \\dots, 6666$.",
+  "answer": "Yes",
+  "solution": "Yes. Consider the permutation\n$3, 2, 1, 12, 11, \\dots, 4, 23, 22, \\dots, 13, 57, 56, \\dots, 24, 6666, 6665, \\dots, 58.$\nMore precisely, we define\n$$\na_k = \\begin{cases} 2^2 - k & \\text{if } 1 \\le k \\le 3, \\\\ 4^2 - k & \\text{if } 4 \\le k \\le 12, \\\\ 6^2 - k & \\text{if } 13 \\le k \\le 23, \\\\ 9^2 - k & \\text{if } 24 \\le k \\le 57, \\\\ 82^2 - k & \\text{if } 58 \\le k \\le 6666. \\end{cases}\n$$\nThe result follows readily."
+ },
+ {
+  "id": "N-034",
+  "title": "Large Lattice Area Clique",
+  "difficulty": 3,
+  "topics": [
+   "最大公约数与欧几里得算法",
+   "抽屉原理",
+   "解析几何与向量复数法"
+  ],
+  "problem": "In the coordinate plane consider the set $S$ of all points with integer coordinates. For a positive integer $k$, two distinct points $A, B \\in S$ will be called $k$-friends if there is a point $C \\in S$ such that the area of the triangle $A B C$ is equal to $k$. A set $T \\subset S$ will be called a $k$-clique if every two points in $T$ are $k$-friends. Find the least positive integer $k$ for which there exists a $k$-clique with more than 200 elements.",
+  "answer": "180180",
+  "solution": "To begin, let us describe those points $B \\in S$ which are $k$-friends of the point $(0,0)$. By definition, $B=(u, v)$ satisfies this condition if and only if there is a point $C=(x, y) \\in S$ such that $\\frac{1}{2}|u y-v x|=k$. (This is a well-known formula expressing the area of triangle $A B C$ when $A$ is the origin.)\n\nTo say that there exist integers $x, y$ for which $|u y-v x|=2 k$, is equivalent to saying that the greatest common divisor of $u$ and $v$ is also a divisor of $2 k$. Summing up, a point $B=(u, v) \\in S$ is a $k$-friend of $(0,0)$ if and only if $\\operatorname{gcd}(u, v)$ divides $2 k$.\n\nTranslation by a vector with integer coordinates does not affect $k$-friendship; if two points are $k$-friends, so are their translates. It follows that two points $A, B \\in S$, $A=(s, t)$, $B=(u, v)$, are $k$-friends if and only if the point $(u-s, v-t)$ is a $k$-friend of $(0,0)$; i.e., if $\\operatorname{gcd}(u-s, v-t) \\mid 2 k$.\n\nLet $n$ be a positive integer which does not divide $2 k$. We claim that a $k$-clique cannot have more than $n^{2}$ elements.\n\nIndeed, all points $(x, y) \\in S$ can be divided into $n^{2}$ classes determined by the remainders that $x$ and $y$ leave in division by $n$. If a set $T$ has more than $n^{2}$ elements, some two points $A, B \\in T$, $A=(s, t)$, $B=(u, v)$, necessarily fall into the same class. This means that $n \\mid u-s$ and $n \\mid v-t$. Hence $n \\mid d$ where $d=\\operatorname{gcd}(u-s, v-t)$. And since $n$ does not divide $2 k$, also $d$ does not divide $2 k$. Thus $A$ and $B$ are not $k$-friends and the set $T$ is not a $k$-clique.\n\nNow let $M(k)$ be the least positive integer which does not divide $2 k$. Write $M(k)=m$ for the moment and consider the set $T$ of all points $(x, y)$ with $0 \\leq x, y < m$. There are $m^{2}$ of them. If $A=(s, t)$, $B=(u, v)$ are two distinct points in $T$ then both differences $|u-s|,|v-t|$ are integers less than $m$ and at least one of them is positive. By the definition of $m$, every positive integer less than $m$ divides $2 k$. Therefore $u-s$ (if nonzero) divides $2 k$, and the same is true of $v-t$. So $2 k$ is divisible by $\\operatorname{gcd}(u-s, v-t)$, meaning that $A, B$ are $k$-friends. Thus $T$ is a $k$-clique.\n\nIt follows that the maximum size of a $k$-clique is $M(k)^{2}$, with $M(k)$ defined as above. We are looking for the minimum $k$ such that $M(k)^{2}>200$.\n\nBy the definition of $M(k)$, $2 k$ is divisible by the numbers $1,2, \\ldots, M(k)-1$, but not by $M(k)$ itself. If $M(k)^{2}>200$ then $M(k) \\geq 15$. Trying to hit $M(k)=15$ we get a contradiction immediately ($2 k$ would have to be divisible by $3$ and $5$, but not by $15$).\n\nSo let us try $M(k)=16$. Then $2 k$ is divisible by the numbers $1,2, \\ldots, 15$, hence also by their least common multiple $L$, but not by $16$. And since $L$ is not a multiple of $16$, we infer that $k=L / 2$ is the least $k$ with $M(k)=16$.\n\nFinally, observe that if $M(k) \\geq 17$ then $2 k$ must be divisible by the least common multiple of $1,2, \\ldots, 16$, which is equal to $2 L$. Then $2 k \\geq 2 L$, yielding $k>L / 2$.\n\nIn conclusion, the least $k$ with the required property is equal to $L / 2=180180$."
+ }
+]

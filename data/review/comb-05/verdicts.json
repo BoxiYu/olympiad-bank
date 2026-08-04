@@ -1,0 +1,44 @@
+[
+  {
+    "mathnet_id": "02v6",
+    "short_title": "Two-Color Three-Term Progressions",
+    "difficulty_codex": 3,
+    "difficulty_reason": "关键是利用换色对称性并对若干点的同异色关系作有组织的分类，证明九点必出现单色三项等差数列。",
+    "topics_verdict": "agree",
+    "topics_comment": "题目正是二染色下强制出现规则子结构的有限 van der Waerden 型问题，Ramsey 型标签贴切。",
+    "text_quality": "minor_issues",
+    "text_comment": "葡萄牙文题面完整自洽且 LaTeX 正常；解答摘录中的构造清楚，但在单词“Port”处突兀截断，未呈现完证明。",
+    "needs_figure": false,
+    "figure_comment": "点的次序、等距性和中点条件均已用文字及下标完整给出，不依赖图形。",
+    "recommend": "claim",
+    "recommend_reason": "题意明确、结论正确且具有典型的二染色结构，解答截断可在入库时从原文补全。"
+  },
+  {
+    "mathnet_id": "0juv",
+    "short_title": "Progressions in Perfect-Power Sumsets",
+    "difficulty_codex": 4,
+    "difficulty_reason": "突破口是按最大幂项作有限分类，再结合归纳与等差数列的 Ramsey 型抽取把问题降到少一个底数，需多层引理串联。",
+    "topics_verdict": "agree",
+    "topics_comment": "证明核心是把长等差数列有限着色并抽取同类子等差数列，属于 van der Waerden/Ramsey 型论证。",
+    "text_quality": "minor_issues",
+    "text_comment": "英文题面与公式完整自洽；解答思路可辨，但摘录在最大幂定义的 LaTeX 表达式中途截断，无法据此核验后半段论证。",
+    "needs_figure": false,
+    "figure_comment": "问题完全由整数集合、幂和与等差数列定义，无任何图形依赖。",
+    "recommend": "claim",
+    "recommend_reason": "题目成立且方法层次丰富，适合作为高阶 Ramsey 型训练题，但入库前应取得完整官方解答。"
+  },
+  {
+    "mathnet_id": "0boz",
+    "short_title": "Two-Coloring Without Infinite Progressions",
+    "difficulty_codex": 2,
+    "difficulty_reason": "关键是构造长度递增的交替色块，并观察任一固定公差的无限等差数列必撞入足够长的异色块。",
+    "topics_verdict": "partial",
+    "topics_comment": "问题具有二染色与等差数列背景，但主方法是显式分块构造，宜以“组合构造”为主并辅以“染色与不变量”。",
+    "text_quality": "clean",
+    "text_comment": "英文题面简洁自洽，解答中的集合、无限词和分块规律一致；末句虽简略，但由长度至少为公差的空档必截断该数列即可补严。",
+    "needs_figure": false,
+    "figure_comment": "构造和证明只涉及正整数的位置、色块及固定公差，不需要图形。",
+    "recommend": "claim",
+    "recommend_reason": "构造正确、文字可独立理解且训练价值明确，仅需在入库解答中补足空档论证的一句话。"
+  }
+]

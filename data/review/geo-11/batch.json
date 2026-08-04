@@ -1,0 +1,105 @@
+[
+ {
+  "mathnet_id": "0jtu",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "圆与四点共圆",
+   "根轴与幂",
+   "解析几何与向量复数法",
+   "面积法与三角法"
+  ],
+  "contest": "HMMT February 2016",
+  "problem": "Problem:\n\nLet $ABC$ be an acute triangle with incenter $I$ and circumcenter $O$. Assume that $\\angle OIA = 90^\\circ$. Given that $AI = 97$ and $BC = 144$, compute the area of $\\triangle ABC$.",
+  "solution_head": "Solution:\n\nWe present five different solutions and outline a sixth and seventh one. In what follows, let $a = BC$, $b = CA$, $c = AB$ as usual, and denote by $r$ and $R$ the inradius and circumradius. Let $s = \\frac{1}{2}(a + b + c)$. In the first five solutions we will only prove that\n$$\n\\angle AIO = 90^\\circ \\Longrightarrow b + c = 2a\n$$\nLet us see how this solves the problem. This lemma implies that $s = 216$. If we let $E$ be the foot of $I$ on $AB$, then $AE = s - BC = 72$, consequently the inradius is $r = \\sqrt{97^2 - 72^2} = 65$. Finally, the area is $sr = 216 \\cdot 65 = 14040$.\n\nFirst Solution.\nSince $OI \\perp DA$, $AI = DI$. Now, it is a well-known fact that $DI = DB = DC$ (this is occasionally called \"Fact 5\"). Then by Ptolemy's Theorem,\n$$\nDB \\cdot AC + DC \\cdot AB = DA \\cdot BC \\Longrightarrow AC + AB = 2BC\n$$\n\nSecond Solution.\nAs before note that $I$ is the midpoint of $AD$. Let $M$ and $N$ be the midpoints of $AB$ and $AC$, and let the reflection of $M$ across $BI$ be $P$; thus $BM = BP$. Also, $MI = PI$, but we know $MI = NI$ as $I$ lies on the circumcircle of triangl"
+ },
+ {
+  "mathnet_id": "0jr1",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理"
+  ],
+  "contest": "HMMT November 2015",
+  "problem": "Problem:\n\nLet $\\triangle ABC$ be a right triangle with right angle $C$. Let $I$ be the incenter of $ABC$, and let $M$ lie on $AC$ and $N$ on $BC$, respectively, such that $M$, $I$, $N$ are collinear and $\\overline{MN}$ is parallel to $AB$. If $AB = 36$ and the perimeter of $CMN$ is $48$, find the area of $ABC$.",
+  "solution_head": "Solution:\n\nAnswer: $252$\n\nNote that $\\angle MIA = \\angle BAI = \\angle CAI$, so $MI = MA$. Similarly, $NI = NB$. As a result, $CM + MN + NC = CM + MI + NI + NC = CM + MA + NB + NC = AC + BC = 48$.\n\nFurthermore, $AC^2 + BC^2 = 36^2$. As a result, we have $AC^2 + 2AC \\cdot BC + BC^2 = 48^2$, so $2AC \\cdot BC = 48^2 - 36^2 = 12 \\cdot 84$, and so $\\dfrac{AC \\cdot BC}{2} = 3 \\cdot 84 = 252$."
+ },
+ {
+  "mathnet_id": "0gno",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "圆与四点共圆"
+  ],
+  "contest": "Turkish Mathematical Olympiad",
+  "problem": "Let $ABC$ be a triangle with $m(\\angle B) = 90^\\circ$. The incircle of $\\triangle ABC$ is tangent to the side $BC$ at point $D$. Let the intersection of lines $XZ$ and $AD$ be $K$, where $X$ and $Z$ are the centers of incircles of $\\triangle ABD$ and $\\triangle ADC$, respectively. $XZ$ intersects the circumscribed circle of $\\triangle ABC$ at $U$ and $V$ and the midpoint of segment $[UV]$ is $M$. Let $Y$ be the point of intersection of the line $AD$ with the circumscribed circle of $\\triangle ABC$ different from $A$. Prove that $|CY| = 2|MK|$. (Cafer Tayyar Yıldırım).",
+  "solution_head": "Let the incircle of $\\triangle ABD$ be tangent to $BC$ at $T$ and the incircle of $\\triangle ADC$ be tangent to $BC$ at $S$. The radii of incircles of $\\triangle ABD$ and $\\triangle ADC$ are $r_1$ and $r_2$, respectively. Then\n$$\n\\begin{aligned}\nDS &= \\frac{AD + DC - AC}{2} = \\frac{AD + BC - BD - AC}{2} \\\\\n&= \\frac{AD - BD - AB + AB + BC - AC}{2} \\\\\n&= \\frac{AB + BC - AC}{2} - \\frac{AB + BD - AD}{2} \\\\\n&= BD - BT = TD.\n\\end{aligned}\n$$\nSince $X$ and $Z$ are centers of incircles, $XD \\perp DZ$. Therefore,\n$$\nXZ^2 = XD^2 + DZ^2 = r_1^2 + TD^2 + r_2^2 + TD^2.\n$$\nand since\n$$\nXZ^2 = (r_1 - r_2)^2 + TS^2 = (r_1 - r_2)^2 + 4TD^2\n$$\nwe have\n$$\n\\begin{aligned}\nr_1^2 + r_2^2 + 2TD^2 &= (r_1 - r_2)^2 + 4TD^2 \\\\\n2r_1r_2 &= 2TD^2.\n\\end{aligned}\n$$\nThus,\n$$\n\\begin{aligned}\nXZ^2 &= r_1^2 + r_2^2 + 2TD^2 = (r_1 + r_2)^2 \\\\\nXZ &= r_1 + r_2.\n\\end{aligned}\n$$\nObviously, $XK \\ge r_1$ and $ZK \\ge r_2$. Since $XK + ZK = r_1 + r_2$, $XK = r_1$, $ZK = r_2$ and $XZ \\perp AD$. Let $O$ be the center of circumscribed circle of $\\triangle ABC$ (the midpoint of the segment $AC$). Then $OM \\perp UV$. Since $AC$ i"
+ },
+ {
+  "mathnet_id": "08vp",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形与四边形基本性质"
+  ],
+  "contest": "Japan Mathematical Olympiad",
+  "problem": "Let $ABC$ be a right triangle with $\\angle ABC = 90^\\circ$. Points $P, Q, R$ lie on the sides $BC, CA, AB$, respectively, in such a way that conditions\n$$\nAQ : QC = 2 : 1, \\quad AR = AQ, \\quad QP = QR, \\quad \\angle PQR = 90^\\circ\n$$\nare satisfied. Find the value of $AR$ if $CP = 1$. Here for a line segment $XY$ its length is also represented by $XY$.",
+  "solution_head": "Take a point $C'$ on the line $AR$ in such a way that the points $A, R, C'$ lie on the line in this order and $RC' = 1$ is satisfied. From the hypothesis of the problem, it then follows that $RC' = PC, RQ = PQ$ are satisfied, and furthermore, we obtain the fact that the triangles $C'RQ$ and $CPQ$ are congruent since\n$$\n\\begin{aligned}\n\\angle C'RQ &= 360^\\circ - (\\angle RQP + \\angle QPB + \\angle PBR) = 360^\\circ - (90^\\circ + \\angle QPB + 90^\\circ) \\\\\n&= 180^\\circ - \\angle QPB = \\angle CPQ.\n\\end{aligned}\n$$\nConsequently, we have $\\angle AQC' = \\angle AQR + \\angle RQC' = \\angle AQR + \\angle PQC = 90^\\circ$. Let $AR = AQ = 2x$. Then, we have $QC = QC' = x$, and by applying the Pythagorean Theorem to the triangle $AQC'$, we get $AC' = \\sqrt{AQ^2 + (QC')^2} = \\sqrt{5}x$. From $1 = RC' - AR = (\\sqrt{5} - 2)x$ we have $x = \\frac{1}{\\sqrt{5}-2}$, and therefore,\n$$\nAR = 2x = \\frac{2}{\\sqrt{5}-2} = 2\\sqrt{5} + 4.\n$$"
+ },
+ {
+  "mathnet_id": "0cnp",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "三角形五心与经典引理"
+  ],
+  "contest": "Russian mathematical olympiad",
+  "problem": "In an acute triangle $ABC$, the altitudes $AA_1$, $BB_1$, $CC_1$ are drawn. A perpendicular to $AC$ passing through $A_1$ intersects line $B_1C_1$ at $D$. Prove that $\\angle ADC = 90^\\circ$.",
+  "solution_head": "Let $K$ be the intersection point of segments $A_1D$ and $AC$ (see Figure 5).\n\nFrom the equality $\\angle AB_1B = \\angle AA_1B = 90^\\circ$, it follows that the quadrilateral $AB_1A_1B$ is inscribed in a circle (with diameter $AB$), so $\\angle A_1B_1K = 180^\\circ - \\angle A_1B_1A = \\angle ABC$.\n\nSimilarly, the quadrilateral $BC_1B_1C$ is inscribed in a circle (with diameter $BC$); therefore, $\\angle DB_1K = 180^\\circ - \\angle C_1B_1C = \\angle ABC$.\n\nWe obtain that $\\angle A_1B_1K = \\angle DB_1K$. From the condition, $\\angle A_1KB_1 = \\angle DKB_1 = 90^\\circ$; hence, the right triangles $A_1B_1K$ and $DB_1K$ are congruent (by a leg and an acute angle), whence $A_1K = DK$.\n\nThe last equality means that points $A_1$ and $D$ are symmetric with respect to the line $AC$; therefore, triangles $A_1AC$ and $DAC$ are symmetric with respect to this line. Then $\\angle ADC = \\angle AA_1C = 90^\\circ$, as required."
+ },
+ {
+  "mathnet_id": "0krs",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "变换几何"
+  ],
+  "contest": "HMMT February 2022",
+  "problem": "Problem:\n\nLet triangle $ABC$ be such that $AB = AC = 22$ and $BC = 11$. Point $D$ is chosen in the interior of the triangle such that $AD = 19$ and $\\angle ABD + \\angle ACD = 90^\\circ$. The value of $BD^2 + CD^2$ can be expressed as $\\frac{a}{b}$, where $a$ and $b$ are relatively prime positive integers. Compute $100a + b$.",
+  "solution_head": "Solution:\n\nRotate triangle $ABD$ about $A$ so that $B$ coincides with $C$. Let $D$ map to $D'$ under this. Note that $CDD'$ is a right triangle with right angle at $C$. Also, note that $ADD'$ is similar to $ABC$. Thus, we have $DD' = \\frac{AD}{2} = \\frac{19}{2}$. Finally, note that\n$$\nBD^2 + CD^2 = CD'^2 + CD^2 = DD'^2 = \\frac{361}{4}\n$$"
+ },
+ {
+  "mathnet_id": "0dc5",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆"
+  ],
+  "contest": "SAUDI ARABIAN MATHEMATICAL COMPETITIONS",
+  "problem": "Let $AD$ be the altitude of the right angled triangle $ABC$ with $\\angle A = 90^{\\circ}$. Let $DE$ be the altitude of the triangle $ADB$ and $DZ$ be the altitude of the triangle $ADC$ respectively. Let $N$ be chosen on the line $AB$ such that $CN$ is parallel to $EZ$. Let $A'$ be the symmetric of $A$ with respect to the line $EZ$ and $I, K$ the projections of $A'$ onto $AB$ and $AC$ respectively. Prove that $\\angle NA'T = \\angle ADT$, where $T$ is the intersection point of $IK$ and $DE$.",
+  "solution_head": "Suppose that the line $AA'$ intersects the lines $EZ$, $BC$ and $CN$ at the points $L$, $M$, $F$ respectively. The line $IK$ being diagonal of the rectangle $KA'IA$ passes through $L$, which by construction of $A'$ is the middle of the other diagonal $AA'$. The triangles $ZAL$ and $ALE$ are similar, so $\\angle ZAL = \\angle AEZ$. By the similarity of the triangles $ABC$ and $DAB$ we get $\\angle ACB = \\angle BAD$. We have also that $\\angle AEZ = \\angle BAD$, therefore\n$$\n\\angle ZAL = \\angle CAM = \\angle ACB = \\angle ACM\n$$\nSince $AF \\perp CN$, we have that the right angled triangles $AFC$ and $CDA$ are equal. Thus the altitudes from the vertices $F$ and $D$ of triangles $AFC$ and $CDA$ are respectively equal. It follows that $FD \\parallel AC$ and since $DE \\parallel AC$ we get that the points $E, D, F$ are collinear. In triangle $LFT$ we have\n$$\nA'I \\parallel FT \\text{ and } \\angle LA'I = \\angle LIA',\n$$\nso $\\angle LFT = \\angle LTF$. Therefore the points $F, A', I, T$ belong to the same circle. Also $\\angle A'IN = \\angle A'FN = 90^{\\circ}$ so the quadrilateral $IA'FN$ is cyclic. Thus t"
+ },
+ {
+  "mathnet_id": "0bnt",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "圆与四点共圆"
+  ],
+  "contest": "66th ROMANIAN MATHEMATICAL OLYMPIAD",
+  "problem": "Consider a triangle $ABC$, such that $\\angle B = 90^\\circ$. Denote by $I$ the in-center and let $F$, $D$ and $E$ be the points where the incircle touches sides $[AB]$, $[BC]$, and $[AC]$ respectively. If $CI \\cap EF = \\{M\\}$ and $DM \\cap AB = \\{N\\}$, show that:\n\na) $AI = ND$;\n\nb) $FM = \\frac{EI \\cdot EM}{EC}$.",
+  "solution_head": "a. Triangle $AFE$ is isosceles with $AE = AF$, and $AI \\perp FE$, hence $\\angle AEF = 90^\\circ - \\angle A/2$. In the same way from the isosceles triangle $CDE$ we get $\\angle DEC = 90^\\circ - \\angle C/2$. As a consequence $\\overline{MED} = 180^\\circ - \\overline{AEF} - \\overline{DEC} = 180^\\circ - (180^\\circ - (\\hat{A} + \\hat{C})/2) = 45^\\circ$. (*)\n\nAs $\\triangle MDC \\equiv \\triangle MEC$, we obtain $MD = ME$ (**). By (*) and (**), the triangle $\\triangle MED$ is right angled and isosceles. As a consequence $DN \\perp EF$ and, because $AI \\perp EF$, we obtain $DN \\parallel AI$. As $AN \\parallel ID$ we conclude that the quadrilateral $ANDI$ is a parallelogram, so $AI = ND$.\n\nb. We have $\\overline{EFD} = 180^\\circ - \\overline{AFE} - \\overline{BFD} = (\\hat{A} + \\hat{B})/2 = 90^\\circ - \\hat{C}/2 = \\overline{DIC}$ so $\\triangle FMD \\sim \\triangle IDC$. We conclude $\\frac{FM}{ID} = \\frac{MD}{DC}$ which implies\n$$\nFM = \\frac{ID \\cdot MD}{DC} = \\frac{EI \\cdot EM}{EC}.\n$$"
+ }
+]

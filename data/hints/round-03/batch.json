@@ -1,0 +1,221 @@
+[
+ {
+  "id": "N-006",
+  "title": "Two-Digit Rotation Multiples",
+  "difficulty": 2,
+  "topics": [
+   "最大公约数与欧几里得算法",
+   "阶与原根",
+   "不定方程"
+  ],
+  "problem": "For each integer $n \\ge 100$ we define $T(n)$ to be the number obtained from $n$ by moving the two leading digits to the end. For example, $T(12345) = 34512$ and $T(100) = 10$. Find all integers $n \\ge 100$ for which:\n$$\nn + T(n) = 10n.\n$$",
+  "answer": "All n of the form n = 10(10^{6k} − 1)/91 for integers k ≥ 1; equivalently, n is the k-fold concatenation of the six-digit block 109890.",
+  "solution": "The general solution is\n$$\nn = \\frac{10}{91} \\times (10^{6k} - 1) = (1 + 10^6 + 10^{12} + \\dots + 10^{6(k-1)}) \\times 109890\n$$\nfor any positive integer $k$. In other words, the number $n$ consists of $k$ replicates of the digits 109890.\n\nLet $m$ be the number of digits of $n$ so $m \\ge 3$ when $n \\ge 100$. Dividing $n$ by $10^{m-2}$, let $q$ be the quotient and $r$ the remainder. This splits the digits of $n$ into the first two and the remaining digits,\n$$\nn = 10^{m-2}q + r\n$$\nwhere $10 \\le q \\le 99$ and $0 \\le r < 10^{m-2}$. Rearranging the digits we have:\n$$\nT(n) = 100r + q.\n$$\nThe equation $n + T(n) = 10n$ is equivalent to $T(n) = 9n$ which we write in terms of $q$ and $r$:\n$$\n100r + q = 9 \\times 10^{m-2}q + 9r\n$$\nor\n$$\n91r = (9 \\times 10^{m-2} - 1)q. \\qquad (7)\n$$\n\nWe know that $q \\ge 10$. We now claim that $q = 10$ for any solution. For a contradiction, suppose that $q \\ge 11$. Then equation (7) implies that\n$$\n(9 \\times 10^{m-2} - 1) \\times 11 \\le (9 \\times 10^{m-2} - 1)q = 91r < 91 \\times 10^{m-2}.\n$$\nComparing the left and right end gives $(99-91) \\times 10^{m-2} \\le 11$, contradicting $m \\ge 3$. Therefore $q = 10$. Substituting $q = 10$ into equation (7) gives\n$$\n91r = (9 \\times 10^{m-2} - 1) \\times 10.\n$$\nAs $\\gcd(91, 10) = 1$ then 91 must divide $9 \\times 10^{m-2} - 1$. This is not only necessary but also sufficient, as we can then write:\n$$\nr = \\frac{9 \\times 10^{m-2} - 1}{91} \\times 10 < \\frac{9}{91} \\times 10^{m-1} < 10^{m-2} \\quad (8)\n$$\nand $r$ is then an integer that lies in the feasible range.\nIt remains then to find the values of $m$ for which $9 \\times 10^{m-2} - 1$ is a multiple of 91. Equivalently, we require that $(9 + 91) \\times 10^{m-2} - 1 = 10^m - 1$, is a multiple of 91. As $91 = 7 \\times 13$ we can use a short cut to check that $10^m - 1$ is a multiple both of 7 and of 13. Remainders tabulated below:\n\n| m | $10^m$ (mod 7) | $10^m$ (mod 13) | $10^m$ (mod 91) |\n|---|----------------|-----------------|-----------------|\n| 0 | 1              | 1               | 1               |\n| 1 | 3              | 10              | 10              |\n| 2 | 2              | 9               | 9               |\n| 3 | 6              | 12              | 90              |\n| 4 | 4              | 3               | 81              |\n| 5 | 5              | 4               | 82              |\n| 6 | 1              | 1               | 1               |\n\nThe pattern continues with period 6. Therefore, $m$ must be a multiple of 6, and, as $m \\ge 3$ we have $m = 6k$ for some positive integer $k$.\nReconstructing the pieces and using equation (8) we have:\n$$\n\\begin{align*}\nq &= 10 & r &= \\frac{9 \\times 10^{6k-2} - 1}{91} \\times 10 \\\\\nn &= 10^{6k-2}q + r = 10 \\times \\frac{91 \\times 10^{6k-2} + 9 \\times 10^{6k-2} - 1}{91} = 10 \\times \\frac{10^{6k} - 1}{91}.\n\\end{align*}\n$$\nWe can write the digits explicitly, noting that:\n$$\n10 \\times \\frac{10^{6k} - 1}{91} = \\frac{10 \\times (10^6 - 1)}{91} (1 + 10^6 + 10^{12} + \\dots + 10^{6(k-1)}).\n$$\nAs $10 \\times (10^6 - 1)/91 = 989010$ the stated representation follows.\n\n---\n\nThe equation $n + T(n) = 10n$ could also be written as $T(n) = 9n$.\nAs $n$ and $T(n)$ have the same number of digits, the leading digit of $n$ must be equal to 1 and the leading digit of $T(n) = 9n$, which is the third digit from the left of $n$, has then to be equal to 9. This implies that there occurs a carry from the third to the second place from the left, hence the second digit of $n$ must be zero. The shapes of $n$ and $T(n)$ are therefore\n$$\nn = 109 **\\ldots** * \\qquad T(n) = 9 **\\ldots** * 10\n$$\nwhere each star stands for a digit and the dots indicate that the number of digits of $n$ is currently unknown. We can now work our way backwards from $T(n) = 9n$ to $n$, starting at the end. The key feature we are using here is that $9k \\equiv -k \\equiv 10 - k \\pmod{10}$.\nLet the rightmost unknown digit be equal to $d$ so that we have\n$$\nn = 109 **\\ldots** * d \\qquad 9n = T(n) = 9 **\\ldots** * d10\n$$\nthen $9d \\equiv 0 \\pmod{10}$, hence $d = 0$. This gives us\n$$\nn = 109 **\\ldots** * 0 \\qquad 9n = T(n) = 9 **\\ldots** * 010\n$$\nWe will again call the rightmost unknown digit $d$ so that we have\n$$\nn = 109 **\\ldots** * d0 \\qquad 9n = T(n) = 9 **\\ldots** * d010\n$$\nand $9d \\equiv 1 \\pmod{10}$, hence $d = 9$. We now need to check if this digit could already be the third digit from the left, i.e. $n = 1090$. But $1090 \\cdot 9 = 9810 \\neq T(1090)$. This gives us, with new $d$,\n$$\nn = 109 **\\ldots** * d90 \\qquad 9n = T(n) = 9 **\\ldots** * d9010\n$$\nand, keeping the carry in mind, $9d + 8 \\equiv 0 \\pmod{10}$. Therefore, $d = 8$ and\n$$\nn = 109 **\\ldots** * d890 \\qquad 9n = T(n) = 9 **\\ldots** * d89010\n$$\nwith $9d + 8 \\equiv 9 \\pmod{10}$, which implies $d = 9$. We have to check again if this digit could already be the third digit from the left, i.e. $n = 109890$. Indeed, we now have $9n = 9 \\cdot 109890 = 989010 = T(n)$.\nSo far we have shown that $109890$ is one solution and that the last six digits of $T(n)$ for any solution $n$ need to be $989010$. This implies that the last six digits of any solution $n$ are equal to $989010/9 = 109890$.\nWe could now continue in the manner above to see that this sequence of digits must repeat if $n$ has more than six digits. Alternatively, we could argue as follows.\n\nLet $m$ be the number obtained from $n$ by removing the last six digits. We show that $T(m) = 9m$. Clearly, $T(m)$ agrees, except possible at the last two digits, with the number $T'(n)$ obtained from $T(n)$ by removing the last six digits. As we have seen above, the two leading digits of $n$, and so also of $m$, are 10. As the last six digits of $n$ are 109890, the last two digits of $T'(n)$ are 10. Hence, $T'(n) = T(m)$. Using $T(n) = 9n$ it follows now that $T(m) = 9m$. It follows by induction that $n$ has $6k$ digits ($k \\ge 1$) and consists of $k$ consecutive blocks of six digits, all equal to 109890."
+ },
+ {
+  "id": "N-007",
+  "title": "Repunit Divisibility Game",
+  "difficulty": 2,
+  "topics": [
+   "费马小定理与欧拉定理",
+   "素数与算术基本定理"
+  ],
+  "problem": "Let $p$ be a fixed prime number. Juku and Miku play the following game. One of the players chooses a natural number $a$ such that $a > 1$ and $a$ is not divisible by $p$, his opponent chooses any natural number $n$ such that $n > 1$. Miku wins if the natural number written as $n$ ones in the positional numeral system with radix $a$ is divisible by $p$, otherwise Juku wins. Which player has a winning strategy if:\n\na. Juku chooses the number $a$, tells it to Miku and then Miku chooses the number $n$;\n\nb. Juku chooses the number $n$, tells it to Miku and then Miku chooses the number $a$?",
+  "answer": "a) Miku; b) Juku",
+  "solution": "*Answer*: (a) Miku; (b) Juku.\n\nThe positional representation with radix $a$ consisting of $n$ ones denotes the sum $a^{n-1} + a^{n-2} + \\dots + a + 1$ which equals $\\frac{a^n-1}{a-1}$.\n\na. Let $a \\equiv 1 \\pmod{p}$. If $p > 2$ or $a \\equiv 1 \\pmod{4}$ then, by the lifting-the-exponent lemma, the exponent of the prime $p$ in the canonical representation of $\\frac{a^n-1}{a-1}$ equals that in the canonical representation of $n$. Thus to win, Miku may choose any number $n$ that is divisible by $p$. If $p = 2$ and $a \\equiv -1 \\pmod{4}$ then the exponent of the prime 2 in the canonical representation of $a-1$ is 1, while that in the canonical representation of $a^2-1$ is larger as $a^2 \\equiv 1 \\pmod{4}$. Thus to win, Miku may choose $n = 2$.\n\nLet now $a \\not\\equiv 1 \\pmod{p}$. By Fermat's little theorem, $a^{p-1} \\equiv 1 \\pmod{p}$. Hence $a^n \\equiv 1 \\pmod{p}$ whenever $n$ is a multiple of $p-1$. Then the numerator of the fraction $\\frac{a^n-1}{a-1}$ is divisible by $p$ while the denominator is not, whence the value of the fraction is divisible by $p$. Consequently, Miku can win by choosing any multiple of $p-1$ greater than 1 as $n$.\n\nb. We show that Juku wins by choosing $n = 2p-1$. Let $a$ be the number chosen by Miku.\n\nLet $a \\equiv 1 \\pmod{p}$. If $p > 2$ or $a \\equiv 1 \\pmod{4}$ then, by the lifting-the-exponent lemma, the exponent of $p$ in the canonical representation of $\\frac{a^n-1}{a-1}$ equals that in the canonical representation of $n$. As $p$ does not divide $2p-1$, it does not divide $\\frac{a^n-1}{a-1}$ either. If $p = 2$ and $a \\equiv -1 \\pmod{4}$ then $a^n \\equiv -1 \\pmod{4}$, whence 2 does not divide $a^n-1$. Therefore 2 does not divide $\\frac{a^n-1}{a-1}$.\n\nLet now $a \\not\\equiv 1 \\pmod{p}$. By Fermat's little theorem, $a^{p-1} \\equiv 1 \\pmod{p}$ and $a^p \\equiv a \\pmod{p}$, giving $a^n = a^{2p-1} \\equiv a \\pmod{p}$. Thus $a^n \\not\\equiv 1 \\pmod{p}$. As $p$ does not divide the numerator of the fraction $\\frac{a^n-1}{a-1}$, it cannot divide the value of the fraction either."
+ },
+ {
+  "id": "N-008",
+  "title": "Last Digit Power Sum",
+  "difficulty": 1,
+  "topics": [
+   "整除与同余"
+  ],
+  "problem": "Problem:\n\nCarl computes the number\n$$\nN=5^{555}+6^{666}+7^{777}\n$$\nand writes it in decimal notation. What is the last digit of $N$ that Carl writes?",
+  "answer": "8",
+  "solution": "Solution:\n\nWe look at the last digit of each term.\n- The last digit of $5^{\\bullet}$ is always $5$.\n- The last digit of $6^{\\bullet}$ is always $6$.\n- The last digit of $7^{\\bullet}$ cycles $7, 9, 3, 1, 7, 9, 3, \\ldots$.\n\nSo the last digits are $5, 6, 7$ in that order. Since $5+6+7=18$, the answer is $8$."
+ },
+ {
+  "id": "N-009",
+  "title": "Factorial Sum Divisibility",
+  "difficulty": 1,
+  "topics": [
+   "素数与算术基本定理"
+  ],
+  "problem": "Problem:\n\nAs usual, let $n!$ denote the product of the integers from $1$ to $n$ inclusive. Determine the largest integer $m$ such that $m!$ divides $100! + 99! + 98!$.",
+  "answer": "98",
+  "solution": "Solution:\n\nThe answer is $m = 98$. Set\n$$\nN = 98! + 99! + 100! = 98! (1 + 99 + 99 \\cdot 100)\n$$\nHence $N$ is divisible by $98!$. But\n$$\n\\frac{N}{98!} = 1 + 99 \\cdot 101\n$$\nis not divisible by $99$. Hence $N$ is not divisible by $99!$."
+ },
+ {
+  "id": "N-010",
+  "title": "Pell-Type Recurrence",
+  "difficulty": 2,
+  "topics": [
+   "不定方程",
+   "多项式",
+   "数列与递推"
+  ],
+  "problem": "Problem:\n\na. Prove that for all real numbers $x$ and $y$,\n$$\nx^{2}-2 y^{2}=-\\left[(x+2 y)^{2}-2(x+y)^{2}\\right] .\n$$\n\nb. How many positive integer solutions does the equation $x^{2}-2 y^{2}=1$ have?\n\nc. How many positive integer solutions does the equation $x^{2}-2 y^{2}=5$ have?",
+  "answer": "a) The identity holds. b) Infinitely many positive integer solutions. c) No positive integer solutions.",
+  "solution": "Solution:\n\na. This is simply an algebra calculation:\n$$\n\\begin{aligned}\n-\\left[(x+2 y)^{2}-2(x+y)^{2}\\right] & =-\\left[x^{2}+4 x y+4 y^{2}-2\\left(x^{2}+2 x y+y^{2}\\right)\\right] \\\\\n& =-\\left[x^{2}+4 x y+4 y^{2}-2 x^{2}-4 x y-2 y^{2}\\right] \\\\\n& =-\\left[-x^{2}+2 y^{2}\\right] \\\\\n& =x^{2}-2 y^{2} .\n\\end{aligned}\n$$\n\nb. There are infinitely many. Begin at the solution $x_{0}=3, y_{0}=2$ and apply the transformation\n$$\nx_{n+1}=x_{n}+2 y_{n}, \\quad y_{n+1}=x_{n}+y_{n} .\n$$\nBy part (a), the value of $x_{n}^{2}-2 y_{n}^{2}$ is alternately 1 and $-1$ (to be precise, $(-1)^{n}$). Also, all the $x_{n}$ are positive so $y_{0}<y_{1}<y_{2}<\\cdots$ and we never repeat a pair $(x, y)$. Thus we get infinitely many solutions to $x^{2}-2 y^{2}=1$. (With some more work one can prove that the $\\left(x_{2 n}, y_{2 n}\\right)$ are all positive integer solutions.)\n\nc. There are no solutions. Look at the remainders of the terms mod $5$. The term $x^{2}$ must be $0,1$, or $4$; the term $2 y^{2}$ must be $0,2$, or $3$. The only way these can equal each other is if $5 \\mid x$ and $5 \\mid y$. But then $25 \\mid x^{2}-2 y^{2}=5$, a contradiction."
+ },
+ {
+  "id": "N-011",
+  "title": "Prime Quadratic Cube",
+  "difficulty": 2,
+  "topics": [
+   "不定方程",
+   "素数与算术基本定理",
+   "根与系数"
+  ],
+  "problem": "Problem:\n\nAli obstaja tako praštevilo $p$, da velja $p^{2}+p+1=n^{3}$ za neko naravno število $n$?",
+  "answer": "证明题",
+  "solution": "Solution:\n\nPokazali bomo, da takšno praštevilo ne obstaja. Enačbo preoblikujemo v $p^{2}+p=n^{3}-1$ in obe strani razstavimo, da dobimo $p(p+1)=(n-1)(n^{2}+n+1)$. Če $p$ deli $n-1$, tedaj $n^{2}+n+1$ deli $p+1$. Od tod sledi $n^{2}+n+1 \\leq p+1 \\leq n$, kar pa je protislovje. Torej mora $p$ deliti $n^{2}+n+1$ in zato $n-1$ deli $p+1$. To pomeni, da obstaja naravno število $k$, da velja $n^{2}+n+1=k p$ in $p+1=k(n-1)$. Iz druge enakosti izrazimo $p$ in ga vstavimo v prvo enakost, da dobimo $n^{2}+n+1=k(k(n-1)-1)=k^{2} n-k^{2}-k$. Slednje preoblikujemo v $n^{2}+(1-k^{2}) n+(k^{2}+k+1)=0$ in to pogledamo kot kvadratno enačbo v spremenljivki $n$. Ker mora imeti ta enačba rešitev, ki je naravno število, mora biti njena diskriminanta $D=k^{4}-6 k^{2}-4 k-3$ popoln kvadrat. Opazimo, da je $D=(k^{2}-3)^{2}-4 k-12< (k^{2}-3)^{2}$, saj je $4 k+12>0$. Prvi popoln kvadrat, ki je manjši od $(k^{2}-3)^{2}$, je $(k^{2}-4)^{2}$, zato mora veljati $D \\leq (k^{2}-4)^{2}$. Z upoštevanjem zveze $D=k^{4}-6 k^{2}-4 k-3$ to neenakost preoblikujemo v $2 k^{2}-4 k-19 \\leq 0$ oziroma $2 k(k-2) \\leq 19$. Opazimo, da za $k \\geq 5$ neenakost ni izpolnjena, torej so edine naravne rešitve $1,2,3$ in $4$. Toda diskriminanta $D$ je pri teh vrednostih števila $k$ zaporedoma enaka $-12,-19,12$ in $141$ in v nobenem primeru ni popoln kvadrat. Torej tako praštevilo $p$ ne obstaja."
+ },
+ {
+  "id": "N-012",
+  "title": "Divisibility Adjacencies in Permutations",
+  "difficulty": 1,
+  "topics": [
+   "整除与同余"
+  ],
+  "problem": "Problem:\n\nIn a sequence of numbers, a term is called golden if it is divisible by the term immediately before it. What is the maximum possible number of golden terms in a permutation of $1,2,3,\\ldots ,2021$?",
+  "answer": "1010",
+  "solution": "Solution:\n\nLet $k$ be the number of golden terms. We claim that $k \\leq 1010$.\n\nProof: Define the term immediately before a golden term to be a silver term. The number of silver terms is also $k$. If $a$ is any silver term and $b$ is the corresponding golden term then we must have\n$$a \\leq \\frac{b}{2} \\leq \\frac{2021}{2} < 1011.$$  \nTherefore $a \\leq 1010$. Hence $a \\in \\{1,2,3,\\ldots ,1010\\}$ and therefore there can be at most 1010 different silver terms. Therefore $k \\leq 1010$.\n\nNow we need to show that $k = 1010$ is indeed possible. To do this we first partition the set $\\{1,2,3,\\ldots ,2021\\}$ into the following distinct parts:\n$$\\{1,2,4,8,16,32,64,128,256,512,1024\\},$$\n$$\\{3,6,12,24,48,96,192,384,768,1536\\},$$\n$$\\{5,10,20,40,80,160,320,640,1280\\},$$\n$$\\{7,14,28,56,112,224,448,896,1792\\},$$\n$$\\ldots$$\n$$\\{2019\\},$$\n$$\\{2021\\}.$$  \nEach part starts with an odd number, which is then doubled until the result is larger than 2021.\n\nPutting each part in the above sequence in order is our example. In this example every even term, $2n$, is golden because it occurs immediately after the term $n$. There are 1010 even numbers, so $k = 1010$ is possible."
+ },
+ {
+  "id": "N-013",
+  "title": "Consecutive Six-Divisor Integers",
+  "difficulty": 2,
+  "topics": [
+   "数论函数与阶乘估计",
+   "素数与算术基本定理",
+   "计数与容斥"
+  ],
+  "problem": "Each of the four positive integers $N, N+1, N+2, N+3$ has exactly six positive divisors. There are exactly 20 different positive integers which are exact divisors of at least one of the integers. One of these is 27. Find all possible values of $N$.\n\n(Both 1 and $m$ are counted as divisors of the integer $m$.)",
+  "answer": "242",
+  "solution": "Each of the four integers has 1 as a divisor. Moreover, 2 is a common divisor of either $N$ and $N+2$ or $N+1$ and $N+3$. Hence, these four integers can have at most $6 \\times 4 - 3 - 1 = 20$ different divisors altogether. Because there are exactly 20 different positive divisors, only one of the four integers can be divisible by 3, that is either $N+1$ or $N+2$ is divisible by 3.\n\nAs 27 is a divisor of one of the integers, and the integer has exactly six divisors, that number must be $3^5 = 243$. This can be seen, for example, by recognising that an integer $p_1^{a_1} \\cdots p_n^{a_n}$, with primes $p_1 < \\cdots < p_n$ and $a_i \\ge 1$, has exactly $(a_1+1) \\cdots (a_n+1)$ different positive divisors.\n\nHence $N+1 = 243$ or $N+2 = 243$. Because $243-2 = 241$ is a prime number (having only two positive divisors), we can only have $N = 242$.\n\nIt is easily checked that the four numbers $242 = 2 \\cdot 11^2$, $243 = 3^5$, $244 = 2^2 \\cdot 61$ and $245 = 5 \\cdot 7^2$ have exactly 20 divisors, namely 1, 2, 3, 4, 5, 7, 9, 11, 22, 27, 35, 49, 61, 81, 121, 122, 242, 243, 244 and 245."
+ },
+ {
+  "id": "N-014",
+  "title": "Tripled Divisor Count",
+  "difficulty": 2,
+  "topics": [
+   "数论函数与阶乘估计",
+   "素数与算术基本定理"
+  ],
+  "problem": "Problem:\n\nFor how many positive integers $n \\leq 100$ is it true that $10 n$ has exactly three times as many positive divisors as $n$ has?",
+  "answer": "28",
+  "solution": "Solution:\n\nAnswer: 28\nLet $n=2^{a} 5^{b} c$, where $2,5 \\nmid c$. Then, the ratio of the number of divisors of $10 n$ to the number of divisors of $n$ is $\\frac{a+2}{a+1} \\frac{b+2}{b+1}=3$. Solving for $b$, we find that $b=\\frac{1-a}{2 a+1}$. This forces $(a, b)=(0,1),(1,0)$. Therefore, the answers are of the form $2 k$ and $5 k$ whenever $\\operatorname{gcd}(k, 10)=1$. There are 50 positive numbers of the form $2 k$ and 20 positive numbers of the form $5 k$ less than or equal to 100. Of those 70 numbers, only $\\frac{1}{2} \\cdot \\frac{4}{5}$ have $k$ relatively prime to 10, so the answer is $70 \\cdot \\frac{1}{2} \\cdot \\frac{4}{5}=28$."
+ },
+ {
+  "id": "N-015",
+  "title": "Doubling-Orbit Orderings Modulo N",
+  "difficulty": 3,
+  "topics": [
+   "阶与原根",
+   "素数与算术基本定理"
+  ],
+  "problem": "Let $N \\ge 3$ be an integer, and $a_0, \\dots, a_{N-1}$ be pairwise distinct reals so that $a_i \\ge a_{2i}$ for all $i$ (indices are taken mod $N$). Find all possible $N$ for which this is possible.",
+  "answer": "N is a power of 2",
+  "solution": "The only such $N$ are powers of $2$.\n\nIf $N$ is not a power of $2$, let's say $p \\nmid N$ where $p$ is an odd prime. Now, observe that $p \\nmid 1$ but $p \\mid 2^k - 1$ for some $k > 1$. Then, let $\\alpha = \\frac{N}{p}$. Now,\n$$\na_{\\alpha} > a_{2\\alpha} \\ge a_{4\\alpha} \\dots \\ge a_{2^k \\alpha} \\implies a_{\\alpha} > a_{2^k \\alpha}\n$$\nBut now, $a_{2^k \\alpha} = a_{\\alpha}$ as $N|(2^k - 1)\\alpha$ but then this is a contradiction! We have that $a_{\\alpha} > a_{2\\alpha}$ since all reals in the circle are distinct and $N \\nmid \\alpha$.\n\nNow, if $N = 2^m$ is a power of $2$, let $a_j = -\\nu_2(j) + \\frac{j}{2N}$. This is clearly okay if $j = N$ and if $j \\ne N$ then $\\nu_2(2j) = \\nu_2(j) + 1$ and thus $a_j \\ge a_{2j}$. $\\square$"
+ },
+ {
+  "id": "N-016",
+  "title": "Pairwise Coprime Consecutive-Product Construction",
+  "difficulty": 3,
+  "topics": [
+   "最大公约数与欧几里得算法",
+   "素数与算术基本定理",
+   "中国剩余定理",
+   "二次剩余与平方数判别",
+   "多项式"
+  ],
+  "problem": "Prove that for each positive integer $n$, there are pairwise relatively prime integers $k_0, k_1, \\dots, k_n$, all strictly greater than 1, such that $k_0 k_1 \\cdots k_n - 1$ is the product of two consecutive integers.",
+  "answer": "证明题",
+  "solution": "We proceed by induction. The case $n=1$ is clear, since we may pick $k_0 = 3$ and $k_1 = 7$. Let us assume now that for a certain $n$ there are pairwise relatively prime integers $1 < k_0 < k_1 < \\cdots < k_n$ such that $k_0 k_1 \\cdots k_n - 1 = a_n(a_n - 1)$, for some positive integer $a_n$. Then choosing $k_{n+1} = a_n^2 + a_n + 1$ yields\n$$\nk_0 k_1 \\cdots k_{n+1} = (a_n^2 - a_n + 1)(a_n^2 + a_n + 1) = a_n^4 + a_n^2 + 1,\n$$\nso $k_0 k_1 \\cdots k_{n+1} - 1$ is the product of the two consecutive integers $a_n^2$ and $a_n^2 + 1$. Moreover,\n$$\n\\gcd(k_0 k_1 \\cdots k_n, k_{n+1}) = \\gcd(a_n^2 - a_n + 1, a_n^2 + a_n + 1) = 1,\n$$\nhence $k_0, k_1, \\dots, k_{n+1}$ are pairwise relatively prime. This completes the proof.\n\n---\n\nWrite the relation to be proved as\n$$\n4k_0 k_1 \\cdots k_n = 4a(a+1) + 4 = (2a+1)^2 + 3.\n$$\nThere are infinitely many primes for which $-3$ is a quadratic residue. Let $2 < p_0 < p_1 < \\dots < p_n$ be such primes. Using the Chinese Remainder Theorem to specify $a$ modulo $p_n$, we can find an integer $a$ such that $(2a+1)^2 + 3 = 4p_0 p_1 \\cdots p_n m$ for some positive integer $m$. Grouping the factors of $m$ appropriately with the $p_i$'s, we obtain $(2a+1)^2 + 3 = 4k_0 k_1 \\cdots k_n$ with $k_i$ pairwise relatively prime. We then have $k_0 k_1 \\cdots k_n - 1 = a(a+1)$, as desired.\n\n---\n\nWe are supposed to show that for every positive integer $n$, there is a positive integer $x$ such that $x(x+1)+1 = x^2+x+1$ has at least $n$ distinct prime divisors. We can actually prove a more general statement.\n\n**Claim.** Let $P(x) = a_d x^d + \\cdots + a_1 x + 1$ be a polynomial of degree $d \\ge 1$ with integer coefficients. Then for every positive integer $n$, there is a positive integer $x$ such that $P(x)$ has at least $n$ distinct prime divisors.\n\nThe proof follows from the following two lemmas.\n\n**Lemma 1.** The following set is infinite:\n$$\nQ = \\{p \\mid p \\text{ a prime for which there is an integer } x \\text{ such that } p \\text{ divides } P(x)\\}.\n$$\n*Proof.* The proof is analogous to Euclid's proof that there are infinitely many primes. Namely, if we assume that there are only finitely many primes $p_1, p_2, \\dots, p_k$ in $Q$, then for each integer $m$, $P(m p_1 p_2 \\cdots p_k)$ is an integer with no prime factors, which must equal 1 or $-1$. However, since $P$ has degree $d \\ge 1$, it takes each of the values 1 and $-1$ at most $d$ times, a contradiction. $\\square$\n\n**Lemma 2.** Let $p_1, p_2, \\dots, p_n$, $n \\ge 1$ be primes in $Q$. Then there is a positive integer $x$ such that $P(x)$ is divisible by $p_1 p_2 \\cdots p_n$.\n*Proof.* For $i = 1, 2, \\dots, n$, since $p_i \\in Q$ we can find an integer $c_i$ such that $P(x)$ is divisible by $p_i$ whenever $x \\equiv c_i(\\text{mod } p_i)$. By the Chinese Remainder Theorem, the system of $n$ congruences $x \\equiv c_i(\\text{mod } p_i)$, $i = 1, 2, \\dots, n$ has positive integer solutions. For every positive integer $x$ that solves this system, $P(x)$ is divisible by $p_1 p_2 \\cdots p_n$. $\\square$"
+ },
+ {
+  "id": "N-017",
+  "title": "Divisors Below the Square Root",
+  "difficulty": 2,
+  "topics": [
+   "数论函数与阶乘估计",
+   "素数与算术基本定理"
+  ],
+  "problem": "The number $n = 11^{2011} \\cdot 2011^{11}$ is given. How many divisors that are less than $n$ and are not divisors of $n$, does $n^2$ have?",
+  "answer": "22121",
+  "solution": "The number of divisors of $n^2 = 11^{4022} \\cdot 2011^{22}$ is:\n$$\nN = (4022 + 1)(22 + 1) = 92529.\n$$\nWe can pair the divisors of $n^2$ in a way $d$ and $\\frac{n^2}{d}$ where one divisor is greater than $n$, another one is less. The number $n$ does have a pair, therefore the number of divisors that are less than $n$ is $\\frac{92529-1}{2} = 46264$.\n\nThe number $N_1$ of divisors of $n$ that are less than $n$ is:\n$$\nN_1 = (2011+1)(11+1)-1 = 24143.\n$$\nSo the number we are looking for is $46264 - 24143 = 22121$."
+ },
+ {
+  "id": "N-018",
+  "title": "Simultaneous Pure-Power Sum and Product",
+  "difficulty": 3,
+  "topics": [
+   "代数变换技巧"
+  ],
+  "problem": "For a positive integer $k$, call an integer a pure $k$-th power if it can be represented as $m^{k}$ for some integer $m$. Show that for every positive integer $n$ there exist $n$ distinct positive integers such that their sum is a pure $2009$-th power, and their product is a pure $2010$-th power.",
+  "answer": "证明题",
+  "solution": "For the sake of simplicity, let us set $k=2009$.\n\nFirst of all, choose $n$ distinct positive integers $b_{1}, \\cdots, b_{n}$ suitably so that their product is a pure $k+1$-th power (for example, let $b_{i}=i^{k+1}$ for $i=1, \\cdots, n$). Then we have $b_{1} \\cdots b_{n}=t^{k+1}$ for some positive integer $t$. Set $b_{1}+\\cdots+b_{n}=s$.\n\nNow we set $a_{i}=b_{i} s^{k^{2}-1}$ for $i=1, \\cdots, n$, and show that $a_{1}, \\cdots, a_{n}$ satisfy the required conditions. Since $b_{1}, \\cdots, b_{n}$ are distinct positive integers, it is clear that so are $a_{1}, \\cdots, a_{n}$. From\n$$\n\\begin{aligned}\na_{1}+\\cdots+a_{n} & =s^{k^{2}-1}\\left(b_{1}+\\cdots+b_{n}\\right)=s^{k^{2}}=\\left(s^{k}\\right)^{2009} \\\\\na_{1} \\cdots a_{n} & =\\left(s^{k^{2}-1}\\right)^{n} b_{1} \\cdots b_{n}=\\left(s^{k^{2}-1}\\right)^{n} t^{k+1}=\\left(s^{(k-1) n} t\\right)^{2010}\n\\end{aligned}\n$$\nwe can see that $a_{1}, \\cdots, a_{n}$ satisfy the conditions on the sum and the product as well. This ends the proof of the assertion."
+ },
+ {
+  "id": "N-019",
+  "title": "Ceiling Perturbation of a Square",
+  "difficulty": 4,
+  "topics": [
+   "不定方程",
+   "根与系数"
+  ],
+  "problem": "Let $a$ and $b$ be two positive integers. Prove that the integer\n$$\na^{2} + \\left\\lceil \\frac{4 a^{2}}{b} \\right\\rceil\n$$\nis not a square. (Here $\\lceil z\\rceil$ denotes the least integer greater than or equal to $z$.)",
+  "answer": "证明题",
+  "solution": "Assume, for contradiction, that\n$$\na^{2} + \\left\\lceil \\frac{4 a^{2}}{b} \\right\\rceil = (a + k)^{2}, \\quad \\text{or} \\quad \\left\\lceil \\frac{(2a)^{2}}{b} \\right\\rceil = (2a + k)k.\n$$\nClearly, $k \\geqslant 1$. In other words, the equation\n$$\n\\left\\lceil \\frac{c^{2}}{b} \\right\\rceil = (c + k)k \\tag{1}\n$$\nhas a positive integer solution $(c, k)$, with an even value of $c$.\n\nChoose a positive integer solution of (1) with minimal possible value of $k$, without regard to the parity of $c$. From\n$$\n\\frac{c^{2}}{b} > \\left\\lceil \\frac{c^{2}}{b} \\right\\rceil - 1 = c k + k^{2} - 1 \\geqslant c k\n$$\nand\n$$\n\\frac{(c - k)(c + k)}{b} < \\frac{c^{2}}{b} \\leqslant \\left\\lceil \\frac{c^{2}}{b} \\right\\rceil = (c + k)k\n$$\nit can be seen that $c > b k > c - k$, so\n$$\nc = k b + r \\quad \\text{with some} \\ 0 < r < k.\n$$\nBy substituting this in (1) we get\n$$\n\\left\\lceil \\frac{c^{2}}{b} \\right\\rceil = \\left\\lceil \\frac{(b k + r)^{2}}{b} \\right\\rceil = k^{2} b + 2 k r + \\left\\lceil \\frac{r^{2}}{b} \\right\\rceil\n$$\nand\n$$\n(c + k)k = (k b + r + k)k = k^{2} b + 2 k r + k(k - r),\n$$\nso\n$$\n\\left\\lceil \\frac{r^{2}}{b} \\right\\rceil = k(k - r) \\tag{2}\n$$\nNotice that relation (2) provides another positive integer solution of (1), namely $c' = r$ and $k' = k - r$, with $c' > 0$ and $0 < k' < k$. That contradicts the minimality of $k$, and hence finishes the solution.\n\n---\n\nSuppose that\n$$\na^{2} + \\left\\lceil \\frac{4 a^{2}}{b} \\right\\rceil = c^{2}\n$$\nwith some positive integer $c > a$, so\n$$\n\\begin{align*}\n& c^{2} - 1 < a^{2} + \\frac{4 a^{2}}{b} \\leqslant c^{2} \\\\\n& 0 \\leqslant c^{2} b - a^{2}(b + 4) < b \\tag{3}\n\\end{align*}\n$$\nLet $d = c^{2} b - a^{2}(b + 4)$, $x = c + a$ and $y = c - a$; then we have $c = \\frac{x + y}{2}$ and $a = \\frac{x - y}{2}$, and (3) can be re-written as follows:\n$$\n\\begin{align*}\n\\left( \\frac{x + y}{2} \\right)^{2} b - \\left( \\frac{x - y}{2} \\right)^{2} (b + 4) & = d, \\\\\nx^{2} - (b + 2) x y + y^{2} + d = 0 ; \\quad 0 & \\leqslant d < b. \\tag{4}\n\\end{align*}\n$$\nSo, by the indirect assumption, the equation (4) has some positive integer solution $(x, y)$.\n\nFix $b$ and $d$, and take a pair $(x, y)$ of positive integers, satisfying (4), such that $x + y$ is minimal. By the symmetry in (4) we may assume that $x \\geqslant y \\geqslant 1$.\n\nNow we perform a usual \"Vieta jump\". Consider (4) as a quadratic equation in variable $x$, and let $z$ be its second root. By the Vieta formulas,\n$$\nx + z = (b + 2) y, \\quad \\text{and} \\quad z x = y^{2} + d\n$$\nso\n$$\nz = (b + 2) y - x = \\frac{y^{2} + d}{x}\n$$\nThe first formula shows that $z$ is an integer, and by the second formula $z$ is positive. Hence $(z, y)$ is another positive integer solution of (4). From\n$$\n\\begin{aligned}\n(x - 1)(z - 1) & = x z - (x + z) + 1 = (y^{2} + d) - (b + 2) y + 1 \\\\\n& < (y^{2} + b) - (b + 2) y + 1 = (y - 1)^{2} - b(y - 1) \\leqslant (y - 1)^{2} \\leqslant (x - 1)^{2}\n\\end{aligned}\n$$\nwe can see that $z < x$ and therefore $z + y < x + y$. But this contradicts the minimality of $x + y$ among the positive integer solutions of (4)."
+ },
+ {
+  "id": "N-020",
+  "title": "Eventually Periodic Divisibility Sequences",
+  "difficulty": 4,
+  "topics": [
+   "素数与算术基本定理",
+   "数列与递推"
+  ],
+  "problem": "Let $a_{1}, a_{2}, a_{3}, \\ldots$ be an infinite sequence of positive integers such that $a_{n+2m}$ divides $a_{n} + a_{n+m}$ for all positive integers $n$ and $m$. Prove that this sequence is eventually periodic, i.e. there exist positive integers $N$ and $d$ such that $a_{n} = a_{n+d}$ for all $n > N$.",
+  "answer": "证明题",
+  "solution": "We will make repeated use of the following simple observation:\n\nLemma 1. If a positive integer $d$ divides $a_{n}$ and $a_{n-m}$ for some $m$ and $n > 2m$, it also divides $a_{n-2m}$. If $d$ divides $a_{n}$ and $a_{n-2m}$, it also divides $a_{n-m}$.\n\nProof. Both parts are obvious since $a_{n}$ divides $a_{n-2m} + a_{n-m}$.\n\nClaim. The sequence $(a_{n})$ is bounded.\n\nProof. Suppose the contrary. Then there exist infinitely many indices $n$ such that $a_{n}$ is greater than each of the previous terms $a_{1}, a_{2}, \\ldots, a_{n-1}$. Let $a_{n} = k$ be such a term, $n > 10$. For each $s < \\frac{n}{2}$ the number $a_{n} = k$ divides $a_{n-s} + a_{n-2s} < 2k$, therefore\n$$\na_{n-s} + a_{n-2s} = k\n$$\nIn particular,\n$$\na_{n} = a_{n-1} + a_{n-2} = a_{n-2} + a_{n-4} = a_{n-4} + a_{n-8}\n$$\nthat is, $a_{n-1} = a_{n-4}$ and $a_{n-2} = a_{n-8}$. It follows from Lemma 1 that $a_{n-1}$ divides $a_{n-1-3s}$ for $3s < n-1$ and $a_{n-2}$ divides $a_{n-2-6s}$ for $6s < n-2$. Since at least one of the numbers $a_{n-1}$ and $a_{n-2}$ is at least $a_{n}/2$, so is some $a_{i}$ with $i \\leq 6$. However, $a_{n}$ can be arbitrarily large, a contradiction.\n\nSince $(a_{n})$ is bounded, there exist only finitely many $i$ for which $a_{i}$ appears in the sequence finitely many times. In other words, there exists $N$ such that if $a_{i} = t$ and $i > N$, then $a_{j} = t$ for infinitely many $j$.\n\nClearly the sequence $(a_{n+N})_{n > 0}$ satisfies the divisibility condition, and it is enough to prove that this sequence is eventually periodic. Thus truncating the sequence if necessary, we can assume that each number appears infinitely many times in the sequence. Let $k$ be the maximum number appearing in the sequence.\n\nLemma 2. If a positive integer $d$ divides $a_{n}$ for some $n$, then the numbers $i$ such that $d$ divides $a_{i}$ form an arithmetical progression with an odd difference.\n\nProof. Let $i_{1} < i_{2} < i_{3} < \\ldots$ be all the indices $i$ such that $d$ divides $a_{i}$. If $i_{s} + i_{s+1}$ is even, it follows from Lemma 1 that $d$ also divides $a_{\\frac{i_{s} + i_{s+1}}{2}}$, impossible since $i_{s} < \\frac{i_{s} + i_{s+1}}{2} < i_{s+1}$. Thus $i_{s}$ and $i_{s+1}$ are always of different parity, and therefore $i_{s} + i_{s+2}$ is even. Applying Lemma 1 again, we see that $d$ divides $a_{\\frac{i_{s} + i_{s+2}}{2}}$, hence $\\frac{i_{s} + i_{s+2}}{2} = i_{s+1}$.\n\nWe are ready now to solve the problem.\n\nThe number of positive divisors of all terms of the progression is finite. Let $d_{s}$ be the difference of the progression corresponding to $s$, that is, $s$ divides $a_{n}$ if and only if it divides $a_{n + t d_{s}}$ for any positive integer $t$. Let $D$ be the product of all $d_{s}$. Then each $s$ dividing a term of the progression divides $a_{n}$ if and only if it divides $a_{n+D}$. This means that the sets of divisors of $a_{n}$ and $a_{n+D}$ coincide, and $a_{n+D} = a_{n}$. Thus $D$ is a period of the sequence."
+ },
+ {
+  "id": "N-021",
+  "title": "Infinite Primes from Quadratic Ratios",
+  "difficulty": 4,
+  "topics": [
+   "二次剩余与平方数判别",
+   "整除与同余",
+   "素数与算术基本定理"
+  ],
+  "problem": "Let $S$ be the set of rational numbers of the form\n$$\n\\frac{(a_1^2 + a_1 - 1)(a_2^2 + a_2 - 1) \\cdots (a_n^2 + a_n - 1)}{(b_1^2 + b_1 - 1)(b_2^2 + b_2 - 1) \\cdots (b_n^2 + b_n - 1)},\n$$\nwhere $n, a_1, a_2, \\dots, a_n, b_1, b_2, \\dots, b_n$ run through the positive integers. Show that $S$ contains infinitely many primes.",
+  "answer": "证明题",
+  "solution": "Clearly, $S$ is closed under multiplication and division: if $r$ and $s$ are members of $S$, so are $rs$ and $r/s$.\n\nIf $a$ is a positive integer, and $p \\neq 5$ is a prime factor of $a^2 + a - 1$, then $p \\equiv \\pm 1 \\pmod 5$. To prove this, notice that $(2a + 1)^2 \\equiv 5 \\pmod p$, so $5$ is a quadratic residue modulo $p$. By quadratic reciprocity, $p$ is a quadratic residue modulo $5$, so $p \\equiv \\pm 1 \\pmod 5$. Notice also that $S$ contains $5$, for $5 = 2^2 + 2 - 1$.\n\nWe now show by induction that $S$ contains all primes congruent to $\\pm 1 \\pmod 5$. Since there are infinitely many such, the conclusion follows. To begin, notice that $11$ and $19$ both are in $S$: $11 = 3^2 + 3 - 1$, and $19 = 4^2 + 4 - 1$.\n\nConsider now a prime $q \\equiv \\pm 1 \\pmod 5$, and assume that $S$ contains all primes $p < q, p \\equiv \\pm 1 \\pmod 5$. Since $q$ is a quadratic residue modulo $5$, quadratic reciprocity shows that $5$ is a quadratic residue modulo $q$, so there exists $a$ in $\\{1, 2, \\dots, q - 1\\}$ such that $a^2 + a - 1 = mq$ for some positive integer $m$. Notice that $a^2 + a - 1 \\le (q - 1)^2 + (q - 1) - 1 = q^2 - q - 1 < q^2$, to deduce that $m < q$. If $m = 1$, then $q = a^2 + a - 1$ which is a member of $S$. If $m > 1$, and $p$ is a prime factor of $m$, then\n\n$p$ is also a prime factor of $a^2 + a - 1$, so $p = 5$ or $p \\equiv \\pm 1 \\pmod 5$. In either case, $p$ is a member of $S$, so $m$ is a member, for $S$ is closed under multiplication. Since $q = (a^2 + a - 1)/m$, and $S$ is closed under division, it follows that $q$ is indeed a member of $S$. This completes the proof."
+ },
+ {
+  "id": "N-022",
+  "title": "Minimum Denominator of a Rational Sum",
+  "difficulty": 2,
+  "topics": [
+   "最大公约数与欧几里得算法"
+  ],
+  "problem": "Problem:\n\nThe rational numbers $x$ and $y$, when written in lowest terms, have denominators $60$ and $70$, respectively. What is the smallest possible denominator of $x+y$?",
+  "answer": "84",
+  "solution": "Solution:\n\nWrite $x + y = \\dfrac{a}{60} + \\dfrac{b}{70} = \\dfrac{7a + 6b}{420}$. Since $a$ is relatively prime to $60$ and $b$ is relatively prime to $70$, it follows that none of the primes $2, 3, 7$ can divide $7a + 6b$, so we won't be able to cancel any of these factors in the denominator. Thus, after reducing to lowest terms, the denominator will still be at least $2^{2} \\cdot 3 \\cdot 7 = 84$ (the product of the powers of $2, 3$, and $7$ dividing $420$). On the other hand, $84$ is achievable, by taking (e.g.) $\\dfrac{1}{60} + \\dfrac{3}{70} = \\dfrac{25}{420} = \\dfrac{5}{84}$. So $84$ is the answer."
+ },
+ {
+  "id": "N-023",
+  "title": "Minimal Cuts for a Congruence Grid",
+  "difficulty": 4,
+  "topics": [
+   "图论",
+   "整除与同余"
+  ],
+  "problem": "喬老大有一條 $1 \\times 46^2$ 的棟木板，其上有 $46^2$ 個 $1 \\times 1$ 大小的正方格子，依序編號為 1 至 $46^2$ 號。喬老大將這條木板鋸成 $N$ 段，每一段皆為連續編號的若干個格子，並在**不旋轉或翻面**的情況下，用這 $N$ 段木板排出滿足以下條件的 $46 \\times 46$ 方陣：若位於第 $i$ 列第 $j$ 行格子的編號為 $a_{ij}$，則 $a_{ij} - (i + j - 1)$ 被 46 整除。試求 $N$ 的最小可能值。\n\nJoe has a $1 \\times 46^2$ rectangular dogwood strip consisting of $46^2$ unit squares, which are labelled from 1 to $46^2$ in order. Joe saws the strip into $N$ pieces, each of which consists of a number of consecutive unit squares, and rearrange them (without rotating or flipping) into a $46 \\times 46$ grids satisfying the following: if the square in the $i^{th}$ row and $j^{th}$ column is labelled with $a_{ij}$, then $a_{ij} - (i + j - 1)$ is divisible by 46. Find the smallest possible number of $N$.",
+  "answer": "91",
+  "solution": "答案為 91；一般性地，對於 $1 \\times n^2$ 的木板，$N$ 的最小可能值為 $2n-1$。\n\n構造：將 $1 \\times n^2$ 的長條切成長度為 $n, 1, n, \\dots, 1, 1$ 的 $2n-1$ 段。用第一段 $n$ 木條構成第一行，依此類推，構成下方的 $(n-1) \\times n$ 方陣，再用所有 $1$ 木條構成最後一行即可。(備註：這並非唯一的構造方法。)\n\n估計：由於題目要求僅與編號對 $n$ 的餘數有關，以下討論都在 mod $n$ 的同餘下進行。\n\n考慮點集 $V = \\{0, 1, \\dots, n-1\\}$，並依以下規則連邊：對於鋸出的每一段木條，若其左右端的編號分別為 $a$ 與 $b$，則將點 $a$ 和點 $b+1$ 連邊（允許單環與重邊）。注意到邊的總數量等於鋸出來的段數，因此我們只須證明，在滿足題目條件下，所構出來的邊集 $E$ 至少要有 $2n-1$ 條邊。\n\n注意到所構出來的圖 $G = (V, E)$ 有以下性質：\n1. 由於每一段木條可以接成 1 到 $n^2$，因此 $G$ 有歐拉迴路。\n2. 因為方陣第 $k$ 行的方格編號依序為 $k, k+1, \\dots, k+n-1$，故在方陣第 $k$ 行的所有木條會對應一個環 $\\gamma_k$，且 $\\gamma_k$ 必包含點 $k$（因為最左邊木條的最左方格編號為 $k$）。\n\n由 1. 知 $G$ 連通。此外，由於任兩個 $\\gamma_k$ 沒有公共邊（因為一段木條只會出現在某一行中），若我們從每一個 $\\gamma_k$ 中刪去一條邊，所得到的新圖 $G' = (V, E')$ 仍為連通。這表示 $|E'| \\ge |V| - 1 = n - 1$，從而 $|E| = |E'| + n \\ge 2n - 1$。證畢。"
+ }
+]

@@ -1,0 +1,77 @@
+[
+ {
+  "mathnet_id": "0c8a",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "染色与不变量",
+   "组合博弈与策略"
+  ],
+  "contest": "Romanian Mathematical Olympiad",
+  "problem": "Iulia and Ştefan shared the 52 playing cards from a deck¹ so each got 26 cards. The cards from 2 to 10 are assigned their own value, the ace is worth 11 points, the jack 12 points, the queen 13 points and the king 14 points. Ştefan noticed that he had no ace in his stack, no 2 and no four cards of the same value. Iulia noticed that from her cards above 11 points, she doesn't have more than two of the same value. Iulia adds up all her points. What is the lowest value she can get? What is the highest?\n\n¹A deck has 52 cards: four with the value 2, four with the value 3, ..., four with the value 10, 4 aces, 4 jacks, 4 queens and 4 kings.",
+  "solution_head": "If we denote by $x_i$ the number of cards with the value $i$ that Iulia has in her stack, then $x_i \\ge 1$, $x_{11} = x_4 = 4$, $1 \\le x_{12} \\le 2$, $1 \\le x_{13} \\le 2$, $1 \\le x_{14} \\le 2$.\nIf $M$ and $m$ represent the highest and the lowest value that Iulia's stack can have then:\n$$\n\\begin{align*}\nM &= 2 \\cdot 14 + 2 \\cdot 13 + 2 \\cdot 12 + 4 \\cdot 11 + 4 \\cdot 10 + 2 \\cdot 9 + 1 \\cdot 8 + 1 \\cdot 7 + 1 \\cdot 6 + 1 \\cdot 5 + 1 \\cdot 4 + 1 \\cdot 3 + 4 \\cdot 2 = 221, \\\\\nm &= 1 \\cdot 14 + 1 \\cdot 13 + 1 \\cdot 12 + 4 \\cdot 11 + 1 \\cdot 10 + 1 \\cdot 9 + 1 \\cdot 8 + 1 \\cdot 7 + 1 \\cdot 6 + 2 \\cdot 5 + 4 \\cdot 4 + 4 \\cdot 3 + 4 \\cdot 2 = 169.\n\\end{align*}\n$$"
+ },
+ {
+  "mathnet_id": "08sr",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "组合博弈与策略",
+   "代数变换技巧"
+  ],
+  "contest": "Japan Mathematical Olympiad",
+  "problem": "Currently circulating coins in Japanese currency come in 6 different denominations: 500 yen, 100 yen, 50 yen, 10 yen, 5 yen and 1 yen. Taro had 1 each of 1000 yen note, 100 yen coin, 10 yen coin and 1 yen coin. He made a certain purchase from a merchant and handed him all he had and received some change. Assume that Taro made the payment in such a way that he would not receive in the change any coins of the denominations same as what he had had to begin with, nor a 1000 yen note. Furthermore, he chose the method of the payment so that he would end up with the minimum possible number of coins when he received his change. Assume also that the merchant gave Taro the change with minimum possible number of coins. Count the case of no change as a possibility for the purchase price also. Under these conditions how many distinct purchase prices are possible?",
+  "solution_head": "To begin with, we note that two or more of 500 yen coins, or of 50 yen coins, or of 5 yen coins could not be included in the change Taro received. This is because if two or more of any of these coins were in the change, two of them could be exchanged for one 1000 yen note, or one 100 yen coin or one 10 yen coin to reduce the total number of coins in the change. Also, the change did\n\nnot include 1000 yen note, 100 yen coin, 10 yen coin or 1 yen coin, since Taro used all of these in his payment. Therefore, the change must have consisted of zero or one piece each of 500 yen, 50 yen and 5 yen coins. Consequently, the purchase price must have been of the form: $1111 - (500a + 50b + 5c)$ yen, where each of $a$, $b$, $c$ being either 0 or 1.\n\nConversely, let us show that if the purchase price is of the form $1111 - (500a + 50b + 5c)$ yen, with each one of $a$, $b$, $c$ being 0 or 1, then Taro would make his payment in the way specified in the statement of the problem. Note that as each of $a$, $b$, $c$ is either 0 or 1, a 500 yen, b 50 yen and c 5 yen coins together would yield the method o"
+ },
+ {
+  "mathnet_id": "06r4",
+  "est": 4,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "组合博弈与策略"
+  ],
+  "contest": "51st IMO Shortlisted Problems",
+  "problem": "Six stacks $S_{1}, \\ldots, S_{6}$ of coins are standing in a row. In the beginning every stack contains a single coin. There are two types of allowed moves:\n\nMove 1: If stack $S_{k}$ with $1 \\leq k \\leq 5$ contains at least one coin, you may remove one coin from $S_{k}$ and add two coins to $S_{k+1}$.\n\nMove 2: If stack $S_{k}$ with $1 \\leq k \\leq 4$ contains at least one coin, then you may remove one coin from $S_{k}$ and exchange stacks $S_{k+1}$ and $S_{k+2}$.\n\nDecide whether it is possible to achieve by a sequence of such moves that the first five stacks are empty, whereas the sixth stack $S_{6}$ contains exactly $2010^{2010^{2010}}$ coins.",
+  "solution_head": "Denote by $\\left(a_{1}, a_{2}, \\ldots, a_{n}\\right) \\rightarrow\\left(a_{1}^{\\prime}, a_{2}^{\\prime}, \\ldots, a_{n}^{\\prime}\\right)$ the following: if some consecutive stacks contain $a_{1}, \\ldots, a_{n}$ coins, then it is possible to perform several allowed moves such that the stacks contain $a_{1}^{\\prime}, \\ldots, a_{n}^{\\prime}$ coins respectively, whereas the contents of the other stacks remain unchanged.\n\nLet $A=2010^{2010}$ or $A=2010^{2010^{2010}}$, respectively. Our goal is to show that\n$$\n(1,1,1,1,1,1) \\rightarrow(0,0,0,0,0, A)\n$$\nFirst we prove two auxiliary observations.\n\nLemma 1. $\\quad(a, 0,0) \\rightarrow\\left(0,2^{a}, 0\\right)$ for every $a \\geq 1$.\n\nProof. We prove by induction that $(a, 0,0) \\rightarrow\\left(a-k, 2^{k}, 0\\right)$ for every $1 \\leq k \\leq a$. For $k=1$, apply Move 1 to the first stack:\n$$\n(a, 0,0) \\rightarrow(a-1,2,0)=\\left(a-1,2^{1}, 0\\right)\n$$\nNow assume that $k<a$ and the statement holds for some $k<a$. Starting from $\\left(a-k, 2^{k}, 0\\right)$, apply Move 1 to the middle stack $2^{k}$ times, until it becomes empty. Then apply Move 2 to the first"
+ },
+ {
+  "mathnet_id": "0k21",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "组合博弈与策略",
+   "代数变换技巧"
+  ],
+  "contest": "HMMT November 2018",
+  "problem": "Problem:\n\nAlice starts with the number $0$. She can apply $100$ operations on her number. In each operation, she can either add $1$ to her number, or square her number. After applying all operations, her score is the minimum distance from her number to any perfect square. What is the maximum score she can attain?",
+  "solution_head": "Solution:\n\nAnswer: $94$\n\nNote that after applying the squaring operation, Alice's number will be a perfect square, so she can maximize her score by having a large number of adding operations at the end. However, her score needs to be large enough that the many additions do not bring her close to a larger square. Hence the strategy is as follows: $2$ additions to get to $2$, $4$ consecutive squares to get to $65536$, and $94$ more additions for a score of $94$."
+ },
+ {
+  "mathnet_id": "01k8",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "组合博弈与策略"
+  ],
+  "contest": "60th Belarusian Mathematical Olympiad",
+  "problem": "Two cats, Bill and Tom, play the following game. They, in turn (Bill starts), eat fishes from the heap of 50 fishes. Per move it is allowed to eat exactly 1, or exactly 4, or exactly 7 fishes. The player wins if he eats the last fish of the heap.\nWho of the cats wins if both of them play to win?",
+  "solution_head": "It is easy to see that if either $1$ or $4$ fishes remain in the heap, then the player who must move wins, but if $2$ fishes remain, then this player loses. So we will solve the problem moving backward. We write all numbers from $1$ to $50$ and mark them with \"+\" or \"-\". If $k$ fishes remain in the heap before the move of a player and he can win, then we write $+k$, otherwise we write $-k$. We have the following table\n\n| +1 | -2 | +3 | +4 | -5 | +6 | +7 | -8 | +9 | -10 | +11 | +12 | -13 | +14 | +15 | -16 | ... |\n|----|----|----|----|----|----|----|----|----|-----|-----|-----|-----|-----|-----|-----|-----|\n| 1  | -  | 1  | 4  | -  | 4  | 7  | -  | 1  |  -  | 1   | 4   |  -  | 4   | 7   |  -  | ... |\n\nThe second row of the table contains the possible winning moves (to win the player can eat so many fishes that after his move the number of the fishes remained in the heap would be marked with \"+\" ). We see that the signs in the first row of the table are repeated with the period equaled $8$ (it is easy to prove by induction).\n\nSince $50$ leaves remainder $2$ when divided by $8$, it follo"
+ },
+ {
+  "mathnet_id": "0kld",
+  "est": 2,
+  "conf": "mid",
+  "category": "combinatorics",
+  "topics": [
+   "组合博弈与策略"
+  ],
+  "contest": "Berkeley Math Circle: Monthly Contest 3",
+  "problem": "Problem:\n\nThe 2020 members of the society of game theorists are holding the annual election for their leadership board. All members are initially on the board, and are ranked based on their qualifications. They start off by voting on whether to keep the board the same size; if they fail to get a strict majority, the member with the lowest rank is expelled. This process continues until they finally vote to keep the size of the board intact.\nIt is common knowledge that, as each board member seeks to maximize their own influence, they seek to remain on the board while retaining as few other members as possible.\nAt the end of this process, how many society members will remain on the leadership board?",
+  "solution_head": "Solution:\n\nNumber members #1 to #2020, with #1 being the member with the highest rank. We claim that only if there are $2^{n}-1$ members still on the board for some $n \\in \\mathbb{N}$, they all remain on the board.\n\nProof. We use induction on $n$.\n\nBase case: $n=1$.\nIf there were $2^{1}-1=1$ persons on the board, that person would vote to keep themselves on the board and win.\n\nInductive step: $n \\Longrightarrow n+1$\nIf there were at least $2^{n}$ members, the first $2^{n}-1$ would all vote \"no\", because by induction they know they would be guaranteed a spot on the board in any case and want to minimize its total size. This would be a weak majority vote for \"no\" if the total size of the board were at most $2\\left(2^{n}-1\\right)=2^{n+1}-2$ members.\n\nHowever, if there were $2^{n+1}-1$ members, all whose numbers are at least $2^{n}$ would vote \"yes\", as by the above, they would otherwise get kicked off the board. This is a strict majority, as desired.\n\nThe largest number at most 2020 of the form $2^{n}-1$ is 1023, so this is our answer."
+ }
+]

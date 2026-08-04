@@ -1,0 +1,102 @@
+[
+ {
+  "mathnet_id": "03wf",
+  "est": 5,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "不等式",
+   "数列与递推"
+  ],
+  "contest": "China National Team Selection Test",
+  "problem": "Given integer $n \\ge 2$, find the largest number $\\lambda(n)$ with the following property: if a sequence of real numbers $a_0, a_1, a_2, \\dots, a_n$ satisfies\n$$0 = a_0 \\le a_1 \\le a_2 \\le \\dots \\le a_n,$$ \n$$a_i \\ge \\frac{1}{2}(a_{i+1} + a_{i-1}), \\quad i = 1, 2, \\dots, n-1,$$\nthen\n$$\n\\left(\\sum_{i=1}^{n} ia_{i}\\right)^{2} \\geqslant \\lambda(n) \\sum_{i=1}^{n} a_{i}^{2}.\n$$",
+  "solution_head": "The largest possible value of $\\lambda(n)$ is $\\frac{n(n+1)^2}{4}$.\n\nLet $a_1 = a_2 = \\dots = a_n = 1$. Then we have $\\lambda(n) \\le \\frac{n(n+1)^2}{4}$.\n\nWe shall show that for any real numbers $a_0, a_1, a_2, \\dots, a_n$ satisfying the indicated property in the problem, the following inequality holds:\n$$\n\\left(\\sum_{i=1}^{n} ia_i\\right)^2 \\geqslant \\frac{n(n+1)^{2}}{4}\\left(\\sum_{i=1}^{n} a_{i}^{2}\\right). \\qquad \\textcircled{1}\n$$\nFirst, we notice that\n$$\na_1 \\ge \\frac{a_2}{2} \\ge \\dots \\ge \\frac{a_n}{n}.\n$$\nIndeed, by assumption, $2ia_i \\ge i(a_{i+1} + a_{i-1})$ holds for $i = 1, 2, \\dots, n-1$. For any given positive integer $1 \\le l \\le n-1$, summing the above inequality over $i = 1, 2, \\dots, l$, we have $(l+1)a_l \\ge la_{l+1}$, i.e.\n$$\n\\frac{a_l}{l} \\ge \\frac{a_{l+1}}{l+1} \\text{ for } l = 1, 2, \\dots, n-1.\n$$\nIn what follows, we show that for any $i, j, k \\in \\{1, 2, \\dots, n\\}$, if $i > j$, then\n$$\n\\frac{2ik^2}{i+k} > \\frac{2jk^2}{j+k}.\n$$\nIndeed, the above inequality is equivalent to $2ik^2(j+k) > 2jk^2(i+k)$, i.e. $(i-j)k^3 > 0$, which is clearly true.\n\nNow, we are going "
+ },
+ {
+  "mathnet_id": "0jlr",
+  "est": 4,
+  "conf": "mid",
+  "category": "algebra",
+  "topics": [
+   "函数方程"
+  ],
+  "contest": "IMO Team Selection Team Selection Test",
+  "problem": "Let $\\mathbb{N}$ be the set of positive integers. Find all functions $f : \\mathbb{N} \\to \\mathbb{N}$ that satisfy the equation\n$$\nf^{abc-a}(abc) + f^{abc-b}(abc) + f^{abc-c}(abc) = a + b + c\n$$\nfor all $a, b, c \\ge 2$.\n(Here $f^1(n) = f(n)$ and $f^k(n) = f(f^{k-1}(n))$ for every integer $k$ greater than 1.)",
+  "solution_head": "Clearly if $f(n) = n - 1$ for $n > 1$, the desired identity will be satisfied. In fact one can easily check that the value of $f(2)$ is also irrelevant, so any $f$ such that $f(n) = n - 1$ for all $n > 2$ will work. We show that these are the only such functions.\nPlug in $a = b = c$ to obtain $f^{a^3-a}(a^3) = a$ for all $a$. Using this twice, $f^{a^9-a}(a^9) = a$. Then, $b = c = a^4$ gives $f^{a^9-a^4}(a^9) = a^4$. Meanwhile $b = a^3, c = a^5$ gives $f^{a^9-a^5}(a^9) = a^5$; consequently, we get $f^{a^5-a^4}(a^5) = a^4$.\n\n$$\nf^{bc-b}(bc) + f^{bc-c}(bc) = b + c. \\qquad (19)\n$$\nNow fix a large number $N$, and for all divisors $d \\mid N$ with $1 < d < N$, define $g(d)$ by $g(d) = f^{N-d}(N)-d$. We claim that $g(bc) = g(b) + g(c)$ whenever $bc$ is still a proper divisor of $N$. Proof: put $a = N/bc$, and write\n$$\n\\begin{aligned}\ng(bc) &= f^{abc-bc}(abc) - bc \\\\\n&= (a + bc - f^{abc-a}(abc)) - bc \\quad (\\text{by (19)}) \\\\\n&= a - f^{abc-a}(abc) \\\\\n&= f^{abc-b}(abc) - b + f^{abc-c}(abc) - c \\\\\n&= g(b) + g(c).\n\\end{aligned}\n$$\nThis holds for any $N$. In particular, fix any $b \\ge 2$, and put"
+ },
+ {
+  "mathnet_id": "06wv",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "函数方程",
+   "不等式"
+  ],
+  "contest": "International Mathematical Olympiad",
+  "problem": "Let $\\mathbb{R}_{>0}$ be the set of positive real numbers. Find all functions $f: \\mathbb{R}_{>0} \\rightarrow \\mathbb{R}_{>0}$ such that, for every $x \\in \\mathbb{R}_{>0}$, there exists a unique $y \\in \\mathbb{R}_{>0}$ satisfying\n$$\nx f(y)+y f(x) \\leqslant 2 .\n$$",
+  "solution_head": "First we prove that the function $f(x)=1 / x$ satisfies the condition of the problem statement. The AM-GM inequality gives\n$$\n\\frac{x}{y}+\\frac{y}{x} \\geqslant 2\n$$\nfor every $x, y>0$, with equality if and only if $x=y$. This means that, for every $x>0$, there exists a unique $y>0$ such that\n$$\n\\frac{x}{y}+\\frac{y}{x} \\leqslant 2\n$$\nnamely $y=x$.\n\nLet now $f: \\mathbb{R}_{>0} \\rightarrow \\mathbb{R}_{>0}$ be a function that satisfies the condition of the problem statement. We say that a pair of positive real numbers $(x, y)$ is good if $x f(y)+y f(x) \\leqslant 2$. Observe that if $(x, y)$ is good, then so is $(y, x)$.\n\nLemma 1.0. If $(x, y)$ is good, then $x=y$.\n\nProof. Assume that there exist positive real numbers $x \\neq y$ such that $(x, y)$ is good. The uniqueness assumption says that $y$ is the unique positive real number such that $(x, y)$ is good. In particular, $(x, x)$ is not a good pair. This means that\n$$\nx f(x)+x f(x)>2\n$$\nand thus $x f(x)>1$. Similarly, $(y, x)$ is a good pair, so $(y, y)$ is not a good pair, which implies $y f(y)>1$. We apply the AM-GM inequality to obtai"
+ },
+ {
+  "mathnet_id": "073p",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "数列与递推"
+  ],
+  "contest": "Indija TS 2008",
+  "problem": "Let $\\alpha$ be a real number larger than $1$. Define a sequence $(s_n)_{n \\ge 1}$ as follows: $s_1 = 1$, $s_2 = \\alpha$; if $s_1, s_2, s_3, \\dots, s_{2^n}$ are defined for some $n \\ge 1$, then $s_{2^n+1}, s_{2^n+2}, \\dots, s_{2^{n+1}}$ are defined by $s_j = \\alpha s_{j-2^n}$, for $2^n+1 \\le j \\le 2^{n+1}$. (Thus the first few terms are $1, \\alpha, \\alpha^2, \\alpha, \\alpha^2, \\alpha^3, \\dots$) Let $c_n = s_1+s_2+s_3+\\dots+s_n$. If $n = 2^{e_0} + 2^{e_1} + \\dots + 2^{e_k}$, where $e_0 > e_1 > \\dots > e_k \\ge 0$ is the binary representation of a positive integer $n$, prove that\n$$\nc_n = (1 + \\alpha)^{e_0} + \\alpha(1 + \\alpha)^{e_1} + \\alpha^2(1 + \\alpha)^{e_2} + \\dots + \\alpha^k(1 + \\alpha)^{e_k}.\n$$",
+  "solution_head": "We prove this in four steps. We use $s_n = s(n)$ and $c_n = c(n)$,\n\n(A) If $b(n)$ denotes the number of $1$'s in the binary representation of a non-negative integer $n$, we have $s(n) = \\alpha^{b(n-1)}$, $n \\ge 1$.\n**Proof:** We use induction. Note that $s(1) = 1 = \\alpha^{b(0)}$. Suppose $s(r) = \\alpha^{b(r-1)}$, for $1 \\le r \\le 2^{n-1}$. Take any $r$ such that $2^{n-1} + 1 \\le r \\le 2^n$. We have\n$$\n\\begin{aligned}\ns(r) &= \\alpha s(r - 2^{n-1}) \\\\\n&= \\alpha \\alpha^{b(r-2^{n-1}-1)} \\\\\n&= \\alpha^{b(r-2^{n-1}-1)+1} = \\alpha^{b(r-1)},\n\\end{aligned}\n$$\nas $r-1$ has exactly one more $1$ in its binary representation than $r-2^{n-1}-1$.\n\n(B) If $m \\ge 1$, we have $s(2m+1) = s(m+1)$ and $s(2m) = \\alpha s(m)$.\n**Proof:** Since $m$ and $2m$ have same number of $1$'s, we have\n$$\ns(2m+1) = \\alpha^{b(2m)} = \\alpha^{b(m)} = s(m+1).\n$$\nFor even numbers, first we show that $s(2m) = \\alpha s(2m-1)$. This is easy to establish by induction. Observe $s(2) = \\alpha = \\alpha s(1)$. If $2^{n-1} + 1 \\le 2m-1 < 2n \\le 2^n$, we get by induction hypothesis\n$$\ns(2m) = \\alpha s(2m - 2^{n-1}) = \\alpha^2 s(2m - "
+ },
+ {
+  "mathnet_id": "00g3",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "函数方程"
+  ],
+  "contest": "XIV APMO",
+  "problem": "Let $\\mathbb{R}$ denote the set of all real numbers. Find all functions $f$ from $\\mathbb{R}$ to $\\mathbb{R}$ satisfying:\n(i) there are only finitely many $s$ in $\\mathbb{R}$ such that $f(s)=0$, and\n(ii) $f\\left(x^{4}+y\\right)=x^{3} f(x)+f(f(y))$ for all $x, y$ in $\\mathbb{R}$.",
+  "solution_head": "The only such function is the identity function on $\\mathbb{R}$.\n\nSetting $(x, y)=(1,0)$ in the given functional equation (ii), we have $f(f(0))=0$. Setting $x=0$ in (ii), we find\n$$\n\\begin{equation*}\nf(y)=f(f(y)) \\tag{1}\n\\end{equation*}\n$$\n[1 mark.] and thus $f(0)=f(f(0))=0$ [1 mark.]. It follows from (ii) that $f\\left(x^{4}+y\\right)= x^{3} f(x)+f(y)$ for all $x, y \\in \\mathbb{R}$. Set $y=0$ to obtain\n$$\n\\begin{equation*}\nf\\left(x^{4}\\right)=x^{3} f(x) \\tag{2}\n\\end{equation*}\n$$\nfor all $x \\in \\mathbb{R}$, and so\n$$\n\\begin{equation*}\nf\\left(x^{4}+y\\right)=f\\left(x^{4}\\right)+f(y) \\tag{3}\n\\end{equation*}\n$$\nfor all $x, y \\in \\mathbb{R}$. The functional equation (3) suggests that $f$ is additive, that is, $f(a+b)= f(a)+f(b)$ for all $a, b \\in \\mathbb{R}$. [1 mark.] We now show this.\n\nFirst assume that $a \\geq 0$ and $b \\in \\mathbb{R}$. It follows from (3) that\n$$\nf(a+b)=f\\left(\\left(a^{1 / 4}\\right)^{4}+b\\right)=f\\left(\\left(a^{1 / 4}\\right)^{4}\\right)+f(b)=f(a)+f(b)\n$$\nWe next note that $f$ is an odd function, since from (2)\n$$\nf(-x)=\\frac{f\\left(x^{4}\\right)}{(-x)^{3}}=\\frac{f\\left("
+ },
+ {
+  "mathnet_id": "0jbs",
+  "est": 4,
+  "conf": "mid",
+  "category": "algebra",
+  "topics": [
+   "不等式"
+  ],
+  "contest": "Team Selection Test Selection Test",
+  "problem": "Let $a$, $b$, $c$ be real numbers in the interval $[0, 1]$ with $a + b$, $b + c$, $c + a \\ge 1$. Prove that\n$$\n1 \\le (1-a)^2 + (1-b)^2 + (1-c)^2 + \\frac{2\\sqrt{2abc}}{\\sqrt{a^2+b^2+c^2}}.\n$$",
+  "solution_head": "We may assume without loss of generality that $a \\ge b \\ge c$. Noting that $(1-b)^2 + (1-c)^2 = (b+c-1)^2 - 2bc + 1$, we may transform the right hand side of the desired inequality into\n$$\n(1-a)^2 + (1-b)^2 + (1-c)^2 + \\frac{2\\sqrt{2abc}}{\\sqrt{a^2 + b^2 + c^2}} = \\frac{2\\sqrt{2abc}}{\\sqrt{a^2 + b^2 + c^2}} - 2bc + (1-a)^2 + (b+c-1)^2 + 1.\n$$\nRearranging, it suffices to show that\n$$\n\\frac{2bc(\\sqrt{a^2 + b^2 + c^2} - \\sqrt{2a})}{\\sqrt{a^2 + b^2 + c^2}} \\le (1-a)^2 + (b+c-1)^2, \\quad (19)\n$$\nwhich after rationalizing the numerator is equivalent to\n$$\n\\frac{2bc(b^2 + c^2 - a^2)}{\\sqrt{a^2 + b^2 + c^2} (\\sqrt{2}a + \\sqrt{a^2 + b^2 + c^2})} \\le (1-a)^2 + (b+c-1)^2. \\quad (20)\n$$\nIf $b^2 + c^2 - a^2 \\le 0$, then (20) is clearly true. We may therefore assume that $b^2 + c^2 - a^2 > 0$. To simplify (20), we want to produce the term $b^2 + c^2 - a^2$ from the right-hand side of (20). By the RMS-AM inequality, we have\n$$\n(1-a)^2 + (b+c-1)^2 \\ge \\frac{[(1-a) + (b+c-1)]^2}{2} = \\frac{(b+c-a)^2}{2}. \\quad (21)\n$$\nBy our assumption that $a \\ge b \\ge c$, we obtain\n$$\nb^2 + c^2 - a^2 - (b + c - a)^"
+ },
+ {
+  "mathnet_id": "040c",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "不等式"
+  ],
+  "contest": "China Mathematical Olympiad",
+  "problem": "Let $f(x) = (x+a)(x+b)$ where $a$, $b$ are given positive real numbers, $n \\ge 2$ be a given integer. For non-negative real numbers $x_1, x_2, \\dots, x_n$ that satisfy $x_1 + x_2 + \\dots + x_n = 1$, find the maximum of $F = \\sum_{1 \\le i < j \\le n} \\min\\{f(x_i), f(x_j)\\}$.",
+  "solution_head": "As\n$$\n\\begin{align*}\n\\min\\{f(x_i), f(x_j)\\} &= \\min\\{(x_i + a)(x_i + b), (x_j + a)(x_j + b)\\} \\\\\n&\\le \\sqrt{(x_i + a)(x_i + b)(x_j + a)(x_j + b)} \\\\\n&\\le \\frac{1}{2}((x_i + a)(x_j + b) + (x_i + b)(x_j + a)) \\\\\n&= x_i x_j + \\frac{1}{2}(x_i + x_j)(a + b) + ab,\n\\end{align*}\n$$\nso\n$$\n\\begin{align*}\nF &\\le \\sum_{1 \\le i < j \\le n} x_i x_j + \\frac{a+b}{2} \\sum_{1 \\le i < j \\le n} (x_i + x_j) + C_n^2 \\cdot ab \\\\\n&= \\frac{1}{2} \\left[ \\left( \\sum_{i=1}^n x_i \\right)^2 - \\sum_{i=1}^n x_i^2 \\right] + \\frac{a+b}{2} (n-1) \\sum_{i=1}^n x_i + C_n^2 \\cdot ab \\\\\n&= \\frac{1}{2} \\left( 1 - \\sum_{i=1}^n x_i^2 \\right) + \\frac{n-1}{2} (a+b) + C_n^2 \\cdot ab \\\\\n&\\le \\frac{1}{2} \\left( 1 - \\frac{1}{n} \\left( \\sum_{i=1}^n x_i \\right)^2 \\right) + \\frac{n-1}{2} (a+b) + C_n^2 \\cdot ab \\\\\n&= \\frac{1}{2} \\left( 1 - \\frac{1}{n} \\right) + \\frac{n-1}{2} (a+b) + \\frac{n(n-1)}{2} ab \\\\\n&= \\frac{n-1}{2} \\left( \\frac{1}{n} + a + b + nab \\right).\n\\end{align*}\n$$\nThe equality holds when $x_1 = x_2 = \\cdots = x_n = \\frac{1}{n}$. So the maximum of $F$ is $\\frac{n-1}{2} \\left( \\frac{1}{n} + a + b + nab \\right)$.\n\n---\n\nWe sh"
+ },
+ {
+  "mathnet_id": "0c28",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "根与系数",
+   "复数与三角",
+   "不等式"
+  ],
+  "contest": "69th Romanian Mathematical Olympiad - Final Round",
+  "problem": "Let $n$ be a natural number with $n \\ge 2$. For any real numbers $a_1, a_2, \\dots, a_n$, we denote $S_0 = 1$ and define $S_k$ by\n$$\nS_k = \\sum_{1 \\le i_1 < i_2 < \\dots < i_k \\le n} a_{i_1} a_{i_2} \\dots a_{i_k},\n$$\nthat is, the sum of all products of any $k$ numbers chosen among $a_1, a_2, \\dots, a_n$, $k \\in \\{1, 2, \\dots, n\\}$.\nFind the number of all $n$-tuples $(a_1, a_2, \\dots, a_n)$ for which the following relation holds:\n$$\n(S_n - S_{n-2} + S_{n-4} - \\dots)^2 + (S_{n-1} - S_{n-3} + S_{n-5} - \\dots)^2 = 2^n S_n.\n$$",
+  "solution_head": ""
+ }
+]

@@ -1,0 +1,79 @@
+[
+ {
+  "mathnet_id": "0kew",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "立体几何",
+   "解析几何与向量复数法"
+  ],
+  "contest": "HMMO",
+  "problem": "Problem:\nA sphere is centered at a point with integer coordinates and passes through the three points $(2,0,0)$, $(0,4,0)$, $(0,0,6)$, but not the origin $(0,0,0)$. If $r$ is the smallest possible radius of the sphere, compute $r^{2}$.",
+  "solution_head": "Solution: Let $(x, y, z)$ be the center of the sphere. By the given condition, we have\n$$\n(x-2)^{2} + y^{2} + z^{2} = x^{2} + (y-4)^{2} + z^{2} = x^{2} + y^{2} + (z-6)^{2}.\n$$\nSubtracting $x^{2} + y^{2} + z^{2}$ yields\n$$\nx^{2} - (x-2)^{2} = y^{2} - (y-4)^{2} = z^{2} - (z-6)^{2},\n$$\nor\n$$\n4(x-1) = 8(y-2) = 12(z-3)\n$$\nTherefore $(x-1, y-2, z-3)$ must be $(6t, 3t, 2t)$ for some integer $t$. Checking small values of $t$ yields that the possibilities for $(x, y, z)$ closest to $(2,0,0)$ are $(-5,-1,1)$, $(1,2,3)$, and $(7,5,5)$. The second yields a sphere that passes through the origin and is thus forbidden. The other two yield $r^{2} = 51$ and $r^{2} = 75$, so 51 is the answer."
+ },
+ {
+  "mathnet_id": "0igp",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "立体几何"
+  ],
+  "contest": "Harvard-MIT Mathematics Tournament",
+  "problem": "Problem:\nA cube with side length $2$ is inscribed in a sphere. A second cube, with faces parallel to the first, is inscribed between the sphere and one face of the first cube. What is the length of a side of the smaller cube?",
+  "solution_head": "Solution:\nFirst note that the long diagonal of the cube has length $2\\sqrt{3}$, so the radius of the sphere is $\\sqrt{3}$. Let $x$ be the side length of the smaller cube. Then the distance from the center of the sphere to the far face of the smaller cube is $1 + x$, while the distance from the center of the far face to a vertex lying on the sphere is $\\frac{x\\sqrt{2}}{2}$. Therefore, the square of the radius is\n$$\n3 = (1 + x)^2 + \\frac{x^2}{2},\n$$\nor\n$$\n3x^2 + 4x - 4 = (3x - 2)(x + 2) = 0,\n$$\nso $x = \\frac{2}{3}$."
+ },
+ {
+  "mathnet_id": "04e6",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "立体几何"
+  ],
+  "contest": "Mathematica competitions in Croatia",
+  "problem": "From $n^3$ unit cubes Ivica assembled a large cube with edge length $n$ and then he coloured some of the six sides of the large cube. When he disassembled the large cube, he found that exactly $1000$ unit cubes don't have any coloured side. Show that this is indeed possible and determine the number of sides of the large cube that Ivica coloured.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0jcd",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "立体几何",
+   "圆与四点共圆",
+   "不等式"
+  ],
+  "contest": "Harvard-MIT Mathematics Tournament",
+  "problem": "Problem:\n\nFive points are chosen on a sphere of radius $1$. What is the maximum possible volume of their convex hull?",
+  "solution_head": "Solution:\n\nAnswer: $\\sqrt{3}/2$\n\nLet the points be $A$, $B$, $C$, $X$, $Y$ so that $X$ and $Y$ are on opposite sides of the plane defined by triangle $ABC$. The volume is $1/3$ the product of the area of $ABC$ and the sum of the distances from $X$ and $Y$ to the plane defined by $ABC$.\n\nThe area of $ABC$ is maximized when the plane containing it intersects the sphere in the largest possible cross section, and $ABC$ is equilateral: this gives an area of $3\\sqrt{3}/4$.\n\nThen, the sum of the distances from $X$ and $Y$ to the plane of $ABC$ is at most $2$. This is clearly obtainable when $A$, $B$, and $C$ form an equilateral triangle circumscribed by the equator of the sphere, and $X$ and $Y$ are at the poles, and we get a volume of $\\sqrt{3}/2$."
+ },
+ {
+  "mathnet_id": "0cj7",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "解析几何与向量复数法",
+   "立体几何"
+  ],
+  "contest": "75th NMO",
+  "problem": "Let $ABCD$ be a square with side length $1$.\n\na) Prove that there is no point $M$ in the plane of the square such that the lengths of the segments $MA$, $MB$, $MC$, and $MD$ are natural numbers.\n\nb) Find the points $M$ in space such that the lengths of the segments $MA$, $MB$, $MC$, and $MD$ are natural numbers.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "09l9",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "立体几何",
+   "解析几何与向量复数法"
+  ],
+  "contest": "Mongolian Mathematical Olympiad",
+  "problem": "Consider a sphere and two of its tangent planes in space. Prove that the center of a sphere tangent to all three lies on a fixed ellipse.",
+  "solution_head": "The problem is clear if the two planes are parallel, thus we assume that they intersect on line $l$. Let $r$ denote the radius of the sphere and let $O$ denote the center of the sphere. Let $a > r$ denote the distance from $O$ to $l$.\n\nA sphere with center $P$ and radius $s$ satisfies the condition of the problem iff\n$$\nr + s = OP \\quad \\text{and} \\quad \\frac{r}{a} = \\frac{s}{b}.\n$$\nWe may assume that $r = 1$. Consider a coordinate system where $l$ is the $x$-axis and $O(0, a, 0)$. Then $P(x, y, z)$ satisfies $y = b > 0$ and $z = 0$. Since $a > 1$, the equation\n$$\nx^2 + (y - a)^2 = \\left(1 + \\frac{y}{a}\\right)^2\n$$\ngives an ellipse."
+ }
+]
