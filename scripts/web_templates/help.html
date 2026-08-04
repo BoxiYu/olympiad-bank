@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% set nav = 'help' %}
+{% block title %}怎么练 · 奥数训练台{% endblock %}
+{% block content %}
+
+<h1>这个系统怎么练</h1>
+<p class="sub">一页说清楚。看完就知道每个按钮为什么长这样。</p>
+
+<section class="card">
+  <h2>一次训练的五步</h2>
+  <ol class="steps">
+    <li><strong>开始做</strong>：从「今天要做的题」里挑一道，点「开始做」，计时开始。页面上只有题目，看不到答案。</li>
+    <li><strong>纸笔限时做</strong>：收起其他资料，在限时内自己做。超时不会打断你，但会记进日志。</li>
+    <li><strong>卡住了看提示</strong>：提示是一条一条给的，一条比一条具体。看完一条建议再自己想 {{ cooldown }} 分钟再看下一条。</li>
+    <li><strong>实在不会才看答案</strong>：看了答案会记进日志，撤不回来。看完要合上答案，在纸上重新写一遍完整证明。</li>
+    <li><strong>登记结果</strong>：如实选这次做得怎么样。系统据此安排哪天把这道题排回来复习。</li>
+  </ol>
+</section>
+
+<section class="card">
+  <h2>为什么提示要一条一条看</h2>
+  <p class="sub">一道好题的价值在于你卡住的那段时间。直接看答案，题就废了；而分级提示能让你在「差一点就想到」的地方
+    拿到刚好够用的一句话。三条提示分别是：指方向、给关键结构、临门一脚。</p>
+  <p class="sub">系统<strong>不会阻止</strong>你提前看提示或提前看答案——它只是记一笔「提前看的」。
+    这不是扣分，是给教练看你在什么时候需要帮助。</p>
+</section>
+
+<section class="card">
+  <h2>四种结果，和它们决定的复习时间</h2>
+  <p class="sub">登记结果时选哪一个，直接决定这道题多久以后再出现。选宽松了，等于骗自己少复习。</p>
+  <div class="qlist">
+    {% for label, desc, days in results %}
+    <div class="qrow">
+      <span class="qid" style="min-width:8em">{{ label }}</span>
+      <span class="qtitle">{{ desc }}</span>
+      <span class="tag">{{ days }} 天后复习</span>
+    </div>
+    {% endfor %}
+  </div>
+  <p class="sub">同一道题<strong>连着 {{ graduate }} 次「独立完成」就出师了</strong>，永远不再排复习。</p>
+</section>
+
+<section class="card">
+  <h2>限时是怎么定的</h2>
+  <p class="sub">按题目难度定，对标真实赛制：</p>
+  <p class="sub">{% for d, m in limits %}★{{ d }} ≤ {{ m }} 分钟{% if not loop.last %} · {% endif %}{% endfor %}</p>
+</section>
+
+<section class="card">
+  <h2>做错了怎么办</h2>
+  <p class="sub">一次没做出来不是终点，是一组安排的起点：当天看解法、合上重写一遍、记下卡在哪一步；
+    过两天这道题会自己回到「今天要做的题」，从零重做。教练还可能给你一道<strong>同类题</strong>，
+    检验你能不能把刚学的方法用到新场景里。</p>
+  <p class="sub">「卡在哪一步」这一问很值钱：它区分了「读不懂题」和「想到了写不出来」，
+    这两种情况该补的东西完全不同。</p>
+</section>
+
+<p style="margin:18px 0"><a class="btn primary" href="/">回到今天要做的题</a></p>
+
+{% endblock %}

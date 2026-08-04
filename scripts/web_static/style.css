@@ -59,9 +59,23 @@ a:hover { text-decoration: underline; }
 .wrap { width: min(860px, 100% - 32px); margin: 22px auto; flex: 1; }
 .foot { text-align: center; color: var(--ink-mut); font-size: 12px; padding: 18px 16px 26px; }
 
-.flash { border-radius: 10px; padding: 11px 14px; margin-bottom: 14px; font-size: 14px; }
+.flash { border-radius: 10px; padding: 11px 14px; margin-bottom: 14px; font-size: 14px; line-height: 1.6; }
 .flash.err { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger); }
 .flash.ok { background: var(--ok-bg); color: var(--ok-ink); }
+/* 中性档：正常的流程提示（「这卷已经结束了」），不该让学生以为自己犯了错 */
+.flash.info { background: var(--surface-1); color: var(--ink-1); border: 1px solid var(--grid); }
+
+/* 键盘可达性：全站可见焦点环 + 跳到正文 */
+:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.skip {
+  position: absolute; left: -9999px; top: 8px; z-index: 100;
+  background: var(--accent); color: #fff; padding: 9px 16px; border-radius: 8px;
+}
+.skip:focus { left: 12px; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
 
 .card {
   background: var(--surface-1); border: 1px solid var(--border); border-radius: 14px;
@@ -86,8 +100,9 @@ h3 { font-size: 14.5px; margin: 16px 0 8px; color: var(--ink-2); }
 .btn.big { font-size: 16px; padding: 11px 22px; border-radius: 12px; }
 .btn.danger { color: var(--danger); border-color: var(--danger); background: transparent; }
 .btn.danger:hover { background: var(--danger-bg); }
-.btn.ghost { color: var(--ink-mut); border-color: transparent; }
+.btn.ghost { color: var(--ink-2); border-color: transparent; }
 .btn.ghost:hover { border-color: var(--grid); }
+.btn.small { padding: 6px 12px; font-size: 13px; }
 .btn:disabled { opacity: .5; cursor: default; }
 
 .stats-line { color: var(--ink-2); font-size: 14px; margin: 4px 2px 16px; }
@@ -99,16 +114,21 @@ h3 { font-size: 14.5px; margin: 16px 0 8px; color: var(--ink-2); }
 .cel-facts { margin: 12px 0 0 4px; padding-left: 18px; line-height: 1.9; font-size: 14.5px; }
 .continue { border-color: var(--accent); }
 
-.qlist { display: flex; flex-direction: column; gap: 6px; margin: 8px 0 18px; }
+.qlist { display: flex; flex-direction: column; gap: 6px; margin: 8px 0 18px; list-style: none; padding: 0; }
 .qrow {
   display: flex; align-items: center; gap: 10px; padding: 9px 12px;
   border: 1px solid var(--grid); border-radius: 10px; font-size: 14px;
   flex-wrap: wrap;
 }
-.stars { color: var(--accent-deep); letter-spacing: 1px; white-space: nowrap; }
-.qid { font-weight: 700; font-family: ui-monospace, Menlo, monospace; white-space: nowrap; }
-.qtitle { flex: 1 1 40%; min-width: 0; }
-.qmeta { color: var(--ink-mut); font-size: 12.5px; min-width: 0; overflow-wrap: anywhere; }
+.stars { color: var(--accent-deep); letter-spacing: 1px; white-space: nowrap; flex: none; }
+.qid { font-weight: 700; font-family: ui-monospace, Menlo, monospace; white-space: nowrap; flex: none; }
+.qtitle { flex: 1 1 auto; min-width: 6em; }
+/* 来源赛名最长且最不重要：给死上限让省略号生效，别把标签和按钮挤到下一行
+   （flex-wrap 下浏览器先换行后收缩，只靠 flex-shrink 拦不住超长赛名） */
+.qmeta { color: var(--ink-mut); font-size: 12.5px; flex: 0 1 auto; min-width: 0; max-width: 17em;
+         overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qrow .tag { flex: none; }
+.qrow form { flex: none; margin-left: auto; }
 .tag {
   border: 1px solid var(--grid); border-radius: 999px; padding: 2px 9px;
   font-size: 12px; color: var(--ink-2); white-space: nowrap; background: var(--surface-1);
@@ -126,6 +146,8 @@ details summary { cursor: pointer; user-select: none; }
   padding: 8px 10px; border: 1px solid var(--grid); border-radius: 8px;
   background: var(--surface-1); color: var(--ink-1); font-size: 14px; width: 130px;
 }
+/* 赛事选项带星级区间与可排题数，需要放得下整行 */
+.plan-form select { width: auto; min-width: 260px; max-width: 100%; }
 
 /* 会话页 */
 .sess-head { display: flex; justify-content: space-between; align-items: start; gap: 16px; margin-bottom: 14px; flex-wrap: wrap; }
@@ -146,10 +168,14 @@ details summary { cursor: pointer; user-select: none; }
 /* 收卷页 */
 .finish-form h2 { margin-top: 18px; }
 .finish-form h2:first-child { margin-top: 0; }
+.finish-form fieldset { border: none; padding: 0; margin: 0; }
+.finish-form legend { padding: 0; }
+.finish-form legend h2 { margin-top: 18px; }
+.finish-form fieldset:first-of-type legend h2 { margin-top: 0; }
 .opt-list { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
 .opt {
   display: flex; gap: 12px; align-items: start; border: 1px solid var(--grid);
-  border-radius: 10px; padding: 11px 14px; cursor: pointer;
+  border-radius: 10px; padding: 13px 14px; cursor: pointer; min-height: 44px;
 }
 .opt:hover { border-color: var(--accent); }
 .opt:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
@@ -162,9 +188,39 @@ textarea {
   color: var(--ink-1); padding: 10px 12px; font-size: 14px; font-family: inherit; resize: vertical;
 }
 .finish-actions { margin-top: 18px; }
+.rare { margin-top: 4px; }
+.rare summary { color: var(--ink-mut); font-size: 13px; }
+.rare .opt { opacity: .72; }
 
-/* 长公式块（KaTeX display）在窄屏自己横向滚动，不撑破页面 */
+/* 长公式（KaTeX）在窄屏自己横向滚动，不撑破页面 */
 .md .katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }
+.md .katex { max-width: 100%; }
+
+/* 首次使用引导 */
+.welcome, .highlight { border-color: var(--accent); }
+.steps { margin: 12px 0 4px 22px; line-height: 2; font-size: 14.5px; }
+.sub.tip { background: var(--warn-bg); color: var(--warn-ink); border-radius: 8px; padding: 9px 12px; margin-top: 10px; }
+.errdetail { margin-top: 14px; }
+.errdetail pre { background: var(--page); border: 1px solid var(--grid); border-radius: 8px; padding: 10px 12px; overflow-x: auto; font-size: 12.5px; margin-top: 8px; }
+
+/* 刚解锁的提示 / 刚亮出的答案：短暂高亮，让学生看见「点了有反应」 */
+@keyframes ob-flash { from { background: var(--accent-soft); } to { background: transparent; } }
+.just-unlocked { animation: ob-flash 1.6s ease-out; }
+@media (prefers-reduced-motion: reduce) { .just-unlocked { animation: none; } }
+.hint-card:focus, .solution:focus { outline: none; }
+
+/* 打印：只出题目，去掉一切操作控件（学生要拿纸笔做题） */
+@media print {
+  .topbar, .foot, .flash, .timer, .discipline, .sess-actions, .skip,
+  .hint-card, #hintForm, .solution, .card:not(.statement):not(.sess-head),
+  #printBtn, noscript { display: none !important; }
+  body, .card, .wrap { background: #fff; color: #000; }
+  .wrap { width: 100%; margin: 0; }
+  .card { border: none; padding: 0; }
+  .sess-head { display: block; margin-bottom: 12px; }
+  .md { font-size: 12pt; line-height: 1.9; }
+  a[href]::after { content: ''; }
+}
 
 @media (max-width: 620px) {
   .wrap { width: calc(100% - 20px); margin: 16px auto; }
@@ -181,6 +237,10 @@ textarea {
   .sess-actions { flex-direction: column-reverse; align-items: stretch; }
   .sess-actions .btn { text-align: center; }
 }
+
+/* 只有 JS 可用时才有意义的控件（打印、主题切换）：无 JS 时不显示，别做死按钮 */
+.js-only { display: none; }
+.has-js .js-only { display: inline-block; }
 
 /* 就地二次确认的待确认态（替代原生 confirm，见 app.js armConfirm）*/
 .btn.armed {
