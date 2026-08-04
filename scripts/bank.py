@@ -20,6 +20,7 @@ CATEGORIES = ['algebra', 'number-theory', 'combinatorics', 'geometry']
 PREFIX = {'algebra': 'A', 'number-theory': 'N', 'combinatorics': 'C', 'geometry': 'G'}
 REQUIRED = ['id', 'title', 'category', 'source_ref', 'difficulty', 'topics', 'verification', 'source_url']
 SECTIONS = ['## 题面', '## 答案', '## 解法要点']
+MIN_DIFFICULTY = 2  # 学段下界：本库只收初中+高中，★1 为小学/低龄档不入库（语义正本 SPEC §4）
 
 
 def load_all():
@@ -71,6 +72,9 @@ def lint(problems):
             errors.append(f'{rel}: id 前缀与目录 {p["cat"]} 不匹配')
         if not isinstance(fm.get('difficulty'), int) or not 1 <= fm['difficulty'] <= 5:
             errors.append(f'{rel}: difficulty 必须是 1-5 的整数')
+        elif fm['difficulty'] < MIN_DIFFICULTY:  # 学段下界正本：SPEC §4（初中+高中，★1 是小学档）
+            errors.append(f'{rel}: difficulty {fm["difficulty"]} 低于学段下界 ★{MIN_DIFFICULTY}'
+                          f'——本库只收初中与高中，★1 不入库（SPEC §4）')
         url = str(fm.get('source_url', ''))
         if not url.startswith('http'):
             errors.append(f'{rel}: source_url 不是链接')
