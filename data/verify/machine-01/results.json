@@ -1,0 +1,106 @@
+[
+ {
+  "id": "A-002",
+  "mathnet_id": "0bcs",
+  "status": "pass",
+  "method": "sympy 验证 (x-1)²(x²+x+1) 因式分解与判别式<0，等式链强制每项为零 ⟹ 唯一解 (1,1,1)",
+  "script": "scripts/checks/check_machine_01.py",
+  "checked_at": "2026-08-04"
+ },
+ {
+  "id": "A-003",
+  "mathnet_id": "0grz",
+  "status": "pass",
+  "method": "sympy 精确解 x=y 截线 == 答案两解；25×25 数值网格排查未见约束域内其他根",
+  "script": "scripts/checks/check_machine_01.py",
+  "checked_at": "2026-08-04"
+ },
+ {
+  "id": "A-005",
+  "mathnet_id": "0i5m",
+  "status": "pass",
+  "method": "sympy 符号积分 ∫₀^(1/√2)(arccos−arcsin) = 2 - sqrt(2)，与 2−√2 恒等",
+  "script": "scripts/checks/check_machine_01.py",
+  "checked_at": "2026-08-04"
+ },
+ {
+  "id": "A-012",
+  "mathnet_id": "0am1",
+  "status": "pass",
+  "method": "sympy .equals(4) 符号判定 + 50 位精度数值 |expr−4|<1e-45",
+  "script": "scripts/checks/check_machine_01.py",
+  "checked_at": "2026-08-04"
+ },
+ {
+  "id": "A-022",
+  "mathnet_id": "0931",
+  "status": "pass",
+  "method": "见证点 (-1/3)³ 比值精确 = 9/10；约束面 2 万次播种采样无超界（分母<1e-6 的奇点邻域除外）",
+  "script": "scripts/checks/check_machine_01.py",
+  "checked_at": "2026-08-04"
+ },
+ {
+  "id": "A-026",
+  "mathnet_id": "03wf",
+  "status": "pass",
+  "method": "极端射线枚举 n≤40：最小比值恰为 n(n+1)²/4（全 1 序列取等）；2000 条随机凹序列无反例",
+  "script": "scripts/checks/check_machine_01.py",
+  "checked_at": "2026-08-04"
+ },
+ {
+  "id": "A-030",
+  "mathnet_id": "0gy1",
+  "status": "pass",
+  "method": "数论侧 n²|6027 与数值侧 n≤100 高精度周期检验双实现互证，均得 {1,7}",
+  "script": "scripts/checks/check_machine_01.py",
+  "checked_at": "2026-08-04"
+ },
+ {
+  "id": "C-005",
+  "mathnet_id": "0kx9",
+  "status": "pass",
+  "method": "6⁵=7776 全枚举：360/7776 = 5/108，对照 5/108",
+  "script": "scripts/checks/check_machine_01.py",
+  "checked_at": "2026-08-04"
+ },
+ {
+  "id": "C-010",
+  "mathnet_id": "02p9",
+  "status": "pass",
+  "method": "24 阶旋转群 Burnside=10 与轨道全枚举=10 双实现互证，对照 10",
+  "script": "scripts/checks/check_machine_01.py",
+  "checked_at": "2026-08-04"
+ },
+ {
+  "id": "C-014",
+  "mathnet_id": "0fij",
+  "status": "pass",
+  "method": "27 个数字和的分布逐一统计：最坏 52 张不出三同和，故答案 53，对照 53",
+  "script": "scripts/checks/check_machine_01.py",
+  "checked_at": "2026-08-04"
+ },
+ {
+  "id": "C-015",
+  "mathnet_id": "05ds",
+  "status": "pass",
+  "method": "n=2..5 全排列初始态 × 记忆化最长路径穷举，最大收入均等于 2ⁿ−n−1",
+  "script": "scripts/checks/check_machine_01.py",
+  "checked_at": "2026-08-04"
+ },
+ {
+  "id": "C-038",
+  "mathnet_id": "0kld",
+  "status": "pass",
+  "method": "策略投票递推 S(2020)=1023（稳定态均为 2^k−1：[1, 3, 7, 15, 31, 63]…），对照 1023",
+  "script": "scripts/checks/check_machine_01.py",
+  "checked_at": "2026-08-04"
+ },
+ {
+  "id": "G-005",
+  "mathnet_id": "082n",
+  "status": "pass",
+  "method": "C(20,2)−30−60 = 100（V−E+F=2 校验通过），对照 100",
+  "script": "scripts/checks/check_machine_01.py",
+  "checked_at": "2026-08-04"
+ }
+]

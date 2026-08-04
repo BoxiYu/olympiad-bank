@@ -19,6 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | embedding 索引 | `uv run --group similar python scripts/similar_index.py ...` |
 | 候选池全量索引（两组叠加） | `uv run --group similar --group mathnet python ...` |
 | 一次性核验脚本 | `uv run --with sympy python scripts/verify/...`（sympy 刻意不设组） |
+| 持续机器核验（CI 同款） | `uv run --with sympy python scripts/checks/run_checks.py`（`scripts/verify/` 是退役史料，别混） |
 
 `mathnet_review.py` 的三步依赖组不对称：`batch` 要 `--group mathnet`（读数据集），
 `dispatch` / `merge` 不要。其余 `bank.py` 子命令用 `uv run python scripts/bank.py ...` 即可。

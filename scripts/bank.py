@@ -58,6 +58,23 @@ def _verdict_ids(ref):
     return _VERDICT_CACHE[ref]
 
 
+_MACHINE_CACHE = {}
+
+
+def _machine_status(ref):
+    """machine_check_ref（仓库相对路径）→ {题号: status}；缺失/不可解析 → None。
+    机制正本在 scripts/checks/run_checks.py 头注；lint 只查凭证覆盖，重跑核验归 CI。"""
+    if ref not in _MACHINE_CACHE:
+        import json
+        try:
+            rows = json.load(open(os.path.join(ROOT, ref), encoding='utf-8'))
+            _MACHINE_CACHE[ref] = {str(r.get('id')): r.get('status')
+                                   for r in rows if isinstance(r, dict)}
+        except (OSError, ValueError):
+            _MACHINE_CACHE[ref] = None
+    return _MACHINE_CACHE[ref]
+
+
 def lint(problems):
     errors = []
     seen = {}
@@ -106,6 +123,15 @@ def lint(problems):
                     errors.append(f'{rel}: review_ref 指向的评审凭证不存在或无法解析：{ref}')
                 elif mid and mid not in ids:
                     errors.append(f'{rel}: 评审凭证 {ref} 未覆盖 mathnet_id={mid}——「数据集声称≠已核验」')
+        # 机器核验凭证（可选字段）：挂了 machine_check_ref 的题，台账必须真实覆盖且为 pass。
+        # 凭证是否「仍真」由 CI 重跑 scripts/checks/run_checks.py 保证——lint 不执行核验代码。
+        mref = str(fm.get('machine_check_ref') or '')
+        if mref:
+            mst = _machine_status(mref)
+            if mst is None:
+                errors.append(f'{rel}: machine_check_ref 指向的核验台账不存在或无法解析：{mref}')
+            elif mst.get(pid) != 'pass':
+                errors.append(f'{rel}: 核验台账 {mref} 未覆盖 {pid} 或状态非 pass——裸声明不被信任')
         for s in SECTIONS:
             if s not in p['body']:
                 errors.append(f'{rel}: 缺少小节 {s}')
