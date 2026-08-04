@@ -14,15 +14,15 @@
    - Windows：打开 PowerShell，粘贴运行 `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
 2. **下载本项目**：仓库页绿色 Code 按钮 → Download ZIP，解压到任意位置（或 `git clone`）。
 
-日常使用（三选一，效果相同）：
+日常使用（三选一，效果相同——都通向浏览器训练台）：
 
 - macOS 双击 [开始.command](开始.command)（首次被系统拦截时：右键 → 打开）；
 - Windows 双击 [开始.bat](开始.bat)；
-- 终端：`uv run python scripts/menu.py`。
+- 终端：`uv run python scripts/bank.py web`。
 
-首次运行会自动下载 Python 环境与依赖（联网等几分钟），之后日常训练离线可用。
-菜单覆盖学生训练全流程（开卡/提示/看解/收卡/复习）与教练动作（周计划/能力图）；
-训练纪律的一页纸在 [docs/学生手册.md](docs/学生手册.md)。
+训练台覆盖学生全流程（今日队列/开卡计时/逐级提示/收卷登记）；无浏览器环境可用
+`uv run python scripts/menu.py` 的终端菜单。首次运行会自动下载 Python 环境与依赖
+（联网等几分钟）。训练纪律的一页纸在 [docs/学生手册.md](docs/学生手册.md)。
 
 ## 读者路由
 
