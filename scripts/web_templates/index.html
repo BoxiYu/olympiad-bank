@@ -1,26 +1,96 @@
 {% extends 'base.html' %}
 {% set nav = 'home' %}
+{% macro qlist(items, open) %}
+<ul class="qlist">
+  {% for it in items %}
+  <li class="qrow">
+    <span class="stars" title="难度 {{ it.difficulty }} 星">{{ it.stars }}</span>
+    <span class="qid">{{ it.id }}</span>
+    <span class="qtitle">{{ it.title }}</span>
+    <span class="qmeta">{{ it.contest }} {{ it.year }}</span>
+    <span class="tag {% if it.kind == 'review' %}due{% endif %}">{{ it.tag }}</span>
+    {% if it.limit %}<span class="tag">限时 {{ it.limit }} 分钟</span>{% endif %}
+    <form method="post" action="/start" {% if open %}class="switch-form"{% endif %}>
+      <input type="hidden" name="pid" value="{{ it.id }}">
+      {% if open %}
+      <input type="hidden" name="abandon" value="1">
+      <button class="btn small" type="submit"
+              data-confirm="现在这道没做完的题（{{ open.pid }}）会作废、不留记录，改做 {{ it.id }}。确定吗？"
+              aria-label="放弃 {{ open.pid }}，改做 {{ it.id }} {{ it.title }}">换成这道</button>
+      {% else %}
+      <button class="btn" type="submit" title="点了就开始计时，页面上只有题目、没有答案"
+              aria-label="开始做 {{ it.id }} {{ it.title }}">开始做</button>
+      {% endif %}
+    </form>
+  </li>
+  {% endfor %}
+</ul>
+{% endmacro %}
+
+
+{% macro plan_form(targets, recommended, plan, first_run) %}
+<section class="card {% if first_run %}highlight{% endif %}">
+  <details {% if first_run %}open{% endif %}>
+    <summary><h2 class="inline">{% if first_run %}🚀 第一步：排出这周要做的题{% else %}🧭 重新排一份本周题单（教练用）{% endif %}</h2></summary>
+
+    {% if plan %}
+    <p class="warn-line">⚠️ 重新排会替换掉当前这份题单，已经排好、还没做的题会被清空
+      （已经做过的记录不受影响）。</p>
+    {% endif %}
+
+    <form method="post" action="/plan" class="plan-form">
+      <label>目标赛事（决定题目难度）
+        <select name="target">
+          {% for t in targets %}
+          <option value="{{ t.name }}"
+            {% if (plan and plan.target == t.name) or (not plan and t.recommended) %}selected{% endif %}>
+            {{ t.name }} · {{ t.stars }} · {{ t.hint }} · 本库可排 {{ t.avail }} 题{% if t.recommended %}（推荐）{% endif %}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>这周排几题
+        <input type="number" name="n" value="10" min="3" max="20">
+      </label>
+      <label>换一批（一般不用填）
+        <input type="number" name="seed" placeholder="留空即可">
+      </label>
+      <button class="btn primary" type="submit">排出这周的题单</button>
+    </form>
+
+    <p class="sub">不确定选哪个？先选 <strong>{{ recommended }}</strong>。做两三周后看「独立完成」的比例，再决定要不要往上调。
+      按目标赛事的难度配比挑题；做过的题走复习，已经出师的题不再排进来。</p>
+  </details>
+</section>
+{% endmacro %}
+
+
 {% block content %}
 
 {% if summary %}
 <section class="card celebrate">
   <div class="cel-head">
-    {% if summary.graduated_now %}<span class="cel-emoji">🎓</span>{% elif summary.result == 'independent_ok' %}<span class="cel-emoji">🏆</span>{% elif summary.result == 'fail' %}<span class="cel-emoji">📚</span>{% else %}<span class="cel-emoji">✅</span>{% endif %}
+    {% if summary.graduated_now %}<span class="cel-emoji" aria-hidden="true">🎓</span>
+    {% elif summary.result == 'independent_ok' %}<span class="cel-emoji" aria-hidden="true">🏆</span>
+    {% elif summary.result == 'fail' %}<span class="cel-emoji" aria-hidden="true">📚</span>
+    {% else %}<span class="cel-emoji" aria-hidden="true">✅</span>{% endif %}
     <div>
-      <h2>{{ summary.pid }} 已落账：{{ summary.label }}</h2>
-      <p class="sub">{{ summary.title }} · 用时 {{ summary.time_min }} 分钟 · 提示 {{ summary.rec.hints | length }} 级</p>
+      <h2>{{ summary.pid }} 已登记：{{ summary.label }}</h2>
+      <p class="sub">{{ summary.title }} · 用时 {{ summary.time_min }} 分钟 · 用了 {{ summary.rec.hints | length }} 条提示</p>
     </div>
   </div>
   <ul class="cel-facts">
     {% if summary.graduated_now %}
-      <li>🎉 连续 {{ graduate_streak }} 次独立完成——本题<strong>毕业</strong>，永久退出复习队列！</li>
+      <li>🎉 连着两次自己做出来了——这道题<strong>出师了</strong>，以后不会再排复习。</li>
     {% elif summary.graduated_before %}
-      <li>本题已毕业，这次是加练，不再排复习。</li>
+      <li>这道题已经出师了，这次是加练，不再排复习。</li>
     {% else %}
-      <li>下次复习：<strong>{{ summary.next_review }}</strong>（{{ summary.interval }} 天后，开卡时会自动排进队列）</li>
+      <li>下次复习：<strong>{{ summary.next_review }}</strong>（{{ summary.interval }} 天后自动排进「今天要做的题」）</li>
     {% endif %}
-    <li>本周已完成 {{ summary.week_count }} 次攻坚 · 连击 {{ summary.streak }} 天{% if summary.streak >= 3 %} 🔥{% endif %}</li>
-    {% if summary.result == 'fail' %}<li>fail 不是终点：本题 2 天后会自动回到复习队列，从零重做。</li>{% endif %}
+    <li>本周做完 {{ summary.week_count }} 题 · 已连续训练 {{ summary.streak }} 天{% if summary.streak >= 3 %} 🔥{% endif %}</li>
+    {% if summary.result == 'fail' and summary.interval %}
+      <li>这次没做出来很正常。这道题 {{ summary.interval }} 天后会回到「今天要做的题」，到时候从头再做一遍。</li>
+    {% endif %}
   </ul>
 </section>
 {% endif %}
@@ -29,97 +99,79 @@
 <section class="card continue">
   <div class="row-flex">
     <div>
-      <h2>进行中的会话：{{ open.pid }}</h2>
-      <p class="sub">{{ open.title }} · 已进行 {{ open.elapsed_min }} 分钟{% if open.limit %}（限时 {{ open.limit }} 分钟）{% endif %}</p>
+      <h2>还有一道题没做完：{{ open.pid }}</h2>
+      <p class="sub">{{ open.title }} · 已经做了 {{ open.elapsed_min }} 分钟{% if open.limit %}（限时 {{ open.limit }} 分钟）{% endif %}</p>
     </div>
-    <a class="btn primary big" href="/session">继续攻坚 →</a>
+    <a class="btn primary big" href="/session">接着做 →</a>
   </div>
+  <p class="sub">想换一道？在下面的列表里点「换成这道」——那道没做完的会作废，不留记录。</p>
 </section>
 {% endif %}
 
-<section class="stats-line">
-  本周已完成 <strong>{{ week_count }}</strong> 次攻坚 · 连击 <strong>{{ streak }}</strong> 天{% if streak >= 3 %} 🔥{% endif %} · 累计 {{ n_attempts }} 条训练记录
+{% if first_run %}
+<section class="card welcome">
+  <h2>👋 第一次来</h2>
+  <p class="sub">这里是你的数学训练台：每周给你一份题单，一次做一道、全程计时；卡住可以一条一条看提示，
+    做完登记结果，系统会自己安排哪天把这道题排回来复习。按下面三步就能开始。</p>
+  <ol class="steps">
+    <li>选一个目标赛事</li>
+    <li>排出这周要做的题</li>
+    <li>点「开始做」，拿纸笔限时做一道</li>
+  </ol>
+  <p class="sub">想先了解为什么这么练（提示为什么要一条一条看、复习怎么排），看看 <a href="/help">怎么练</a>。</p>
 </section>
+{% else %}
+<section class="stats-line">
+  本周做完 <strong>{{ week_count }}</strong> 题 · 已连续训练 <strong>{{ streak }}</strong> 天{% if streak >= 3 %} 🔥{% endif %} · 累计 {{ n_attempts }} 条训练记录
+</section>
+{% endif %}
+
+{% if first_run %}{{ plan_form(targets, recommended, plan, first_run) }}{% endif %}
 
 <section class="card">
   <div class="row-flex">
-    <h2>今日队列</h2>
-    {% if first_pid and not open %}
+    <h2>今天要做的题</h2>
+    {% if first and not open %}
     <form method="post" action="/start">
-      <input type="hidden" name="pid" value="{{ first_pid }}">
-      <button class="btn primary big" type="submit">▶ 开始训练</button>
+      <input type="hidden" name="pid" value="{{ first.id }}">
+      <button class="btn primary big" type="submit">▶ 开始做 {{ first.id }}（{{ first.stars }}{% if first.limit %}，限时 {{ first.limit }} 分钟{% endif %}）</button>
     </form>
     {% endif %}
   </div>
-  <p class="sub">顺序：到期复习优先，其次本周计划。开卡后计时开始，题卡上只有题面——没有答案。</p>
+  {% if open %}
+  <p class="sub">你有一道题还没做完，上面可以接着做。想换一道，就在下面点那一行的「换成这道」——
+    没做完的那道会作废、不留记录。</p>
+  {% else %}
+  <p class="sub">先做到期该复习的，再做本周题单里的；也可以在下面自己挑一道。
+    点「开始做」计时就开始，页面上只有题目、看不到答案。</p>
+  {% endif %}
+  {% if first_run and first %}
+  <p class="sub tip">点下去就开始计时。先准备好纸笔、收起其他资料——点错了也没关系，
+    题目页最下面的「不做了，这次不算」不会留下任何记录。</p>
+  {% endif %}
 
   {% if due_items %}
-  <h3>📌 到期复习（{{ due_items | length }} 题）——从零重做，先不看提示</h3>
-  <div class="qlist">
-    {% for it in due_items %}
-    <div class="qrow">
-      <span class="stars">{{ it.stars }}</span>
-      <span class="qid">{{ it.id }}</span>
-      <span class="qtitle">{{ it.title }}</span>
-      <span class="qmeta">{{ it.contest }} {{ it.year }}</span>
-      <span class="tag due">{{ it.tag }}</span>
-      {% if not open %}
-      <form method="post" action="/start"><input type="hidden" name="pid" value="{{ it.id }}"><button class="btn" type="submit">开卡</button></form>
-      {% endif %}
-    </div>
-    {% endfor %}
-  </div>
+  <h3>📌 今天该复习的（{{ due_items | length }} 题）——从头重做，先别看提示</h3>
+  {{ qlist(due_items, open) }}
   {% endif %}
 
   {% if plan_items %}
-  <h3>🗓️ 本周计划{% if plan %}（{{ plan.week }} · 目标 {{ plan.target }}）{% endif %}——还剩 {{ plan_items | length }} 题</h3>
-  {% if plan_stale %}<p class="warn-line">这份计划不是本周生成的，建议在下方「教练工具」里重新生成。</p>{% endif %}
-  <div class="qlist">
-    {% for it in plan_items %}
-    <div class="qrow">
-      <span class="stars">{{ it.stars }}</span>
-      <span class="qid">{{ it.id }}</span>
-      <span class="qtitle">{{ it.title }}</span>
-      <span class="qmeta">{{ it.contest }} {{ it.year }}</span>
-      <span class="tag">{{ it.tag }}</span>
-      {% if not open %}
-      <form method="post" action="/start"><input type="hidden" name="pid" value="{{ it.id }}"><button class="btn" type="submit">开卡</button></form>
-      {% endif %}
-    </div>
-    {% endfor %}
-  </div>
+  <h3>🗓️ 本周题单{% if plan %}（目标 {{ plan.target }}）{% endif %}——还剩 {{ plan_items | length }} 题</h3>
+  {% if plan_stale %}<p class="warn-line">这份题单不是这周排的，建议在下面重新排一份。</p>{% endif %}
+  {{ qlist(plan_items, open) }}
   {% endif %}
 
   {% if not due_items and not plan_items %}
   <div class="empty">
     {% if plan %}
-    <p>🎉 复习队列为空，本周计划已全部完成！可以在下方生成新一批计划。</p>
+    <p>🎉 该复习的都复习完了，本周的题也做完了！可以在下面排新一批。</p>
     {% else %}
-    <p>还没有本周计划。在下方选一个目标赛事，一键生成——之后每天打开这个页面照着打就行。</p>
+    <p>还没有题单。在下面选一个目标赛事，点一下就能排出这周要做的题——之后每天打开这个页面照着做就行。</p>
     {% endif %}
   </div>
   {% endif %}
 </section>
 
-<section class="card">
-  <details {% if not due_items and not plan_items and not open %}open{% endif %}>
-    <summary><h2 class="inline">🧭 教练工具：生成本周计划</h2></summary>
-    <form method="post" action="/plan" class="plan-form">
-      <label>目标赛事
-        <select name="target">
-          {% for t in targets %}<option value="{{ t }}" {% if plan and plan.target == t %}selected{% endif %}>{{ t }}</option>{% endfor %}
-        </select>
-      </label>
-      <label>本周题量
-        <input type="number" name="n" value="10" min="3" max="20">
-      </label>
-      <label>seed（可留空，换一套题就换个数）
-        <input type="number" name="seed" placeholder="自动">
-      </label>
-      <button class="btn primary" type="submit">生成周计划</button>
-    </form>
-    <p class="sub">按目标赛事的星级配比选题；做过的题走复习队列，毕业题不再进计划。生成会覆盖当前计划。</p>
-  </details>
-</section>
+{% if not first_run %}{{ plan_form(targets, recommended, plan, first_run) }}{% endif %}
 
 {% endblock %}

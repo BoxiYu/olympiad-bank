@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}出错了 · 奥数训练台{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>{{ headline }}</h1>
+  {% if status == 500 %}
+  <p class="sub">你的训练记录不会因此丢失。可以回首页重试一次；如果一直这样，把下面这行字告诉教练。</p>
+  {% else %}
+  <p class="sub">回首页继续吧。</p>
+  {% endif %}
+  {% if detail %}
+  <details class="errdetail">
+    <summary>给教练看的技术信息</summary>
+    <pre>{{ detail }}</pre>
+  </details>
+  {% endif %}
+  <p style="margin-top:18px"><a class="btn primary" href="/">回到今天要做的题</a></p>
+</section>
+{% endblock %}

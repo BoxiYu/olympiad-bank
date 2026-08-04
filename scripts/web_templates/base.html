@@ -6,31 +6,45 @@
 <title>{% block title %}奥数训练台{% endblock %}</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏔️</text></svg>">
 <link rel="stylesheet" href="/static/style.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="/static/katex/katex.min.css">
+<script defer src="/static/katex/katex.min.js"></script>
+<script defer src="/static/katex/auto-render.min.js"></script>
 <script>
   // 明暗主题：跟随系统，可手动切换（记忆在本机浏览器）
   (function () {
-    const saved = localStorage.getItem('ob-theme');
-    if (saved) document.documentElement.setAttribute('data-theme', saved);
+    try {
+      var saved = localStorage.getItem('ob-theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    } catch (e) {}
   })();
 </script>
 </head>
 <body>
+<a class="skip" href="#main">跳到正文</a>
 <header class="topbar">
   <a class="brand" href="/">🏔️ 奥数训练台</a>
   <nav>
-    <a href="/" {% if nav == 'home' %}class="on"{% endif %}>今日训练</a>
-    <button id="themeBtn" title="切换明暗" type="button">◐</button>
+    <a href="/" {% if nav == 'home' %}class="on" aria-current="page"{% endif %}>今天要做的题</a>
+    <a href="/help" {% if nav == 'help' %}class="on" aria-current="page"{% endif %}>怎么练</a>
+    <button id="themeBtn" class="js-only" type="button" aria-label="切换深色或浅色主题"><span aria-hidden="true">◐</span></button>
   </nav>
 </header>
-<main class="wrap">
-  {% if err %}<div class="flash err">⚠️ {{ err }}</div>{% endif %}
-  {% if msg %}<div class="flash ok">{{ msg }}</div>{% endif %}
+<main class="wrap" id="main">
+  <div aria-live="polite">
+    {% if err %}<div class="flash err">⚠️ {{ err }}</div>{% endif %}
+    {% if msg %}<div class="flash ok">{{ msg }}</div>{% endif %}
+    {% if info %}<div class="flash info">{{ info }}</div>{% endif %}
+  </div>
+  <noscript>
+    <div class="flash info">浏览器禁用了 JavaScript：计时器不会自动走（数字停在打开页面那一刻，刷新可更新），
+      数学公式会显示成 <code>$…$</code> 原文而不是排版好的样子。开始做题、看提示、看答案、登记结果都能正常用。</div>
+  </noscript>
   {% block content %}{% endblock %}
 </main>
-<footer class="foot">数学公式渲染需要联网（KaTeX CDN）；断网时公式会显示为 $…$ 原文，不影响训练流程。</footer>
+<footer class="foot">
+  本页来自你自己电脑上运行的训练台程序，可以把这个网址收藏起来。关掉运行它的终端窗口后页面就打不开了，
+  重新启动即可——没做完的题不会丢。注意计时按真实时间一直走：中途去吃饭，回来用时也算进去了。
+</footer>
 <script src="/static/app.js"></script>
 </body>
 </html>

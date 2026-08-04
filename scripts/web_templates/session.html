@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}{{ p.id }} 攻坚中 · 奥数训练台{% endblock %}
+{% block title %}{{ p.id }} 做题中 · 奥数训练台{% endblock %}
 {% block content %}
 
 <section class="sess-head">
@@ -7,66 +7,82 @@
     <h1>{{ p.id }}<span class="sess-title">｜{{ p.title }}</span></h1>
     <p class="sub">
       <span class="stars">{{ p.stars }}</span> · {{ p.contest }} {{ p.year }} ·
-      <span class="tag">{{ '复习' if mode == 'review' else ('变式' if mode == 'variant' else '新题') }}</span>
+      {% if mode == 'review' %}<span class="tag" title="以前做过，这次是到期复习">复习</span>
+      {% elif mode == 'variant' %}<span class="tag" title="教练指定的相近题目，检验刚学的方法">同类题</span>
+      {% else %}<span class="tag">新题</span>{% endif %}
     </p>
   </div>
+  {# 无 JS 时服务端渲染的语义必须与 JS 接管后一致：有限时→剩余，无限时→已用 #}
   <div class="timer" id="timer" data-elapsed="{{ elapsed_s }}" data-limit="{{ limit_min or 0 }}">
-    <div class="timer-num" id="timerNum">--:--</div>
-    <div class="timer-cap" id="timerCap">限时 {{ limit_min }} 分钟</div>
+    <div class="timer-num{% if limit_min and remain_s < 0 %} over{% endif %}" id="timerNum" aria-hidden="true">{{ timer_text }}</div>
+    <div class="timer-cap" id="timerCap">
+      {% if limit_min %}剩余时间 · 限时 {{ limit_min }} 分钟，做到 {{ deadline }}{% else %}已用时（这道题不限时）{% endif %}
+    </div>
+    <p class="sr-only">已经做了 {{ elapsed_min }} 分钟{% if limit_min %}，限时 {{ limit_min }} 分钟{% endif %}。</p>
   </div>
 </section>
 
-<section class="card statement">
-  <h2>题面</h2>
+<section class="card statement" id="statement">
+  <div class="row-flex">
+    <h2>题目</h2>
+    <button class="btn small js-only" type="button" id="printBtn">🖨️ 打印题目</button>
+  </div>
   <div class="md">{{ statement_html | safe }}</div>
-  <p class="discipline">纪律：合上其他资料，纸笔限时独立攻坚。超时不拦，但会计入判定。</p>
+  <p class="discipline">做题约定：收起其他资料，拿纸笔在限时内自己做。超时不会打断你，但登记结果时会算进去。</p>
 </section>
 
 <section class="card">
-  <h2>提示阶梯 <span class="sub-inline">{{ hints | length }}/{{ ladder_total }} 已解锁</span></h2>
+  <h2>提示 <span class="sub-inline">一条一条给，已用 {{ hints | length }}/{{ ladder_total }} 条</span></h2>
   {% if ladder_total == 0 %}
-  <p class="sub">本题暂无提示阶梯。</p>
+  <p class="sub">这道题还没配提示。自己再想想，实在不行就看答案。</p>
   {% else %}
   {% for h in hints %}
-  <div class="hint-card" id="hint-{{ h.level }}">
-    <div class="hint-head">提示 {{ h.level }}/{{ ladder_total }}{% if h.early %}<span class="tag early">提前解锁</span>{% endif %}</div>
+  <div class="hint-card" id="hint-{{ h.level }}" tabindex="-1">
+    <div class="hint-head">第 {{ h.level }} 条提示（共 {{ ladder_total }} 条）{% if h.early %}<span class="tag early" title="没等满间隔就看了下一条，只是记一笔，不影响这道题的结果">提前看的</span>{% endif %}</div>
     <div class="md">{{ h.html | safe }}</div>
   </div>
   {% endfor %}
   {% if can_hint %}
-  <form method="post" action="/session/hint" id="hintForm" data-cooldown="{{ cooldown_s }}" data-cooldown-min="{{ cooldown_min }}">
-    <button class="btn" type="submit" id="hintBtn">🔓 解锁提示 {{ hints | length + 1 }}/{{ ladder_total }}</button>
+  <form method="post" action="/session/hint" id="hintForm" data-cooldown="{{ cooldown_s }}"
+        data-cooldown-min="{{ cooldown_min }}" data-cooldown-from="{{ cooldown_from }}">
+    <input type="hidden" name="sid" value="{{ sid }}">
+    <button class="btn" type="submit" id="hintBtn">🔓 看下一条提示（第 {{ hints | length + 1 }} 条，共 {{ ladder_total }} 条）</button>
     <span class="sub" id="hintNote"></span>
   </form>
   {% else %}
-  <p class="sub">提示已全部解锁——再战一会儿，或看解法 / 收卷。</p>
+  <p class="sub">提示已经全部用完了——再自己想想，或者看答案，或者去登记结果。</p>
   {% endif %}
   {% endif %}
 </section>
 
 {% if revealed %}
-<section class="card solution" id="solution">
-  <h2>答案与解法要点 <span class="tag reveal-tag">已记入日志</span></h2>
+<section class="card solution" id="solution" tabindex="-1">
+  <h2>答案与解法要点 <span class="tag reveal-tag">已记进日志</span></h2>
   <h3>答案</h3>
   <div class="md">{{ solution.answer | safe }}</div>
   <h3>解法要点</h3>
   <div class="md">{{ solution.keypoints | safe }}</div>
-  <p class="discipline">看完请<strong>合卷</strong>，不看任何材料凭记忆复述完整证明——收卷时会问复述结果。</p>
+  <p class="discipline">看完请<strong>把答案合上</strong>，什么材料都不看，重新在纸上把整个证明写一遍——待会儿登记结果时会问你写出来没有。</p>
 </section>
 {% else %}
 <section class="card">
-  <h2>弹尽粮绝？</h2>
-  <p class="sub">看解法会永久记入本次日志（revealed_at）——之后判定只能是「看解后复述通过」或「未通过」。先把提示用完再来。</p>
+  <h2>实在做不出来？</h2>
+  <p class="sub">看过答案这件事会记在这一卷里，撤不回来——只要你登记结果，这道题的成绩就只能是
+    「看解后复述通过」或「未通过」。建议先把提示全部用完再来这里。</p>
   <form method="post" action="/session/reveal" id="revealForm">
-    <button class="btn danger" type="submit">👀 看答案与解法要点</button>
+    <input type="hidden" name="sid" value="{{ sid }}">
+    <button class="btn danger" type="submit"
+            data-confirm="看过答案会记在这一卷里，撤不回来，成绩只能是「看解后复述通过」或「未通过」">👀 看答案与解法要点</button>
   </form>
 </section>
 {% endif %}
 
 <section class="sess-actions">
-  <a class="btn primary big" href="/session/finish">📥 收卷落账</a>
+  <a class="btn primary big" href="/session/finish">📥 做完了，登记结果</a>
   <form method="post" action="/abandon" id="abandonForm">
-    <button class="btn ghost" type="submit">放弃本卷（不写记录）</button>
+    <input type="hidden" name="sid" value="{{ sid }}">
+    <button class="btn ghost" type="submit"
+            data-confirm="这次不算，不会写任何训练记录，这道题以后还会正常出现。&#10;&#10;确定不做了吗？">不做了，这次不算（不留记录）</button>
   </form>
 </section>
 

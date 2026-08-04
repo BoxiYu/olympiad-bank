@@ -1,56 +1,90 @@
 {% extends 'base.html' %}
-{% block title %}收卷 · {{ pid }} · 奥数训练台{% endblock %}
+{% block title %}登记结果 · {{ pid }} · 奥数训练台{% endblock %}
 {% block content %}
 
 <section class="sess-head">
   <div>
-    <h1>收卷落账<span class="sess-title">｜{{ pid }} {{ title }}</span></h1>
-    <p class="sub">用时 {{ time_min }} 分钟{% if limit %}（限时 {{ limit }} 分钟）{% endif %} · 提示 {{ n_hints }} 级 · {{ '已看答案' if revealed else '未看答案' }}</p>
+    <h1>登记这次的结果<span class="sess-title">｜{{ pid }} {{ title }}</span></h1>
+    <p class="sub">
+      用时 {{ time_min }} 分钟{% if limit %}（限时 {{ limit }} 分钟{% if over_time %}，<strong>已超时</strong>{% endif %}）{% endif %}
+      · 用了 {{ n_hints }} 条提示 · {{ '看过答案' if revealed else '没看答案' }}
+    </p>
   </div>
-  <a class="btn ghost" href="/session">← 回到题目</a>
+  <a class="btn ghost" href="/session">← 回去看题目</a>
 </section>
 
 <form method="post" action="/session/finish" class="card finish-form" id="finishForm" data-revealed="{{ 1 if revealed else 0 }}">
+  <input type="hidden" name="sid" value="{{ sid }}">
+  <input type="hidden" name="stopped_at" value="{{ stopped_at }}">
+  <input type="hidden" name="state" value="{{ state }}">
 
   {% if revealed %}
-  <h2>① 合卷复述通过了吗？</h2>
-  <p class="sub">标准：不看任何材料，独立写出完整证明。改判可以，自欺没用。</p>
-  <div class="opt-list">
-    <label class="opt"><input type="radio" name="retell" value="yes" required>
-      <span><strong>通过</strong><small>合卷复述出了完整证明</small></span></label>
-    <label class="opt"><input type="radio" name="retell" value="no" required>
-      <span><strong>未通过</strong><small>复述卡壳，或没做复述</small></span></label>
-  </div>
-  <h2>② 判定</h2>
-  {% else %}
-  <h2>① 判定</h2>
-  <p class="sub">系统建议：<strong>{{ suggested }}</strong>（{{ why }}）——可改判，判定标准只有一套。</p>
+  <fieldset>
+    <legend><h2>① 合上答案，重新写一遍，写出来了吗？</h2></legend>
+    <p class="sub">标准：不看任何材料，自己在纸上写出完整证明。怎么选都行——但这条记录决定了这道题几天后再出现，
+      也是教练判断你该补什么的依据，如实选才有用。</p>
+    <div class="opt-list">
+      <label class="opt"><input type="radio" name="retell" value="yes" required>
+        <span><strong>写出来了</strong><small>合上答案自己写出了完整证明</small></span></label>
+      <label class="opt"><input type="radio" name="retell" value="no" required>
+        <span><strong>没写出来</strong><small>写到一半卡住了，或者没写</small></span></label>
+    </div>
+  </fieldset>
   {% endif %}
 
-  <div class="opt-list" id="resultList">
-    {% for r, label, desc, days in results %}
-    <label class="opt">
-      <input type="radio" name="result" value="{{ r }}" {% if r == suggested %}checked{% endif %} required>
-      <span><strong>{{ label }} <code>{{ r }}</code></strong><small>{{ desc }} → {{ days }} 天后复习</small></span>
-    </label>
-    {% endfor %}
-  </div>
+  <fieldset>
+    <legend><h2>{{ '②' if revealed else '①' }} 这道题做得怎么样？</h2></legend>
+    {% if suggested %}
+    <p class="sub">根据这次的情况，建议选「<strong>{{ suggested_label }}</strong>」（{{ why }}）。
+      你可以改选，标准就是下面写的这几条，别自己放宽。</p>
+    {% else %}
+    <p class="sub">看过答案了，所以只可能是这两种。上面那一问选完，这里通常会跟着自动选好；
+      没自动选也没关系，你自己选一个，或者直接提交也能按上面那一问记对。</p>
+    {% endif %}
+    {# 看过答案后前两项已不可能。按「只提醒不阻止」的约定不禁用，只折叠降级 #}
+    {% set shown = results | rejectattr(0, 'in', ['independent_ok', 'hinted_ok']) | list if revealed else results %}
+    <div class="opt-list" id="resultList">
+      {% for r, label, desc, days in shown %}
+      <label class="opt">
+        <input type="radio" name="result" value="{{ r }}" {% if r == suggested %}checked{% endif %}>
+        <span><strong>{{ label }}</strong><small>{{ desc }} → {{ days }} 天后再复习这道题</small></span>
+      </label>
+      {% endfor %}
+    </div>
+    {% if revealed %}
+    <details class="rare">
+      <summary>其他两种（很少用到）</summary>
+      <p class="sub">这两种的前提是「没看答案」，这次已经看过了。确实要改也可以，但记录会和事实对不上。</p>
+      <div class="opt-list">
+        {% for r, label, desc, days in results if r in ['independent_ok', 'hinted_ok'] %}
+        <label class="opt">
+          <input type="radio" name="result" value="{{ r }}">
+          <span><strong>{{ label }}</strong><small>{{ desc }} → {{ days }} 天后再复习这道题</small></span>
+        </label>
+        {% endfor %}
+      </div>
+    </details>
+    {% endif %}
+  </fieldset>
 
-  <h2>{{ '③' if revealed else '②' }} 卡在哪一步？<span class="sub-inline">fail / 复述通过时必选；顺利做出可跳过。选<strong>最早</strong>卡住的环节</span></h2>
-  <div class="opt-list" id="stuckList">
-    {% for c, desc in stucks %}
-    <label class="opt"><input type="radio" name="stuck" value="{{ c }}">
-      <span><strong>{{ c }}</strong><small>{{ desc }}</small></span></label>
-    {% endfor %}
-    <label class="opt"><input type="radio" name="stuck" value="" checked>
-      <span><strong>不选</strong><small>没有明显卡点</small></span></label>
-  </div>
+  <fieldset>
+    <legend><h2>{{ '③' if revealed else '②' }} 卡在哪一步？</h2></legend>
+    <p class="sub">没做出来、或看了答案的请选一个；自己顺利做出来的可以跳过。选你<strong>最早</strong>卡住的那一步。</p>
+    <div class="opt-list" id="stuckList">
+      {% for c, desc in stucks %}
+      <label class="opt"><input type="radio" name="stuck" value="{{ c }}">
+        <span><strong>{{ c }}</strong><small>{{ desc }}</small></span></label>
+      {% endfor %}
+      <label class="opt"><input type="radio" name="stuck" value="" checked>
+        <span><strong>不选</strong><small>没有明显卡住的地方</small></span></label>
+    </div>
+  </fieldset>
 
-  <h2>{{ '④' if revealed else '③' }} 备注 <span class="sub-inline">可留空</span></h2>
-  <textarea name="note" rows="3" placeholder="思路要点、错在哪、值得记的一句话……"></textarea>
+  <h2>{{ '④' if revealed else '③' }} 备注 <span class="sub-inline">可以留空</span></h2>
+  <textarea name="note" rows="3" aria-label="备注" placeholder="思路要点、错在哪、值得记的一句话……"></textarea>
 
   <div class="finish-actions">
-    <button class="btn primary big" type="submit">✔ 落账，写入训练日志</button>
+    <button class="btn primary big" type="submit">✔ 确认，记入训练日志</button>
   </div>
 </form>
 

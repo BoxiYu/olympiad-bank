@@ -176,6 +176,9 @@ source_url: https://huggingface.co/datasets/ShadenA/MathNet
 | 允许小节名单（防泄答白名单） | `spar_session.py` `KNOWN_SECTIONS` | SPEC §3（语义）；spar 解析时执行 |
 | 题卡小节名单 | `spar_session.py` `CARD_SECTIONS` | spar 出卡与 web 训练台题面渲染执行 |
 | 训练台页面防泄答（未解锁的提示/答案不出服务端） | `scripts/web_app.py`（渲染仅经 spar_session 白名单通道） | `tests/test_web.py` 锁定 |
+| 训练台错误文案改写（网页上不出现任何命令行指令） | `scripts/web_app.py` `_web_err`（按 SparError 前缀改写，**不改 spar_session 正本**，CLI 仍用原文） | `tests/test_web.py::TestNoCliLeak` 锁定 |
+| 训练台写操作的会话号校验（过期表单不得记到别的题上） | `scripts/web_app.py` `_require_session`（四个 POST 均带 sid 隐藏域） | `tests/test_web.py::TestSessionGuard` 锁定 |
+| 训练台界面用语（大白话层） | `scripts/web_templates/` 与 `web_app.py` `RESULT_TEXT`/`STUCK_TEXT`/`TARGET_HINT` | 术语语义正本仍在 docs/ 两手册与 `spar_session.py`；界面只做展示层翻译 |
 | 难度星级语义与锚点 | SPEC §4 | `taxonomy/contest_tiers.yml` 头注、`mathnet_review.py` 评审提示 |
 | 学段范围（初中+高中，★1 不入库） | SPEC §4（语义）+ `bank.py` `MIN_DIFFICULTY`（阈值）+ `bank.py apply_grade_floor`（过滤器） | 硬闸：`mathnet_import.py below_floor`（写盘前准入）、`mathnet_review.py batch`、`candidates --gaps`、`bank.py lint`（最终门槛）；`bank.py candidates` 只作默认值（浏览工具允许显式看低档）；`docs/入库SOP-MathNet.md`、`contest_tiers.yml` 头注为引用 |
 | 赛名→难度底档映射 | `taxonomy/contest_tiers.yml` | `mathnet_ingest.py` 估级管线 |
