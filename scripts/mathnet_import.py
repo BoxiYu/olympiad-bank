@@ -6,7 +6,8 @@
       [--per-category 5] [--dry-run]
 
 准入线（SOP 第 4 步）：verdicts 中 recommend=claim 且非 needs_review（难度分歧 ≥2 档、
-topics_verdict=wrong、text_quality=broken、needs_figure 任一命中即拒）。
+topics_verdict=wrong、text_quality=broken、needs_figure 任一命中即拒），
+且定稿难度 ≥ 学段下界 MIN_DIFFICULTY（语义正本 SPEC §4：本库只收初中+高中）。
 逐字纪律（铁律 1）：题面/答案/解法全部从 HF 本地缓存的数据集行原文照录，本脚本零改写；
 含 `## ` 行的原文会撞小节解析白名单，直接拒收（宁缺勿滥）。
 幂等：已入库同 mathnet_id 的题拒绝重复导入。
@@ -14,6 +15,8 @@ topics_verdict=wrong、text_quality=broken、needs_figure 任一命中即拒）�
 min(候选池 difficulty_est, 评审 difficulty_codex)，依据写入 difficulty_note。
 """
 import argparse, json, os, re, sys
+
+from bank import MIN_DIFFICULTY  # 学段下界唯一常量正本，勿在此另设阈值
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 POOL = os.path.join(ROOT, 'candidates', 'mathnet.jsonl')
@@ -98,6 +101,15 @@ def needs_review(v, est):
     """merge 同款判定（正本：mathnet_review.cmd_merge / SOP 第 4 步）。"""
     return bool(abs(v['difficulty_codex'] - est) >= 2 or v['topics_verdict'] == 'wrong'
                 or v['text_quality'] == 'broken' or v['needs_figure'])
+
+
+def below_floor(est, codex):
+    """定稿难度（就低不就高）低于学段下界即拒收。语义正本 SPEC §4，阈值正本 bank.MIN_DIFFICULTY。
+
+    needs_review 只查 est 与 codex 的分歧幅度，分歧 1 档的 ★1 组合（如 est2/codex1）
+    能整个躲过它——所以下界必须是独立一道判定，且必须在写盘前。
+    """
+    return min(est, codex) < MIN_DIFFICULTY
 
 
 def render(pid, title, row, v, full, review_ref):
@@ -194,6 +206,11 @@ def main():
             skipped.append((mid, f'评审 skip：{v.get("recommend_reason", "")[:60]}')); continue
         if needs_review(v, row['difficulty_est']):
             skipped.append((mid, 'needs_review（分歧/质量旗标），须人工定夺')); continue
+        if below_floor(row['difficulty_est'], v['difficulty_codex']):
+            diff = min(row['difficulty_est'], v['difficulty_codex'])
+            skipped.append((mid, f'定稿★{diff} 低于学段下界★{MIN_DIFFICULTY}'
+                                 f'（规则估★{row["difficulty_est"]}/Codex★{v["difficulty_codex"]}）——'
+                                 f'本库只收初中+高中，SPEC §4')); continue
         if mid in have:
             skipped.append((mid, f'已入库于 {have[mid]}（幂等拒重）')); continue
         if mid not in idx:

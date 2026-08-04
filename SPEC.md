@@ -173,7 +173,7 @@ source_url: https://huggingface.co/datasets/ShadenA/MathNet
 | 题卡小节名单 | `spar_session.py` `CARD_SECTIONS` | spar 出卡与 web 训练台题面渲染执行 |
 | 训练台页面防泄答（未解锁的提示/答案不出服务端） | `scripts/web_app.py`（渲染仅经 spar_session 白名单通道） | `tests/test_web.py` 锁定 |
 | 难度星级语义与锚点 | SPEC §4 | `taxonomy/contest_tiers.yml` 头注、`mathnet_review.py` 评审提示 |
-| 学段范围（初中+高中，★1 不入库） | SPEC §4 | `bank.py` `MIN_DIFFICULTY`（lint 执行）、`docs/入库SOP-MathNet.md` 筛题环节、`contest_tiers.yml` 头注 |
+| 学段范围（初中+高中，★1 不入库） | SPEC §4（语义）+ `bank.py` `MIN_DIFFICULTY`（阈值）+ `bank.py apply_grade_floor`（过滤器） | 硬闸：`mathnet_import.py below_floor`（写盘前准入）、`mathnet_review.py batch`、`candidates --gaps`、`bank.py lint`（最终门槛）；`bank.py candidates` 只作默认值（浏览工具允许显式看低档）；`docs/入库SOP-MathNet.md`、`contest_tiers.yml` 头注为引用 |
 | 赛名→难度底档映射 | `taxonomy/contest_tiers.yml` | `mathnet_ingest.py` 估级管线 |
 | 知识点正名与别名 | `taxonomy/registry.yml`（检索别名 `aliases.yml`） | `bank.py lint` 告警、map/query |
 | 攻坚限时/复习间隔/毕业条件 | `spar_session.py` 契约常量（`TIME_LIMIT`/`INTERVALS`/`GRADUATE_STREAK`） | docs/ 两手册、`bank.py` coach/review、`web_app.py`（数值由服务端下发，前端不复制） |
