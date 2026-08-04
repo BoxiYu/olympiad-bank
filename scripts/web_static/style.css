@@ -181,3 +181,12 @@ textarea {
   .sess-actions { flex-direction: column-reverse; align-items: stretch; }
   .sess-actions .btn { text-align: center; }
 }
+
+/* 就地二次确认的待确认态（替代原生 confirm，见 app.js armConfirm）*/
+.btn.armed {
+  background: #b45309;
+  border-color: #b45309;
+  color: #fff;
+  animation: armedPulse 1.1s ease-in-out infinite;
+}
+@keyframes armedPulse { 50% { opacity: .72; } }

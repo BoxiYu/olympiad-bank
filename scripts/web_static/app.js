@@ -58,6 +58,39 @@ if (timer) {
   setInterval(tick, 1000);
 }
 
+/* 就地二次确认：把提醒做进页面本身，不用原生 confirm()。
+   原生弹窗会被隐私模式、部分扩展、内嵌浏览器面板静默屏蔽——一旦屏蔽 confirm() 返回 false，
+   表单永不提交，学生看到的是「按钮点了没反应」，比报错更糟。就地确认无此依赖。
+   语义仍是「只提醒不阻止」：第一次点亮出后果，再点一次即照常执行。 */
+function armConfirm(form, btn, message, shouldAsk) {
+  if (!form || !btn) return;
+  let armed = false;
+  const original = btn.innerHTML;
+  const disarm = () => {
+    armed = false;
+    btn.innerHTML = original;
+    btn.classList.remove('armed');
+    if (btn.dataset.note) {
+      const n = document.getElementById(btn.dataset.note);
+      if (n) n.textContent = n.dataset.idle || '';
+    }
+  };
+  form.addEventListener('submit', (e) => {
+    if (typeof shouldAsk === 'function' && !shouldAsk()) return;   // 无需确认，直接放行
+    if (armed) return;                                             // 已确认，照常提交
+    e.preventDefault();
+    armed = true;
+    btn.innerHTML = '⚠️ 再点一次确认';
+    btn.classList.add('armed');
+    const n = btn.dataset.note ? document.getElementById(btn.dataset.note) : null;
+    if (n) {
+      n.dataset.idle = n.dataset.idle ?? n.textContent;
+      n.textContent = message;
+    }
+    setTimeout(() => { if (armed) disarm(); }, 8000);              // 8 秒未确认自动复位
+  });
+}
+
 /* 提示解锁：冷却期内确认（不拦截，与纪律一致——照常解锁但记 early） */
 const hintForm = document.getElementById('hintForm');
 if (hintForm) {
@@ -72,31 +105,25 @@ if (hintForm) {
   };
   tick();
   if (cd0 > 0) setInterval(tick, 1000);
-  hintForm.addEventListener('submit', (e) => {
-    if (left() > 0 && !confirm(`纪律是每级提示之间再独立奋战 ${cdMin} 分钟。\n现在解锁不会被阻止，但会打上「提前解锁」标记进日志。\n\n确定现在解锁吗？`)) {
-      e.preventDefault();
-    }
-  });
+  const hintBtn = document.getElementById('hintBtn');
+  if (hintBtn) hintBtn.dataset.note = 'hintNote';
+  armConfirm(hintForm, hintBtn,
+    `现在解锁不会被阻止，但会打上「提前解锁」标记进日志（纪律：每级之间 ${cdMin} 分钟）`,
+    () => left() > 0);   // 冷却已过则无需确认
 }
 
 /* 看解法：不可逆动作确认 */
 const revealForm = document.getElementById('revealForm');
 if (revealForm) {
-  revealForm.addEventListener('submit', (e) => {
-    if (!confirm('看解法会永久记入本次日志——之后判定只能是「看解后复述通过」或「未通过」。\n\n确定看吗？')) {
-      e.preventDefault();
-    }
-  });
+  armConfirm(revealForm, revealForm.querySelector('button[type="submit"]'),
+    '看解法会永久记入本次日志，之后判定只能是「看解后复述通过」或「未通过」', () => true);
 }
 
 /* 放弃本卷确认 */
 const abandonForm = document.getElementById('abandonForm');
 if (abandonForm) {
-  abandonForm.addEventListener('submit', (e) => {
-    if (!confirm('放弃本卷不会写任何训练记录，这道题之后还会正常出现。\n\n确定放弃吗？')) {
-      e.preventDefault();
-    }
-  });
+  armConfirm(abandonForm, abandonForm.querySelector('button[type="submit"]'),
+    '放弃本卷不写任何训练记录，这道题之后还会正常出现', () => true);
 }
 
 /* 收卷表单：已看答案时，「复述通过？」按契约驱动判定默认值（通过→solution_reconstructed，否→fail） */
@@ -112,13 +139,11 @@ if (finishForm && finishForm.dataset.revealed === '1') {
 }
 /* fail / 复述通过 时软性要求卡点：未选则确认一次 */
 if (finishForm) {
-  finishForm.addEventListener('submit', (e) => {
-    const result = finishForm.querySelector('input[name="result"]:checked');
-    const stuck = finishForm.querySelector('input[name="stuck"]:checked');
-    if (result && ['fail', 'solution_reconstructed'].includes(result.value) && stuck && !stuck.value) {
-      if (!confirm('这次没独立做出来——卡点标签是教练诊断的金矿，建议选一个「最早卡住的环节」。\n\n不选直接落账吗？')) {
-        e.preventDefault();
-      }
-    }
-  });
+  armConfirm(finishForm, finishForm.querySelector('button[type="submit"]'),
+    '卡点标签是教练诊断的金矿——建议选一个「最早卡住的环节」，不选也可直接落账',
+    () => {
+      const result = finishForm.querySelector('input[name="result"]:checked');
+      const stuck = finishForm.querySelector('input[name="stuck"]:checked');
+      return !!(result && ['fail', 'solution_reconstructed'].includes(result.value) && stuck && !stuck.value);
+    });
 }
