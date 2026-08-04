@@ -1,17 +1,6 @@
 [
  {
   "id": "A-001",
-  "title": "Birds Between Two Branches",
-  "difficulty": 1,
-  "topics": [
-   "方程与设元"
-  ],
-  "problem": "There were 25 birds on two branches. After a while 5 birds from the first branch flew over to the second and after a while longer 7 birds from the second flew away. In that moment on the first branch there were twice as many birds than on the second. How many birds were there on each of the two branches in the beginning?",
-  "answer": "Initially 17 birds on the first branch and 8 birds on the second branch.",
-  "solution": "When the 7 birds flew away from the second branch the total number of birds on both branches was $25-7=18$. Because in that moment on the first branch there were twice as many birds than on the second, there were $18:3=6$ birds on the second branch, and on the first one were $2 \\cdot 6=12$ birds. Hence, before the 7 birds flew away from the second branch, there were $6+7=13$ birds on it. In the beginning, before the 5 birds flew from the first to the second branch, on the second branch were $13-5=8$ birds and on the first were $12+5=17$ birds."
- },
- {
-  "id": "A-002",
   "title": "Weighted Partial-Sum Convergence",
   "difficulty": 3,
   "topics": [
@@ -22,7 +11,7 @@
   "solution": "Let $S_n = \\sum_{k=1}^{n} x_k$, $n \\in \\mathbb{N}^*$. Using the hypothesis, one can find a constant $c > 0$ such that $|S_n| \\le c n^a$, $\\forall n \\in \\mathbb{N}^*$. Let $n, p \\in \\mathbb{N}^*$; we have:\n$$\n\\begin{align*}\n|y_{n+p} - y_n| &= \\left| \\sum_{k=n+1}^{n+p} \\frac{x_k}{k^b} \\right| = \\left| \\sum_{k=n+1}^{n+p} \\frac{S_k - S_{k-1}}{k^b} \\right| = \\\\\n&= \\left| \\frac{S_{n+p}}{(n+p+1)^b} - \\frac{S_n}{(n+1)^b} + \\sum_{k=n+1}^{n+p} S_k \\left( \\frac{1}{k^b} - \\frac{1}{(k+1)^b} \\right) \\right| \\\\\n&\\le \\frac{|S_{n+p}|}{(n+p+1)^b} + \\frac{|S_n|}{(n+1)^b} + \\sum_{k=n+1}^{n+p} |S_k| \\left( \\frac{1}{k^b} - \\frac{1}{(k+1)^b} \\right) \\\\\n&\\le c \\left[ \\frac{2}{n^{b-a}} + \\sum_{k=n+1}^{n+p} k^a \\left( \\frac{1}{k^b} - \\frac{1}{(k+1)^b} \\right) \\right].\n\\end{align*}\n$$\nApplying the mean value theorem to the function $f(x) = x^{-\\alpha}$, $x > 0$ on the interval $[i, i+1]$, with $\\alpha, i > 0$, yields\n$$\n\\frac{\\alpha}{(i+1)^{\\alpha+1}} < \\frac{1}{i^{\\alpha}} - \\frac{1}{(i+1)^{\\alpha}} < \\frac{\\alpha}{i^{\\alpha+1}},\n$$\nand since $b, b-a > 0$, we obtain\n$$\n\\frac{1}{k^b} - \\frac{1}{(k+1)^b} < \\frac{b}{k^{b+1}} \\quad \\text{and} \\quad \\frac{b-a}{k^{b-a+1}} < \\frac{1}{(k-1)^{b-a}} - \\frac{1}{k^{b-a}}, \\forall k \\in \\mathbb{N}, k \\ge 2.\n$$\nThen\n$$\n\\begin{align*}\n\\sum_{k=n+1}^{n+p} k^a \\left( \\frac{1}{k^b} - \\frac{1}{(k+1)^b} \\right) &< \\sum_{k=n+1}^{n+p} \\frac{b k^a}{k^{b+1}} = \\frac{b}{b-a} \\sum_{k=n+1}^{n+p} \\frac{b-a}{k^{b-a+1}} \\\\\n&< \\frac{b}{b-a} \\sum_{k=n+1}^{n+p} \\left( \\frac{1}{(k-1)^{b-a}} - \\frac{1}{k^{b-a}} \\right) \\\\\n&= \\frac{b}{b-a} \\left( \\frac{1}{n^{b-a}} - \\frac{1}{(n+p)^{b-a}} \\right) < \\frac{b}{(b-a)n^{b-a}}.\n\\end{align*}\n$$\nIt follows that\n$$\n|y_{n+p} - y_n| < c \\left( 2 + \\frac{b}{b-a} \\right) \\frac{1}{n^{b-a}}, \\forall n, p \\in \\mathbb{N}^*.\n$$\nFinally, since $\\lim_{n \\to \\infty} n^{-(b-a)} = 0$, we obtain that $(y_n)_{n \\ge 1}$ is a Cauchy sequence, hence a convergent one."
  },
  {
-  "id": "A-003",
+  "id": "A-002",
   "title": "Cubic–Quartic Equality Triple",
   "difficulty": 2,
   "topics": [
@@ -34,7 +23,7 @@
   "solution": "a. Write $x^4 - x^3 - x + 1 = (x-1)(x^3 - 1) = (x-1)^2(x^2 + x + 1)$ and notice that $x^2 + x + 1 > 0$ for all $x \\in \\mathbb{R}$ to get the claim.\n\nb. Notice that $\\sum_{k=1}^{3} (x_k^4 - x_k^3 - x_k + 1) = 0$ and use (a) to derive that $x_1^4 - x_1^3 - x_1 + 1 = 0$, $k = 1, 2, 3$. It follows that $x_1 = x_2 = x_3 = 1$."
  },
  {
-  "id": "A-004",
+  "id": "A-003",
   "title": "Bounded Symmetric Cubic System",
   "difficulty": 3,
   "topics": [
@@ -46,7 +35,7 @@
   "solution": "Answer: $(x, y) = (-1/3, -1/3)$, $(5/3, 5/3)$.\nFirstly, we obtain that\n$$\nx^2 + y^2 + x + y - xy(x + y) + 2 = -(1-x)(1-y)(x+y+2)\n$$\nand hence we get\n$$\n(1-x)(1-y)(x+y+2) = \\frac{64}{27}.\n$$\nLet $k^3 = 1-x$, $\\ell^3 = 1-y$, $m^3 = x+y+2$. Then we have\n$$\nk^3 + \\ell^3 + m^3 = 4 \\quad \\text{and} \\quad k\\ell m = \\frac{4}{3}.\n$$\nThis shows that $k^3 + \\ell^3 + m^3 = 3k\\ell m$ and it can be expressed as\n$$\n(k + \\ell + m)((k - \\ell)^2 + (\\ell - m)^2 + (m - k)^2) = 0.\n$$\nThe last equality implies that either $k + \\ell + m = 0$ or $k = \\ell = m$.\nFor $k = \\ell = m$, we obtain the solution $x = y = -1/3$.\nLet $k + \\ell + m = 0$. In this case using $k\\ell m = 4/3$, we get $k\\ell(k + \\ell) = -4/3$. Consider the condition $|xy| = |(1-k^3)(1-\\ell^3)| \\le 25/9$. Define $u = k + \\ell$, $v = k\\ell$. In this case, we get\n$$\nuv = -\\frac{4}{3} \\quad \\text{and} \\quad |(1-k^3)(1-\\ell^3)| = |u^3 - v^3 + 3| \\le \\frac{25}{9}.\n$$\nThese two conditions imply that\n$$\n-\\frac{52}{9} \\le u^3 - v^3 = u^3 + \\frac{64}{27u^3} \\le -\\frac{2}{9} \\quad (*)\n$$\nBy AM-GM, we get $u^2 \\ge 4v = -16/(3u)$ which is equivalent to $u > 0$ or $u^3 \\le -16/3$. From (*), we conclude that $u < 0$ and hence $u^3 \\le -16/3$. In this case since $u^3 + 16/3 \\le 0$ and $4/(9u^3) + 1 \\ge 11/12 > 0$ we get that\n$$\nu^3 + \\frac{64}{27u^3} + \\frac{52}{9} = \\left(u^3 + \\frac{16}{3}\\right) \\left(\\frac{4}{9u^3} + 1\\right) \\le 0\n$$\nTherefore, (*) holds only if $u^3 = -16/3$ and $u^2 = 4v$ which implies that $k = \\ell = -\\sqrt[3]{2}/3$. This yields the solution $x = y = 5/3$. Both obtained solutions satisfy the problem conditions.\n\n---\n\nLet $x+y=a$, $xy=b$. Then by AM-GM, we have $a^2 \\ge 4b$ and hence\n$$\nx^2 + y^2 + x + y - xy(x + y) = a^2 + a - b(a + 2) = -\\frac{10}{27},\n$$\n$$\nb = \\frac{a^2 + a + \\frac{10}{27}}{a + 2} \\le \\frac{a^2}{4},\n$$\n$$\n|b| = \\left| \\frac{a^2 + a + \\frac{10}{27}}{a + 2} \\right| \\le \\frac{25}{9}.\n$$\nTherefore, we get\n$$\n\\frac{a^2}{4} - \\frac{a^2 + a + \\frac{10}{27}}{a + 2} = \\frac{\\left(a + \\frac{2}{3}\\right)^2 \\left(a - \\frac{10}{3}\\right)}{4(a + 2)} \\ge 0 \\quad (1),\n$$\n$$\n\\frac{a^2 + a + \\frac{10}{27}}{a + 2} - \\frac{25}{9} = \\frac{\\left(a - \\frac{10}{3}\\right)\\left(a + \\frac{14}{9}\\right)}{a + 2} \\le 0 \\quad (2),\n$$\n$$\n\\frac{a^2 + a + \\frac{10}{27}}{a + 2} + \\frac{25}{9} = \\frac{\\left(a + \\frac{17}{9}\\right)^2 + \\frac{191}{81}}{a + 2} \\ge 0 \\quad (3).\n$$\nUsing (1), (2) and (3), we obtain the following solutions:\n$$\n(1) \\iff a < -2 \\quad \\text{or} \\quad a \\ge \\frac{10}{3} \\quad \\text{or} \\quad a = -\\frac{2}{3},\n$$\n$$\n(2) \\iff a < -2 \\quad \\text{or} \\quad -\\frac{14}{9} \\le a \\le \\frac{10}{3},\n$$\n$$\n(3) \\iff a > -2.\n$$\nHence, the only solutions are $a = -\\frac{2}{3}$ and $a = \\frac{10}{3}$. In both cases, $a^2 = 4b$ and it follows that $x = y = \\frac{a}{2}$. The obtained solutions $(x, y) = (-1/3, -1/3)$, $(5/3, 5/3)$ satisfy the problem conditions."
  },
  {
-  "id": "A-005",
+  "id": "A-004",
   "title": "Injective Functional Equation",
   "difficulty": 3,
   "topics": [
