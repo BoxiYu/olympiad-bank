@@ -32,7 +32,7 @@ bash scripts/lint.sh
 | 训练（coach/spar/log/review/similar） | `docs/学生手册.md` + `docs/教练手册.md` |
 | 学生档案 / 能力图（student/assess/profile） | `docs/教练手册.md` 第 5 节 |
 | git 操作（commit/push/pull/land） | `.codex/skills/` 对应 skill |
-| Symphony 编排会话 | `WORKFLOW.md` |
+| 派工单给 Symphony 编排 | `WORKFLOW.md` |
 | CLI 用法 | `uv run python scripts/bank.py --help` |
 
 MathNet 入库单走本地 `codex exec`，**不派 Symphony**（Symphony 只接文档/代码类工单）。
