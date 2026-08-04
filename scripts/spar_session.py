@@ -381,7 +381,10 @@ def spar_start(problems, args, pid):
     print(f'会话已开：{sid}（{mode}）')
     print(f'题卡：{_rel(card_path)}')
     print(f'限时：★{d} ≤ {limit} 分钟（超时不拦，finish 时计入判定）；{ladder_note}')
-    print(f'卡住：{CLI} spar hint　看解：spar reveal　落账：spar finish')
+    print(f'卡住：{CLI} spar hint')
+    print(f'看解：{CLI} spar reveal')
+    print(f'落账：{CLI} spar finish')
+    print('（嫌长？alias ob="uv run python scripts/bank.py" 之后 ob spar hint）')
     if getattr(args, 'print_card', False):
         print('\n' + card)
 

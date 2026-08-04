@@ -1,0 +1,225 @@
+[
+ {
+  "id": "A-001",
+  "title": "Birds Between Two Branches",
+  "difficulty": 1,
+  "topics": [
+   "方程与设元"
+  ],
+  "problem": "There were 25 birds on two branches. After a while 5 birds from the first branch flew over to the second and after a while longer 7 birds from the second flew away. In that moment on the first branch there were twice as many birds than on the second. How many birds were there on each of the two branches in the beginning?",
+  "answer": "Initially 17 birds on the first branch and 8 birds on the second branch.",
+  "solution": "When the 7 birds flew away from the second branch the total number of birds on both branches was $25-7=18$. Because in that moment on the first branch there were twice as many birds than on the second, there were $18:3=6$ birds on the second branch, and on the first one were $2 \\cdot 6=12$ birds. Hence, before the 7 birds flew away from the second branch, there were $6+7=13$ birds on it. In the beginning, before the 5 birds flew from the first to the second branch, on the second branch were $13-5=8$ birds and on the first were $12+5=17$ birds."
+ },
+ {
+  "id": "A-002",
+  "title": "Weighted Partial-Sum Convergence",
+  "difficulty": 3,
+  "topics": [
+   "数列与递推"
+  ],
+  "problem": "Let $a \\ge 0$ and let $(x_n)_{n \\ge 1}$ be a sequence of real numbers. Given that $\\left(\\frac{x_1+\\dots+x_n}{n^a}\\right)_{n \\ge 1}$ is a bounded sequence, prove that the sequence $(y_n)_{n \\ge 1}$, defined by\n$$\ny_n = \\frac{x_1}{1^b} + \\frac{x_2}{2^b} + \\dots + \\frac{x_n}{n^b},\n$$\nis a convergent sequence for all $b > a$.",
+  "answer": "证明题",
+  "solution": "Let $S_n = \\sum_{k=1}^{n} x_k$, $n \\in \\mathbb{N}^*$. Using the hypothesis, one can find a constant $c > 0$ such that $|S_n| \\le c n^a$, $\\forall n \\in \\mathbb{N}^*$. Let $n, p \\in \\mathbb{N}^*$; we have:\n$$\n\\begin{align*}\n|y_{n+p} - y_n| &= \\left| \\sum_{k=n+1}^{n+p} \\frac{x_k}{k^b} \\right| = \\left| \\sum_{k=n+1}^{n+p} \\frac{S_k - S_{k-1}}{k^b} \\right| = \\\\\n&= \\left| \\frac{S_{n+p}}{(n+p+1)^b} - \\frac{S_n}{(n+1)^b} + \\sum_{k=n+1}^{n+p} S_k \\left( \\frac{1}{k^b} - \\frac{1}{(k+1)^b} \\right) \\right| \\\\\n&\\le \\frac{|S_{n+p}|}{(n+p+1)^b} + \\frac{|S_n|}{(n+1)^b} + \\sum_{k=n+1}^{n+p} |S_k| \\left( \\frac{1}{k^b} - \\frac{1}{(k+1)^b} \\right) \\\\\n&\\le c \\left[ \\frac{2}{n^{b-a}} + \\sum_{k=n+1}^{n+p} k^a \\left( \\frac{1}{k^b} - \\frac{1}{(k+1)^b} \\right) \\right].\n\\end{align*}\n$$\nApplying the mean value theorem to the function $f(x) = x^{-\\alpha}$, $x > 0$ on the interval $[i, i+1]$, with $\\alpha, i > 0$, yields\n$$\n\\frac{\\alpha}{(i+1)^{\\alpha+1}} < \\frac{1}{i^{\\alpha}} - \\frac{1}{(i+1)^{\\alpha}} < \\frac{\\alpha}{i^{\\alpha+1}},\n$$\nand since $b, b-a > 0$, we obtain\n$$\n\\frac{1}{k^b} - \\frac{1}{(k+1)^b} < \\frac{b}{k^{b+1}} \\quad \\text{and} \\quad \\frac{b-a}{k^{b-a+1}} < \\frac{1}{(k-1)^{b-a}} - \\frac{1}{k^{b-a}}, \\forall k \\in \\mathbb{N}, k \\ge 2.\n$$\nThen\n$$\n\\begin{align*}\n\\sum_{k=n+1}^{n+p} k^a \\left( \\frac{1}{k^b} - \\frac{1}{(k+1)^b} \\right) &< \\sum_{k=n+1}^{n+p} \\frac{b k^a}{k^{b+1}} = \\frac{b}{b-a} \\sum_{k=n+1}^{n+p} \\frac{b-a}{k^{b-a+1}} \\\\\n&< \\frac{b}{b-a} \\sum_{k=n+1}^{n+p} \\left( \\frac{1}{(k-1)^{b-a}} - \\frac{1}{k^{b-a}} \\right) \\\\\n&= \\frac{b}{b-a} \\left( \\frac{1}{n^{b-a}} - \\frac{1}{(n+p)^{b-a}} \\right) < \\frac{b}{(b-a)n^{b-a}}.\n\\end{align*}\n$$\nIt follows that\n$$\n|y_{n+p} - y_n| < c \\left( 2 + \\frac{b}{b-a} \\right) \\frac{1}{n^{b-a}}, \\forall n, p \\in \\mathbb{N}^*.\n$$\nFinally, since $\\lim_{n \\to \\infty} n^{-(b-a)} = 0$, we obtain that $(y_n)_{n \\ge 1}$ is a Cauchy sequence, hence a convergent one."
+ },
+ {
+  "id": "A-003",
+  "title": "Cubic–Quartic Equality Triple",
+  "difficulty": 2,
+  "topics": [
+   "多项式",
+   "不等式"
+  ],
+  "problem": "a. Show that $x^4 - x^3 - x + 1 \\ge 0$, for all real numbers $x$.\n\nb. Find all real numbers $x_1, x_2$ and $x_3$ given that $x_1 + x_2 + x_3 = 3$ and $x_1^3 + x_2^3 + x_3^3 = x_1^4 + x_2^4 + x_3^4$.",
+  "answer": "x1 = x2 = x3 = 1",
+  "solution": "a. Write $x^4 - x^3 - x + 1 = (x-1)(x^3 - 1) = (x-1)^2(x^2 + x + 1)$ and notice that $x^2 + x + 1 > 0$ for all $x \\in \\mathbb{R}$ to get the claim.\n\nb. Notice that $\\sum_{k=1}^{3} (x_k^4 - x_k^3 - x_k + 1) = 0$ and use (a) to derive that $x_1^4 - x_1^3 - x_1 + 1 = 0$, $k = 1, 2, 3$. It follows that $x_1 = x_2 = x_3 = 1$."
+ },
+ {
+  "id": "A-004",
+  "title": "Bounded Symmetric Cubic System",
+  "difficulty": 3,
+  "topics": [
+   "根与系数",
+   "不等式"
+  ],
+  "problem": "Find all pairs of real numbers $(x, y)$ satisfying the following conditions:\n$$x^2 + y^2 + x + y = xy(x + y) - \\frac{10}{27}$$\n$$|xy| \\le \\frac{25}{9}.$$",
+  "answer": "(x, y) = (-1/3, -1/3) and (x, y) = (5/3, 5/3)",
+  "solution": "Answer: $(x, y) = (-1/3, -1/3)$, $(5/3, 5/3)$.\nFirstly, we obtain that\n$$\nx^2 + y^2 + x + y - xy(x + y) + 2 = -(1-x)(1-y)(x+y+2)\n$$\nand hence we get\n$$\n(1-x)(1-y)(x+y+2) = \\frac{64}{27}.\n$$\nLet $k^3 = 1-x$, $\\ell^3 = 1-y$, $m^3 = x+y+2$. Then we have\n$$\nk^3 + \\ell^3 + m^3 = 4 \\quad \\text{and} \\quad k\\ell m = \\frac{4}{3}.\n$$\nThis shows that $k^3 + \\ell^3 + m^3 = 3k\\ell m$ and it can be expressed as\n$$\n(k + \\ell + m)((k - \\ell)^2 + (\\ell - m)^2 + (m - k)^2) = 0.\n$$\nThe last equality implies that either $k + \\ell + m = 0$ or $k = \\ell = m$.\nFor $k = \\ell = m$, we obtain the solution $x = y = -1/3$.\nLet $k + \\ell + m = 0$. In this case using $k\\ell m = 4/3$, we get $k\\ell(k + \\ell) = -4/3$. Consider the condition $|xy| = |(1-k^3)(1-\\ell^3)| \\le 25/9$. Define $u = k + \\ell$, $v = k\\ell$. In this case, we get\n$$\nuv = -\\frac{4}{3} \\quad \\text{and} \\quad |(1-k^3)(1-\\ell^3)| = |u^3 - v^3 + 3| \\le \\frac{25}{9}.\n$$\nThese two conditions imply that\n$$\n-\\frac{52}{9} \\le u^3 - v^3 = u^3 + \\frac{64}{27u^3} \\le -\\frac{2}{9} \\quad (*)\n$$\nBy AM-GM, we get $u^2 \\ge 4v = -16/(3u)$ which is equivalent to $u > 0$ or $u^3 \\le -16/3$. From (*), we conclude that $u < 0$ and hence $u^3 \\le -16/3$. In this case since $u^3 + 16/3 \\le 0$ and $4/(9u^3) + 1 \\ge 11/12 > 0$ we get that\n$$\nu^3 + \\frac{64}{27u^3} + \\frac{52}{9} = \\left(u^3 + \\frac{16}{3}\\right) \\left(\\frac{4}{9u^3} + 1\\right) \\le 0\n$$\nTherefore, (*) holds only if $u^3 = -16/3$ and $u^2 = 4v$ which implies that $k = \\ell = -\\sqrt[3]{2}/3$. This yields the solution $x = y = 5/3$. Both obtained solutions satisfy the problem conditions.\n\n---\n\nLet $x+y=a$, $xy=b$. Then by AM-GM, we have $a^2 \\ge 4b$ and hence\n$$\nx^2 + y^2 + x + y - xy(x + y) = a^2 + a - b(a + 2) = -\\frac{10}{27},\n$$\n$$\nb = \\frac{a^2 + a + \\frac{10}{27}}{a + 2} \\le \\frac{a^2}{4},\n$$\n$$\n|b| = \\left| \\frac{a^2 + a + \\frac{10}{27}}{a + 2} \\right| \\le \\frac{25}{9}.\n$$\nTherefore, we get\n$$\n\\frac{a^2}{4} - \\frac{a^2 + a + \\frac{10}{27}}{a + 2} = \\frac{\\left(a + \\frac{2}{3}\\right)^2 \\left(a - \\frac{10}{3}\\right)}{4(a + 2)} \\ge 0 \\quad (1),\n$$\n$$\n\\frac{a^2 + a + \\frac{10}{27}}{a + 2} - \\frac{25}{9} = \\frac{\\left(a - \\frac{10}{3}\\right)\\left(a + \\frac{14}{9}\\right)}{a + 2} \\le 0 \\quad (2),\n$$\n$$\n\\frac{a^2 + a + \\frac{10}{27}}{a + 2} + \\frac{25}{9} = \\frac{\\left(a + \\frac{17}{9}\\right)^2 + \\frac{191}{81}}{a + 2} \\ge 0 \\quad (3).\n$$\nUsing (1), (2) and (3), we obtain the following solutions:\n$$\n(1) \\iff a < -2 \\quad \\text{or} \\quad a \\ge \\frac{10}{3} \\quad \\text{or} \\quad a = -\\frac{2}{3},\n$$\n$$\n(2) \\iff a < -2 \\quad \\text{or} \\quad -\\frac{14}{9} \\le a \\le \\frac{10}{3},\n$$\n$$\n(3) \\iff a > -2.\n$$\nHence, the only solutions are $a = -\\frac{2}{3}$ and $a = \\frac{10}{3}$. In both cases, $a^2 = 4b$ and it follows that $x = y = \\frac{a}{2}$. The obtained solutions $(x, y) = (-1/3, -1/3)$, $(5/3, 5/3)$ satisfy the problem conditions."
+ },
+ {
+  "id": "A-005",
+  "title": "Injective Functional Equation",
+  "difficulty": 3,
+  "topics": [
+   "函数方程"
+  ],
+  "problem": "Find all functions $f: \\mathbb{R} \\to \\mathbb{R}$, such that\n$$ (x - 2)f(y) + f(y + 2f(x)) = f(x + yf(x)) $$\nfor all real $x$ and $y$.",
+  "answer": "f(x) = 0 for all x, and f(x) = x - 1",
+  "solution": "First, assume that $f(0) = 0$. Inserting $x = 0$ into the functional equation we get $f(y) = 0$ for all $y \\in \\mathbb{R}$. This function satisfies the equation.\n\nNow, let $f(0) \\neq 0$. Inserting $y = 0$ into the equation we get\n$$\n(x - 2)f(0) + f(2f(x)) = f(x)\n$$\nfor all $x \\in \\mathbb{R}$. Obviously, this means that $f$ is injective.\n\nNow, put $x = 2$ into the equation to get\n$$\nf(y + 2f(2)) = f(2 + yf(2)) \\quad \\text{for all } y \\in \\mathbb{R}.\n$$\nSince $f$ is injective, we have $y + 2f(2) = 2 + yf(2)$ for all $y \\in \\mathbb{R}$. If we insert $y = 0$, then we get $f(2) = 1$.\n\nSince $f(2) = 1$ and $f$ is injective, we have $f(3) \\neq 1$. Insert $x = 3$ and $y = \\frac{3}{1-f(3)}$ into the equation to get\n$$\nf\\left(\\frac{3}{1-f(3)} + 2f(3)\\right) = 0.\n$$\nWe have shown that $f$ has a zero. Let $a$ be a zero of $f$, $f(a) = 0$. Inserting $y = a$ into the initial equation yields\n$$\nf(a + 2f(x)) = f(x + af(x)) \\quad \\text{for all } x \\in \\mathbb{R}.\n$$\nSince $f$ is injective, we have $a + 2f(x) = x + af(x)$ for all $x \\in \\mathbb{R}$. Since $a \\neq 2$ (remember that $f(2) = 1 \\neq 0$), we get $f(x) = \\frac{x-a}{2-a}$.\n\nFinally, inserting $f(x) = \\frac{x-a}{2-a}$ into the equation we get $a = 1$. The only two solutions to this functional equation are the functions $f(x) = 0$ and $f(x) = x - 1$."
+ },
+ {
+  "id": "N-001",
+  "title": "Consecutive Five-Digit Palindromes",
+  "difficulty": 2,
+  "topics": [
+   "代数变换技巧"
+  ],
+  "problem": "Problem:\n\nLet $a$ and $b$ be five-digit palindromes (without leading zeroes) such that $a < b$ and there are no other five-digit palindromes strictly between $a$ and $b$. What are all possible values of $b - a$? (A number is a palindrome if it reads the same forwards and backwards in base 10.)",
+  "answer": "11, 100, 110",
+  "solution": "Solution:\n\nLet $\\overline{x y z y x}$ be the digits of the palindrome $a$. There are three cases.\n\nIf $z < 9$, then the next palindrome greater than $\\overline{x y z y x}$ is $\\overline{x y (z+1) y x}$, which differs by $100$.\n\nIf $z = 9$ but $y < 9$, then the next palindrome up is $\\overline{x (y+1) 0 (y+1) x}$, which differs from $\\overline{x y 9 y x}$ by $110$.\n\nFinally, if $y = z = 9$, then the next palindrome after $\\overline{x 9 9 9 x}$ is $\\overline{(x+1) 0 0 0 (x+1)}$, which gives a difference of $11$.\n\nThus, the possible differences are $11, 100, 110$."
+ },
+ {
+  "id": "N-002",
+  "title": "Nearest Square to Odd Power",
+  "difficulty": 2,
+  "topics": [
+   "二次剩余与平方数判别",
+   "素数与算术基本定理",
+   "不定方程"
+  ],
+  "problem": "Find the smallest possible value of the expression $|5^{4m+3} - n^2|$, given that $m$ and $n$ are non-negative integers.",
+  "answer": "4",
+  "solution": "Assume that $n^2 - 5^{4m+3} > 0$. If $n^2 - 5^{4m+3} = 1$, then $5^{4m+3} = n^2 - 1 = (n-1)(n+1)$. Since $n$ is obviously even the numbers $n-1$ and $n+1$ must be coprime, which implies $n-1 = 1$ and $n+1 = 5^{4m+3}$. This is not possible. If $n$ is divisible by $5$, then $n^2 - 5^{4m+3} \\ge 5$, if $n$ is of the form $n = 5k \\pm 1$, then\n\n$n^2 - 5^{4m+3} \\equiv 1 \\pmod{5}$, and if $n = 5k \\pm 2$, then $n^2 - 5^{4m+3} \\equiv 4 \\pmod{5}$. Since none of the remainders are equal to $2$ or $3$ and $n^2 - 5^{4m+3} > 1$, we conclude that $n^2 - 5^{4m+3} \\ge 4$.\n\nNow, assume $5^{4m+3} - n^2 > 0$. This number cannot be equal to either $2$ or $3$. We can see this by considering the remainders modulo $5$, because $5^{4m+3} - n^2$ is either divisible by $5$ (and hence greater than or equal to $5$), or $n$ has the form $n = 5k \\pm 1$ or $n = 5k \\pm 2$. So, either $5^{4m+3} - n^2 \\equiv -1 \\equiv 4 \\pmod{5}$ or $5^{4m+3} - n^2 \\equiv -4 \\equiv 1 \\pmod{5}$.\n\nAssume there exist $m$ and $n$ such that $5^{4m+3} - n^2 = 1$. We can rewrite the equation as\n$$\n\\begin{aligned}\nn^2 &= 5^{4m+3} - 1 = (5-1)(5^{4m+2} + 5^{4m+1} + \\dots + 5 + 1) = \\\\\n&= 4(5^{4m+2} + 5^{4m+1} + \\dots + 5 + 1).\n\\end{aligned}\n$$\nThis implies that $5^{4m+2} + 5^{4m+1} + \\dots + 5 + 1$ is a perfect square. If it is equal to $l^2$, then $(l-1)(l+1) = 5(5^{4m+1} + 5^4 + \\dots + 5 + 1)$. Let us consider the expression $5^{4m+1} + 5^4 + \\dots + 5 + 1$ modulo $4$. We have\n$$\n5^{4m+1} + 5^4 + \\dots + 5 + 1 \\equiv 1 + 1 + \\dots + 1 + 1 \\equiv (4m + 2) \\equiv 2 \\pmod{4},\n$$\nsince there are $4m + 2$ summands in the sum. This sum is therefore divisible by $2$ but not by $4$. So, $(l-1)(l+1)$ is even. On the other hand, $l-1$ and $l+1$ have the same parity, so $(l-1)(l+1)$ is divisible by $4$, a contradiction. The numbers $m$ and $n$ such that $5^{4m+3} - n^2 = 1$ do not exist.\n\nWe have shown that $n^2 - 5^{4m+3}$ and $5^{4m+3} - n^2$ cannot be equal to $0$, $1$, $2$ or $3$, so the smallest possible value of $|5^{4m+3} - n^2|$ is $4$ and this value is attained when $n=11$ and $m=0$, for example."
+ },
+ {
+  "id": "N-003",
+  "title": "Triangle-Factor Equation Modulo Three",
+  "difficulty": 2,
+  "topics": [
+   "最大公约数与欧几里得算法",
+   "素数与算术基本定理",
+   "整除与同余"
+  ],
+  "problem": "Do there exist positive integers $a, b, c$, such they have no common divisor and\n$$\nab + bc + ca = (a + b - c)(b + c - a)(c + a - b)?\n$$",
+  "answer": "No; any solution would force all three integers to be divisible by three, so none exist without a common divisor.",
+  "solution": "We show that all of $a, b$ and $c$ have the number $3$ as a common factor. First suppose that one of $a, b, c$ is divisible by $3$. By symmetry, we may assume that $a \\equiv 0 \\pmod{3}$. Then the equation implies $bc \\equiv (b-c)(b+c)(c-b) \\pmod{3}$. If neither of $b$ and $c$ is divisible by $3$, this gives $bc \\equiv 0 \\pmod{3}$, which is a contradiction. On the other hand, if either of $b$ and $c$ is divisible by $3$, then from $bc \\equiv (b-c)(b+c)(c-b) \\pmod{3}$ we see that they both are divisible by $3$, which means that $a, b$ and $c$ are all divisible by $3$.\n\nNow we are left with the case that $a, b, c$ are each $\\pm 1 \\pmod{3}$. If $a \\equiv b \\equiv c \\pmod{3}$, then clearly the left-hand side of the equation is divisible by $3$, while the right-hand side is not, so we have a contradiction. In the opposite case that two of $a, b$ and $c$ are equal and the third one is distinct modulo $3$, clearly the left-hand side of the equation is not divisible by $3$, while the right-hand side is divisible. We conclude that $a, b$ and $c$ are all divisible by $3$."
+ },
+ {
+  "id": "N-004",
+  "title": "Odd Representation by Quadratic Form",
+  "difficulty": 4,
+  "topics": [
+   "不定方程",
+   "抽屉原理"
+  ],
+  "problem": "Suppose positive integers $m$, $n$, $k$ satisfy $mn = k^2 + k + 3$. Prove that at least one of the following Diophantine equations\n$$\nx^2 + 11y^2 = 4m \\text{ and } x^2 + 11y^2 = 4n\n$$\nhas a solution $(x, y)$ with $x$, $y$ being odd numbers.",
+  "answer": "证明题",
+  "solution": "First, we prove a lemma.\n\n**Lemma** The following Diophantine equation\n$$\nx^2 + 11y^2 = 4m\n$$\nhas a solution $(x_0, y_0)$, such that either $x_0$, $y_0$ are odd numbers or $x_0$, $y_0$ are even numbers with $x_0 \\equiv (2k+1)y_0 \\pmod m$.\n\nConsider the expression $x + (2k+1)y$, where $x$, $y$ are integers, and $0 \\le x \\le 2\\sqrt{m}$, $0 \\le y \\le \\frac{\\sqrt{m}}{2}$.\n\nThere are $([2\\sqrt{m}]+1)\\left\\lfloor\\frac{\\sqrt{m}}{2}\\right\\rfloor+1 \\ge m$ such expressions. So there exist integers $x_1$, $x_2 \\in [0, 2\\sqrt{m}]$, $y_1$, $y_2 \\in [0, \\frac{\\sqrt{m}}{2}]$, such that $(x_1, y_1) \\ne (x_2, y_2)$, and\n$$\nx_1 + (2k+1)y_1 \\equiv x_2 + (2k+1)y_2 \\pmod m,\n$$\nSo\n$$\nx \\equiv (2k+1)y \\pmod m, \\quad \\text{where} \\quad x = x_1 - x_2, \\ y = y_2 - y_1.\n$$\nThis means\n$$\nx^2 \\equiv (2k+1)^2 y^2 \\equiv -11y^2 \\pmod m,\n$$\nthat is, $x^2 + 11y^2 = tm$ for some integer $t$.\nSince $|x| \\le 2\\sqrt{m}$, $|y| \\le \\frac{\\sqrt{m}}{2}$, we have\n$$\nx^2 + 11y^2 < 4m + \\frac{11}{4}m < 7m.\n$$\nSo $1 \\le t \\le 6$.\nAs $m$ is an odd number, obviously the equations $x^2 + 11y^2 = 2m$, and $x^2 + 11y^2 = 6m$ have no integer solution.\n\n(1) If $x^2 + 11y^2 = m$, then $x_0 = 2x$, $y_0 = 2y$ is a solution of $x^2 + 11y^2 = 4m$ satisfying the lemma.\n\n(2) If $x^2 + 11y^2 = 4m$, then $x_0 = x$, $y_0 = y$ is a solution of $x^2 + 11y^2 = 4m$ satisfying the lemma.\n\n(3) If $x^2 + 11y^2 = 3m$, then $(x \\pm 11y)^2 + 11(x \\mp y)^2 = 9 \\cdot 4m$.\nFirst, assume that $3 \\mid m$. If $x \\not\\equiv 0 \\pmod{3}$, $y \\not\\equiv 0 \\pmod{3}$, and $x \\not\\equiv y \\pmod{3}$, then\n$$\nx_0 = \\frac{x - 11y}{3}, \\quad y_0 = \\frac{x + y}{3}\n$$\nis a solution of $x^2 + 11y^2 = 4m$ satisfying the lemma.\nIf $x \\equiv y \\not\\equiv 0 \\pmod{3}$, then\n$$\nx_0 = \\frac{x + 11y}{3}, \\quad y_0 = \\frac{y - x}{3}\n$$\nis a solution of $x^2 + 11y^2 = 4m$ satisfying the lemma.\nNow suppose $3 \\mid m$. Then the above are still integer solutions. If $x^2 + 11y^2 = 4m$ has an even integer solution $x_0 = 2x_1$, $y_0 = 2y_1$, then\n$$\nx_1^2 + 11y_1^2 = m \\Leftrightarrow 36m = (5x_1 \\pm 11y_1)^2 + 11(5y_1 \\mp x_1)^2.\n$$\nSince one of $x_1$, $y_1$ is even and the other is odd, so $5x_1 \\pm 11y_1$, $5y_1 \\mp x_1$ are odd numbers.\nIf $x_1 \\equiv y_1 \\pmod{3}$, then $x_0 = \\frac{5x_1 - 11y_1}{3}$, $y_0 = \\frac{5y_1 + x_1}{3}$ is a solution of $x^2 + 11y^2 = 4m$ satisfying the lemma.\nIf $x_1 \\not\\equiv y_1 \\pmod{3}$, then $x_0 = \\frac{5x_1 + 11y_1}{3}$, $y_0 = \\frac{5y_1 - x_1}{3}$ is a solution of $x^2 + 11y^2 = 4m$ satisfying the lemma.\n\n(4) If $x^2 + 11y^2 = 5m$, then $25 \\cdot 4m = (3x \\mp 11y)^2 + 11(3y \\pm x)^2$.\nWhen $5 \\nmid m$, if\n$$\nx \\equiv \\pm 1 \\pmod{5}, \\quad y \\equiv \\mp 2 \\pmod{5}, \\quad \\text{or } x \\equiv \\pm 2 \\pmod{5}, \\quad y \\equiv \\pm 1 \\pmod{5},\n$$\nthen\n$$\nx_0 = \\frac{3x - 11y}{5}, \\quad y_0 = \\frac{3y + x}{5}\n$$\nis a solution of $x^2 + 11y^2 = 4m$ satisfying the lemma.\nIf $x \\equiv \\pm 1 \\pmod{5}$, $y \\equiv \\pm 2 \\pmod{5}$, or $x \\equiv \\pm 2 \\pmod{5}$, $y \\equiv \\mp 1 \\pmod{5}$, then\n$$\nx_0 = \\frac{3x + 11y}{5}, \\quad y_0 = \\frac{3y - x}{5}\n$$\nis a solution of $x^2 + 11y^2 = 4m$ satisfying the lemma.\n\nWhen $5 \\mid m$, then the above are still integer solutions. If $x^2 + 11y^2 = 4m$ has an even integer solution $x_0 = 2x_1$, $y_0 = 2y_1$, then\n$$\nx_1^2 + 11y_1^2 = m, \\quad x_1 \\not\\equiv y_1 \\pmod 2,\n$$\nand we have $100m = (x_1 \\mp 33y_1)^2 + 11(y_1 \\pm 3x_1)^2$.\nIf $x_1 \\equiv y_1 \\equiv 0 \\pmod{5}$, or $x_1 \\equiv \\pm 1 \\pmod{5}$, $y_1 \\equiv \\pm 2 \\pmod{5}$, or\n$$\nx_1 \\equiv \\pm 2 \\pmod{5}, \\quad y_1 \\equiv \\mp 1 \\pmod{5},\n$$\nthen $x_0 = \\frac{x_1 - 33y_1}{5}$, $y_0 = \\frac{y_1 + 3x_1}{5}$ is a solution of $x^2 + 11y^2 = 4m$ satisfying the lemma.\nIf $x_1 \\equiv \\pm 1 \\pmod{5}$, $y_1 \\equiv \\mp 2 \\pmod{5}$, or $x_1 \\equiv \\pm 2 \\pmod{5}$, $y_1 \\equiv \\pm 1 \\pmod{5}$, then\n$$\nx_0 = \\frac{x_1 + 33y_1}{5}, \\quad y_0 = \\frac{y_1 - 33x_1}{5}\n$$\nis a solution of $x^2 + 11y^2 = 4m$ satisfying the lemma.\n\nThe lemma is proved.\n\nFrom the lemma, if $x^2 + 11y^2 = 4m$ has a solution $(x, y)$ with $x$, $y$ being odd numbers, then it has a solution $(x_0, y_0)$ with $x_0$, $y_0$ being even numbers satisfying $x_0 \\equiv (2k+1)y_0 \\pmod m$.\n\nLet $l = 2k + 1$, the solution of the quadratic equation\n$$\nmx^2 + ly_0x + ny_0^2 - 1 = 0\n$$\nis\n$$\nx = \\frac{-ly_0 \\pm \\sqrt{l^2 y_0^2 - 4mny_0^2 + 4m}}{2m} = \\frac{-ly_0 \\pm x_0}{2m}.\n$$\nSo the equation\n$$\nmx_1^2 + ly_0x_1 + ny_0^2 - 1 = 0\n$$\nhas at least an integer solution $x_1$, i.e.\n$$\nmx_1^2 + ly_0x_1 + ny_0^2 - 1 = 0.\n$$\nThis indicates that $x_1$ is an odd number. Now, from this equation, it follows that\n$$\n(2ny_0 + lx_1)^2 + 11x_1^2 = 4n.\n$$\nThis means $x^2 + 11y^2 = 4n$ has a solution $(x, y)$ with $x$, $y$ being odd numbers, where $x = 2ny_0 + lx_1$, $y = x_1$.\n\nTherefore, at least one of the equations $x^2 + 11y^2 = 4m$ or $x^2 + 11y^2 = 4n$ has a solution $(x, y)$ with $x$, $y$ odd."
+ },
+ {
+  "id": "N-005",
+  "title": "Divisors Separated by Square Root",
+  "difficulty": 3,
+  "topics": [
+   "素数与算术基本定理",
+   "数列与递推"
+  ],
+  "problem": "Show that there are infinitely many positive integer numbers $n$ such that $n^2 + 1$ has two positive divisors whose difference is $n$.",
+  "answer": "证明题",
+  "solution": "Define the sequence $(a_k)_{k \\ge 0}$ by $a_0 = 1$, $a_1 = 2$ and $a_{k+2} a_k = a_{k+1}^2 + 1$, $k = 0, 1, 2, \\dots$, and check inductively that the $a_k$ are all positive integer numbers, the $n_k = a_{k+1} - a_k$ form a strictly increasing sequence of positive integer numbers, and $a_k$ and $a_{k+1}$ both divide $n_k^2 + 1$."
+ },
+ {
+  "id": "C-001",
+  "title": "Positive Inverse of Grid Matrix",
+  "difficulty": 3,
+  "topics": [
+   "不等式",
+   "图论"
+  ],
+  "problem": "Let $n$ be an integer and $n_1$ be one of its divisors. Let $A$ be a $n \\times n$ symmetric matrix defined by $a_{i,i} = 4$, $a_{i,i+1} = a_{i+1,i} = -1$ for all $i$ such that $1 \\le i \\le n-1$ and $i+1$ is not a multiple of $n_1$, $a_{i,i+n_1} = a_{i+n_1,i} = -1$ and $a_{i,j} = 0$ otherwise.\nProve that $A$ has an inverse and that all of the entries in the inverse are positive.",
+  "answer": "证明题",
+  "solution": "Let's find the inverse of $A/4 = I - X$, where all entries in $X$ are either $0$ or $1/4$. We will use the series\n$$\n(I - X)^{-1} = I + X + X^2 + X^3 + \\dots\n$$\nFirst let's prove that this series converges. It suffices to show that the maximum $M$ such that $\\|Xw\\| \\le M\\|w\\|$ for all column vectors $w$ of $X$ is less than $1$, so the sum of the entries always decrease by a factor smaller than $1$ if you multiply a vector by $X^2$; then we sum the series as $(I+X)(I+X^2+X^4+\\dots)$. Notice that every row of $X$ has at most four nonzero entries, all of which are equal to $1/4$. So if $w = (a_1, a_2, \\dots, a_n)$ then every entry of $Xw$ is of the form $\\frac{a_{r_1}+a_{r_2}+\\dots+a_{r_s}}{4}$, $s \\le 4$. By the Cauchy-Schwarz inequality, its square is at most $\\frac{s}{16}(a_{r_1}^2+a_{r_2}^2+\\dots+a_{r_s}^2) \\le \\frac{a_{r_1}^2+a_{r_2}^2+\\dots+a_{r_s}^2}{4}$, with equality if and only if $a_{r_1} = a_{r_2} = \\dots = a_{r_s}$ and $s=4$. Summing over all the rows, the sum of squares of the coordinates of $Xw$ is at most $a_1^2 + a_2^2 + \\dots + a_n^2 = \\|w\\|^2$, because all columns of $X$ have at most four nonzero entries. But equality would only happen if all entries $a_i$ are equal and $s=4$ always, which does not happen for, say, the first row. So $M < 1$ and the series converges.\n\nConsider the graph whose vertices are the numbers $v_1, v_2, \\dots, v_n$ and we connect $v_i$ and $v_j$ if and only if the entry $x_{ij}$ in $X$ is $1/4$. By the definition of the matrix $A$, this graph has a lattice-like configuration: it can be split in several paths $v_1v_2 \\dots v_{n_1-1}$, $v_{k_1}v_{k_1+1} \\dots v_{(k+1)n_1-1}$, $1 \\le k \\le \\frac{n}{2}-1$, $v_r v_{r+n_1} v_{r+2n_1} \\dots v_{r+n-n_1}$, $1 \\le r \\le n_1$. It is clear that this graph is connected. Since the entry $m_{ij}$ in $X^k$ is nonzero if and only if there exists a circuit from $i$ to $j$ with $k$ edges, for all $i, j$ there is $k$ such that the corresponding entry $m_{ij}$ in $X^k$ is nonzero. This proves that all entries in the inverse of $A$ is positive."
+ },
+ {
+  "id": "C-002",
+  "title": "Crossing the Seventy-Five Percent Mark",
+  "difficulty": 2,
+  "topics": [
+   "染色与不变量"
+  ],
+  "problem": "Problem:\n\nAerith and Bob play rounds of pool. At some point Bob had won more rounds than Aerith, but now Aerith has won $85\\%$ of their rounds. Show that at some point, Aerith had won exactly $75\\%$ of their rounds.",
+  "answer": "证明题",
+  "solution": "Solution:\n\nAt any time, let $a$ and $b$ represent the respective number of rounds won by Aerith and Bob. Now, after $n$ games, $a-3b = n(85\\% - 3 \\cdot 15\\%) > 0$. However, at some point in the past $b$ was greater than $a$, so $a-3b$ was negative. Consider the first subsequent moment when $a-3b$ was non-negative. At that moment,\n$$\n(a-1)-3b < 0 \\leq a-3b,\n$$\nso as $a$ and $b$ were integers, $a-3b=0$ and $a=75\\% \\cdot (a+b)$, as desired."
+ },
+ {
+  "id": "C-003",
+  "title": "Distinct Grid Line Sums",
+  "difficulty": 3,
+  "topics": [
+   "计数与容斥",
+   "递推与生成结构"
+  ],
+  "problem": "In how many ways every unit square of a $2018 \\times 2018$ board can be colored in red or white such that number of red unit squares in any two rows are distinct and number of red unit squares in any two columns are distinct.",
+  "answer": "2(2018!)^2",
+  "solution": "The answer is $2(2018!)^2$. We consider the problem for an $n \\times n$ board. Let $r_i$ be the number of red squares in the $i$-th row for $i = 1, \\dots, n$ and $c_j$ be the number of red squares in the $j$-th column for $j = 1, \\dots, n$. Since $r_i \\neq r_j$ for every $i \\neq j$, we see that $\\{r_1, \\dots, r_n\\} = \\{0, 1, \\dots, n\\} \\setminus \\{a\\}$ for some number $a$. Similarly, we have $\\{c_1, \\dots, c_n\\} = \\{0, 1, \\dots, n\\} \\setminus \\{b\\}$ for some number $b$. On the other hand, the number of red squares on the board is both $\\sum_{i=1}^n r_i$ and $\\sum_{j=1}^n c_j$. Thus, we get $a=b$.\n\nNote that if $r_i = 0$ for some $i$, then $c_j \\le n-1$ for every $j$ and hence, $a = n$. Moreover, if $r_i = n$ for some $i$, then $c_j \\ge 1$ for every $j$ and hence, $a = 0$. Therefore, the missing number is either $0$ or $n$.\nIf $a = 0$, then $r_i = c_j = n$ for some $i$ and $j$ and removing the $i$-th row and $j$-th column gives us the problem for $(n-1) \\times (n-1)$ board with the missing number $n-1$. Similarly, If $a = n$, then $r_i = c_j = 0$ for some $i$ and $j$ and removing the $i$-th row and $j$-th column gives us the problem for $(n-1) \\times (n-1)$ board with the missing number $0$. Therefore, at the beginning we can decide on the missing number in $2$ ways but later on it is uniquely determined. We can choose a row and a column to remove in $n \\cdot n$ ways. Finally, the answer is\n$$\n2 \\cdot n \\cdot n \\cdot (n-1) \\cdot (n-1) \\cdots 2 \\cdot 2 \\cdot 1 \\cdot 1 = 2(n!)^2.\n$$"
+ },
+ {
+  "id": "C-004",
+  "title": "Rainbow Connectivity Edge Coloring",
+  "difficulty": 4,
+  "topics": [
+   "图论"
+  ],
+  "problem": "Some cities of a country consisting of $n$ cities are connected by round trip flights so that there are at least $k$ flights from any city and any city is reachable from any city. Prove that for any such flight organization these flights can be distributed among $n-k$ air companies so that one can reach any city from any city by using at most one flight of each air company.",
+  "answer": "证明题",
+  "solution": "The problem can be reformulated in terms of graph theory: Let $G$ be a connected graph with $n$ vertices. If the degree of each vertex is at least $k$, then the edges of $G$ can be colored into $n-k$ colors so that for any pair of vertices there is a path between them not containing identically colored edges. We will prove the following slightly stronger statement: Let $G$ be a connected graph with $n$ vertices and $\\alpha(G)$ be the minimal degree and $K$ be any clique of $G$ consisting of vertices with minimal degree. The edges of $G$ can be colored into $n-\\alpha(G)$ colors so that the clique $K$ is colored into a single color and for any pair of vertices there is a path between them not containing identically colored edges. The statement will be proved at fixed $\\alpha(G)$ by induction over $n$.\n\nIf $\\alpha(G) = 1$, then we take any spanning tree of $G$ having $n-1$ edges and color it obviously by $n-1$ colors.\n\nInduction base: Since $n > \\alpha(G)$ we start with $n = \\alpha(G)+1$. Then $G$ is a complete graph and we can color all vertices in one color.\n\nNow suppose that $1 < \\alpha(G) < n-1$. Let $K$ be a maximal clique consisting of only vertices having degree $\\alpha(G)$ and put $l = |K|$. Note that if $l = \\alpha(G)+1$ then since $G$ is connected we get $K = G$, so $G$ is complete and one color is sufficient. Suppose $1 \\le l \\le \\alpha(G)$. Let $G_1, \\dots, G_p$ be connected components of $G-K$ and $K_i$ be the vertices directly connected to some vertex in $G_i$, $i = 1, \\dots, p$. Without loss of generality suppose that $|K_1| \\ge |K_i|$ for $i = 2, \\dots, p$. Let $f(G)$ be the minimal number of colors necessary for proper coloring of $G$. By inductive hypothesis $f(G_i) \\le n_i - \\alpha(G_i)$, where $n_i = |G_i|$.\n\nCase 1. $1 = |K_1| = 1 < |K|$. By contracting $K$ into single vertex, we get a graph $G'$. Note that $|G'| = n-l+1$ and $\\alpha(G') \\ge \\alpha(G)$ ($\\alpha(G') = \\alpha(G)$ if there is a vertex in some $G_i$ with degree $\\alpha(G)$ or each vertex in $K$ is connected to exactly one vertex in $G-K$). Therefore, by inductive hypothesis, $f(G') \\le n-l+1-\\alpha(G)$. Now for proper coloring of $G$ we take a coloring of $G'$ and color all edges of $K$ by some new color, spending in total less or equal than $n-l+1-\\alpha(G)+1 \\le n-\\alpha(G)$ colors, since in our case $l = |K| > |K_1| = 1$.\n\nCase 2. $1 < |K_1| = l_1 < |K|$. By contracting $K_1$ into single vertex $v$ $G$ transfers into $G'$ and $K$ transfers into $K'$. Note that $|G'| = n - l_1 + 1$ and $\\alpha(G') = \\alpha(G) - l_1 + 1$. By inductive hypothesis, there is a proper coloring of $G'$ by $f(G') \\le n - \\alpha(G)$ colors where all edges of $K'$ are colored by a single color $c$. Now for proper coloring of $G$ we take a coloring of $G'$ and color all remaining edges with both vertices in $K$ in $c$ and with one edge in $K$ with the color of the edge from $v$ to other endpoint, spending in total less or equal than $n - \\alpha(G)$ colors.\n\nCase 3. $K_1 = K$. By inductive hypothesis, $f(G') \\le n_i - \\alpha(G_i)$. Since $K$ is maximal, $\\alpha(G_i) \\ge \\alpha(G) - l + 1$. We can color all edges of $K$ and all edges from $K$ to $G_1$ by some color and edges from $K$ to $G_i, i = 2, \\dots, p$ by new distinct colors. Then\n$$\nf(G) \\le t+0+\\sum_{i=1}^{p}(n_i-\\alpha(G_i)) \\le t+\\sum_{i=1}^{p}(n_i-\\alpha(G)+l-1) = n-\\alpha(G)+(p-1)(l-\\alpha(G)) \\le n-\\alpha(G).\n$$"
+ },
+ {
+  "id": "C-005",
+  "title": "Mutual-Pointing Triangles",
+  "difficulty": 2,
+  "topics": [
+   "概率与期望"
+  ],
+  "problem": "Problem:\nThere are five people in a room. They each simultaneously pick two of the other people in the room independently and uniformly at random and point at them. Compute the probability that there exists a group of three people such that each of them is pointing at the other two in the group.",
+  "answer": "5/108",
+  "solution": "Solution:\nThe desired probability is the number of ways to pick the two isolated people times the probability that the remaining three point at each other. So,\n$$\nP = \\binom{5}{2} \\cdot \\left(\\frac{\\binom{2}{2}}{\\binom{4}{2}}\\right)^3 = 10 \\cdot \\left(\\frac{1}{6}\\right)^3 = \\frac{5}{108}\n$$\nis the desired probability."
+ },
+ {
+  "id": "G-001",
+  "title": "Four Separated Quartic Points",
+  "difficulty": 3,
+  "topics": [
+   "解析几何与向量复数法"
+  ],
+  "problem": "Problem:\n\nDo there exist four points $P_{i} = (x_{i}, y_{i}) \\in \\mathbb{R}^{2}$ ($1 \\leq i \\leq 4$) on the plane such that:\n- for all $i = 1,2,3,4$, the inequality $x_{i}^{4} + y_{i}^{4} \\leq x_{i}^{3} + y_{i}^{3}$ holds, and\n- for all $i \\neq j$, the distance between $P_{i}$ and $P_{j}$ is greater than $1$?",
+  "answer": "证明题",
+  "solution": "Solution:\n\nIn fact, there are! One might think that the region\n$$\n\\left\\{(x, y) \\in \\mathbb{R}^{2} \\mid x^{4} + y^{4} \\leq x^{3} + y^{3}\\right\\}\n$$\nis inside the ball defined by $x^{2} + y^{2} \\leq x + y$, which is a ball of radius $1 / \\sqrt{2}$. It turns out that it is not the case.\nWe claim that for all $\\epsilon > 0$ small enough, we can choose $(0,0)$, $(1,1)$, $\\left(1 - \\epsilon^{2}, -2\\epsilon\\right)$, and $\\left(-2\\epsilon, 1 - \\epsilon^{2}\\right)$. First we check the condition $x_{i}^{4} + y_{i}^{4} \\leq x_{i}^{3} + y_{i}^{3}$. This is obviously satisfied for the first two points, and for the other two points this translates to\n$$\n\\begin{aligned}\n\\left(1 - \\epsilon^{2}\\right)^{4} + (-2\\epsilon)^{4} &\\leq \\left(1 - \\epsilon^{2}\\right)^{3} + (-2\\epsilon)^{3} \\\\\n(2\\epsilon)^{3}(1 + 2\\epsilon) &\\leq \\left(1 - \\epsilon^{2}\\right)^{3}\\left(\\epsilon^{2}\\right) \\\\\n8\\epsilon(1 + 2\\epsilon) &\\leq \\left(1 - \\epsilon^{2}\\right)^{3}.\n\\end{aligned}\n$$\nThis is satisfied for small $\\epsilon$. Next we check that the distances are greater than $1$. Clearly the third and fourth points are at distance greater than $1$ from $(1,1)$ as they have negative $y$ and $x$ coordinates respectively. They are also at distance greater than $1$ from each other for small $\\epsilon$ as their distance tends to $\\sqrt{2}$ as $\\epsilon \\rightarrow 0$. Also, $(0,0)$ and $(1,1)$ are at distance greater than $1$ as well. The only remaining distances to check are the distance from the first point to the third and fourth points (which are the same distance). This distance is\n$$\n\\sqrt{\\left(1 - \\epsilon^{2}\\right)^{2} + (-2\\epsilon)^{2}} = \\sqrt{\\left(1 + \\epsilon^{2}\\right)^{2}} = 1 + \\epsilon^{2} > 0\n$$\nso all conditions are satisfied (for sufficiently small $\\epsilon$).\nFor example, one may choose $\\epsilon = 1 / 20$ to obtain the four points $(0,0)$, $(1,1)$, $\\left(-\\frac{1}{10}, \\frac{399}{400}\\right)$ and $\\left(\\frac{399}{400}, -\\frac{1}{10}\\right)$."
+ },
+ {
+  "id": "G-002",
+  "title": "Rotated Equilateral Orthocenters",
+  "difficulty": 2,
+  "topics": [
+   "解析几何与向量复数法",
+   "三角形五心与经典引理"
+  ],
+  "problem": "On the small arc $AB$ of the circumcircle of the equilateral triangle $ABC$ we consider a point $N$ such that the length of the arc $NB$ is $30^\\circ$. Consider the perpendicular lines from $N$ to $AC$ and $AB$, respectively. These lines intersect again the circumcircle of the triangle $ABC$ in points $M$ and $I$, respectively.\n\na) Prove that $IMN$ is an equilateral triangle.\n\nb) If $H_1, H_2$, and $H_3$ are the orthocenters of the triangles $NAB, IBC$, and $CAM$, respectively, prove that $H_1H_2H_3$ is an equilateral triangle.",
+  "answer": "证明题",
+  "solution": "a) Let $O$ be the circumcenter of the triangle $ABC$. Without loss of generality, we consider $O(0)$, while the vertices of the triangle are $A(1)$, $B(\\varepsilon)$, and $C(\\varepsilon^2)$, where $\\varepsilon = -\\frac{1}{2} + i\\frac{\\sqrt{3}}{2}$. Because the length of the arc $NB$ is $30^\\circ$, we have $AO \\perp ON$, so point $N$ has the affix $i$. Moreover, $NI \\perp AB$ implies the existence of $\\alpha \\in \\mathbb{R}^*$ such that:\n$$\n\\frac{i - z_I}{1 - \\varepsilon} = i\\alpha \\Rightarrow z_I = i - \\frac{3}{2}i\\alpha - \\frac{\\sqrt{3}}{2}\\alpha,\n$$\nwhere $z_I$ is the affix of the point $I$. From $|z_I| = 1$ we obtain $\\alpha = 1$, so the affix of the point $I$ is $i\\varepsilon$. In the same manner, from $MN \\perp AC$ we obtain that the affix of the point $M$ is $i\\varepsilon^2$, so the triangle $IMN$ is equilateral.\n\nb) Using Sylvester's theorem we have the affixes of the orthocenters as follows:\n$$\n\\begin{aligned}\nz_{H_1} &= z_A + z_N + z_B = i + 1 + \\varepsilon, \\\\\nz_{H_2} &= z_B + z_M + z_C = \\varepsilon + i\\varepsilon + \\varepsilon^2 = \\varepsilon z_{H_1}, \\\\\nz_{H_3} &= z_C + z_I + z_A = \\varepsilon^2 + i\\varepsilon^2 + 1 = \\varepsilon^2 z_{H_1},\n\\end{aligned}\n$$\nso the triangle $H_1H_2H_3$ is equilateral."
+ },
+ {
+  "id": "G-003",
+  "title": "Disjoint Discs Covering Lattice",
+  "difficulty": 4,
+  "topics": [
+   "圆与四点共圆",
+   "面积法与三角法",
+   "不等式"
+  ],
+  "problem": "A square grid on the Euclidean plane consists of all points $(m, n)$, where $m$ and $n$ are integers. Is it possible to cover all grid points by an infinite family of discs with non-overlapping interiors if each disc in the family has radius at least $5$?",
+  "answer": "No",
+  "solution": "It is not possible. The proof is by contradiction. Suppose that such a covering family $\\mathcal{F}$ exists. Let $D(P, \\rho)$ denote the disc with center $P$ and radius $\\rho$. Start with an arbitrary disc $D(O, r)$ that does not overlap any member of $\\mathcal{F}$. Then $D(O, r)$ covers no grid point. Take the disc $D(O, r)$ to be maximal in the sense that any further enlargement would cause it to violate the non-overlap condition. Then $D(O, r)$ is tangent to at least three discs in $\\mathcal{F}$. Observe that there must be two of the three tangent discs, say $D(A, a)$ and $D(B, b)$, such that $\\angle AOB \\le 120^\\circ$. By the Law of Cosines applied to triangle $ABO$,\n$$\n(a+b)^2 \\le (a+r)^2 + (b+r)^2 + (a+r)(b+r),\n$$\nwhich yields\n$$\nab \\le 3(a+b)r + 3r^2, \\quad \\text{and thus}\\quad 12r^2 \\ge (a-3r)(b-3r).\n$$\nNote that $r < 1/\\sqrt{2}$ because $D(O, r)$ covers no grid point, and $(a-3r)(b-3r) \\ge (5-3r)^2$ because each disc in $\\mathcal{F}$ has radius at least $5$. Hence $2\\sqrt{3}r \\ge (5-3r)$, which gives $5 \\le (3+2\\sqrt{3})r < (3+2\\sqrt{3})/\\sqrt{2}$ and thus $5\\sqrt{2} < 3+2\\sqrt{3}$. Squaring both sides of this inequality yields $50 < 21+12\\sqrt{3} < 21+12 \\cdot 2 = 45$. This contradiction completes the proof."
+ },
+ {
+  "id": "G-004",
+  "title": "Separated Circle Merging Cover",
+  "difficulty": 2,
+  "topics": [
+   "组合几何",
+   "不等式"
+  ],
+  "problem": "Problem:\n\nGiven 100 points on the plane. Prove that you can cover them with a collection of circles whose diameters total less than 100 and the distance between any two of which is more than 1. [The distance between circles radii $r$ and $s$ with centers a distance $d$ apart is the greater of 0 and $d - r - s$.]",
+  "answer": "证明题",
+  "solution": "Solution:\n\nIf we have two circles diameters $d$ and $d'$, the distance between which is less than $1$, then they are contained in a circle diameter $d + d' + 1$. [If the line through the centers cuts the circles in $A$, $B$, $A'$, $B'$, then take a circle diameter $AB'$.] So start with $100$ circles of diameter $1/1000$ each. If any pair is a distance $\\leq 1$ apart, then replace them by a single circle, increasing the total diameter by $1$. Repeat until all the circles are a distance $>1$ apart. We must end up with at least one circle, so the total increase is at most $99$. Hence the final total diameter is at most $99\\,1/10$."
+ }
+]
