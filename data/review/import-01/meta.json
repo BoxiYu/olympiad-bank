@@ -1,0 +1,8 @@
+{
+ "dataset": "ShadenA/MathNet",
+ "revision": "33e6b3bc254e6f0f0c1479b4252f5e9dd551d56c",
+ "seed": 7,
+ "quota": "每板块 ★2×2 ★3×2 ★4×2",
+ "built": "2026-08-04",
+ "filter": "status=ok, conf=high, 无图, 有解, 非MCQ, 全文英文(ASCII+停用词投票), topics 非空"
+}
