@@ -2,8 +2,9 @@
 """训练菜单：bank.py 的零参数入口（非程序员向）。
 
 只做薄封装：每个菜单项就是一条 bank.py 命令，规则与流程正本在 docs/ 两手册与 SPEC.md，
-本文件不持有任何训练规则。启动方式（三选一，效果相同）：
-  macOS 双击 开始.command ｜ Windows 双击 开始.bat ｜ 终端 uv run python scripts/menu.py
+本文件不持有任何训练规则。定位：无浏览器环境的终端备选入口——
+双击 开始.command / 开始.bat 拉起的是浏览器训练台（bank.py web），本菜单用
+  uv run python scripts/menu.py
 """
 import os
 import subprocess
