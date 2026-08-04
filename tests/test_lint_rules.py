@@ -88,6 +88,16 @@ def write_boards(root, reg=REGISTRY):
         _write(os.path.join(root, 'taxonomy', fname), f'# {cat}\n\n{heads}')
 
 
+# 基线依赖图：一条板块内边 + 一条跨板块边，合法 DAG（doclint d 项的基线）
+PREREQ = {'algebra/函数方程': ['algebra/不等式'],
+          'geometry/圆幂': ['number-theory/同余']}
+
+
+def write_prereq(root, pre=PREREQ):
+    _write(os.path.join(root, 'taxonomy', 'prereq.yml'),
+           yaml.safe_dump({'prereq': pre}, allow_unicode=True, sort_keys=False))
+
+
 @pytest.fixture()
 def repo(tmp_path, monkeypatch):
     """一个 lint/doclint 基线全绿的空仓库：四个题目目录 + registry + 四张 taxonomy 板块表。"""
@@ -96,6 +106,7 @@ def repo(tmp_path, monkeypatch):
         os.makedirs(os.path.join(root, 'problems', cat))
     write_registry(root)
     write_boards(root)
+    write_prereq(root)
     monkeypatch.setattr(bank, 'ROOT', root)
     bank._VERDICT_CACHE.clear()   # 模块级缓存按 ref 相对路径存，换 ROOT 必须清，否则串味
     yield root
@@ -418,3 +429,104 @@ class TestTopicsCount:
         rc, out = run_lint(capsys)
         assert rc == 1
         assert 'problems/algebra/A-001.md: topics 必须是列表' in out
+
+
+# ---------------- 前置依赖图（doclint d 项：端点合法 + DAG） ----------------
+
+class TestPrereqGraph:
+    def test_baseline_with_cross_board_edge_passes(self, repo, capsys):
+        """基线 PREREQ 含一条跨板块边（geometry/圆幂 ← number-theory/同余），必须绿。"""
+        rc, out = run_doclint(capsys)
+        assert rc == 0, out
+
+    def test_missing_prereq_file_caught(self, repo, capsys):
+        """防回归：prereq.yml 与 registry 同级正本，缺失要点名报，不得静默跳过。"""
+        os.remove(os.path.join(repo, 'taxonomy', 'prereq.yml'))
+        rc, out = run_doclint(capsys)
+        assert rc == 1
+        assert 'taxonomy/prereq.yml 缺失' in out
+
+    def test_unknown_node_endpoint_caught(self, repo, capsys):
+        write_prereq(repo, {'algebra/函数方程': ['algebra/不存在的节点']})
+        rc, out = run_doclint(capsys)
+        assert rc == 1
+        assert '端点「algebra/不存在的节点」不是 registry 规范节点' in out
+
+    def test_alias_endpoint_caught(self, repo, capsys):
+        """防回归：端点只认规范节点名——写别名（AM-GM 是不等式的别名）必须红，防词表漂移。"""
+        write_prereq(repo, {'algebra/函数方程': ['algebra/AM-GM']})
+        rc, out = run_doclint(capsys)
+        assert rc == 1
+        assert '端点「algebra/AM-GM」不是 registry 规范节点' in out
+
+    def test_bare_node_without_category_caught(self, repo, capsys):
+        """端点必须带 <板块>/ 限定名，裸节点名不合法。"""
+        write_prereq(repo, {'algebra/函数方程': ['不等式']})
+        rc, out = run_doclint(capsys)
+        assert rc == 1
+        assert '端点「不等式」不是 registry 规范节点' in out
+
+    def test_self_loop_caught(self, repo, capsys):
+        write_prereq(repo, {'algebra/不等式': ['algebra/不等式']})
+        rc, out = run_doclint(capsys)
+        assert rc == 1
+        assert '「algebra/不等式」把自己列为前置（自环）' in out
+
+    def test_two_cycle_caught_with_members(self, repo, capsys):
+        write_prereq(repo, {'algebra/不等式': ['algebra/函数方程'],
+                            'algebra/函数方程': ['algebra/不等式']})
+        rc, out = run_doclint(capsys)
+        assert rc == 1
+        assert '依赖图有环' in out
+        assert 'algebra/不等式' in out and 'algebra/函数方程' in out
+
+    def test_three_cycle_caught(self, repo, capsys):
+        write_prereq(repo, {'algebra/不等式': ['algebra/函数方程'],
+                            'algebra/函数方程': ['number-theory/同余'],
+                            'number-theory/同余': ['algebra/不等式']})
+        rc, out = run_doclint(capsys)
+        assert rc == 1
+        assert '依赖图有环' in out
+
+    def test_cycle_downstream_not_reported_as_cycle_member(self, repo, capsys):
+        """防回归：报错只点名真正环上的节点——依赖环的下游节点（同余 ← 函数方程）不算环成员。"""
+        write_prereq(repo, {'algebra/不等式': ['algebra/函数方程'],
+                            'algebra/函数方程': ['algebra/不等式'],
+                            'number-theory/同余': ['algebra/函数方程']})
+        rc, out = run_doclint(capsys)
+        assert rc == 1
+        cyc_line = next(line for line in out.splitlines() if '依赖图有环' in line)
+        assert 'algebra/不等式' in cyc_line and 'algebra/函数方程' in cyc_line
+        assert 'number-theory/同余' not in cyc_line
+
+    def test_cycle_does_not_mask_valid_branch(self, repo, capsys):
+        """环之外的合法边不受牵连：报错只点名环上节点。"""
+        write_prereq(repo, {'algebra/不等式': ['algebra/函数方程'],
+                            'algebra/函数方程': ['algebra/不等式'],
+                            'geometry/圆幂': ['number-theory/同余']})
+        rc, out = run_doclint(capsys)
+        assert rc == 1
+        assert 'geometry/圆幂' not in out.split('依赖图有环')[1].splitlines()[0]
+
+
+class TestGenMapEdges:
+    def test_map_data_contains_edges_and_node_keys(self, repo, capsys):
+        """gen_map 产物：节点带 key（cat/name），edges 来自 prereq.yml。"""
+        make_problem(repo)
+        _write(os.path.join(repo, 'scripts', 'map_template.html'), '<html>__MAP_DATA__</html>')
+        bank.gen_map(bank.load_all())
+        capsys.readouterr()
+        data = json.load(open(os.path.join(repo, 'maps', 'map_data.json'), encoding='utf-8'))
+        assert {'from': 'algebra/不等式', 'to': 'algebra/函数方程'} in data['edges']
+        keys = {n['key'] for c in data['cats'] for n in c['nodes']}
+        assert 'algebra/不等式' in keys
+
+    def test_edges_with_unknown_endpoint_skipped(self, repo, capsys):
+        """map 只消费不校验（校验正本在 doclint）：端点不认识的边跳过，不崩、不输出。"""
+        write_prereq(repo, {'algebra/函数方程': ['algebra/幽灵节点']})
+        make_problem(repo)
+        _write(os.path.join(repo, 'scripts', 'map_template.html'), '<html>__MAP_DATA__</html>')
+        bank.gen_map(bank.load_all())
+        capsys.readouterr()
+        data = json.load(open(os.path.join(repo, 'maps', 'map_data.json'), encoding='utf-8'))
+        assert data['edges'] == []

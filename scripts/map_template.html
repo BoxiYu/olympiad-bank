@@ -75,6 +75,13 @@
   .chip .cid { color:var(--ink-2); }
   #tip { position:fixed; z-index:50; background:var(--surface-1); color:var(--ink-1); border:1px solid var(--grid); border-radius:8px; padding:7px 10px; font-size:12px; max-width:300px; box-shadow:0 4px 14px rgba(0,0,0,.18); pointer-events:none; display:none; }
   #tip .t2 { color:var(--ink-2); margin-top:2px; }
+  .prow { display:flex; flex-wrap:wrap; gap:5px; align-items:center; margin-top:8px; color:var(--ink-mut); font-size:11.5px; }
+  .pchip { border:1px dashed var(--grid); border-radius:7px; padding:2px 7px; font-size:11.5px; color:var(--ink-2); background:transparent; cursor:pointer; }
+  .pchip:hover { border-color:var(--d3); color:var(--ink-1); }
+  .node.hl-pre { border-color:var(--d3); box-shadow:0 0 0 1px var(--d3); }
+  .node.hl-succ { border-style:dashed; border-color:var(--d4); }
+  .node.flash { animation:ndflash 1.5s ease-out; }
+  @keyframes ndflash { 0% { box-shadow:0 0 0 3px var(--d3); } 100% { box-shadow:0 0 0 0 transparent; } }
 </style>
 </head>
 <body>
@@ -96,6 +103,7 @@
     <span class="lg-item">难度：<span class="sw" style="background:var(--d1)"></span>★1 <span class="sw" style="background:var(--d2)"></span>★2 <span class="sw" style="background:var(--d3)"></span>★3 <span class="sw" style="background:var(--d4)"></span>★4 <span class="sw" style="background:var(--d5)"></span>★5</span>
     <span class="lg-item">格内数字＝该知识点该星级题数（颜色越深越多）</span>
     <span class="lg-item"><span class="sw z"></span>＝缺口（0 题，扩容优先级）</span>
+    <span class="lg-item"><span class="pchip" style="cursor:default">前置</span>＝建议先掌握的知识点（点击跳转；悬停节点卡高亮前置/后继）</span>
   </div>
   <div id="app"></div>
   <div id="tip"></div>
@@ -103,6 +111,14 @@
 <script>
 const DATA = __MAP_DATA__;
 const app = document.getElementById('app');
+/* 前置依赖边（正本 taxonomy/prereq.yml）→ preOf/succOf 两张邻接表 */
+const preOf = new Map(), succOf = new Map();
+(DATA.edges || []).forEach(e => {
+  if (!preOf.has(e.to)) preOf.set(e.to, []);
+  preOf.get(e.to).push(e.from);
+  if (!succOf.has(e.from)) succOf.set(e.from, []);
+  succOf.get(e.from).push(e.to);
+});
 document.getElementById('metaLine').textContent =
   `共 ${DATA.total} 题 · ${DATA.cats.reduce((s,c)=>s+c.nodes.length,0)} 个知识点节点 · 生成于 ${DATA.generated}`;
 let maxCell = 1;
@@ -116,6 +132,7 @@ for (const c of DATA.cats) {
   const grid = document.createElement('div'); grid.className='grid'; app.appendChild(grid);
   for (const n of c.nodes) {
     const el = document.createElement('div'); el.className='node';
+    el.id = 'nd-' + n.key; el.dataset.key = n.key;
     const cells = [1,2,3,4,5].map(d=>{
       const v = n.stars[String(d)]; const b = bucket(v);
       const ids = n.problems.filter(p=>p.d===d).map(p=>p.id).slice(0,8).join('、')||'—';
@@ -124,12 +141,36 @@ for (const c of DATA.cats) {
     const chips = n.problems.map(p=>
       `<span class="chip" data-d="${p.d}" data-txt="${(p.id+' '+p.t+' '+(p.c||'')).toLowerCase()}" data-tip="${p.id}｜${'★'.repeat(p.d)}|${p.t}（${p.c||'?'} ${p.y||''}）"><span class="dot d${p.d}"></span><span class="cid">${p.id}</span>${p.t}</span>`
     ).join('');
+    const pre = preOf.get(n.key) || [];
+    const prow = pre.length
+      ? `<div class="prow">前置 →${pre.map(k =>
+          `<span class="pchip" data-key="${k}" data-tip="${k}｜点击跳转">${k.split('/')[1]}</span>`).join('')}</div>`
+      : '';
     el.innerHTML = `<div class="nhead"><span class="nname">${n.name}</span><span class="ntotal">${n.total} 题</span></div>
-      <div class="heat">${cells}</div>
+      <div class="heat">${cells}</div>${prow}
       <details><summary>题目列表</summary><div class="plist">${chips}</div></details>`;
     grid.appendChild(el);
   }
 }
+/* 前置 chip 点击跳转 + 悬停节点卡高亮前置/后继 */
+app.addEventListener('click', e => {
+  const ch = e.target.closest('.pchip');
+  if (!ch || !ch.dataset.key) return;
+  const tgt = document.getElementById('nd-' + ch.dataset.key);
+  if (!tgt) return;
+  tgt.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  tgt.classList.remove('flash'); void tgt.offsetWidth; tgt.classList.add('flash');
+});
+app.addEventListener('mouseover', e => {
+  const nd = e.target.closest('.node');
+  document.querySelectorAll('.node.hl-pre,.node.hl-succ')
+    .forEach(x => x.classList.remove('hl-pre', 'hl-succ'));
+  if (!nd) return;
+  (preOf.get(nd.dataset.key) || []).forEach(k =>
+    document.getElementById('nd-' + k)?.classList.add('hl-pre'));
+  (succOf.get(nd.dataset.key) || []).forEach(k =>
+    document.getElementById('nd-' + k)?.classList.add('hl-succ'));
+});
 /* hover tooltip */
 const tip = document.getElementById('tip');
 document.addEventListener('mouseover', e=>{

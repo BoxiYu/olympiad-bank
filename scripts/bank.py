@@ -404,6 +404,16 @@ def load_registry():
     return {c: (v or {}) for c, v in data.items() if not str(c).startswith('_')}
 
 
+def load_prereq():
+    """taxonomy/prereq.yml → {'板块/节点': ['板块/节点', ...]}；文件缺失返回 None（与 load_registry 同款约定）。"""
+    path = os.path.join(ROOT, 'taxonomy', 'prereq.yml')
+    if not os.path.exists(path):
+        return None
+    data = yaml.safe_load(open(path, encoding='utf-8')) or {}
+    return {str(k): [str(v) for v in (vs or [])]
+            for k, vs in (data.get('prereq') or {}).items()}
+
+
 def resolve_topic(reg, cat, t):
     nodes = (reg or {}).get(cat) or {}
     if t in nodes:
@@ -439,7 +449,8 @@ def gen_map(problems):
         sys.exit(2)
     # 跨界题的他板块标签按「节点归属板块」落位（SPEC §1 允许并列第二板块节点），
     # 判定口径与 lint/registry_report 一致：本板块解析不到就全表找，找不到才算未注册。
-    all_nodes = {cat: {n: {'name': n, 'stars': {str(i): 0 for i in range(1, 6)}, 'problems': []}
+    all_nodes = {cat: {n: {'name': n, 'key': f'{cat}/{n}',
+                           'stars': {str(i): 0 for i in range(1, 6)}, 'problems': []}
                        for n in (reg.get(cat) or {})} for cat in CATEGORIES}
     unresolved = []
     for p in problems:
@@ -466,7 +477,12 @@ def gen_map(problems):
             nd['total'] = len(nd['problems'])
         cats.append({'cat': cat, 'label': CAT_LABEL[cat],
                      'nodes': [all_nodes[cat][n] for n in (reg.get(cat) or {})]})
-    data = {'generated': datetime.date.today().isoformat(), 'total': len(problems), 'cats': cats}
+    # 前置依赖边（正本 taxonomy/prereq.yml，校验在 doclint——map 只消费，端点不认识就跳过）
+    known = {f'{cat}/{n}' for cat in CATEGORIES for n in (reg.get(cat) or {})}
+    edges = [{'from': v, 'to': k} for k, vs in (load_prereq() or {}).items()
+             for v in vs if k in known and v in known]
+    data = {'generated': datetime.date.today().isoformat(), 'total': len(problems),
+            'cats': cats, 'edges': edges}
     os.makedirs(os.path.join(ROOT, 'maps'), exist_ok=True)
     with open(os.path.join(ROOT, 'maps', 'map_data.json'), 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=1)
@@ -534,11 +550,46 @@ def doclint():
                 errors.append(f'taxonomy/{fname}: 缺少 registry 节点小节「### {n}」')
             for h in sorted(heads - nodes):
                 errors.append(f'taxonomy/{fname}: 小节「{h}」不是 registry 的 {cat} 节点（树漂移）')
+    # d) 前置依赖图：端点必须是 registry 规范节点（<板块>/<节点名>，不走别名解析），且全图无环
+    pre = load_prereq()
+    if pre is None:
+        errors.append('taxonomy/prereq.yml 缺失')
+    elif reg is not None:
+        def _known(key):
+            cat, _, node = key.partition('/')
+            return cat in CATEGORIES and node in (reg.get(cat) or {})
+        nodes = set(pre)
+        for k, vs in pre.items():
+            nodes.update(vs)
+            for ep in dict.fromkeys([k, *vs]):
+                if not _known(ep):
+                    errors.append(f'taxonomy/prereq.yml: 端点「{ep}」不是 registry 规范节点'
+                                  f'（须写 <板块>/<节点名>，别名不合法）')
+            if k in vs:
+                errors.append(f'taxonomy/prereq.yml: 「{k}」把自己列为前置（自环）')
+        # 正反两遍 Kahn 拓扑排序取残留交集＝真正的环上节点（单向残留会把环的下游也算进去）
+        def _kahn_leftover(edges):
+            indeg = {n: 0 for n in nodes}
+            succ = {n: [] for n in nodes}
+            for a, b in edges:
+                succ[a].append(b)
+                indeg[b] += 1
+            queue = [n for n in nodes if indeg[n] == 0]
+            while queue:
+                for m in succ[queue.pop()]:
+                    indeg[m] -= 1
+                    if indeg[m] == 0:
+                        queue.append(m)
+            return {n for n in nodes if indeg[n] > 0}
+        fwd = [(v, k) for k, vs in pre.items() for v in vs if v != k]
+        cyc = sorted(_kahn_leftover(fwd) & _kahn_leftover([(b, a) for a, b in fwd]))
+        if cyc:
+            errors.append('taxonomy/prereq.yml: 依赖图有环，环上节点：' + '、'.join(cyc))
     if errors:
         print('\n'.join(errors))
         print(f'\nDOCLINT FAILED: {len(errors)} 个问题')
         return 1
-    print(f'DOCLINT OK: {n_files} 个 md 文件（死链/禁词/树一致性）全部通过')
+    print(f'DOCLINT OK: {n_files} 个 md 文件（死链/禁词/树一致性/依赖图）全部通过')
     return 0
 
 
@@ -660,7 +711,7 @@ def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest='cmd', required=True)
     sub.add_parser('lint')
-    sub.add_parser('doclint', help='全仓 md 文档校验：死链 / 禁词 / taxonomy 树一致性')
+    sub.add_parser('doclint', help='全仓 md 文档校验：死链 / 禁词 / taxonomy 树一致性 / 前置依赖图')
     q = sub.add_parser('query')
     q.add_argument('--difficulty', type=int)
     q.add_argument('--topic')
@@ -778,7 +829,7 @@ def main():
     elif args.cmd == 'assess':
         stp.cmd_assess(problems, load_registry(), resolve_topic, args)
     elif args.cmd == 'profile':
-        stp.cmd_profile(problems, load_registry(), resolve_topic, args)
+        stp.cmd_profile(problems, load_registry(), resolve_topic, args, load_prereq())
     elif args.cmd == 'candidates':
         candidates_cmd(problems, args)
     else:
