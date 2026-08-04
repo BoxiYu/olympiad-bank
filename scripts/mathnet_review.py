@@ -34,7 +34,9 @@ def find_companion():
     hits = glob.glob(os.path.expanduser(COMPANION_GLOB))
     return max(hits, key=ver_key) if hits else None
 
-PROMPT = """你是奥数题库的候选题评审员。读同目录 batch.json（{n} 道 MathNet 候选题，含题面、
+PROMPT = """你是奥数题库的候选题评审员。评审批次目录：{dir}/
+（你可能被置于仓库根目录运行；batch.json 在 {dir}/batch.json，verdicts.json 也必须写到 {dir}/verdicts.json，
+不要碰其它批次目录。）读该 batch.json（{n} 道 MathNet 候选题，含题面、
 部分官方解摘录、我方规则层给出的板块/知识点/难度估级），逐题独立评估，把结果写成 verdicts.json。
 
 难度标尺（★1–5，按解法所需思维跨度定级，不按赛事名气；有疑义就低不就高）：
@@ -73,6 +75,9 @@ def cmd_batch(args):
         pool = [r for r in pool if lo <= r['difficulty_est'] <= hi]
     if args.node:
         pool = [r for r in pool if any(args.node in t for t in r['topics'])]
+    if args.grep:   # 题面预览正则旁路（同 bank.py candidates --grep：标签流盖不住的节点用它召回）
+        rx = re.compile(args.grep, re.I)
+        pool = [r for r in pool if rx.search(r['head'])]
     if args.conf:
         rank = {'high': 2, 'mid': 1, 'low': 0}
         pool = [r for r in pool if rank[r['difficulty_conf']] >= rank[args.conf]]
@@ -95,7 +100,8 @@ def cmd_batch(args):
     os.makedirs(d, exist_ok=True)
     json.dump(batch, open(os.path.join(d, 'batch.json'), 'w', encoding='utf-8'),
               ensure_ascii=False, indent=1)
-    open(os.path.join(d, 'task.md'), 'w', encoding='utf-8').write(PROMPT.format(n=len(batch)))
+    open(os.path.join(d, 'task.md'), 'w', encoding='utf-8').write(
+        PROMPT.format(n=len(batch), dir=args.out.rstrip('/')))
     print(f'批次已出：{len(batch)} 题 → {args.out}/batch.json')
     print(f'下一步：uv run python scripts/mathnet_review.py dispatch --dir {args.out}')
 
@@ -104,6 +110,12 @@ def cmd_dispatch(args):
     d = os.path.join(ROOT, args.dir)
     if not os.path.exists(os.path.join(d, 'batch.json')):
         print(f'{args.dir}/batch.json 不存在，先跑 batch'); sys.exit(2)
+    # 自愈：task.md 是 PROMPT 的确定性渲染（batch.json 才是数据），派单前按现行模板重render，
+    # 保证提示词内含批次目录显式路径——companion 会把 --cwd 归一到仓库根，相对表述会歧义。
+    batch = json.load(open(os.path.join(d, 'batch.json'), encoding='utf-8'))
+    rel = os.path.relpath(d, ROOT)
+    open(os.path.join(d, 'task.md'), 'w', encoding='utf-8').write(
+        PROMPT.format(n=len(batch), dir=rel))
     companion = find_companion()
     if not companion:
         print(f'找不到 codex-companion（找遍 {COMPANION_GLOB}）\n先确认 Codex 插件已安装'); sys.exit(2)
@@ -164,6 +176,7 @@ def main():
     sub = ap.add_subparsers(dest='cmd', required=True)
     b = sub.add_parser('batch')
     b.add_argument('--category'); b.add_argument('--difficulty'); b.add_argument('--node')
+    b.add_argument('--grep', help='题面预览正则旁路（同 candidates --grep）')
     b.add_argument('--conf', choices=['high', 'mid', 'low'], default='mid')
     b.add_argument('--n', type=int, default=12); b.add_argument('--seed', type=int, default=7)
     b.add_argument('--chars', type=int, default=2200)

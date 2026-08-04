@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""题库工具：lint / doclint / query / stats / plan / coach / spar / review / similar
+"""题库工具：lint / doclint / query / stats / plan / coach / spar / review / similar / student / assess / profile
 
 用法：
   uv run python scripts/bank.py lint
@@ -10,12 +10,16 @@
   uv run python scripts/bank.py spar next                     # 开卡（复习到期 > 周计划）
   uv run python scripts/bank.py spar hint / reveal / finish   # 提示 / 看解 / 落账
   uv run python scripts/bank.py similar A-037                 # 相似候选 + 确认边
+  uv run python scripts/bank.py student add <id> --name 张三  # 学生建档（student list 看名单）
+  uv run python scripts/bank.py assess <id> --wave 基线-1 --id A-001 --score 1   # 测评波次录入
+  uv run python scripts/bank.py profile <id> [--html]         # 能力图：基础值走势 + 节点状态 + 补齐队列
 """
 import argparse, os, re, sys, yaml
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
 import spar_session as sp  # 会话流程 + v2 日志契约（间隔/毕业/归一化），三方共用
+import student_profile as stp  # 学生档案 + 能力图（证据折算/状态阈值的正本在该模块 docstring）
 CATEGORIES = ['algebra', 'number-theory', 'combinatorics', 'geometry']
 PREFIX = {'algebra': 'A', 'number-theory': 'N', 'combinatorics': 'C', 'geometry': 'G'}
 REQUIRED = ['id', 'title', 'category', 'source_ref', 'difficulty', 'topics', 'verification', 'source_url']
@@ -406,32 +410,35 @@ def gen_map(problems):
     if reg is None:
         print('缺 taxonomy/registry.yml')
         sys.exit(2)
-    cats, unresolved = [], []
+    # 跨界题的他板块标签按「节点归属板块」落位（SPEC §1 允许并列第二板块节点），
+    # 判定口径与 lint/registry_report 一致：本板块解析不到就全表找，找不到才算未注册。
+    all_nodes = {cat: {n: {'name': n, 'stars': {str(i): 0 for i in range(1, 6)}, 'problems': []}
+                       for n in (reg.get(cat) or {})} for cat in CATEGORIES}
+    unresolved = []
+    for p in problems:
+        fm = p['fm'] or {}
+        cat = fm.get('category')
+        hit = set()
+        for t in fm.get('topics', []) or []:
+            node = resolve_topic(reg, cat, t)
+            owner = cat if node else next((c for c in CATEGORIES if resolve_topic(reg, c, t)), None)
+            if owner is None:
+                unresolved.append((fm.get('id'), t))
+            else:
+                hit.add((owner, node or resolve_topic(reg, owner, t)))
+        for owner, node in hit:
+            d = fm.get('difficulty')
+            nd = all_nodes[owner][node]
+            nd['stars'][str(d)] += 1
+            nd['problems'].append({'id': fm['id'], 'd': d, 't': fm.get('title', ''),
+                                   'c': fm.get('contest', ''), 'y': fm.get('year', '')})
+    cats = []
     for cat in CATEGORIES:
-        nodes = {n: {'name': n, 'stars': {str(i): 0 for i in range(1, 6)}, 'problems': []}
-                 for n in (reg.get(cat) or {})}
-        for p in problems:
-            fm = p['fm'] or {}
-            if fm.get('category') != cat:
-                continue
-            hit = set()
-            for t in fm.get('topics', []) or []:
-                node = resolve_topic(reg, cat, t)
-                if node is None:
-                    unresolved.append((fm.get('id'), t))
-                else:
-                    hit.add(node)
-            for node in hit:
-                d = fm.get('difficulty')
-                nodes[node]['stars'][str(d)] += 1
-                nodes[node]['problems'].append(
-                    {'id': fm['id'], 'd': d, 't': fm.get('title', ''),
-                     'c': fm.get('contest', ''), 'y': fm.get('year', '')})
-        for nd in nodes.values():
+        for nd in all_nodes[cat].values():
             nd['problems'].sort(key=lambda x: (-x['d'], x['id']))
             nd['total'] = len(nd['problems'])
         cats.append({'cat': cat, 'label': CAT_LABEL[cat],
-                     'nodes': [nodes[n] for n in (reg.get(cat) or {})]})
+                     'nodes': [all_nodes[cat][n] for n in (reg.get(cat) or {})]})
     data = {'generated': datetime.date.today().isoformat(), 'total': len(problems), 'cats': cats}
     os.makedirs(os.path.join(ROOT, 'maps'), exist_ok=True)
     with open(os.path.join(ROOT, 'maps', 'map_data.json'), 'w', encoding='utf-8') as f:
@@ -654,6 +661,28 @@ def main():
     lg.add_argument('--note')
     sub.add_parser('review')
     sub.add_parser('map')
+    stu = sub.add_parser('student', help='学生档案：add <id> / list')
+    stu.add_argument('action', help='add|list')
+    stu.add_argument('sid', nargs='?', help='学生 id（小写字母/数字/连字符）')
+    stu.add_argument('--name')
+    stu.add_argument('--grade')
+    stu.add_argument('--target')
+    stu.add_argument('--alias', action='append', help='绑定 attempts.jsonl 的 student 名（可多次；首个学生用 --alias self）')
+    stu.add_argument('--note')
+    asx = sub.add_parser('assess', help='测评波次录入（基础值来源）')
+    asx.add_argument('sid', help='学生 id')
+    asx.add_argument('--wave', required=True, help='波次名，如 基线-1')
+    asx.add_argument('--score', required=True, type=float, help='0–1：对=1、半对=0.5、错=0')
+    asx.add_argument('--id', help='库内题号（自动补板块/知识点/难度）')
+    asx.add_argument('--source', help='外部题标识，如 "AMC10 2023 P15"（须配 --category/--difficulty/--topics）')
+    asx.add_argument('--category', choices=CATEGORIES)
+    asx.add_argument('--difficulty', type=int, choices=[1, 2, 3, 4, 5])
+    asx.add_argument('--topics', help='知识点，逗号分隔（registry 节点名或别名）')
+    asx.add_argument('--date')
+    asx.add_argument('--note')
+    pf = sub.add_parser('profile', help='能力图：基础值走势 + 节点状态 + 补齐队列 + 细分建议')
+    pf.add_argument('sid', help='学生 id')
+    pf.add_argument('--html', action='store_true', help='另生成 maps/能力图-<id>.html')
     ca = sub.add_parser('candidates')
     ca.add_argument('--category', choices=CATEGORIES)
     ca.add_argument('--difficulty', help='单值 3 或区间 2-3（估级）')
@@ -688,6 +717,12 @@ def main():
         review(problems)
     elif args.cmd == 'map':
         gen_map(problems)
+    elif args.cmd == 'student':
+        stp.cmd_student(problems, args)
+    elif args.cmd == 'assess':
+        stp.cmd_assess(problems, load_registry(), resolve_topic, args)
+    elif args.cmd == 'profile':
+        stp.cmd_profile(problems, load_registry(), resolve_topic, args)
     elif args.cmd == 'candidates':
         candidates_cmd(problems, args)
     else:

@@ -19,6 +19,26 @@ keyword_rules:
   category: number-theory
   node: p-adic 赋值与 LTE
   note: 标签树无对应叶子，靠 LTE/p 进赋值记号召回
+# 以下四条为 2026-08-04 补：这些节点标签树同样无叶子，导致 --gaps 显示「库内 0、候选 0」，
+# 而库内其实已有实质考该点的题（靠读题 retag 补挂，流程见 docs/教练手册.md 第 5 节）。
+# 收紧原则同 Ramsey 条：只保留能指向「该技法是主线」的信号词，宁可漏召不可误召——
+# 首轮对抗核验里「表面出现直角/最大字样」的提议 12 条中被驳回 12 条，故正则一律避开裸词。
+- pattern: (?i)digit sum|sum of (?:its |the )?digits|decimal representation|base[- ]\d+ representation|\bpalindrom
+  category: number-theory
+  node: 数字与进位制
+  note: 标签树无数位/进位制叶子；只收数位和、十进制表示、进位制表示、回文数这类明确的数位结构信号。
+- pattern: (?i)minimal counterexample|extremal (?:principle|configuration|element)|(?:choose|consider|take) the (?:largest|smallest|longest|maximal|minimal)
+  category: combinatorics
+  node: 极端原理
+  note: 标签树无极端原理叶子；裸 largest/smallest 是通用词，只收「取极端对象」的完整动作短语。
+- pattern: (?i)Pythagorean (?:theorem|triple)|right[- ]angled triangle|hypotenuse
+  category: geometry
+  node: 勾股定理与直角三角形
+  note: 标签树无该叶子；只收勾股定理/勾股数/斜边这类实名信号，裸 right angle 已证明误召率过高。
+- pattern: (?i)construction shows|explicit construction|(?:is|are) attained by|achieves? the bound
+  category: combinatorics
+  node: 组合构造
+  note: 标签树无该叶子；只收「显式构造达到界」的信号，泛化的 construct 一词误召率过高。
 normalize:
 - from: 'Algebra > Algebraic Expressions > Polynomials > Irreducibility: Rational Root Theorem, Gauss’s Lemma'
   to: 'Algebra > Algebraic Expressions > Polynomials > Irreducibility: Rational Root Theorem, Gauss''s Lemma'

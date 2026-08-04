@@ -166,4 +166,5 @@ source_url: https://huggingface.co/datasets/ShadenA/MathNet
 | 版权边界 | SPEC §6 | AGENTS.md（路由指针） |
 | lint 执行命令 | `scripts/lint.sh` | CI workflow、AGENTS.md |
 | 训练日志 v2 数据契约 | `spar_session.py` 模块 docstring | `tests/test_learning_loop.py` 锁定 |
+| 学生档案数据契约 / 能力图折算与阈值 | `student_profile.py` 模块 docstring（契约常量） | docs/教练手册.md（用法）；`tests/test_student_profile.py` 锁定 |
 | 规则归属表（本表） | SPEC §7 | ——（本文件自身也受本表约束） |

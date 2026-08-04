@@ -58,6 +58,10 @@ uv run python scripts/mathnet_review.py dispatch --dir data/review/geo-01
 
 需本机 codex-cli 已登录；companion 路径由脚本 glob 自动发现（取插件最高版本）。产物：同目录 `verdicts.json`。
 
+> **提示词必须内含批次目录路径**（`dispatch` 派单前会按现行模板自动重render `task.md`，无需手工维护）。
+> 缘由：codex-companion 会把传入的 `--cwd` 上溯归一到 git 仓库根，「读同目录 batch.json」这类相对表述
+> 在有多个待评批次并存时会歧义，Codex 会拒绝猜测并空手而归。同一机制也适用于 `hint_backfill.py dispatch`。
+
 ### 评审输出 schema（每题一个对象；`scripts/mathnet_review.py` 的 PROMPT 是其可执行渲染，改字段先改本表）
 
 | 字段 | 取值 | 含义 |
