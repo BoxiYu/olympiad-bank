@@ -1,0 +1,19 @@
+name: linkcheck
+
+# 外链月检：不进主 lint（外站抖动不该挡入库）。死链处置纪律见 docs/入库SOP-MathNet.md 凭证纪律节。
+on:
+  schedule:
+    - cron: '17 3 1 * *'   # 每月 1 日 03:17 UTC（避开整点高峰）
+  workflow_dispatch:
+
+jobs:
+  linkcheck:
+    name: bank.py linkcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v9.0.0
+
+      - name: 外链检查
+        run: uv run python scripts/bank.py linkcheck

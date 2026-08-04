@@ -586,3 +586,43 @@ class TestMachineCheckRef:
         make_problem(repo, machine_check_ref=MACHINE_REL)
         rc, out = run_lint(capsys)
         assert rc == 0, out
+
+# ---------------- 外链检查 linkcheck（不联网：注入假 fetcher） ----------------
+
+class TestLinkcheck:
+    def _docs(self, repo):
+        _write(os.path.join(repo, 'docs', 'guide.md'),
+               '# 指南\n\n[好链](https://good.example/a)\n[好链再引](https://good.example/a)\n'
+               '[坏链](https://dead.example/b)\n[站内](../SPEC.md)\n[邮件](mailto:x@y.z)\n')
+        _write(os.path.join(repo, 'docs', 'archive', 'old.md'),
+               '# 存档\n\n[史料死链](https://gone.example/z)\n')
+        _write(os.path.join(repo, 'SPEC.md'), '# spec\n')
+
+    def test_collect_dedups_and_exempts_archive(self, repo):
+        """收链：http(s) 才收、同链去重记两处出现、docs/archive/ 豁免、相对链与 mailto 不收。"""
+        self._docs(repo)
+        links = bank.collect_external_links()
+        assert set(links) == {'https://good.example/a', 'https://dead.example/b'}
+        assert len(links['https://good.example/a']) == 2
+
+    def test_dead_link_fails_and_lists_locations(self, repo, capsys):
+        self._docs(repo)
+        rc_ = bank.linkcheck(fetch=lambda url: 404 if 'dead' in url else 200)
+        out = capsys.readouterr().out
+        assert rc_ == 1
+        assert 'LINKCHECK FAILED: 1 个死链' in out
+        assert 'https://dead.example/b' in out
+        assert 'guide.md' in out           # 报出引用位置
+        assert 'gone.example' not in out   # 存档豁免：连检查都不进
+
+    def test_all_alive_passes(self, repo, capsys):
+        self._docs(repo)
+        rc_ = bank.linkcheck(fetch=lambda url: 200)
+        out = capsys.readouterr().out
+        assert rc_ == 0
+        assert 'LINKCHECK OK: 2 个外链全部可达' in out
+
+    def test_network_error_counts_as_dead(self, repo, capsys):
+        self._docs(repo)
+        rc_ = bank.linkcheck(fetch=lambda url: None)
+        assert rc_ == 1
