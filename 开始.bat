@@ -1,5 +1,6 @@
 @echo off
-rem Windows 双击入口：打开训练菜单（菜单本体在 scripts/menu.py，本文件只负责启动）。
+rem Windows 双击入口：拉起浏览器训练台（bank.py web，正本在 scripts/web_app.py）。
+rem 不想开浏览器可在终端用 scripts/menu.py 的命令行菜单。
 cd /d %~dp0
 where uv >nul 2>nul
 if errorlevel 1 (
@@ -11,5 +12,5 @@ if errorlevel 1 (
   pause
   exit /b 1
 )
-uv run python scripts\menu.py
+uv run python scripts\bank.py web
 pause
