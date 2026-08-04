@@ -1,0 +1,81 @@
+[
+ {
+  "mathnet_id": "0ilo",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "复数与三角",
+   "多项式"
+  ],
+  "contest": "Harvard-MIT Mathematics Tournament",
+  "problem": "Problem:\n\nThe polynomial $f(x) = x^{2007} + 17 x^{2006} + 1$ has distinct zeroes $r_1, \\ldots, r_{2007}$. A polynomial $P$ of degree $2007$ has the property that $P\\left(r_j + \\frac{1}{r_j}\\right) = 0$ for $j = 1, \\ldots, 2007$. Determine the value of $\\frac{P(1)}{P(-1)}$.",
+  "solution_head": "Solution:\n\nAnswer: $\\mathbf{289}$.\n\nFor some constant $k$, we have\n$$\nP(z) = k \\prod_{j=1}^{2007} \\left(z - \\left(r_j + \\frac{1}{r_j}\\right)\\right)\n$$\nNow writing $\\omega^3 = 1$ with $\\omega \\neq 1$, we have $\\omega^2 + \\omega = -1$. Then\n$$\n\\begin{gathered}\n\\frac{P(1)}{P(-1)} = \\frac{k \\prod_{j=1}^{2007} \\left(1 - \\left(r_j + \\frac{1}{r_j}\\right)\\right)}{k \\prod_{j=1}^{2007} \\left(-1 - \\left(r_j + \\frac{1}{r_j}\\right)\\right)} = \\prod_{j=1}^{2007} \\frac{r_j^2 - r_j + 1}{r_j^2 + r_j + 1} = \\prod_{j=1}^{2007} \\frac{\\left(-\\omega - r_j\\right)\\left(-\\omega^2 - r_j\\right)}{\\left(\\omega - r_j\\right)\\left(\\omega^2 - r_j\\right)} \\\\\n= \\frac{f(-\\omega) f\\left(-\\omega^2\\right)}{f(\\omega) f\\left(\\omega^2\\right)} = \\frac{\\left(-\\omega^{2007} + 17 \\omega^{2006} + 1\\right)\\left(-\\left(\\omega^2\\right)^{2007} + 17\\left(\\omega^2\\right)^{2006} + 1\\right)}{\\left(\\omega^{2007} + 17 \\omega^{2006} + 1\\right)\\left(\\left(\\omega^2\\right)^{2007} + 17\\left(\\omega^2\\right)^{2006} + 1\\right)} = \\frac{\\left(17 \\omega^2\\right)(17 \\omega)}{\\left(2 + 17 \\omega^2\\right)(2 + 17 \\omega\\right)} \\\\\n= \\frac{289}{4 + 34\\lef"
+ },
+ {
+  "mathnet_id": "0gy1",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "复数与三角"
+  ],
+  "contest": "49th Mathematical Olympiad in Ukraine",
+  "problem": "Find all positive integer numbers $n$ such that the number $3\\pi$ is a period of the function $f(x) = \\cos nx \\cdot \\sin \\frac{2009x}{n^2}$.",
+  "solution_head": "$3\\pi$ is a period of the function $f(x)$ if and only if $f(x+3\\pi) = f(x)$ for arbitrary real number $x$. Putting $x=0$ we obtain that $f(0)=0$, since $f(3\\pi) = \\cos 3\\pi n \\cdot \\sin \\frac{3 \\cdot 2009\\pi}{n^2}$ we have $0 = \\cos 3\\pi n \\cdot \\sin \\frac{3 \\cdot 2009\\pi}{n^2} \\Leftrightarrow 0 = \\sin \\frac{3 \\cdot 2009\\pi}{n^2} \\Leftrightarrow \\frac{6027\\pi}{n^2} = \\pi k,\\ k \\in \\mathbb{Z} \\Leftrightarrow 6027 : n^2$.\n\nAs $6027 = 3 \\cdot 7^2 \\cdot 41$ thus the possible values for $n$ can only be numbers $1$ or $7$. It is directly verified that the numbers $1$ and $7$ satisfy the same initial conditions."
+ },
+ {
+  "mathnet_id": "07q0",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "复数与三角",
+   "多项式",
+   "不等式"
+  ],
+  "contest": "Ireland",
+  "problem": "Let $a$, $b$, $c$, $d$ be real numbers, with at least one of $a$ or $c$ non-zero, such that\n$$\na^2 + ac + c^2 + 1 = b^2 + bd + d^2, \\quad \\text{and} \\quad 2ab + ad + 2cd + bc = 0.\n$$\nShow that $ac < 0$ or $(3a^2 - b^2 + 1)(3c^2 - d^2 + 1) \\le 0$.",
+  "solution_head": "Notice that $b \\neq 0$ or $d \\neq 0$ as $a^2 + ac + c^2 + 1 = (a + c/2)^2 + (3/4)c^2 + 1 > 0$. Suppose that $c = 0$. By assumption, we then have $a \\neq 0$ and the second equation becomes $2ab + ad = 0$, hence $b = -d/2$. Substituting this into the first equation gives $d^2 = (4/3)(a^2 + 1)$. So $b^2 = (a^2 + 1)/3$ and\n$$\n(3a^2 - b^2 + 1)(3c^2 - d^2 + 1) = \\frac{1}{9}(8a^2 + 2)(-1 - 4a^2) < 0,\n$$\n\n$$\n(2a + c)b = -(a + 2c)d.\n$$\nSince $b \\neq 0$ or $d \\neq 0$, and $(2a + c)(a + 2c) = 2(a + c)^2 + ac > 0$, we deduce that $bd < 0$. Consider the complex numbers $z = a + ib$ and $w = c + id$. Then\n$$\nz^2 + zw + w^2 = (a^2 - b^2 + ac - bd + c^2 - d^2) + i(2ab + ad + bc + 2cd) = -1.\n$$\n\nSo\n$$\n(z^3 + z) - (w^3 + w) = (z - w)(z^2 + zw + w^2 + 1) = 0.\n$$\nNow\n$$\n\\begin{aligned}\nz^3 + z &= a(a^2 - 3b^2 + 1) + ib(3a^2 - b^2 + 1), \\\\\nw^3 + w &= c(c^2 - 3d^2 + 1) + id(3c^2 - d^2 + 1).\n\\end{aligned}\n$$\nIn particular $d(3c^2 - d^2 + 1) = b(3a^2 - b^2 + 1)$. But $bd < 0$. So\n$$\n(3a^2 - b^2 + 1)(3c^2 - d^2 + 1) \\le 0.\n$$"
+ },
+ {
+  "mathnet_id": "0i5m",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "复数与三角"
+  ],
+  "contest": "Harvard-MIT Math Tournament",
+  "problem": "Problem:\nFind the area of the region in the first quadrant $x>0, y>0$ bounded above the graph of $y=\\arcsin (x)$ and below the graph of $y=\\arccos (x)$.",
+  "solution_head": "Solution:\nWe can integrate over $y$ rather than $x$. In particular, the solution is\n$$\n\\int_{0}^{\\pi / 4} \\sin y \\, dy + \\int_{\\pi / 4}^{\\pi / 2} \\cos y \\, dy = \\left(1 - \\frac{1}{\\sqrt{2}}\\right) 2 = 2 - \\sqrt{2}.\n$$"
+ },
+ {
+  "mathnet_id": "08ra",
+  "est": 3,
+  "conf": "mid",
+  "category": "algebra",
+  "topics": [
+   "不定方程",
+   "复数与三角",
+   "多项式"
+  ],
+  "contest": "The 16th Japanese Mathematical Olympiad - The Final Round",
+  "problem": "Find every integer $k$ that satisfies the following condition.\nThere are infinitely many triplet $(a, b, c)$ of integers such that $(a^2 - k)(b^2 - k) = c^2 - k$.",
+  "solution_head": "Consider an arbitrary integer $k$. Take a complex number $\\alpha$ that meets $\\alpha^2 = k$. (For example, let $\\alpha = \\sqrt{k}$ if $k$ is nonnegative, and $\\alpha = i\\sqrt{-k}$ if $k$ negative.)\nIt is easy verify the following equalities:\n$$\n(n + \\alpha)(n + 1 - \\alpha) = ((n(n + 1) - k) + \\alpha), \\\\\n(n - \\alpha)(n + 1 + \\alpha) = ((n(n + 1) - k) - \\alpha).\n$$\nBy multiplying these two formulae, we obtain an identity,\n$$\n(n^2 - k)((n + 1)^2 - k) = ((n(n + 1) - k)^2 - k).\n$$\nIn consequence, for any $k$, we can pick up any $n$ and let $(a, b, c) = (n, n + 1, n(n + 1) - k)$ so that the required equality holds. There are infinitely many $n$ and hence $(a, b, c)$. Therefore, every integer $k$ meets the required condition."
+ },
+ {
+  "mathnet_id": "045s",
+  "est": 5,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "复数与三角",
+   "面积法与三角法",
+   "不等式"
+  ],
+  "contest": "China National Team Selection Test",
+  "problem": "Let $C = \\{z \\in \\mathbb{C} \\mid |z| = 1\\}$ be the unit circle in the complex plane. 240 complex numbers $z_1, z_2, \\dots, z_{240} \\in C$ (can be repeated) satisfy the following conditions:\n(1) for any open arc $\\Gamma$ of length $\\pi$ on $C$, there are at most 200 $j$'s $(1 \\le j \\le 240)$ such that $z_j \\in \\Gamma$;\n(2) for any open arc $\\gamma$ of length $\\frac{\\pi}{3}$ on $C$, there are at most 120 $j$'s $(1 \\le j \\le 240)$ such that $z_j \\in \\gamma$.\n\nFind the maximum of $|z_1 + z_2 + \\dots + z_{240}|$.",
+  "solution_head": "The maximum is $80 + 40\\sqrt{3}$. Take 80 of 1's, 40 of each of $\\exp(\\frac{\\pi}{6}i)$, $\\exp(-\\frac{\\pi}{6}i)$, $i$, $-i$. It is straightforward to check that they satisfy (1), (2), and their sum equals $80 + 40\\sqrt{3}$. We need to show this is the maximum value.\n\nLet $z_1, z_2, \\dots, z_{240}$ satisfy (1), (2). By rotation if necessary, we may assume that $S = z_1 + z_2 + \\dots + z_{240}$ is a nonnegative real number; starting from $-1$ (included) along $C$, in the counterclockwise order, let the numbers be $z_1, z_2, \\dots, z_{240}$.\n\nCondition (1) indicates that for $1 \\le j \\le 40$, to go from $z_j$ to $z_{j+200}$ along $C$, at least an arc of length $\\pi$ is needed, that is to say, there exists $2\\pi \\ge \\alpha \\ge \\pi$ such that $z_{j+200} = z_j \\cdot \\exp(\\alpha i)$. Let $z_j = (-1) \\cdot \\exp(\\beta i)$, $\\beta \\in [0, 2\\pi)$. From $\\arg z_{j+200}$ we see $\\beta + \\alpha < 2\\pi$, and thus\n$$\n\\operatorname{Re}(z_j + z_{j+200}) = -\\cos \\beta - \\cos(\\beta + \\alpha) = -2 \\cos \\frac{\\alpha}{2} \\cos \\left(\\beta + \\frac{\\alpha}{2}\\right) \\le 0 \\\\\n\\left( \\text{because } \\frac{\\alpha"
+ }
+]

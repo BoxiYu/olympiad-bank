@@ -30,6 +30,7 @@ bash scripts/lint.sh
 | 写题 / 入库 | `docs/入库SOP-MathNet.md` |
 | 补提示阶梯 | `scripts/hint_backfill.py`（batch → dispatch → apply） |
 | 训练（coach/spar/log/review/similar） | `docs/学生手册.md` + `docs/教练手册.md` |
+| 学生档案 / 能力图（student/assess/profile） | `docs/教练手册.md` 第 5 节 |
 | git 操作（commit/push/pull/land） | `.codex/skills/` 对应 skill |
 | Symphony 编排会话 | `WORKFLOW.md` |
 | CLI 用法 | `uv run python scripts/bank.py --help` |

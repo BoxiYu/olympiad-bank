@@ -1,0 +1,183 @@
+[
+ {
+  "mathnet_id": "07ti",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "最大公约数与欧几里得算法",
+   "阶与原根",
+   "不定方程"
+  ],
+  "contest": "IRL_ABooklet",
+  "problem": "For each integer $n \\ge 100$ we define $T(n)$ to be the number obtained from $n$ by moving the two leading digits to the end. For example, $T(12345) = 34512$ and $T(100) = 10$. Find all integers $n \\ge 100$ for which:\n$$\nn + T(n) = 10n.\n$$",
+  "solution_head": "The general solution is\n$$\nn = \\frac{10}{91} \\times (10^{6k} - 1) = (1 + 10^6 + 10^{12} + \\dots + 10^{6(k-1)}) \\times 109890\n$$\nfor any positive integer $k$. In other words, the number $n$ consists of $k$ replicates of the digits 109890.\n\nLet $m$ be the number of digits of $n$ so $m \\ge 3$ when $n \\ge 100$. Dividing $n$ by $10^{m-2}$, let $q$ be the quotient and $r$ the remainder. This splits the digits of $n$ into the first two and the remaining digits,\n$$\nn = 10^{m-2}q + r\n$$\nwhere $10 \\le q \\le 99$ and $0 \\le r < 10^{m-2}$. Rearranging the digits we have:\n$$\nT(n) = 100r + q.\n$$\nThe equation $n + T(n) = 10n$ is equivalent to $T(n) = 9n$ which we write in terms of $q$ and $r$:\n$$\n100r + q = 9 \\times 10^{m-2}q + 9r\n$$\nor\n$$\n91r = (9 \\times 10^{m-2} - 1)q. \\qquad (7)\n$$\n\nWe know that $q \\ge 10$. We now claim that $q = 10$ for any solution. For a contradiction, suppose that $q \\ge 11$. Then equation (7) implies that\n$$\n(9 \\times 10^{m-2} - 1) \\times 11 \\le (9 \\times 10^{m-2} - 1)q = 91r < 91 \\times 10^{m-2}.\n$$\nComparing the left and right end gives $(99-91) \\times 10^{m-2} \\le 11$, co"
+ },
+ {
+  "mathnet_id": "05a5",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "费马小定理与欧拉定理",
+   "素数与算术基本定理"
+  ],
+  "contest": "Estonian Math Competitions",
+  "problem": "Let $p$ be a fixed prime number. Juku and Miku play the following game. One of the players chooses a natural number $a$ such that $a > 1$ and $a$ is not divisible by $p$, his opponent chooses any natural number $n$ such that $n > 1$. Miku wins if the natural number written as $n$ ones in the positional numeral system with radix $a$ is divisible by $p$, otherwise Juku wins. Which player has a winning strategy if:\n\na. Juku chooses the number $a$, tells it to Miku and then Miku chooses the number $n$;\n\nb. Juku chooses the number $n$, tells it to Miku and then Miku chooses the number $a$?",
+  "solution_head": "*Answer*: (a) Miku; (b) Juku.\n\nThe positional representation with radix $a$ consisting of $n$ ones denotes the sum $a^{n-1} + a^{n-2} + \\dots + a + 1$ which equals $\\frac{a^n-1}{a-1}$.\n\na. Let $a \\equiv 1 \\pmod{p}$. If $p > 2$ or $a \\equiv 1 \\pmod{4}$ then, by the lifting-the-exponent lemma, the exponent of the prime $p$ in the canonical representation of $\\frac{a^n-1}{a-1}$ equals that in the canonical representation of $n$. Thus to win, Miku may choose any number $n$ that is divisible by $p$. If $p = 2$ and $a \\equiv -1 \\pmod{4}$ then the exponent of the prime 2 in the canonical representation of $a-1$ is 1, while that in the canonical representation of $a^2-1$ is larger as $a^2 \\equiv 1 \\pmod{4}$. Thus to win, Miku may choose $n = 2$.\n\nLet now $a \\not\\equiv 1 \\pmod{p}$. By Fermat's little theorem, $a^{p-1} \\equiv 1 \\pmod{p}$. Hence $a^n \\equiv 1 \\pmod{p}$ whenever $n$ is a multiple of $p-1$. Then the numerator of the fraction $\\frac{a^n-1}{a-1}$ is divisible by $p$ while the denominator is not, whence the value of the fraction is divisible by $p$. Consequently, Miku can win by cho"
+ },
+ {
+  "mathnet_id": "0js0",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "整除与同余"
+  ],
+  "contest": "Berkeley Math Circle: Monthly Contest 2",
+  "problem": "Problem:\n\nCarl computes the number\n$$\nN=5^{555}+6^{666}+7^{777}\n$$\nand writes it in decimal notation. What is the last digit of $N$ that Carl writes?",
+  "solution_head": "Solution:\n\nWe look at the last digit of each term.\n- The last digit of $5^{\\bullet}$ is always $5$.\n- The last digit of $6^{\\bullet}$ is always $6$.\n- The last digit of $7^{\\bullet}$ cycles $7, 9, 3, 1, 7, 9, 3, \\ldots$.\n\nSo the last digits are $5, 6, 7$ in that order. Since $5+6+7=18$, the answer is $8$."
+ },
+ {
+  "mathnet_id": "0hmq",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "素数与算术基本定理"
+  ],
+  "contest": "Berkeley Math Circle",
+  "problem": "Problem:\n\nAs usual, let $n!$ denote the product of the integers from $1$ to $n$ inclusive. Determine the largest integer $m$ such that $m!$ divides $100! + 99! + 98!$.",
+  "solution_head": "Solution:\n\nThe answer is $m = 98$. Set\n$$\nN = 98! + 99! + 100! = 98! (1 + 99 + 99 \\cdot 100)\n$$\nHence $N$ is divisible by $98!$. But\n$$\n\\frac{N}{98!} = 1 + 99 \\cdot 101\n$$\nis not divisible by $99$. Hence $N$ is not divisible by $99!$."
+ },
+ {
+  "mathnet_id": "0hp6",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "不定方程",
+   "多项式",
+   "数列与递推"
+  ],
+  "contest": "Berkeley Math Circle Monthly Contest 6",
+  "problem": "Problem:\n\na. Prove that for all real numbers $x$ and $y$,\n$$\nx^{2}-2 y^{2}=-\\left[(x+2 y)^{2}-2(x+y)^{2}\\right] .\n$$\n\nb. How many positive integer solutions does the equation $x^{2}-2 y^{2}=1$ have?\n\nc. How many positive integer solutions does the equation $x^{2}-2 y^{2}=5$ have?",
+  "solution_head": "Solution:\n\na. This is simply an algebra calculation:\n$$\n\\begin{aligned}\n-\\left[(x+2 y)^{2}-2(x+y)^{2}\\right] & =-\\left[x^{2}+4 x y+4 y^{2}-2\\left(x^{2}+2 x y+y^{2}\\right)\\right] \\\\\n& =-\\left[x^{2}+4 x y+4 y^{2}-2 x^{2}-4 x y-2 y^{2}\\right] \\\\\n& =-\\left[-x^{2}+2 y^{2}\\right] \\\\\n& =x^{2}-2 y^{2} .\n\\end{aligned}\n$$\n\nb. There are infinitely many. Begin at the solution $x_{0}=3, y_{0}=2$ and apply the transformation\n$$\nx_{n+1}=x_{n}+2 y_{n}, \\quad y_{n+1}=x_{n}+y_{n} .\n$$\nBy part (a), the value of $x_{n}^{2}-2 y_{n}^{2}$ is alternately 1 and $-1$ (to be precise, $(-1)^{n}$). Also, all the $x_{n}$ are positive so $y_{0}<y_{1}<y_{2}<\\cdots$ and we never repeat a pair $(x, y)$. Thus we get infinitely many solutions to $x^{2}-2 y^{2}=1$. (With some more work one can prove that the $\\left(x_{2 n}, y_{2 n}\\right)$ are all positive integer solutions.)\n\nc. There are no solutions. Look at the remainders of the terms mod $5$. The term $x^{2}$ must be $0,1$, or $4$; the term $2 y^{2}$ must be $0,2$, or $3$. The only way these can equal each other is if $5 \\mid x$ and $5 \\mid y$. But then $25 \\mid x^"
+ },
+ {
+  "mathnet_id": "00aa",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "计数与容斥",
+   "不等式",
+   "素数与算术基本定理"
+  ],
+  "contest": "Argentine National Olympiad 2015",
+  "problem": "Alex has thought of a number $N$ in $S = \\{1, 2, ..., 1001\\}$, and Bibi has to find it via the following procedure. She gives Alex a list of subsets of $S$, Alex reads it and tells Bibi how many subsets in her list contain $N$. If Bibi wishes she can repeat the same with a second list, and then with a third one, but no more than 3 lists are allowed.\nWhat least total number of subsets would enable Bibi to find $N$ with certainty?",
+  "solution_head": "The least number of subsets is 28. Suppose that Bibi has 3 lists 1, 2, 3 which enable her to find $N$ with certainty. Let the lists contain $a_1, a_2, a_3$ subsets respectively. For list $i=1,2,3$ Alex announces the number $x_i$ of subsets in the list that contain $N$, and the ordered triple $x_1, x_2, x_3$ is the only information Bibi obtains. So being able to guess $N$ with certainty means that each triple $x_1, x_2, x_3$ yields a certain $N \\in \\{1, 2, ..., 1001\\}$ as a solution. Because there are 1001 possible numbers $N$ and Alex can choose any of them, it is then necessary that the number of different triples $x_1, x_2, x_3$ is at least 1001. This number equals $(a_1+1)(a_2+1)(a_3+1)$ as there are $a_i+1$ possible values of $x_i$, namely $0,1,...,a_i$ ($i=1,2,3$). Hence we must have\n\n$$(a_1+1)(a_2+1)(a_3+1) \\ge 1001.$$ \n\nNow use the AM-GM inequality to estimate the total number $a_1 + a_2 + a_3$ of subsets used by Bibi:\n\n$$\n1001 \\le (a_1 + 1)(a_2 + 1)(a_3 + 1) \\le \\left( \\frac{a_1 + a_2 + a_3}{3} + 1 \\right)^3\n$$\n\nIt follows from here that $a_1 + a_2 + a_3 \\ge 28$. Indeed if $a"
+ },
+ {
+  "mathnet_id": "0ein",
+  "est": 2,
+  "conf": "mid",
+  "category": "number-theory",
+  "topics": [
+   "不定方程",
+   "素数与算术基本定理",
+   "根与系数"
+  ],
+  "contest": "63. matematično tekmovanje srednješolcev Slovenije, Državno tekmovanje",
+  "problem": "Problem:\n\nAli obstaja tako praštevilo $p$, da velja $p^{2}+p+1=n^{3}$ za neko naravno število $n$?",
+  "solution_head": "Solution:\n\nPokazali bomo, da takšno praštevilo ne obstaja. Enačbo preoblikujemo v $p^{2}+p=n^{3}-1$ in obe strani razstavimo, da dobimo $p(p+1)=(n-1)(n^{2}+n+1)$. Če $p$ deli $n-1$, tedaj $n^{2}+n+1$ deli $p+1$. Od tod sledi $n^{2}+n+1 \\leq p+1 \\leq n$, kar pa je protislovje. Torej mora $p$ deliti $n^{2}+n+1$ in zato $n-1$ deli $p+1$. To pomeni, da obstaja naravno število $k$, da velja $n^{2}+n+1=k p$ in $p+1=k(n-1)$. Iz druge enakosti izrazimo $p$ in ga vstavimo v prvo enakost, da dobimo $n^{2}+n+1=k(k(n-1)-1)=k^{2} n-k^{2}-k$. Slednje preoblikujemo v $n^{2}+(1-k^{2}) n+(k^{2}+k+1)=0$ in to pogledamo kot kvadratno enačbo v spremenljivki $n$. Ker mora imeti ta enačba rešitev, ki je naravno število, mora biti njena diskriminanta $D=k^{4}-6 k^{2}-4 k-3$ popoln kvadrat. Opazimo, da je $D=(k^{2}-3)^{2}-4 k-12< (k^{2}-3)^{2}$, saj je $4 k+12>0$. Prvi popoln kvadrat, ki je manjši od $(k^{2}-3)^{2}$, je $(k^{2}-4)^{2}$, zato mora veljati $D \\leq (k^{2}-4)^{2}$. Z upoštevanjem zveze $D=k^{4}-6 k^{2}-4 k-3$ to neenakost preoblikujemo v $2 k^{2}-4 k-19 \\leq 0$ oziroma $2 k(k-2) \\leq 19$. Opazi"
+ },
+ {
+  "mathnet_id": "02qp",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "最大公约数与欧几里得算法"
+  ],
+  "contest": "Nível 2",
+  "problem": "Problem:\n\nO múltiplo irado de um número natural é o menor múltiplo do número formado apenas pelos algarismos 0 e 1. Por exemplo, o múltiplo irado de 2, bem como de 5, é 10; já o múltiplo irado de 3 é 111 e o de 110 é ele mesmo.\n\na) Qual é o múltiplo irado de 20?\nb) Qual é o múltiplo irado de 9?\nc) Qual é o múltiplo irado de 45?\nd) Qual é o menor número natural cujo múltiplo irado é 1110?",
+  "solution_head": "Solution:\n\na) Os primeiros múltiplos de $20$ são $20, 40, 60, 80$ e $100$. Logo o múltiplo irado de $20$ é $100$.\n\nb) Se os algarismos de um número divisível por $9$ são apenas $0$ e $1$, nesse número devem aparecer pelo menos nove algarismos $1$. Para que esse múltiplo seja o menor possível, ele deve ter o menor número de algarismos possível; logo o múltiplo irado de $9$ é $111111111$.\n\nc) Um múltiplo de $45$ é múltiplo de $5$ e $9$; logo seu algarismo das unidades é $0$ ou $5$ e a soma de seus algarismos é divisível por $9$. Como múltiplos irados são formados apenas pelos algarismos $0$ e $1$, segue que o múltiplo irado de $45$ deve ter $0$ como algarismo das unidades; logo esse múltiplo é $1111111110$.\n\nd) O número $1110$ é o menor número que tem apenas os algarismos $0$ e $1$ e que é, ao mesmo tempo, múltiplo de $3$ (pois a soma de seus algarismos é $3$) e múltiplo de $2$ (pois seu último algarismo é $0$). Logo $1110$ é o múltiplo irado de $6$. Como os múltiplos irados de $1, 2, 3, 4$ e $5$ são, respectivamente, $1, 10, 111, 100$ e $10$, segue que o menor número cujo múltiplo ira"
+ },
+ {
+  "mathnet_id": "0a5c",
+  "est": 1,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "整除与同余"
+  ],
+  "contest": "NZMO Round One",
+  "problem": "Problem:\n\nIn a sequence of numbers, a term is called golden if it is divisible by the term immediately before it. What is the maximum possible number of golden terms in a permutation of $1,2,3,\\ldots ,2021$?",
+  "solution_head": "Solution:\n\nLet $k$ be the number of golden terms. We claim that $k \\leq 1010$.\n\nProof: Define the term immediately before a golden term to be a silver term. The number of silver terms is also $k$. If $a$ is any silver term and $b$ is the corresponding golden term then we must have\n$$a \\leq \\frac{b}{2} \\leq \\frac{2021}{2} < 1011.$$  \nTherefore $a \\leq 1010$. Hence $a \\in \\{1,2,3,\\ldots ,1010\\}$ and therefore there can be at most 1010 different silver terms. Therefore $k \\leq 1010$.\n\nNow we need to show that $k = 1010$ is indeed possible. To do this we first partition the set $\\{1,2,3,\\ldots ,2021\\}$ into the following distinct parts:\n$$\\{1,2,4,8,16,32,64,128,256,512,1024\\},$$\n$$\\{3,6,12,24,48,96,192,384,768,1536\\},$$\n$$\\{5,10,20,40,80,160,320,640,1280\\},$$\n$$\\{7,14,28,56,112,224,448,896,1792\\},$$\n$$\\ldots$$\n$$\\{2019\\},$$\n$$\\{2021\\}.$$  \nEach part starts with an odd number, which is then doubled until the result is larger than 2021.\n\nPutting each part in the above sequence in order is our example. In this example every even term, $2n$, is golden because it occurs immediately after the "
+ },
+ {
+  "mathnet_id": "0dbk",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "染色与不变量"
+  ],
+  "contest": "SAUDI ARABIAN MATHEMATICAL COMPETITIONS",
+  "problem": "Each integer is painted one of three colors. Prove that there exist two distinct numbers of the same color, whose difference is a perfect square.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "07oh",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "数论函数与阶乘估计",
+   "素数与算术基本定理",
+   "计数与容斥"
+  ],
+  "contest": "Irska 2014",
+  "problem": "Each of the four positive integers $N, N+1, N+2, N+3$ has exactly six positive divisors. There are exactly 20 different positive integers which are exact divisors of at least one of the integers. One of these is 27. Find all possible values of $N$.\n\n(Both 1 and $m$ are counted as divisors of the integer $m$.)",
+  "solution_head": "Each of the four integers has 1 as a divisor. Moreover, 2 is a common divisor of either $N$ and $N+2$ or $N+1$ and $N+3$. Hence, these four integers can have at most $6 \\times 4 - 3 - 1 = 20$ different divisors altogether. Because there are exactly 20 different positive divisors, only one of the four integers can be divisible by 3, that is either $N+1$ or $N+2$ is divisible by 3.\n\nAs 27 is a divisor of one of the integers, and the integer has exactly six divisors, that number must be $3^5 = 243$. This can be seen, for example, by recognising that an integer $p_1^{a_1} \\cdots p_n^{a_n}$, with primes $p_1 < \\cdots < p_n$ and $a_i \\ge 1$, has exactly $(a_1+1) \\cdots (a_n+1)$ different positive divisors.\n\nHence $N+1 = 243$ or $N+2 = 243$. Because $243-2 = 241$ is a prime number (having only two positive divisors), we can only have $N = 242$.\n\nIt is easily checked that the four numbers $242 = 2 \\cdot 11^2$, $243 = 3^5$, $244 = 2^2 \\cdot 61$ and $245 = 5 \\cdot 7^2$ have exactly 20 divisors, namely 1, 2, 3, 4, 5, 7, 9, 11, 22, 27, 35, 49, 61, 81, 121, 122, 242, 243, 244 and 245."
+ },
+ {
+  "mathnet_id": "0kh2",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "数论函数与阶乘估计",
+   "素数与算术基本定理"
+  ],
+  "contest": "HMMT November 2021",
+  "problem": "Problem:\nLet $n$ be a positive integer. Given that $n^{n}$ has 861 positive divisors, find $n$.",
+  "solution_head": "Solution:\nIf $n = p_{1}^{\\alpha_{1}} p_{2}^{\\alpha_{2}} \\ldots p_{k}^{\\alpha_{k}}$, we must have $\\left(n \\alpha_{1} + 1\\right)\\left(n \\alpha_{2} + 1\\right) \\ldots\\left(n \\alpha_{k} + 1\\right) = 861 = 3 \\cdot 7 \\cdot 41$.\n\nIf $k = 1$, we have $n \\mid 860$, and the only prime powers dividing 860 are $2, 2^{2}, 5$, and 43, which are not solutions.\n\nNote that if $n \\alpha_{i} + 1 = 3$ or $n \\alpha_{i} + 1 = 7$ for some $i$, then $n$ is either $1, 2, 3$, or 6, which are not solutions.\n\nTherefore, we must have $n \\alpha_{i} + 1 = 3 \\cdot 7$ for some $i$. The only divisor of 20 that is divisible by $p_{i}^{n / 20}$ for some prime $p_{i}$ is 20, and it is indeed the solution."
+ },
+ {
+  "mathnet_id": "0k2w",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "数论函数与阶乘估计",
+   "素数与算术基本定理"
+  ],
+  "contest": "HMMT November 2018",
+  "problem": "Problem:\n\nFor how many positive integers $n \\leq 100$ is it true that $10 n$ has exactly three times as many positive divisors as $n$ has?",
+  "solution_head": "Solution:\n\nAnswer: 28\nLet $n=2^{a} 5^{b} c$, where $2,5 \\nmid c$. Then, the ratio of the number of divisors of $10 n$ to the number of divisors of $n$ is $\\frac{a+2}{a+1} \\frac{b+2}{b+1}=3$. Solving for $b$, we find that $b=\\frac{1-a}{2 a+1}$. This forces $(a, b)=(0,1),(1,0)$. Therefore, the answers are of the form $2 k$ and $5 k$ whenever $\\operatorname{gcd}(k, 10)=1$. There are 50 positive numbers of the form $2 k$ and 20 positive numbers of the form $5 k$ less than or equal to 100. Of those 70 numbers, only $\\frac{1}{2} \\cdot \\frac{4}{5}$ have $k$ relatively prime to 10, so the answer is $70 \\cdot \\frac{1}{2} \\cdot \\frac{4}{5}=28$."
+ },
+ {
+  "mathnet_id": "050w",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "素数与算术基本定理"
+  ],
+  "contest": "Estonian Math Competitions",
+  "problem": "Find all pairs $(n, m)$ of positive integers such that the arithmetic and geometric means of $m$ and $n$ are different two-digit numbers consisting of the same digits.",
+  "solution_head": "Let $10a + b$ be the arithmetic mean of the given numbers, where $a$ and $b$ are decimal digits. Let $10a + b + x$ and $10a + b - x$ be the numbers we are searching for. Then, by the premises\n$$\n\\sqrt{(10a + b + x)(10a + b - x)} = 10b + a,\n$$\nwhich after squaring and simplifying gives $x^2 = 99(a^2 - b^2)$. So, $x^2$ is divisible by $99$, implying $x^2$ is divisible by $3$ and $11$. Since $3$ and $11$ are primes, $x$ itself is divisible by $3$ and $11$, and therefore by $33$. Denoting $x = 33z$, we get\n$$\n11z^2 = \\frac{99 \\cdot 11z^2}{99} = \\frac{x^2}{99} = a^2 - b^2 = (a+b)(a-b),\n$$\nfrom which we see, that the product $(a+b)(a-b)$ is divisible by $11$. Since $11$ is a prime, either $a+b$ or $a-b$ is divisible by $11$. Since $a-b \\neq 0$ and $a$ and $b$ are single-digit numbers, we must have $a+b = 11$. Therefore $a-b = z^2$. Since $a-b$ and $a+b$ are either both odd or both even, $z$ must be odd. So, $z=1$, since $z \\ge 3$ implies $x \\ge 99$, but $10a+b-x$ must be positive. So, $a=6$, $b=5$, $x=33$, and the corresponding pair is $(98, 32)$."
+ }
+]

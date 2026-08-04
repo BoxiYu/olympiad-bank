@@ -1,0 +1,81 @@
+[
+ {
+  "mathnet_id": "0f7y",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "组合几何"
+  ],
+  "contest": "21st ASU",
+  "problem": "Problem:\n\nLet $\\{A_1, A_2, \\ldots, A_{2m+1}\\}$ and $\\{B_1, B_2, \\ldots, B_{2n+1}\\}$ be points in the plane such that the $2m + 2n + 2$ lines $A_1A_2, A_2A_3, \\ldots, A_{2m}A_{2m+1}, A_{2m+1}A_1, B_1B_2, B_2B_3, \\ldots, B_{2n}B_{2n+1}, B_{2n+1}B_1$ are all different and no three of them are concurrent. Show that we can find $i$ and $j$ such that $A_iA_{i+1}$ and $B_jB_{j+1}$ are opposite sides of a convex quadrilateral (if $i = 2m+1$, then we take $A_{i+1}$ to be $A_1$. Similarly for $j = 2n+1$).",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0gdw",
+  "est": 4,
+  "conf": "mid",
+  "category": "geometry",
+  "topics": [
+   "组合几何",
+   "面积法与三角法",
+   "不定方程",
+   "递推与生成结构"
+  ],
+  "contest": "2020 Taiwan IMO 2J",
+  "problem": "在坐標平面上有 $N$ 個銳角三角形, 它們的三頂點皆為整數點, 面積皆為 $2^{2020}$, 且兩兩不全等。試求 $N$ 的最大值。\n註：$(x, y)$ 為整數點, 若且唯若 $x$ 與 $y$ 皆為整數。\n\nThere are $N$ acute triangles on the plane. Their vertices are all integer points, their areas are all equal to $2^{2020}$, but no two of them are congruent. Find the maximum possible value of $N$.\nNote: $(x, y)$ is an integer point if and only if $x$ and $y$ are both integers.",
+  "solution_head": "我們先觀察出以下性質。\n\n**引理一：** 所有整點三角形若面積是整數，則必有 1 或 3 條邊的中點是整點。\n*Proof.* 由 Pick 定理知，面積整數的三角形落在邊上的整點必為偶數個。假設在三角形的某邊 $AB$ 上有整點 $P$。設中點為 $M$，則 $P$ 對 $M$ 的對稱點 $P'$ 也是整點（$A + B = P + P'$），所以三頂點和三中點的整點數總和必須是偶數，故有奇數個中點是整點，得證。□\n\n**引理二：** 沒有整點正三角形。\n*Proof.* 整點三角形的面積必為有理數。但假設存在整點正三角形且邊長為 $a$，那麼其面積為 $\\frac{\\sqrt{3}}{4}a^2$，且由畢氏定理知 $a^2$ 是整數，故面積不是有理數而矛盾。□\n\n**引理三：** 若等腰整點三角形的面積是 2 的幂次，則其底邊平行 $x, y$ 軸或 $x = y$ 或 $x = -y$。\n*Proof.* 假設反之，設三角形為 $ABC$，且 $BC$ 是底邊，做 $B$ 對 $A$ 對稱點 $B'$，$C$ 對 $A$ 對稱點 $C'$ 得到矩形 $BCB'C'$，此矩形面積也是 2 的幂次，假設 $BC = \\sqrt{a^2 + b^2}$。若 $p|a^2 + b^2$，則若 $BCB'C'$ 面積為整數則同時也是 $p$ 的倍數，所以 $a^2 + b^2 = 2^n$。令 $g = \\gcd(a, b)$，\n$$\ng^2 \\left( \\left( \\frac{a}{g} \\right)^2 + \\left( \\frac{b}{g} \\right)^2 \\right) = 2^n\n$$\n然而熟知若兩數不同時為偶數，則其平方和不被 4 整除，故 $\\left(\\frac{a}{g}\\right)^2 + \\left(\\frac{b}{g}\\right)^2$ 只能取值 1, 2。所以 $a = b = g$ 或 $ab = 0$，恰對應引理提及的情況，得證。□\n\n**引理四：** 不存在銳角整點三角形面積為 $\\frac{1}{2}$。\n*Proof.* 假設三角形 $ABC$ 面積是 $\\frac{1}{2}$，其中 $\\angle A$ 是最大角且 $b = AC, c = AB$，那麼 $\\angle A \\ge \\frac{\\pi}{3}$\n$$\n\\frac{1}{2}bc \\sin A = \\frac{1}{2} \\Rightarrow bc = \\frac{1}{\\sin A} \\le \\frac{2}{\\sqrt{3}}\n$$\n由"
+ },
+ {
+  "mathnet_id": "0jgn",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "组合几何",
+   "不等式"
+  ],
+  "contest": "HMIC",
+  "problem": "Problem:\n\na.\nGiven a finite set $X$ of points in the plane, let $f_{X}(n)$ be the largest possible area of a polygon with at most $n$ vertices, all of which are points of $X$. Prove that if $m, n$ are integers with $m \\geq n > 2$, then $f_{X}(m) + f_{X}(n) \\geq f_{X}(m+1) + f_{X}(n-1)$.\n\nb.\nLet $P_{0}$ be a 1-by-2 rectangle (including its interior), and inductively define the polygon $P_{i}$ to be the result of folding $P_{i-1}$ over some line that cuts $P_{i-1}$ into two connected parts. The diameter of a polygon $P_{i}$ is the maximum distance between two points of $P_{i}$. Determine the smallest possible diameter of $P_{2013}$.\n\n(In other words, given a polygon $P_{i-1}$, a fold of $P_{i-1}$ consists of a line $l$ dividing $P_{i-1}$ into two connected parts $A$ and $B$, and the folded polygon $P_{i} = A \\cup B_{l}$, where $B_{l}$ is the reflection of $B$ over the line $l$.)",
+  "solution_head": "Solution:\n\n## 1 Convexity of the largest area of a polygon function\n\na.\nLet $V$ be a finite set of points in the plane. Let $f_{V}$ be a function that takes integers $\\geq 3$ as input, and outputs a polygon of largest area with vertices in $V$.\n\nLemma 1.1. $\\left[f_{V}(a+1)\\right] + \\left[f_{V}(a-1)\\right] \\leq 2\\left[f_{V}(a)\\right]$, where $[P]$ represents the area of polygon $P$.\n\nProof. Let the vertices of $f_{V}(a+1)$ be $1_{a+1}, 2_{a+1}, \\ldots, (a+1)_{a+1}$, and let the vertices of $f_{V}(a-1)$ be $1_{a-1}, 2_{a-1}, \\ldots, (a-1)_{a-1}$.\n\nLemma 1.2. The collection of vertices\n$$\nW = \\left(1_{a-1}, 2_{a-1}, \\ldots, (a-1)_{a-1}, 1_{a+1}, \\ldots, (a+1)_{a+1}\\right)\n$$\nare in convex configuration.\n\nProof. Suppose that the vertex $s_{x} \\in W$ (for some integers $x \\in \\{a-1, a+1\\}, s$) is inside the convex hull of $W$. Then there exists a vertex $k$ on the convex hull of $W$ such that replacing vertex $s_{x}$ in $f_{V}(x)$ with $k$ increases the area of the polygon $f_{V}(x)$. However, $f_{V}(x)$ is defined to be the polygon with $x$ sides with maximum area. Contradiction. This p"
+ },
+ {
+  "mathnet_id": "0i8h",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "组合几何",
+   "解析几何与向量复数法"
+  ],
+  "contest": "Harvard-MIT Mathematics Tournament",
+  "problem": "Problem:\nHow many lattice points are enclosed by the triangle with vertices $(0,99)$, $(5,100)$, and $(2003, 500)$? Don't count boundary points.",
+  "solution_head": "Solution:\nUsing the determinant formula, we get that the area of the triangle is\n$$\n\\left|\\begin{array}{cc}\n5 & 1 \\\\\n2003 & 401\n\\end{array}\\right| / 2 = 1\n$$\nThere are 4 lattice points on the boundary of the triangle (the three vertices and $(1004, 300)$), so it follows from Pick's Theorem that there are 0 in the interior."
+ },
+ {
+  "mathnet_id": "0hr9",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "组合几何",
+   "不等式",
+   "面积法与三角法"
+  ],
+  "contest": "Berkeley Math Circle: Monthly Contest 2",
+  "problem": "Problem:\nLet $P$ be a $2023$-sided polygon. All but one side has length $1$. What is the maximum possible area of $P$?",
+  "solution_head": "Solution:\nFirst, we claim $P$ must be convex to maximize its area. If not, let $A$ and $B$ be consecutive vertices on the perimeter of its convex hull that aren't consecutive vertices of $P$. Reflecting the path between $A$ and $B$ over line $AB$ must increase the area of $P$ as the new shape strictly contains $P$.\n\nThus we assume $P$ is convex. Let $\\ell$ be the line containing the side with length not equal to $1$. Let $P'$ be the reflection of $P$ over $\\ell$. By convexity, $P$ and $P'$ do not overlap, so the union of $P$ and $P'$ is a polygon, specifically an equilateral $4044$-gon with sides of length $1$.\n\nThe area of an equilateral polygon is maximized when it is regular, so this union has maximum area that of a regular $4044$-gon, which is $1011 \\cot \\dfrac{\\pi}{4044}$. Thus, the answer is half of this, i.e.\n$$\n\\frac{1011}{2} \\cdot \\cot \\frac{\\pi}{4044}\n$$"
+ },
+ {
+  "mathnet_id": "0j2u",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "组合几何"
+  ],
+  "contest": "Harvard-MIT Mathematics Tournament",
+  "problem": "Problem:\nInto how many regions can a circle be cut by 10 parabolas?",
+  "solution_head": "Solution:\nAnswer: $201$\n\nWe will consider the general case of $n$ parabolas, for which the answer is $2 n^{2} + 1$.\n\nWe will start with some rough intuition, then fill in the details afterwards. The intuition is that, if we make the parabolas steep enough, we can basically treat them as two parallel lines. Furthermore, the number of regions is given in terms of the number of intersections of the parabolas that occur within the circle, since every time two parabolas cross a new region is created. Since two pairs of parallel lines intersect in $4$ points, and pairs of parabolas also intersect in $4$ points, as long as we can always make all $4$ points of intersection lie inside the circle, the parallel lines case is the best we can do.\n\nIn other words, the answer is the same as the answer if we were trying to add ten pairs of parallel lines. We can compute the answer for pairs of parallel lines as follows: when we add the $k$th set of parallel lines, there are already $2k-2$ lines that the two new lines can intersect, meaning that each of the lines adds $2k-1$ new regions. This means t"
+ }
+]

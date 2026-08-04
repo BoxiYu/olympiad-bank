@@ -1,0 +1,176 @@
+[
+ {
+  "mathnet_id": "024r",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "概率与期望"
+  ],
+  "contest": "Nível 2",
+  "problem": "Problem:\n\nBrincando com números ímpares - Beatriz adora números ímpares. Quantos números entre $0$ e $1000$ ela pode escrever usando apenas algarismos ímpares?",
+  "solution_head": "Solution:\n\nComo cada algarismo é ímpar, temos:\n- cinco possibilidades de números com um algarismo: $1$, $3$, $5$, $7$ e $9$;\n- para números com dois algarismos, temos cinco possibilidades na casa das unidades e cinco na casa das dezenas, totalizando $5 \\times 5 = 25$ possibilidades;\n- para números com três algarismos, temos cinco possibilidades na casa das unidades, cinco na casa das dezenas e cinco na casa das centenas, totalizando $5 \\times 5 \\times 5 = 125$ possibilidades.\n\nAssim, Beatriz pode escrever $5 + 25 + 125 = 155$ números com todos algarismos sendo ímpares."
+ },
+ {
+  "mathnet_id": "08bw",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "概率与期望"
+  ],
+  "contest": "Gara di Febbraio",
+  "problem": "Problem:\n\nUn'urna contiene 8 palline, sulle quali sono scritti i numeri da 1 a 8. Federica pesca due palline di seguito, cancella il numero scritto sulla prima e lo sostituisce con il suo doppio, cancella il numero sulla seconda pallina e lo sostituisce con il quadruplo di esso. Reinserisce quindi le due palline nell'urna (ad esempio, se Federica ha pescato le palline 3 e 7 in quest'ordine, reinserirà nell'urna due palline con i numeri 6 e 28). Infine, estrae nuovamente una pallina: qual è la probabilità che la pallina estratta abbia il numero 8?\n(A) $\\frac{1}{8}$\n(B) $\\frac{1}{7}$\n(C) $\\frac{7}{44}$\n(D) $\\frac{9}{56}$\n(E) $\\frac{1}{6}$",
+  "solution_head": "Solution:\n\nLa risposta è (A). Supponiamo che la pallina pescata alla fine da Federica riporti il numero 8. Questo può accadere per tre motivi diversi (che sono tra loro mutuamente esclusivi):\n- la pallina era numerata 8 fin dall'inizio, e non è stata estratta nelle prime due pescate. Questo evento ha probabilità $\\frac{1}{8} \\times \\frac{6}{8}$, ovvero la probabilità di aver pescato proprio la pallina che all'inizio riportava il numero $8\\left(\\frac{1}{8}\\right)$, moltiplicata per la probabilità che tale pallina non fosse fra le prime due estratte ($\\frac{6}{8}$, dal momento che le palline non estratte sono 6 su un totale di 8);\n- la pallina riportava inizialmente il numero 4, ed è stata pescata alla prima estrazione: con un ragionamento simile al precedente, troviamo che questo evento ha probabilità $\\frac{1}{8} \\times \\frac{1}{8}$;\n- la pallina riportava inizialmente il numero 2, ed è stata pescata alla seconda estrazione: questo evento ha nuovamente probabilità $\\frac{1}{8} \\times \\frac{1}{8}$.\nIn totale, la probabilità che la pallina pescata da Federica riporti il numero 8 è $\\fr"
+ },
+ {
+  "mathnet_id": "00lb",
+  "est": 1,
+  "conf": "mid",
+  "category": "combinatorics",
+  "topics": [
+   "染色与不变量",
+   "最大公约数与欧几里得算法"
+  ],
+  "contest": "Regional Competition",
+  "problem": "On the occasion of the 47th Mathematical Olympiad 2016 the numbers $47$ and $2016$ are written on the blackboard. Alice and Bob play the following game. Alice begins and in turns they choose two numbers $a$ and $b$ with $a > b$ written on the blackboard, whose difference $a - b$ is not yet written on the blackboard and write this difference additionally on the board. The game ends when no further move is possible. The winner is the player who made the last move.\nProve that Bob wins, no matter how they play.",
+  "solution_head": "We consider the set $B$ of the numbers on the blackboard at the end of the game. It is clear that $B \\subseteq \\{1, \\dots, 2016\\}$. Let $m = \\min B$ and $n \\in B$. We claim that $m \\mid n$. Otherwise, write $n = qm + r$ with $0 < r < m$. By induction on $k$, we have $n - k m \\in B$ for $0 \\le k \\le q$ (because no more moves are possible, these numbers must be on the blackboard). Thus $r = n - q m \\in B$, which contradicts the minimality of $m$.\n\nWe conclude that $m \\mid 1 = \\gcd(2016, 47) \\in B$. By induction on $c$, we have $n - c \\in B$ for $0 \\le c \\le 2015$. This also implies that $B = \\{1, \\dots, 2016\\}$.\n\nAs $2$ numbers had been on the blackboard at the beginning of the game, the game ends after $2014$ moves when all other numbers have been written. Therefore, Bob wins after move $2014$."
+ },
+ {
+  "mathnet_id": "0g32",
+  "est": 1,
+  "conf": "mid",
+  "category": "combinatorics",
+  "topics": [
+   "数列与递推",
+   "计数与容斥"
+  ],
+  "contest": "Vorrunde 2019",
+  "problem": "Problem:\n\nSoit $n$ un entier strictement positif. Maurice écrit sur une même ligne tous les $2^{n}-1$ sous-ensembles non-vides de l'ensemble $\\{1,2, \\ldots, n\\}$. Ensuite, en-dessous de chaque sous-ensemble, il écrit le produit de ses éléments. Finalement, il écrit les inverses des nombres présents sur la deuxième ligne et il en calcule la somme. Quelle sera la valeur de la somme (en fonction de $n$ ) que Maurice va obtenir?\n\nExemple: pour $n=3$, Maurice obtient\n\n| $\\{1\\}$ | $\\{2\\}$ | $\\{3\\}$ | $\\{1,2\\}$ | $\\{1,3\\}$ | $\\{2,3\\}$ | $\\{1,2,3\\}$ |\n| :---: | :---: | :---: | :---: | :---: | :---: | :---: |\n| 1 | 2 | 3 | $1 \\cdot 2=2$ | $1 \\cdot 3=3$ | $2 \\cdot 3=6$ | $1 \\cdot 2 \\cdot 3=6$ |\n| $\\frac{1}{1}+$ | $\\frac{1}{2}+$ | $\\frac{1}{3}+$ | $\\frac{1}{2}+$ | $\\frac{1}{3}+$ | $\\frac{1}{6}+$ | $\\frac{1}{6}=3$. |",
+  "solution_head": "Solution:\n\nOn commence par tester les petites valeurs de $n$ et on constate que à chaque fois la valeur obtenue est $n$. On pose donc l'hypothèse\n$$\nH(n): \\text{ La somme obtenue avec l'ensemble } \\{1,2, \\ldots, n\\} \\text{ vaut } n\n$$\net on va essayer de prouver par induction que $H(n)$ est vérifiée pour tout nombre naturel $n$.\nOn commence par le cas de base $n=1$. Le seul sous-ensemble non-vide de $\\{1\\}$ est $\\{1\\}$, et le produit de ses éléments vaut 1. Ainsi, la somme recherchée prend la valeur 1 et le cas de base est démontré.\nPour le pas d'induction maintenant, supposons que $H(n)$ soit vérifiée et prouvons $H(n+1)$. On sépare les sous-ensembles non-vides en deux groupes. Le premier est constitué de tous les sous-ensembles qui ne contiennent pas $n+1$, et le second de tous les sous-ensembles qui contiennent $n+1$. Pour le premier groupe $H(n)$ prouve que la somme restreinte à ce groupe donne $n$.\nOn veut donc prouver que pour le second groupe la somme restreinte à ce groupe vaut 1. En retirant l'élément $n+1$ de chacun des sous-ensembles du deuxième groupe, on obtient tous les"
+ },
+ {
+  "mathnet_id": "0jtc",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "抽屉原理"
+  ],
+  "contest": "HMMT November",
+  "problem": "Problem:\n\nConsider an infinite grid of equilateral triangles. Each edge (that is, each side of a small triangle) is colored one of $N$ colors. The coloring is done in such a way that any path between any two nonadjacent vertices consists of edges with at least two different colors. What is the smallest possible value of $N$?",
+  "solution_head": "Solution:\n\nAnswer: 6\n\nNote that the condition is equivalent to having no edges of the same color sharing a vertex by just considering paths of length two. Consider a hexagon made out of six triangles. Six edges meet at the center, so $N \\geq 6$. To prove $N=6$, simply use two colors for each of the three possible directions of an edge, and color edges of the same orientation alternatingly with different colors."
+ },
+ {
+  "mathnet_id": "0i0q",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "抽屉原理",
+   "计数与容斥"
+  ],
+  "contest": "Berkeley Math Circle",
+  "problem": "Problem:\n\nAn $n \\times n$ matrix of integers is called \"golden\" if, for every row and every column, their union contains all of the numbers $1,2,3, \\ldots, 2 n-1$. Find all golden matrices (of all sizes).",
+  "solution_head": "Solution:\n\nThe $1 \\times 1$ matrix whose only entry is $1$ is certainly golden; we claim there are no others. To see this, note that each of the numbers $1,2, \\ldots, 2 n-1$ must appear at least $n$ times in the matrix. (Proof: Suppose some number $k$ appears less than $n$ times. Because there are $n$ columns, some column does not contain $k$. Likewise, some row does not contain $k$; then the union of this row and this column fails to contain $k$, contrary to the given). So we have at least $n(2 n-1)$ entries in the matrix. But an $n \\times n$ matrix has $n^{2}$ entries, so $n^{2} \\geq n(2 n-1) \\Rightarrow n \\geq 2 n-1 \\Rightarrow 1 \\geq n$, and only the $1 \\times 1$ matrix can be golden.\n\n---\n\nSolution:\n\nAs before, the $1 \\times 1$ matrix consisting only of a $1$ is golden. Now, note that the union of any row and any column in an $n \\times n$ golden matrix contains exactly $2 n-1$ entries, so each of the numbers $1,2, \\ldots, 2 n-1$ must appear exactly once in this union. Therefore, there is no room in the matrix for any numbers other than $1,2, \\ldots, 2 n-1$. Moreover, if any of t"
+ },
+ {
+  "mathnet_id": "06hk",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "素数与算术基本定理",
+   "计数与容斥"
+  ],
+  "contest": "HONG KONG PRELIMINARY SELECTION CONTEST",
+  "problem": "How many sets of integers $(a, b, c)$ satisfy $2 \\le a \\le b \\le c$ and $abc = 2013 \\times 2014$? (2 marks)\n\n有多少組整數 $(a, b, c)$ 滿足 $2 \\le a \\le b \\le c$ 及 $abc = 2013 \\times 2014$? (2分)",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "05va",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "图论",
+   "算法与过程类问题",
+   "素数与算术基本定理"
+  ],
+  "contest": "PRÉPARATION OLYMPIQUE FRANÇAISE DE MATHÉMATIQUES",
+  "problem": "Problem:\n\nUn graphe $G$ fini simple à $n$ sommets est dit divisible s'il est possible d'attribuer à chaque sommet $s$ de $G$ un numéro $n_{s}$ de sorte que deux sommets distincts possèdent toujours deux numéros distincts et deux sommets quelconques $s$ et $s^{\\prime}$ sont reliés par une arête si et seulement si $n_{s} \\mid n_{s^{\\prime}}$ ou $n_{s^{\\prime}} \\mid n_{s}$.\n\nUn graphe $G$ fini simple à $n$ sommets est dit permutable s'il est possible de numéroter les sommets de $G$ de $1$ à $n$ et s'il existe une permutation $\\sigma$ de $\\{1, \\ldots, n\\}$ telle que les sommets ayant pour numéros $i$ et $j$ sont reliés par une arête si et seulement si $(i-j)(\\sigma(i)-\\sigma(j))<0$.\n\nMontrer qu'un graphe $G$ est permutable si et seulement si $G$ et son complémentaire sont divisibles.",
+  "solution_head": "Solution:\n\nUn graphe est de divisibilité ssi on peut l'orienter (dans le sens des divisibilités) de manière à ce que s'il y a un arc (arête orientée) de $A$ vers $B$ et un de $B$ vers $C$, il y en a un de $A$ vers $C$. En effet, on peut alors attribuer à chaque sommet un nombre premier différent, et le nombre attribué pour les relations de divisibilité est alors le produit de son nombre premier par ceux de chacun des sommets ayant un arc arrivant sur lui. On a alors les bonnes relations de divisibilité : s'il y a un arc de $A$ vers $B$, tout premier divisant le nombre attribué à $A$ est le premier d'un sommet $C$ avec un arc de $C$ vers $A$. Il y a alors aussi un arc de $C$ vers $B$, donc le premier divise aussi le nombre attribué à $B$.\n\nMontrons qu'on peut orienter un graphe de permutation. On trace un arc de $a$ vers $b$ ssi $a<b$ et $\\sigma(a)>\\sigma(b)$. On a bien les arêtes du graphe de permutation attribué et la relation est transitive, on a donc bien un graphe de divisibilité. Son complémentaire est également de divisibilité car orientable en traçant un arc de $a$ vers $b$ ss"
+ },
+ {
+  "mathnet_id": "0j31",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "概率与期望"
+  ],
+  "contest": "Harvard-MIT November Tournament",
+  "problem": "Problem:\n\nGeorge has two coins, one of which is fair and the other of which always comes up heads. Jacob takes one of them at random and flips it twice. Given that it came up heads both times, what is the probability that it is the coin that always comes up heads?",
+  "solution_head": "Solution:\n\nAnswer: $\\frac{4}{5}$.\n\nIn general, $P(A|B) = \\frac{P(A \\cap B)}{P(B)}$, where $P(A|B)$ is the probability of $A$ given $B$ and $P(A \\cap B)$ is the probability of $A$ and $B$ (See http://en.wikipedia.org/wiki/Conditional_probability for more information).\n\nIf $A$ is the event of selecting the \"double-headed\" coin and $B$ is the event of Jacob flipping two heads, then $P(A \\cap B) = \\left(\\frac{1}{2}\\right)(1)$, since there is a $\\frac{1}{2}$ chance of picking the double-headed coin and Jacob will always flip two heads when he has it.\n\nBy conditional probability, $P(B) = \\left(\\frac{1}{2}\\right)(1) + \\left(\\frac{1}{2}\\right)\\left(\\frac{1}{4}\\right) = \\frac{5}{8}$, so $P(A \\mid B) = \\frac{1/2}{5/8} = \\frac{4}{5}$."
+ },
+ {
+  "mathnet_id": "02p9",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "计数与容斥"
+  ],
+  "contest": "Brazilian Mathematical Olympiad, Nível 2",
+  "problem": "Problem:\n\nDe quantas formas é possível colorir as 6 faces de um cubo de preto ou branco? Duas colorações são iguais se é possível obter uma a partir da outra por uma rotação.",
+  "solution_head": "Solution:\n\nObservemos que basta contar quantas colorações existem que têm exatamente 0, 1, 2 e 3 faces pretas, porque os outros casos são simétricos. Com uma ou nenhuma face preta existe uma única coloração para cada caso. Quando temos duas faces pretas temos duas possíveis colorações que são: quando estas faces são opostas e quando elas não são. Por último, com três faces pretas também temos dois casos: quando duas dessas faces pretas são opostas e quando não existem faces opostas de cor preta. Assim, no total temos $1+1+2+2+2+1+1=10$ possíveis colorações."
+ },
+ {
+  "mathnet_id": "0d95",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "染色与不变量"
+  ],
+  "contest": "SAUDI ARABIAN MATHEMATICAL COMPETITIONS",
+  "problem": "Consider the set $X=\\{1,2,3, \\ldots, 2018\\}$. How many positive integers $k$ with $2 \\leq k \\leq 2017$ that satisfy the following conditions:\n\ni) There exists some partition of the set $X$ into $1009$ disjoint pairs which are $(a_{1}, b_{1}), (a_{2}, b_{2}), \\ldots, (a_{1009}, b_{1009})$ with $|a_{i}-b_{i}| \\in \\{1, k\\}$.\n\nii) For all partitions satisfy the condition (i), the sum $T=\\sum_{i=1}^{1009}|a_{i}-b_{i}|$ has the right most digit is $9$.",
+  "solution_head": "First, we notice that for all $2 \\leq k \\leq 2017$, we always can find a partition satisfy i). For example, we can choose $a_{i}=2i-1$, $b_{i}=2i$ with $i=1,2, \\ldots, 1009$.\n\nDenote $m$ as the number of pairs $(a_{i}, b_{i})$ with $|a_{i}-b_{i}|=k$ then\n$$\nT=(1009-m) \\cdot 1 + m \\cdot k = 1009 + (k-1)m.\n$$\nHence, the necessary condition of $k$ is $(k-1)m$ is divisible by $10$. First, we can see that all numbers $k \\equiv 1 \\pmod{5}$ satisfy the given condition.\n\nIndeed, we have some cases:\n\n1. If $k \\equiv 1 \\pmod{10}$ then $10 \\mid k-1$ and ii) is satisfied.\n\n2. If $k \\equiv 6 \\pmod{10}$ then $k$ is even. Thus, we need to prove $m$ is even. This is true because we can write $m = m_{1} + m_{2}$ with $m_{1}, m_{2}$ are the number of pairs with the difference is $k$ that have same parity and different parity. In $X$, the number of even and odd numbers are equal and all the pairs $(a_{i}, b_{i})$ with $|a_{i}-b_{i}|=1$ also contain exactly $1$ number in each type of even/odd. These imply that $m_{1}=m_{2}$ or $m$ is an even number.\n\nHence, all numbers $k \\equiv 1 \\pmod{5}$ satisfy the "
+ },
+ {
+  "mathnet_id": "0l34",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "染色与不变量"
+  ],
+  "contest": "AMC 10 A",
+  "problem": "What is the minimum number of successive swaps of adjacent letters in the string $ABCDEF$ that are needed to change the string to $FEDCBA$? (For example, 3 swaps are required to change $ABC$ to $CBA$; one such sequence of swaps is $ABC \\to BAC \\to BCA \\to CBA$.)\n\n(A) 6   (B) 10   (C) 12   (D) 15   (E) 24",
+  "solution_head": "If the $A$ is swapped 5 times, once with each of the other letters, the result will be $BCDEFA$. Now the $B$ can be swapped 4 times in the same way to end up in the fifth position: $CDEFBA$. Continuing in this way gives a sequence of $5 + 4 + 3 + 2 + 1 = 15$ swaps that achieves the required result.\n\nTo see that no sequence of fewer than 15 swaps will work, note that in $ABCDEF$ there are 15 instances of pairs of letters that are in alphabetical order ($AB$, $AC$, $AD$, $AE$, $AF$, $BC$, $BD$, $BE$, $BF$, $CD$, $CE$, $CF$, $DE$, $DF$, $EF$), and in the required final string there are no such pairs. Each swap can decrease the number of pairs of letters that are in alphabetical order by just 1, so at least 15 swaps are required."
+ },
+ {
+  "mathnet_id": "04jj",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "概率与期望"
+  ],
+  "contest": "Croatia Mathematical Competitions",
+  "problem": "In a box, there is one red and five white balls marked by numbers $1$, $2$, $3$, $4$ and $5$. Without looking, Domagoj draws one ball at a time until he draws the red ball and then he stops. Drawn balls are not returned into the box. What is the probability that the sum of the numbers on the drawn balls is at least $10$?",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "07ro",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "抽屉原理"
+  ],
+  "contest": "Irish",
+  "problem": "We say that a rectangle with side lengths $a$ and $b$ fits inside a rectangle with side lengths $c$ and $d$ if either $(a \\le c)$ and $(b \\le d)$ or $(a \\le d)$ and $(b \\le c)$. For instance, a rectangle with side lengths $1$ and $5$ fits inside another rectangle with side lengths $1$ and $5$, and also fits inside a rectangle with side lengths $6$ and $2$.\nSuppose $S$ is a set of $2019$ rectangles, all with integer side lengths between $1$ and $2018$ inclusive. Show that there are three rectangles $A$, $B$, and $C$ in $S$ such that $A$ fits inside $B$, and $B$ fits inside $C$.",
+  "solution_head": "We write $R \\le R'$ if $R$ fits inside $R'$. (Note that $\\le$ is a preorder: it is reflexive and transitive. It might not be a partial order because two different rectangles might have matching widths and lengths.)\nWe call an $n$-element subset $C$ of $S$ an $n$-chain if its elements can be listed in \"increasing order\", i.e. in the form\n$$\nR_1 \\le R_2 \\le \\dots \\le R_n\n$$\nAn $n$-chain is allowed to contain congruent rectangles; for example, all $n$ rectangles $R_1, R_2, \\dots, R_n$ may be congruent to each other. We call $A \\subset S$ an *anti-chain* if it contains no 2-chains. In particular, no two rectangles are congruent in an anti-chain. For each rectangle $R$ in $S$, we select a chain $GR$ with $R$ as a maximal element, and which has maximal cardinality among chains having $R$ as a maximal element. Let $f(R)$ be the size of $GR$.\n**Claim 1:** The subset $f^{-1}(n)$ is an anti-chain for all $n \\in N$.\nTo prove this claim, it suffices to show that if $f(R) = f(R')$ for distinct $R, R' \\in S$, then $\\{R, R'\\}$ is an anti-chain. But this is easy since if $f(R) = f(R')$ and if $R' \\l"
+ }
+]

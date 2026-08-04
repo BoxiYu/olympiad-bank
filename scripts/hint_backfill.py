@@ -19,7 +19,8 @@ import bank
 ROOT = sp.ROOT
 LADDER_HEAD = '## 提示阶梯'
 
-PROMPT = """你是奥数教练，为 {n} 道题各写一条三级提示阶梯。读同目录 batch.json，把结果写成 hints.json。
+PROMPT = """你是奥数教练，为 {n} 道题各写一条三级提示阶梯。批次目录：{dir}/
+（你可能被置于仓库根目录运行；读 {dir}/batch.json，结果必须写到 {dir}/hints.json，不要碰其它目录。）
 
 三级的分工（这是学生卡住时逐级解锁的，每级之间他会再战 15 分钟）：
 1. **方向**：指出该往哪个方向想（切入视角、该关注什么量），不给具体手法。
@@ -63,7 +64,8 @@ def cmd_batch(args):
     os.makedirs(d, exist_ok=True)
     json.dump(items, open(os.path.join(d, 'batch.json'), 'w', encoding='utf-8'),
               ensure_ascii=False, indent=1)
-    open(os.path.join(d, 'task.md'), 'w', encoding='utf-8').write(PROMPT.format(n=len(items)))
+    open(os.path.join(d, 'task.md'), 'w', encoding='utf-8').write(
+        PROMPT.format(n=len(items), dir=args.out.rstrip('/')))
     print(f'批次已出：{len(items)} 题 → {args.out}/batch.json')
     print(f'下一步：uv run python scripts/hint_backfill.py dispatch --dir {args.out}')
 
@@ -72,6 +74,11 @@ def cmd_dispatch(args):
     d = os.path.join(ROOT, args.dir)
     if not os.path.exists(os.path.join(d, 'batch.json')):
         print(f'{args.dir}/batch.json 不存在，先跑 batch'); sys.exit(2)
+    # 自愈：派单前按现行模板重render task.md（companion 会把 --cwd 归一到仓库根，
+    # 提示词必须内含批次目录显式路径，机制同 mathnet_review.cmd_dispatch）。
+    items = json.load(open(os.path.join(d, 'batch.json'), encoding='utf-8'))
+    open(os.path.join(d, 'task.md'), 'w', encoding='utf-8').write(
+        PROMPT.format(n=len(items), dir=os.path.relpath(d, ROOT)))
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     from mathnet_review import find_companion
     companion = find_companion()
@@ -86,9 +93,14 @@ def cmd_dispatch(args):
     print(f'完成。下一步：uv run python scripts/hint_backfill.py apply --dir {args.dir}')
 
 
-def _answer_tokens(ans):
-    """答案里的数值与关键 token，用于检测提示是否剧透。"""
-    return {t for t in re.findall(r'\d+(?:\.\d+)?', ans) if len(t) >= 1}
+def _answer_tokens(ans, statement=''):
+    """答案里的数值 token，用于检测提示是否剧透。
+
+    题面里已出现的数字不算剧透——它们是题目给定量（如 `x_{2011}=x_0` 的 2011、
+    `n ≥ 100` 的 10），提示复述它们不泄露任何答案信息。只有答案独有的数值才是剧透。
+    """
+    given = set(re.findall(r'\d+(?:\.\d+)?', statement))
+    return {t for t in re.findall(r'\d+(?:\.\d+)?', ans) if t not in given}
 
 
 def cmd_apply(args):
@@ -106,7 +118,7 @@ def cmd_apply(args):
             rejected.append((pid, '不是三级或有空级')); continue
         secs = sp.split_sections(p['body'], pid)
         ans = secs.get('答案', '')
-        toks = _answer_tokens(ans)
+        toks = _answer_tokens(ans, secs.get('题面', ''))
         leak = [t for t in toks if len(t) >= 2 and any(t in lv for lv in levels)]
         if leak and not args.force:
             rejected.append((pid, f'提示疑似含答案数值 {leak}（--force 可强收）')); continue

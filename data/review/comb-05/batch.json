@@ -1,0 +1,38 @@
+[
+ {
+  "mathnet_id": "02v6",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "Ramsey 型问题"
+  ],
+  "contest": "Brazilian Mathematical Olympiad",
+  "problem": "Problem:\n\nSeja $n \\geq 3$ um inteiro positivo. Sobre uma reta, são marcados os $n$ pontos $P_{1}, P_{2}, P_{3}, \\ldots, P_{n}$, nessa ordem e igualmente espaçados entre si. Em seguida, cada um dos pontos deve ser pintado de azul ou de vermelho de modo que não existam três pontos $P_{x}, P_{\\frac{x+y}{2}}$ e $P_{y}$ pintados da mesma cor, sendo $x+y$ par.\n\na. Mostre que para $n=8$ existe uma maneira de colorir os pontos $P_{1}, P_{2}, \\ldots, P_{8}$ satisfazendo a condição dada.\n\nb. Mostre que qualquer pintura para $n=9$ não satisfaz a condição dada.",
+  "solution_head": "Solution:\n\na. Marcaremos com $A$ e $V$ as cores dos pontos em ordem. Considere a seguinte forma de colorir os 8 pontos:\n$$\n\\begin{array}{cccccccc}\nP_{1} & P_{2} & P_{3} & P_{4} & P_{5} & P_{6} & P_{7} & P_{8} \\\\\nA & V & V & A & A & V & V & A .\n\\end{array}\n$$\nA condição dada requer que não existam pontos de mesma cor de modo que um deles seja o ponto médio do segmento formado pelos outros dois. É imediato verificar que essa condição é satisfeita no exemplo anterior.\n\n\nb. Considere uma pintura qualquer para $n=9$ satisfazendo as condições do enunciado. Assim, não podem existir trios da forma $\\left(P_{x}, P_{\\frac{x+y}{2}}, P_{y}\\right)$ com todos esses pontos com a mesma cor. Suponha inicialmente que $P_{3}$ e $P_{5}$ possuem a mesma cor, digamos azul. Então $P_{1}, P_{4}$ e $P_{7}$ deverão ter a cor oposta, ou seja, vermelho. Caso contrário, algum dos trios $\\left(P_{1}, P_{3}, P_{5}\\right),\\left(P_{3}, P_{4}, P_{5}\\right)$ ou $\\left(P_{3}, P_{5}, P_{7}\\right)$ teria três pontos pintados de azul. Entretanto, isso implicaria que ($P_{1}, P_{4}, P_{7}$) estão pintados de vermelho. Port"
+ },
+ {
+  "mathnet_id": "0juv",
+  "est": 3,
+  "conf": "mid",
+  "category": "combinatorics",
+  "topics": [
+   "Ramsey 型问题"
+  ],
+  "contest": "HMMT Invitational Competition",
+  "problem": "Problem:\nLet $S=\\{a_{1}, \\ldots, a_{n}\\}$ be a finite set of positive integers of size $n \\geq 1$, and let $T$ be the set of all positive integers that can be expressed as sums of perfect powers (including $1$) of distinct numbers in $S$, meaning\n$$\nT=\\left\\{\\sum_{i=1}^{n} a_{i}^{e_{i}} \\mid e_{1}, e_{2}, \\ldots, e_{n} \\geq 0\\right\\}\n$$\nShow that there is a positive integer $N$ (only depending on $n$) such that $T$ contains no arithmetic progression of length $N$.",
+  "solution_head": "Solution:\nIn general we can assume that each $a_{i}>1$, since replacing $a_{i}=1$ by some large integer $a$ creates a set $T$ containing the original $T$ as a subset (by setting $e_{i}=0$).\n\nWe proceed by induction on $n$. For the base case $n=1$, an arithmetic progression of length at least $3$ would give $a_{1}^{e_{1}}+a_{1}^{e_{3}}=2 a_{1}^{e_{2}}$ where $e_{3}>e_{2}>e_{1}$. But $a_{1}^{e_{3}} \\geq 2 a_{1}^{e_{2}}$, so this is impossible. Thus our result holds for $n=1$.\n\nAssume the result is true for some $n-1$, and let $A_{n-1}$ be a number such that the longest progression when $|S|=n-1$ has length less than $A_{n-1}$. Let $M$ be a large integer that we will choose later. Take an arithmetic progression of length $2M+1$, calling the terms $b_{1}, b_{2}, \\ldots, b_{2M+1}$. Note that $b_{2M+1} \\leq 2 b_{M+1}$, since $b$ is a sequence of positive integers. For each term from $b_{M+1}$ to $b_{2M+1}$ assign to it the maximum power that is part of the sum. Call this value $c(b_{i})$. More explicitly, if $b_{i}=\\sum_{j=1}^{n} a_{j}^{e_{j}}$, then $c(b_{i})=\\max \\left(a_{1}^{e_{1}}, a_{"
+ },
+ {
+  "mathnet_id": "0boz",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "Ramsey 型问题"
+  ],
+  "contest": "66th NMO SELECTION TESTS FOR THE JUNIOR BALKAN MATHEMATICAL OLYMPIAD",
+  "problem": "Is it possible to partition the set of the positive integers into two subsets such that none of them contains an infinitely long (non-constant) arithmetic progression?",
+  "solution_head": "The answer is in the affirmative. For example, one can consider\n$$A = \\{1, 3, 4, 7, 8, 9, 13, 14, 15, 16, 21, \\dots\\},$$\n$$B = \\{2, 5, 6, 10, 11, 12, 17, 18, 19, 20, 26, \\dots\\},$$\ni.e., for the infinite word $W = w_1w_2\\cdots w_k \\cdots = aba^2b^2\\cdots a^nb^n\\cdots$, put $A$ the set of the indices $i$ for which $w_i = a$, and $B$ the set of the indices $i$ for which $w_i = b$. The terms of an arithmetic progression are equally spaced, while $A$ and $B$ both contain arbitrarily long gaps, hence the conclusion follows readily."
+ }
+]

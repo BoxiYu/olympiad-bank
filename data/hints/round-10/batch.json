@@ -1,0 +1,278 @@
+[
+ {
+  "id": "A-030",
+  "title": "Trigonometric Product Periods",
+  "difficulty": 2,
+  "topics": [
+   "复数与三角"
+  ],
+  "problem": "Find all positive integer numbers $n$ such that the number $3\\pi$ is a period of the function $f(x) = \\cos nx \\cdot \\sin \\frac{2009x}{n^2}$.",
+  "answer": "1, 7",
+  "solution": "$3\\pi$ is a period of the function $f(x)$ if and only if $f(x+3\\pi) = f(x)$ for arbitrary real number $x$. Putting $x=0$ we obtain that $f(0)=0$, since $f(3\\pi) = \\cos 3\\pi n \\cdot \\sin \\frac{3 \\cdot 2009\\pi}{n^2}$ we have $0 = \\cos 3\\pi n \\cdot \\sin \\frac{3 \\cdot 2009\\pi}{n^2} \\Leftrightarrow 0 = \\sin \\frac{3 \\cdot 2009\\pi}{n^2} \\Leftrightarrow \\frac{6027\\pi}{n^2} = \\pi k,\\ k \\in \\mathbb{Z} \\Leftrightarrow 6027 : n^2$.\n\nAs $6027 = 3 \\cdot 7^2 \\cdot 41$ thus the possible values for $n$ can only be numbers $1$ or $7$. It is directly verified that the numbers $1$ and $7$ satisfy the same initial conditions."
+ },
+ {
+  "id": "A-031",
+  "title": "Complex Cubic Inequality",
+  "difficulty": 2,
+  "topics": [
+   "复数与三角",
+   "多项式",
+   "不等式"
+  ],
+  "problem": "Let $a$, $b$, $c$, $d$ be real numbers, with at least one of $a$ or $c$ non-zero, such that\n$$\na^2 + ac + c^2 + 1 = b^2 + bd + d^2, \\quad \\text{and} \\quad 2ab + ad + 2cd + bc = 0.\n$$\nShow that $ac < 0$ or $(3a^2 - b^2 + 1)(3c^2 - d^2 + 1) \\le 0$.",
+  "answer": "证明题",
+  "solution": "Notice that $b \\neq 0$ or $d \\neq 0$ as $a^2 + ac + c^2 + 1 = (a + c/2)^2 + (3/4)c^2 + 1 > 0$. Suppose that $c = 0$. By assumption, we then have $a \\neq 0$ and the second equation becomes $2ab + ad = 0$, hence $b = -d/2$. Substituting this into the first equation gives $d^2 = (4/3)(a^2 + 1)$. So $b^2 = (a^2 + 1)/3$ and\n$$\n(3a^2 - b^2 + 1)(3c^2 - d^2 + 1) = \\frac{1}{9}(8a^2 + 2)(-1 - 4a^2) < 0,\n$$\n\n$$\n(2a + c)b = -(a + 2c)d.\n$$\nSince $b \\neq 0$ or $d \\neq 0$, and $(2a + c)(a + 2c) = 2(a + c)^2 + ac > 0$, we deduce that $bd < 0$. Consider the complex numbers $z = a + ib$ and $w = c + id$. Then\n$$\nz^2 + zw + w^2 = (a^2 - b^2 + ac - bd + c^2 - d^2) + i(2ab + ad + bc + 2cd) = -1.\n$$\n\nSo\n$$\n(z^3 + z) - (w^3 + w) = (z - w)(z^2 + zw + w^2 + 1) = 0.\n$$\nNow\n$$\n\\begin{aligned}\nz^3 + z &= a(a^2 - 3b^2 + 1) + ib(3a^2 - b^2 + 1), \\\\\nw^3 + w &= c(c^2 - 3d^2 + 1) + id(3c^2 - d^2 + 1).\n\\end{aligned}\n$$\nIn particular $d(3c^2 - d^2 + 1) = b(3a^2 - b^2 + 1)$. But $bd < 0$. So\n$$\n(3a^2 - b^2 + 1)(3c^2 - d^2 + 1) \\le 0.\n$$"
+ },
+ {
+  "id": "A-032",
+  "title": "Area Between Inverse Trigonometric Curves",
+  "difficulty": 2,
+  "topics": [
+   "复数与三角"
+  ],
+  "problem": "Problem:\nFind the area of the region in the first quadrant $x>0, y>0$ bounded above the graph of $y=\\arcsin (x)$ and below the graph of $y=\\arccos (x)$.",
+  "answer": "2 - sqrt(2)",
+  "solution": "Solution:\nWe can integrate over $y$ rather than $x$. In particular, the solution is\n$$\n\\int_{0}^{\\pi / 4} \\sin y \\, dy + \\int_{\\pi / 4}^{\\pi / 2} \\cos y \\, dy = \\left(1 - \\frac{1}{\\sqrt{2}}\\right) 2 = 2 - \\sqrt{2}.\n$$"
+ },
+ {
+  "id": "A-033",
+  "title": "Universal Diophantine Product Identity",
+  "difficulty": 2,
+  "topics": [
+   "不定方程",
+   "复数与三角",
+   "多项式"
+  ],
+  "problem": "Find every integer $k$ that satisfies the following condition.\nThere are infinitely many triplet $(a, b, c)$ of integers such that $(a^2 - k)(b^2 - k) = c^2 - k$.",
+  "answer": "all integers",
+  "solution": "Consider an arbitrary integer $k$. Take a complex number $\\alpha$ that meets $\\alpha^2 = k$. (For example, let $\\alpha = \\sqrt{k}$ if $k$ is nonnegative, and $\\alpha = i\\sqrt{-k}$ if $k$ negative.)\nIt is easy verify the following equalities:\n$$\n(n + \\alpha)(n + 1 - \\alpha) = ((n(n + 1) - k) + \\alpha), \\\\\n(n - \\alpha)(n + 1 + \\alpha) = ((n(n + 1) - k) - \\alpha).\n$$\nBy multiplying these two formulae, we obtain an identity,\n$$\n(n^2 - k)((n + 1)^2 - k) = ((n(n + 1) - k)^2 - k).\n$$\nIn consequence, for any $k$, we can pick up any $n$ and let $(a, b, c) = (n, n + 1, n(n + 1) - k)$ so that the required equality holds. There are infinitely many $n$ and hence $(a, b, c)$. Therefore, every integer $k$ meets the required condition."
+ },
+ {
+  "id": "A-034",
+  "title": "Constrained Unit-Circle Vector Sum",
+  "difficulty": 4,
+  "topics": [
+   "复数与三角",
+   "面积法与三角法",
+   "不等式"
+  ],
+  "problem": "Let $C = \\{z \\in \\mathbb{C} \\mid |z| = 1\\}$ be the unit circle in the complex plane. 240 complex numbers $z_1, z_2, \\dots, z_{240} \\in C$ (can be repeated) satisfy the following conditions:\n(1) for any open arc $\\Gamma$ of length $\\pi$ on $C$, there are at most 200 $j$'s $(1 \\le j \\le 240)$ such that $z_j \\in \\Gamma$;\n(2) for any open arc $\\gamma$ of length $\\frac{\\pi}{3}$ on $C$, there are at most 120 $j$'s $(1 \\le j \\le 240)$ such that $z_j \\in \\gamma$.\n\nFind the maximum of $|z_1 + z_2 + \\dots + z_{240}|$.",
+  "answer": "80 + 40*sqrt(3)",
+  "solution": "The maximum is $80 + 40\\sqrt{3}$. Take 80 of 1's, 40 of each of $\\exp(\\frac{\\pi}{6}i)$, $\\exp(-\\frac{\\pi}{6}i)$, $i$, $-i$. It is straightforward to check that they satisfy (1), (2), and their sum equals $80 + 40\\sqrt{3}$. We need to show this is the maximum value.\n\nLet $z_1, z_2, \\dots, z_{240}$ satisfy (1), (2). By rotation if necessary, we may assume that $S = z_1 + z_2 + \\dots + z_{240}$ is a nonnegative real number; starting from $-1$ (included) along $C$, in the counterclockwise order, let the numbers be $z_1, z_2, \\dots, z_{240}$.\n\nCondition (1) indicates that for $1 \\le j \\le 40$, to go from $z_j$ to $z_{j+200}$ along $C$, at least an arc of length $\\pi$ is needed, that is to say, there exists $2\\pi \\ge \\alpha \\ge \\pi$ such that $z_{j+200} = z_j \\cdot \\exp(\\alpha i)$. Let $z_j = (-1) \\cdot \\exp(\\beta i)$, $\\beta \\in [0, 2\\pi)$. From $\\arg z_{j+200}$ we see $\\beta + \\alpha < 2\\pi$, and thus\n$$\n\\operatorname{Re}(z_j + z_{j+200}) = -\\cos \\beta - \\cos(\\beta + \\alpha) = -2 \\cos \\frac{\\alpha}{2} \\cos \\left(\\beta + \\frac{\\alpha}{2}\\right) \\le 0 \\\\\n\\left( \\text{because } \\frac{\\alpha}{2} \\in \\left[\\frac{\\pi}{2}, \\pi\\right], \\beta + \\frac{\\alpha}{2} \\in \\left[\\frac{\\pi}{2}, \\frac{3\\pi}{2}\\right] \\right). \\text{ Summing up } 1 \\le j \\le 40, \\text{ we} \\\\\n\\text{obtain}\n$$\n$$\n\\operatorname{Re}(z_1 + z_2 + \\cdots + z_{40} + z_{201} + z_{202} + \\cdots + z_{240}) \\le 0. \\quad \\textcircled{1}\n$$\n\nSimilarly, condition (2) indicates that for $41 \\le j \\le 80$, to go from $z_j$ to $z_{j+120}$ along $C$, at least an arc of length $\\frac{\\pi}{3}$ is needed. So there exists $2\\pi \\ge \\alpha \\ge \\frac{\\pi}{3}$, such that $z_{j+120} = z_j \\cdot \\exp(\\alpha i)$. Let $z_j = (-1) \\cdot \\exp(\\beta i)$, $\\beta \\in [0, 2\\pi)$. From $\\arg z_{j+120}$ we see $\\beta + \\alpha < 2\\pi$, and thus\n$$\n\\operatorname{Re}(z_j + z_{j+120}) = -\\cos \\beta - \\cos(\\beta + \\alpha) = -2 \\cos \\frac{\\alpha}{2} \\cos \\left(\\beta + \\frac{\\alpha}{2}\\right).\n$$\nIf $\\alpha \\ge \\pi$, the above quantity is non-positive; if $\\alpha \\in [\\frac{\\pi}{3}, \\pi)$, then\n$$\n\\left| 2 \\cos \\frac{\\alpha}{2} \\cos \\left( \\beta + \\frac{\\alpha}{2} \\right) \\right| \\le 2 \\times \\cos \\frac{\\pi}{6} \\times 1 = \\sqrt{3},\n$$\nso the real part is $\\le \\sqrt{3}$. Summing up for $41 \\le j \\le 80$, we obtain\n$$\n\\operatorname{Re}(z_{41} + z_{42} + \\cdots + z_{80} + z_{161} + z_{162} + \\cdots + z_{200}) \\le 40\\sqrt{3}. \\quad \\textcircled{2}\n$$\n\nThe inequalities (1) and (2) lead to an estimate of the sum\n$$\n\\begin{aligned}\n& |z_1 + z_2 + \\cdots + z_{240}| \\\\\n&= \\operatorname{Re} \\left( \\sum_{j=1}^{40} (z_j + z_{200+j}) \\right) + \\operatorname{Re} \\left( \\sum_{j=41}^{80} (z_j + z_{120+j}) \\right) + \\operatorname{Re} \\left( \\sum_{j=81}^{120} z_j \\right) \\\\\n&\\le 0 + 40\\sqrt{3} + 80 = 80 + 40\\sqrt{3}.\n\\end{aligned}\n$$\n\nHere, the maximum is attained only when the numbers are: 80 of 1's, 40 of each of $\\exp(\\frac{\\pi}{6}i)$, $\\exp(-\\frac{\\pi}{6}i)$, $i$, $-i$ (or by any rotation). $\\square$"
+ },
+ {
+  "id": "N-035",
+  "title": "Small Idempotent Modulo n",
+  "difficulty": 4,
+  "topics": [
+   "中国剩余定理",
+   "抽屉原理"
+  ],
+  "problem": "Let $n > 1$ be an integer, $k$ be the number of distinct prime factors of $n$. Prove that there exists an integer $a$, $1 < a < \\frac{n}{k} + 1$, such that $n \\mid a^2 - a$. (posed by Yu Hongbing)",
+  "answer": "证明题",
+  "solution": "Let $n = p_1^{a_1} \\cdots p_k^{a_k}$ be the standard factorization of $n$. Since $p_1^{a_1}, \\dots, p_k^{a_k}$ are pairwise coprime, by the Chinese Remainder Theorem, for each $i$, $1 \\le i \\le k$, congruence equations\n$$\n\\begin{cases} x \\equiv 1 \\pmod{p_i^{a_i}} \\\\ x \\equiv 0 \\pmod{p_j^{a_j}}, \\quad j \\neq i \\end{cases}\n$$\nhave solution $x_i$.\nFor any solution of $x_0^2 = x_0 \\pmod{n}$, we see that $x_0(x_0 - 1) \\equiv 0 \\pmod{n}$. Then for each $i = 1, 2, \\dots, k$, either $x_0 \\equiv 0 \\pmod{p_i^{a_i}}$ or $x_0 \\equiv 1 \\pmod{p_i^{a_i}}$. Further, let $S(A)$ be the sum of elements of subset $\\{x_1, x_2, \\dots, x_k\\}$ (particularly, $S(\\emptyset) = 0$). Obviously, we have\n$$\nS(A)(S(A) - 1) \\equiv 0 \\pmod{n}.\n$$\n(This is because of the selection of $x_i$, such that $S(A) \\pmod{p_i^{a_i}}$ is either 0 or 1.) Moreover if $A \\neq A'$, then $S(A) \\neq S(A') \\pmod{n}$. Therefore, the sum of all subsets of $\\{x_1, x_2, \\dots, x_n\\}$ is exactly all solutions of $x(x - 1) \\equiv 0 \\pmod{n}$.\nLet $S_0 = n$, $S_r$ be the least non-negative remainder of $x_1 + x_2 + \\dots + x_r$ modulo $n$, $r = 1, 2, \\dots, k$. Thus $S_k = 1$. For all $1 \\le r \\le k - 1$, $S_r \\neq 0$. Since $k+1$ numbers $S_0, S_1, \\dots, S_k$ are in $[1, n]$, by Dirichlet's Drawer Principle, there exist $0 \\le l < m \\le k$, such that $S_l, S_m$ in the same interval $\\left(\\frac{jn}{k}, \\frac{(j+1)n}{k}\\right]$, $(0 \\le j \\le k-1)$, where $l=0$ and $m=k$ do not hold simultaneously.\nThus, $|S_l - S_m| < \\frac{n}{k}$. Denote $y_1 = S_1, y_r = S_r - S_{r-1}$ ($r=2, 3, \\dots, k$). So any sum of $y_r \\equiv x_r \\pmod{n}$ ($r=1, 2, \\dots, k$) meets the requirement.\nIf $S_m - S_l > 1$, then $a = y_{l+1} + y_{l+2} + \\dots + y_m = S_m - S_l \\in (1, \\frac{n}{k})$ is the solution of the equation $x^2 - x \\equiv 0 \\pmod{n}$.\nIf $S_m - S_l = 1$, then $n$ ($y_1 + y_2 + \\dots + y_l + (y_{m+1} + y_{m+2} + \\dots + y_k)$, that is, $n$ ($x_1 + x_2 + \\dots + x_l + (x_{m+1} + x_{m+2} + \\dots + x_k)$. Notice that $m > l$, which contradicts to the definition of $x_i$.\nIf $S_m - S_l = 0$, then $n \\mid y_{l+1} + y_{l+2} + \\cdots + y_m$, that is, $n \\mid x_{l+1} + x_{l+2} + \\cdots + x_m$, which contradicts the definition of $x_i$.\nIf $S_m - S_l < 0$, then\n$$\n\\begin{aligned}\na &= (y_1 + y_2 + \\cdots + y_l) + (y_{m+1} + \\cdots + y_k) \\\\\n&= S_k - (S_m - S_l) = 1 - (S_m - S_l)\n\\end{aligned}\n$$\nis the solution of equation $x^2 - x \\equiv 0 \\pmod{n}$, and $1 < a < 1 + \\frac{n}{k}$.\nSumming up, there exists $a$ satisfying the condition. $\\square$"
+ },
+ {
+  "id": "N-036",
+  "title": "Consecutive Integer Signatures",
+  "difficulty": 2,
+  "topics": [
+   "中国剩余定理",
+   "素数与算术基本定理",
+   "染色与不变量"
+  ],
+  "problem": "For each positive integer $n$ larger than $1$ with prime factorization $p_1^{\\alpha_1} p_2^{\\alpha_2} \\cdots p_k^{\\alpha_k}$, its *signature* is defined as the sum $\\alpha_1 + \\alpha_2 + \\cdots + \\alpha_k$. Does there exist $2020$ consecutive positive integers such that among them, there are exactly $1812$ integers whose signatures are strictly smaller than $11$?",
+  "answer": "Yes",
+  "solution": "Yes. Let $f(n)$ be the number of integers among $n+1, n+2, \\dots, n+2020$ having signatures less than $11$. Since $2^{11} = 2048 > 2021$, all of $2, 3, \\dots, 2021$ have signatures smaller than $11$. Therefore, we have $f(1) = 2020$.\n\nNext, let $p_1, p_2, \\dots, p_{2020}$ be distinct primes. By the Chinese remainder theorem,\n\nthere exists a positive integer $m$ such that\n$$\n\\begin{array}{l@{\\quad}l@{\\quad}l}\nm & \\equiv & -1 \\pmod{p_1^{11}}, \\\\\nm & \\equiv & -2 \\pmod{p_2^{11}}, \\\\\n\\multicolumn{3}{c}{\\dots} \\\\\nm & \\equiv & -2020 \\pmod{p_{2020}^{11}}.\n\\end{array}\n$$\nFor this $m$, since $p_j^{11}$ divides $m+j$ for $j = 1, 2, \\dots, 2020$, each of the integers $m+1, m+2, \\dots, m+2020$ has signature larger than or equal to $11$. This implies $f(m) = 0$.\n\nNow, when we move from the integers $n+1, n+2, \\dots, n+2020$ to the integers $n+2, n+3, \\dots, n+2021$, the number of integers with signature less than $11$ will be increased or decreased by $1$, or remain unchanged. Thus, the difference between $f(n)$ and $f(n+1)$ is at most $1$. Therefore, in order to decrease $f(1) = 2020$ to $f(m) = 0$, we must come across a positive integer $k$ such that $f(k) = 1812$, and we are done."
+ },
+ {
+  "id": "N-037",
+  "title": "Bounded Coprimality-Preserving Function",
+  "difficulty": 3,
+  "topics": [
+   "素数与算术基本定理",
+   "最大公约数与欧几里得算法",
+   "中国剩余定理",
+   "函数方程"
+  ],
+  "problem": "Let $N$ be the set of positive integers. Let $f: \\mathbb{N} \\to \\mathbb{N}$ be a function satisfying the following two conditions:\n\na. $f(m)$ and $f(n)$ are relatively prime whenever $m$ and $n$ are relatively prime.\n\nb. $n \\le f(n) \\le n + 2012$ for all $n$.\n\nProve that for any natural number $n$ and any prime $p$, if $p$ divides $f(n)$ then $p$ divides $n$.",
+  "answer": "证明题",
+  "solution": "Let $g(n)$ be the smallest prime factor of $f(n)$. (Since $f(n) \\ge n$, $f(n)$ must have a prime factor unless $n=1$ and $f(1)=1$. In this case, we define $g(1)=1$.) First, we show that for any prime $p$ and any $k \\ge 1$, $f(p^k)$ is a power of $g(p)$.\n\nSuppose for the sake of contradiction that $f(p^k)$ is not a power of $g(p)$ for some $p$ and $k$. Choose $M$ sufficiently large so that $p^k < M \\cdot 2013!$, and let $P$ be the set of primes less than or equal to $M \\cdot 2013! + 1$. For any $q \\in P$, we have\n$$\ng(q) \\le f(q) \\le q + 2012 \\le M \\cdot 2013! + 2013,\n$$\nand furthermore the numbers $M \\cdot 2013! + i$ are composite for $2 \\le i \\le 2013$. It follows that $g(q) \\in P$, and so $g$ can be treated as a function from $P$ to $P$. Clearly, $g$ is injective because $f(q_1)$ and $f(q_2)$ are relatively prime for any distinct $q_1, q_2 \\in P$. Then, $g$ is bijective and in particular surjective.\n\nNow we can apply the same reasoning we used on primes in $P$ to $p^k$. We have\n$$\nf(p^k) \\le p^k + 2012 \\le M \\cdot 2013! + 2013,\n$$\nand so $f(p^k)$ has only prime factors in $P$. Suppose for the sake of contradiction that there is some prime $q \\in P$ not equal to $g(p)$ which divides $f(p^k)$. Then, by the surjectivity of $g$, there exists $r \\in P$ such that $g(r) = q$ (and with $r \\neq p$). We then find that $p^k$ and $r$ are relatively prime, but $q$ divides both $f(r)$ and $f(p^k)$, contradicting the first condition in the problem. It follows that $f(p^k)$ is a power of $g(p)$, as claimed.\n\nNext, we show that in fact $g(p) = p$. Indeed, suppose instead that $g(p) = q \\neq p$. Then, choose $\\ell$ sufficiently large so that $q^\\ell > 2013$, and letting $P = p^{q^\\ell - q^{\\ell-1}}$, choose $k$ sufficiently large so that $P^k > q^\\ell$. We find that\n$$\nP^k \\equiv 1^k \\equiv 1 \\bmod{q^\\ell}.\n$$\nBy the second condition of the problem, the only possible residues of $f(P^k)$ modulo $q^\\ell$ are the numbers between 1 and 2013, so in particular, $f(P^k)$ cannot be divisible by $q^\\ell$. On the other hand, $f(P^k) \\ge P^k > q^\\ell$, so $f(P^k)$ cannot be any power of $q$, contradicting the fact that since $P^k$ is a power of $p$, $f(P^k)$ must be a power of $g(p) = q$. This proves our claim that $g(p) = p$.\n\nFinally, let $p$ be any prime, and let $n$ be any positive integer relatively prime to $p$. Then, $f(p)$ and $f(n)$ are relatively prime, and since $f(p)$ is a power of $p$, it follows that $f(n)$ is not divisible by $p$. This is the contrapositive of the desired result, so we are done.\n\n---\n\n(By Gabriel Carroll) We first show that for any positive integer $N > 1$ and residue $r$, there exists a number $L$ such that $L \\equiv r \\bmod{N}$ and $f(L) = L$.\n\nTo see this, let $\\{p_{i,j} \\mid 1 \\le i, j \\le 2012\\}$ be a set of distinct primes not dividing $N$ and larger than 2012. Also, let $\\{q_i \\mid 1 \\le i \\le 2012\\}$ be another disjoint set of primes, also not dividing $N$ and larger than 2012.\n\nBy the Chinese Remainder Theorem, there exists a positive integer $K$ such that the following congruences hold:\n\n* $K \\equiv -i \\bmod{p_{i,j}}$ for $1 \\le i, j \\le 2012$,\n* $K \\equiv 0 \\bmod{q_i}$ for $1 \\le i \\le 2012$, and\n* $K \\equiv r + 1 \\bmod{N}$.\n\nNote that since $p_{i,j} > 2012$ and $1 \\le i \\le 2012$, it follows that $K$ is relatively prime to each $p_{i,j}$. Let $P$ be the product of the prime factors of $K$ not dividing $N$ and not equal to $q_i$ for some $i$.\n\nBy the Chinese Remainder Theorem again, there exists a positive integer $L$ such that the following congruences hold:\n\n* $L \\equiv -j \\bmod{p_{i,j}}$ for $1 \\le i, j \\le 2012$,\n* $L \\equiv -i \\bmod{q_i}$ for $1 \\le i \\le 2012$,\n* $L \\equiv r \\bmod{N}$, and\n* $L \\equiv 1 \\bmod{P}$.\n\nWe first claim that $K$ and $L$ are relatively prime. Indeed, suppose for the sake of contradiction that a prime $q$ divided both $K$ and $L$. By the construction of $L$, $q$ cannot be a factor of $P$ or any of the $q_i$. Thus, the only remaining possibility is that $q \\mid N$. However, $K - L \\equiv 1 \\bmod{N}$, so this is impossible.\n\nThus, since $K$ and $L$ are relatively prime, we have by the first condition of the problem that $f(K)$ and $f(L)$ are relatively prime. Next, note that for any $1 \\le i, j \\le 2012$, we have\n$$\nK + i \\equiv L + j \\equiv 0 \\quad \\text{mod } p_{i,j},\n$$\nand for any $1 \\le j \\le 2012$, we have\n$$\nK \\equiv L + j \\equiv 0 \\quad \\text{mod } q_j.\n$$\nRecall from the second condition of the problem that $f(K)$ and $f(L)$ must take the forms $K + i$ and $L + j$, respectively, where $0 \\le i, j \\le 2012$. It follows from the above considerations that we must have $f(L) = L$, and by construction, we have $L \\equiv r \\pmod N$, as desired.\n\nWe can now quickly finish the problem. Suppose for the sake of contradiction that there is a prime $p$ and a number $n$ such that $p \\mid f(n)$ but $p \\nmid n$. Take $L$ to be a positive integer such that $L \\equiv p \\pmod{np}$ and $f(L) = L$. Then, $L$ is relatively prime to $n$, so $f(n)$ is relatively prime to $f(L)$. But $f(L) = L$ is divisible by $p$, a contradiction."
+ },
+ {
+  "id": "N-038",
+  "title": "Fixed-Point-Free Additive Permutations",
+  "difficulty": 2,
+  "topics": [
+   "中国剩余定理",
+   "最大公约数与欧几里得算法",
+   "计数与容斥"
+  ],
+  "problem": "Problem:\nFind the number of functions $f$ from the set $S=\\{0,1,2, \\ldots, 2020\\}$ to itself such that, for all $a, b, c \\in S$, all three of the following conditions are satisfied:\n(i) If $f(a)=a$, then $a=0$;\n(ii) If $f(a)=f(b)$, then $a=b$; and\n(iii) If $c \\equiv a+b(\\bmod 2021)$, then $f(c) \\equiv f(a)+f(b)(\\bmod 2021)$.",
+  "answer": "1845",
+  "solution": "Solution:\nNote that, from (i), our function is completely determined by $f(1)$; i.e., $f(a) \\equiv a f(1)$ $(\\bmod 2021)$. Then, from (i) and (ii), we need that $f(a) \\neq 0$ if $a \\neq 0$; otherwise, if $a \\neq 0$ but $f(a)=0, f(b)=f(a+b)$ for any $b$. Thus, if $a \\neq 0$, we need that $a f(1) \\neq 0(\\bmod 2021)$ for any $a \\in S \\backslash\\{0\\}$. If \\operatorname{gcd}(f(1), 2021)=d>1$, then note that $a=\\frac{2021}{d} \\in S \\backslash\\{0\\}$, and from (i), $f(a) \\equiv a f(1) \\equiv 2021 \\equiv 0(\\bmod 2021)$. As we just established, this is not allowed. Hence, \\operatorname{gcd}(f(1), 2021)=1$.\n\nMoreover, from (iii), we need that $f(a)=a f(1) \\not \\equiv a(\\bmod 2021)$ if $a \\neq 0$; in other words, $2021 \\nmid a(f(1)-1)$ if $a \\neq 0$. By similar reasoning to earlier, suppose that \\operatorname{gcd}(f(1)-1,2021)=d>1$. Then $a=\\frac{2021}{d} \\in S \\backslash\\{0\\}$, and $2021 \\mid a(f(1)-1)$; thus, $f(a)=a$. We thus need that \\operatorname{gcd}(f(1)-1,2021)=1$ as well.\n\nWe count the number of integers that satisfy both these conditions. We use complementary counting here; thus, we start by counting those that fail to satisfy at least one condition. Indeed, we count the number of values of $f(1)$ that are not coprime to 2021. Either they are divisible by 43, or 47, or both. Since only 0 is divisible by both, by the principle of inclusion and exclusion, there are $47+43-1=89$ possible values of $f(1)$ so that $f(1)$ is not coprime to 2021. By the same reasoning, there are also 89 possible values of $f(1)$ such that $f(1)-1$ is not coprime to 2021. Finally, we count the values of $f(1)$ for which neither $f(1)$ nor $f(1)-1$ is coprime to 2021. This happens precisely when $43 \\mid f(1)$ and $47 \\mid f(1)-1$, or $47 \\mid f(1)$ and $43 \\mid f(1)-1$. By the Chinese remainder theorem, each of these possibilities gives one value of $f(1)$. Thus, by the principle of inclusion and exclusion, there are $2 \\cdot 89-2=176$ such values of $f(1)$ that fail to satisfy at least one condition. This gives us $2021-176=1845$ possible values of $f(1)$, and thus possible functions $f$."
+ },
+ {
+  "id": "N-039",
+  "title": "Tetration Congruence Stabilization",
+  "difficulty": 3,
+  "topics": [
+   "中国剩余定理",
+   "费马小定理与欧拉定理",
+   "阶与原根"
+  ],
+  "problem": "Problem:\n\nFor positive integers $a, b$, $a \\uparrow \\uparrow b$ is defined as follows: $a \\uparrow \\uparrow 1 = a$, and $a \\uparrow \\uparrow b = a^{a \\uparrow \\uparrow (b-1)}$ if $b > 1$.\nFind the smallest positive integer $n$ for which there exists a positive integer $a$ such that $a \\uparrow \\uparrow 6 \\not\\equiv a \\uparrow \\uparrow 7 \\pmod{n}$.",
+  "answer": "283",
+  "solution": "Solution:\n\nWe see that the smallest such $n$ must be a prime power, because if two numbers are distinct mod $n$, they must be distinct mod at least one of the prime powers that divide $n$. For $k \\geq 2$, if $a \\uparrow \\uparrow k$ and $a \\uparrow \\uparrow (k+1)$ are distinct $\\bmod p^{r}$, then $a \\uparrow \\uparrow (k-1)$ and $a \\uparrow \\uparrow k$ must be distinct $\\bmod \\phi\\left(p^{r}\\right)$. In fact they need to be distinct $\\bmod \\frac{\\phi\\left(p^{r}\\right)}{2}$ if $p=2$ and $r \\geq 3$ because then there are no primitive roots mod $p^{r}$.\n\nUsing this, for $1 \\leq k \\leq 5$ we find the smallest prime $p$ such that there exists $a$ such that $a \\uparrow \\uparrow k$ and $a \\uparrow \\uparrow (k+1)$ are distinct $\\bmod p$. The list is: $3, 5, 11, 23, 47$. We can easily check that the next largest prime for $k=5$ is $139$, and also any prime power other than $121$ for which $a \\uparrow \\uparrow 5$ and $a \\uparrow \\uparrow 6$ are distinct is also larger than $139$.\n\nNow if $a \\uparrow \\uparrow 6$ and $a \\uparrow \\uparrow 7$ are distinct $\\bmod p$, then $p-1$ must be a multiple of $47$ or something that is either $121$ or at least $139$. It is easy to see that $283$ is the smallest prime that satisfies this.\n\nIf $n$ is a prime power less than $283$ such that $a \\uparrow \\uparrow 6$ and $a \\uparrow \\uparrow 7$ are distinct $\\bmod n$, then the prime can be at most $13$ and clearly this doesn't work because $\\phi\\left(p^{r}\\right) = p^{r-1}(p-1)$.\n\nTo show that $283$ works, choose $a$ so that $a$ is a primitive root $\\bmod 283, 47, 23, 11, 5$ and $3$. This is possible by the Chinese Remainder theorem, and it is easy to see that this $a$ works by induction."
+ },
+ {
+  "id": "N-040",
+  "title": "Solutions of a Hexagonal Norm",
+  "difficulty": 2,
+  "topics": [
+   "不定方程",
+   "费马小定理与欧拉定理",
+   "阶与原根"
+  ],
+  "problem": "Find all integer solutions $(x, y)$ to the equation\n$$\nx^2 - x y + y^2 = 2023.\n$$",
+  "answer": "The integer solutions are (17, 51), (-17, -51), (51, 17), (-51, -17), (34, 51), (-34, -51), (51, 34), (-51, -34), (-17, 34), (17, -34), (34, -17), and (-34, 17).",
+  "solution": "Note that $2023 = 17^2 \\cdot 7$ and let $(x, y)$ be a solution. If we assume that $y$ is not divisible by $17$, there exists a number $a$ such that $a y \\equiv x \\pmod{17}$. We then have\n$$\n0 = x^2 - x y + y^2 \\equiv y^2 (a^2 - a + 1) \\pmod{17},\n$$\nhence $a^2 - a + 1 \\equiv 0 \\pmod{17}$. This implies that $a^6 \\equiv 1 \\pmod{17}$, because\n$$\na^6 - 1 = (a^3 - 1)(a^3 + 1) = (a^3 - 1)(a + 1)(a^2 - a + 1).\n$$\nOn the other hand, by Fermat's little theorem, $a^{16} \\equiv 1 \\pmod{17}$. Then $a^2 \\equiv a^2 \\cdot a^{16} \\equiv a^{18} \\equiv (a^6)^3 \\equiv 1 \\pmod{17}$, hence $a \\equiv \\pm 1 \\pmod{17}$. But for these two values of $a$ we get $a^2 - a + 1 \\equiv 2 - a \\equiv 2 \\mp 1 \\not\\equiv 0 \\pmod{17}$, a contradiction. Hence, $y$ must be divisible by $17$.\n\nIt follows that $x$ must also be divisible by $17$, and we look for solutions $(x, y) = (17u, 17v)$. Let $N(x, y) = x^2 - x y + y^2$ and note that\n$$\nN(x, y) = \\frac{(2x - y)^2 + 3y^2}{4}.\n$$\nThen $2023 = N(17u, 17v) = 17^2 N(u, v)$, iff $7 = N(u, v)$, or equivalently\n$$\n28 = (2u - v)^2 + 3v^2.\n$$\nBecause $v^2 \\le 28/3$ and $28$ is not a square, to find solutions to this equation we only need to consider $v \\in \\{\\pm 1, \\pm 2, \\pm 3\\}$. To a solution with negative $v$ there corresponds one with positive $v$, obtained by changing the signs of both, $u$ and $v$. Because $28 - 3 = 5^2$, $28 - 12 = 4^2$, and $28 - 27 = 1^2$, we have these three cases for solutions with positive $v$\n$$\nv = 1, \\quad 2u - v = \\pm 5, \\quad v = 2, \\quad 2u - v = \\pm 4, \\quad v = 3, \\quad 2u - v = \\pm 1.\n$$\nThe possibilities for solutions $(u, v)$ with positive $v$ are therefore\n$$\n(3, 1) \\quad (-2, 1) \\quad (3, 2) \\quad (-1, 2) \\quad (2, 3) \\quad (1, 3).\n$$\nThus we obtain $12$ solutions to the original equation, namely\n$$\n(x, y) = (17, 51), (34, 51), (-17, 34)\n$$\nand all the variants $(-x, -y)$, $(y, x)$, $(-y, -x)$ of these."
+ },
+ {
+  "id": "N-041",
+  "title": "Floor Sum of Powers of Two",
+  "difficulty": 2,
+  "topics": [
+   "费马小定理与欧拉定理",
+   "阶与原根",
+   "中国剩余定理",
+   "数列与递推"
+  ],
+  "problem": "Problem:\nDetermine the remainder when\n$$\n\\sum_{i=0}^{2015}\\left\\lfloor\\frac{2^{i}}{25}\\right\\rfloor\n$$\nis divided by $100$, where $\\lfloor x\\rfloor$ denotes the largest integer not greater than $x$.",
+  "answer": "14",
+  "solution": "Solution:\nLet $r_{i}$ denote the remainder when $2^{i}$ is divided by $25$. Note that because $2^{\\phi(25)} \\equiv 2^{20} \\equiv 1 \\pmod{25}$, $r$ is periodic with length $20$. In addition, we find that $20$ is the order of $2 \\bmod 25$. Since $2^{i}$ is never a multiple of $5$, all possible integers from $1$ to $24$ are represented by $r_{1}, r_{2}, \\ldots, r_{20}$ with the exceptions of $5, 10, 15$, and $20$. Hence,\n$$\n\\sum_{i=1}^{20} r_{i} = \\sum_{i=1}^{24} i - (5+10+15+20) = 250.\n$$\nWe also have\n$$\n\\begin{aligned}\n\\sum_{i=0}^{2015}\\left\\lfloor\\frac{2^{i}}{25}\\right\\rfloor &= \\sum_{i=0}^{2015} \\frac{2^{i} - r_{i}}{25} \\\\\n&= \\sum_{i=0}^{2015} \\frac{2^{i}}{25} - \\sum_{i=0}^{2015} \\frac{r_{i}}{25} \\\\\n&= \\frac{2^{2016} - 1}{25} - \\sum_{i=0}^{1999} \\frac{r_{i}}{25} - \\sum_{i=0}^{15} \\frac{r_{i}}{25} \\\\\n&= \\frac{2^{2016} - 1}{25} - 100\\left(\\frac{250}{25}\\right) - \\sum_{i=0}^{15} \\frac{r_{i}}{25} \\\\\n&\\equiv \\frac{2^{2016} - 1}{25} - \\sum_{i=0}^{15} \\frac{r_{i}}{25} \\pmod{100}\n\\end{aligned}\n$$\nWe can calculate $\\sum_{i=0}^{15} r_{i} = 185$, so\n$$\n\\sum_{i=0}^{2015}\\left\\lfloor\\frac{2^{i}}{25}\\right\\rfloor \\equiv \\frac{2^{2016} - 186}{25} \\pmod{100}\n$$\nNow $2^{\\phi(625)} \\equiv 2^{500} \\equiv 1 \\pmod{625}$, so $2^{2016} \\equiv 2^{16} \\equiv 536 \\pmod{625}$. Hence $2^{2016} - 186 \\equiv 350 \\pmod{625}$, and $2^{2016} - 186 \\equiv 2 \\pmod{4}$. This implies that $2^{2016} - 186 \\equiv 350 \\pmod{2500}$, and so $\\frac{2^{2016} - 186}{25} \\equiv 14 \\pmod{100}$."
+ },
+ {
+  "id": "N-042",
+  "title": "Divisibility of an Exponential Quotient",
+  "difficulty": 4,
+  "topics": [
+   "整除与同余",
+   "最大公约数与欧几里得算法",
+   "费马小定理与欧拉定理",
+   "阶与原根"
+  ],
+  "problem": "Problem:\nLet $n \\geq 2$ be an integer. Prove that if\n$$\n\\frac{n^{2}+4^{n}+7^{n}}{n}\n$$\nis an integer, then it is divisible by $11$.",
+  "answer": "证明题",
+  "solution": "Solution:\nThe \"Lifting the Exponent\" lemma tells us that\n$$\nv_{11}\\left(4^{n}+7^{n}\\right)=v_{11}(4+7)+v_{11}(n)=1+v_{11}(n)\n$$\nand we therefore have $11 \\mid\\left(4^{n}+7^{n}\\right) / n$.\n\nNow let $p$ denote the smallest prime factor of $n$. By assumption we have $p \\mid n \\mid 4^{n}+7^{n}$, with $p \\neq 2,7$. Now setting $x \\equiv 4 \\cdot 7^{-1} \\bmod p$, we find:\n$$\n4^{n} \\equiv -7^{n} \\bmod p \\Longrightarrow x^{n} \\equiv -1 \\quad \\bmod p \\Longrightarrow x^{2 n} \\equiv 1 \\quad \\bmod p\n$$\nIf $d$ denotes the order of $x \\bmod p$, the above implies $d \\mid 2 n$. By Euler-Fermat we also have $d \\mid \\varphi(p)=p-1$. By minimality of $p$, we have $\\gcd(n, p-1)=1$, and thus $d \\mid 2$. Therefore,\n$$\nx^{2} \\equiv 1 \\quad \\bmod p \\Longrightarrow 4^{2} \\equiv 7^{2} \\quad \\bmod p \\Longrightarrow p \\mid 49-16=33 \\Longrightarrow p=3,11\n$$\nBut since $4^{n} \\equiv 7^{n} \\equiv 1 \\bmod 3$, we cannot have $p=3 \\mid n$, since otherwise $n$ does not divide $4^{n}+7^{n}$. We conclude that $p=11 \\mid n$ and the result follows."
+ },
+ {
+  "id": "C-037",
+  "title": "Maximum Distance from Squares",
+  "difficulty": 2,
+  "topics": [
+   "组合博弈与策略",
+   "代数变换技巧"
+  ],
+  "problem": "Problem:\n\nAlice starts with the number $0$. She can apply $100$ operations on her number. In each operation, she can either add $1$ to her number, or square her number. After applying all operations, her score is the minimum distance from her number to any perfect square. What is the maximum score she can attain?",
+  "answer": "94",
+  "solution": "Solution:\n\nAnswer: $94$\n\nNote that after applying the squaring operation, Alice's number will be a perfect square, so she can maximize her score by having a large number of adding operations at the end. However, her score needs to be large enough that the many additions do not bring her close to a larger square. Hence the strategy is as follows: $2$ additions to get to $2$, $4$ consecutive squares to get to $65536$, and $94$ more additions for a score of $94$."
+ },
+ {
+  "id": "C-038",
+  "title": "Mersenne Board Voting",
+  "difficulty": 2,
+  "topics": [
+   "组合博弈与策略"
+  ],
+  "problem": "Problem:\n\nThe 2020 members of the society of game theorists are holding the annual election for their leadership board. All members are initially on the board, and are ranked based on their qualifications. They start off by voting on whether to keep the board the same size; if they fail to get a strict majority, the member with the lowest rank is expelled. This process continues until they finally vote to keep the size of the board intact.\nIt is common knowledge that, as each board member seeks to maximize their own influence, they seek to remain on the board while retaining as few other members as possible.\nAt the end of this process, how many society members will remain on the leadership board?",
+  "answer": "1023",
+  "solution": "Solution:\n\nNumber members #1 to #2020, with #1 being the member with the highest rank. We claim that only if there are $2^{n}-1$ members still on the board for some $n \\in \\mathbb{N}$, they all remain on the board.\n\nProof. We use induction on $n$.\n\nBase case: $n=1$.\nIf there were $2^{1}-1=1$ persons on the board, that person would vote to keep themselves on the board and win.\n\nInductive step: $n \\Longrightarrow n+1$\nIf there were at least $2^{n}$ members, the first $2^{n}-1$ would all vote \"no\", because by induction they know they would be guaranteed a spot on the board in any case and want to minimize its total size. This would be a weak majority vote for \"no\" if the total size of the board were at most $2\\left(2^{n}-1\\right)=2^{n+1}-2$ members.\n\nHowever, if there were $2^{n+1}-1$ members, all whose numbers are at least $2^{n}$ would vote \"yes\", as by the above, they would otherwise get kicked off the board. This is a strict majority, as desired.\n\nThe largest number at most 2020 of the form $2^{n}-1$ is 1023, so this is our answer."
+ },
+ {
+  "id": "G-043",
+  "title": "Integer-Centered Sphere Through Three Points",
+  "difficulty": 2,
+  "topics": [
+   "立体几何",
+   "解析几何与向量复数法"
+  ],
+  "problem": "Problem:\nA sphere is centered at a point with integer coordinates and passes through the three points $(2,0,0)$, $(0,4,0)$, $(0,0,6)$, but not the origin $(0,0,0)$. If $r$ is the smallest possible radius of the sphere, compute $r^{2}$.",
+  "answer": "51",
+  "solution": "Solution: Let $(x, y, z)$ be the center of the sphere. By the given condition, we have\n$$\n(x-2)^{2} + y^{2} + z^{2} = x^{2} + (y-4)^{2} + z^{2} = x^{2} + y^{2} + (z-6)^{2}.\n$$\nSubtracting $x^{2} + y^{2} + z^{2}$ yields\n$$\nx^{2} - (x-2)^{2} = y^{2} - (y-4)^{2} = z^{2} - (z-6)^{2},\n$$\nor\n$$\n4(x-1) = 8(y-2) = 12(z-3)\n$$\nTherefore $(x-1, y-2, z-3)$ must be $(6t, 3t, 2t)$ for some integer $t$. Checking small values of $t$ yields that the possibilities for $(x, y, z)$ closest to $(2,0,0)$ are $(-5,-1,1)$, $(1,2,3)$, and $(7,5,5)$. The second yields a sphere that passes through the origin and is thus forbidden. The other two yield $r^{2} = 51$ and $r^{2} = 75$, so 51 is the answer."
+ },
+ {
+  "id": "G-044",
+  "title": "Cube in a Spherical Gap",
+  "difficulty": 2,
+  "topics": [
+   "立体几何"
+  ],
+  "problem": "Problem:\nA cube with side length $2$ is inscribed in a sphere. A second cube, with faces parallel to the first, is inscribed between the sphere and one face of the first cube. What is the length of a side of the smaller cube?",
+  "answer": "2/3",
+  "solution": "Solution:\nFirst note that the long diagonal of the cube has length $2\\sqrt{3}$, so the radius of the sphere is $\\sqrt{3}$. Let $x$ be the side length of the smaller cube. Then the distance from the center of the sphere to the far face of the smaller cube is $1 + x$, while the distance from the center of the far face to a vertex lying on the sphere is $\\frac{x\\sqrt{2}}{2}$. Therefore, the square of the radius is\n$$\n3 = (1 + x)^2 + \\frac{x^2}{2},\n$$\nor\n$$\n3x^2 + 4x - 4 = (3x - 2)(x + 2) = 0,\n$$\nso $x = \\frac{2}{3}$."
+ },
+ {
+  "id": "G-045",
+  "title": "Maximum Five-Point Spherical Hull",
+  "difficulty": 3,
+  "topics": [
+   "立体几何",
+   "圆与四点共圆",
+   "不等式"
+  ],
+  "problem": "Problem:\n\nFive points are chosen on a sphere of radius $1$. What is the maximum possible volume of their convex hull?",
+  "answer": "sqrt(3)/2",
+  "solution": "Solution:\n\nAnswer: $\\sqrt{3}/2$\n\nLet the points be $A$, $B$, $C$, $X$, $Y$ so that $X$ and $Y$ are on opposite sides of the plane defined by triangle $ABC$. The volume is $1/3$ the product of the area of $ABC$ and the sum of the distances from $X$ and $Y$ to the plane defined by $ABC$.\n\nThe area of $ABC$ is maximized when the plane containing it intersects the sphere in the largest possible cross section, and $ABC$ is equilateral: this gives an area of $3\\sqrt{3}/4$.\n\nThen, the sum of the distances from $X$ and $Y$ to the plane of $ABC$ is at most $2$. This is clearly obtainable when $A$, $B$, and $C$ form an equilateral triangle circumscribed by the equator of the sphere, and $X$ and $Y$ are at the poles, and we get a volume of $\\sqrt{3}/2$."
+ },
+ {
+  "id": "G-046",
+  "title": "Acute Lattice Triangles of Fixed Area",
+  "difficulty": 4,
+  "topics": [
+   "组合几何",
+   "面积法与三角法",
+   "不定方程",
+   "递推与生成结构"
+  ],
+  "problem": "在坐標平面上有 $N$ 個銳角三角形, 它們的三頂點皆為整數點, 面積皆為 $2^{2020}$, 且兩兩不全等。試求 $N$ 的最大值。\n註：$(x, y)$ 為整數點, 若且唯若 $x$ 與 $y$ 皆為整數。\n\nThere are $N$ acute triangles on the plane. Their vertices are all integer points, their areas are all equal to $2^{2020}$, but no two of them are congruent. Find the maximum possible value of $N$.\nNote: $(x, y)$ is an integer point if and only if $x$ and $y$ are both integers.",
+  "answer": "2^{2020} - 1",
+  "solution": "我們先觀察出以下性質。\n\n**引理一：** 所有整點三角形若面積是整數，則必有 1 或 3 條邊的中點是整點。\n*Proof.* 由 Pick 定理知，面積整數的三角形落在邊上的整點必為偶數個。假設在三角形的某邊 $AB$ 上有整點 $P$。設中點為 $M$，則 $P$ 對 $M$ 的對稱點 $P'$ 也是整點（$A + B = P + P'$），所以三頂點和三中點的整點數總和必須是偶數，故有奇數個中點是整點，得證。□\n\n**引理二：** 沒有整點正三角形。\n*Proof.* 整點三角形的面積必為有理數。但假設存在整點正三角形且邊長為 $a$，那麼其面積為 $\\frac{\\sqrt{3}}{4}a^2$，且由畢氏定理知 $a^2$ 是整數，故面積不是有理數而矛盾。□\n\n**引理三：** 若等腰整點三角形的面積是 2 的幂次，則其底邊平行 $x, y$ 軸或 $x = y$ 或 $x = -y$。\n*Proof.* 假設反之，設三角形為 $ABC$，且 $BC$ 是底邊，做 $B$ 對 $A$ 對稱點 $B'$，$C$ 對 $A$ 對稱點 $C'$ 得到矩形 $BCB'C'$，此矩形面積也是 2 的幂次，假設 $BC = \\sqrt{a^2 + b^2}$。若 $p|a^2 + b^2$，則若 $BCB'C'$ 面積為整數則同時也是 $p$ 的倍數，所以 $a^2 + b^2 = 2^n$。令 $g = \\gcd(a, b)$，\n$$\ng^2 \\left( \\left( \\frac{a}{g} \\right)^2 + \\left( \\frac{b}{g} \\right)^2 \\right) = 2^n\n$$\n然而熟知若兩數不同時為偶數，則其平方和不被 4 整除，故 $\\left(\\frac{a}{g}\\right)^2 + \\left(\\frac{b}{g}\\right)^2$ 只能取值 1, 2。所以 $a = b = g$ 或 $ab = 0$，恰對應引理提及的情況，得證。□\n\n**引理四：** 不存在銳角整點三角形面積為 $\\frac{1}{2}$。\n*Proof.* 假設三角形 $ABC$ 面積是 $\\frac{1}{2}$，其中 $\\angle A$ 是最大角且 $b = AC, c = AB$，那麼 $\\angle A \\ge \\frac{\\pi}{3}$\n$$\n\\frac{1}{2}bc \\sin A = \\frac{1}{2} \\Rightarrow bc = \\frac{1}{\\sin A} \\le \\frac{2}{\\sqrt{3}}\n$$\n由於 $\\sqrt{2} > \\frac{2}{\\sqrt{3}}$，所以只能有 $b = c = 1$，然而這顯然不成立，得證。□\n\n回到原題，以下我們稱面積為 $2^n$ 的整點銳角三角形為 $n$-好三角形，假設有 $a_n$ 個不等邊的 $n$-好三角形，$b_n$ 個等腰 $n$-好三角形。此外，我們稱其中三邊中點都是整點的三角形為偶好三角形，只有一個中點是整點的三角形為奇好三角形。\n\n現在，讓我們對不等邊與等腰的好三角形，分別考慮一個能從 $(n-1)$-好三角形造出一個 $n$-好三角形的映射：\n- 對於一個不等邊的 $(n-1)$-好三角形 $ABC$，考慮一個對應 $f(\\Delta ABC, AB)$ 映射到不等邊的 $n$-好三角形，映射規則是：不失一般性 $CA < CB$，做 $A$ 對 $C$ 對稱點 $A'$，則取值三角形 $ABA'$。\n- 對於等腰 $n$-好三角形 $ABC$ 且 $AB = AC$，考慮對應 $g(\\Delta ABC)$，取值規則如下：若 $AB > BC$ 則做 $C$ 對 $B$ 對稱點 $C'$，取值三角形 $ACC'$；若 $AB < BC$ 則做 $A$ 對 $B$ 對稱點 $A'$，取值三角形 $ACA'$。\n\n現在，取遍所有 $(n-1)$-好三角形與其三邊，套用 $f,g$，我們總共構出 $3a_{n-1} + b_{n-1}$ 個 $n$-好三角形，但這其中有可能有 $n$-好三角形被重複構造，因此我們需要計算每個 $n$-好三角形被對應到了幾次。考慮以下三種情況：\n1. $n$-好三角形是不等邊偶三角形：分別連中線後可以得到 3 個 $(n-1)$-好三角形，所以每個被對應到 3 次。又 $n$-不等邊偶好三角形取中點三角形後可以雙射對應到全體不等邊 $(n-2)$-好三角形，故這裡一共被對應到 $3a_{n-2}$ 次。\n2. $n$-好三角形是不等邊奇三角形：對唯一的整中點連線後可以得到一個 $(n-1)$-好三角形，所以每個被對應到 1 次，扣掉不等邊偶三角形數即得不等邊奇 $n$-好三角形有 $a_n - a_{n-2}$ 個。\n3. $n$-好三角形是等腰三角形：無論底邊中點是否為整點，連中線後不會得到銳角三角形，故如果被對應到只能是側邊。因此只有偶等腰好三角形會被對應到 1 次，類似前面的討論知，共被對應到 $b_{n-2}$ 次。\n\n綜合上面的討論，我們得到關係式\n$$\n3a_{n-1} + b_{n-1} = 3a_{n-2} + (a_n - a_{n-2}) + b_{n-2} \\implies a_n - 3a_{n-1} + 2a_{n-2} + (b_{n-2} - b_{n-1}) = 0 \\quad (1)\n$$\n\n現在我們計算 $b_n$，分成兩種情況：\n1. 偶 $n$–好三角形：共有 $b_{n-2}$ 種\n2. 奇 $n$–好三角形：設三角形 $ABC$ 且 $AB = AC$, $BC$ 中點 $M$, 其中引理 1 表明 $M$ 一定是整點。由於是銳角三角形，所以 $MA > MB$，由引理 3 加上 $\\triangle AMB$ 面積是 2 的幂次易知 $\\frac{MA}{MB} = 2^k$，所以 $MA$ 中點是整點。對 $\\triangle AMB$ 應用引理 1 可以知道 $AB$ 中點是整點的充分必要條件是 $BM$ 中點是整點。再由引理 3 知，$BM$ 中點不是整點的所有可能三角形是 $BC = 2$ 和 $BC = 2\\sqrt{2}$，容易驗證兩者皆符合條件。\n\n因此, $b_n = b_{n-2} + 2$, 由於面積整數的好等腰三角形底邊必須是 $2^n$ 或 $2^n\\sqrt{2}$, 可以推得 $b_0 = 0, b_1 = 1$, 所以\n$$\nb_n = n\n$$\n\n將結果代回 (1) 式：\n$$\na_n - 3a_{n-1} + 2a_{n-2} - 1 = 0 \\quad (2)\n$$\n整理得\n$$\n(a_n + n) - 3(a_{n-1} + (n-1)) + 2(a_{n-2} + (n-2)) = 0\n$$\n因特徵方程式 $x^2 - 3x + 2 = 0$ 有根 1,2, 此二階遞迴式有通解 $a_n + n = p2^n + q$。\n\n由於整點三角形一定存在一邊中點是整點,故若存在不等邊 $0$–好三角形則一定存在銳角整點三角形面積為 $\\frac{1}{2}$。由引理 4 知不可能,所以 $a_0 = 0$。\n同理,若存在不等邊 $1$–好三角形,則必存在 $0$–好三角形,然而並沒有,所以\n$a_1 = 0$。\n\n綜上, $a_0 + 0 = 0, a_1 + 1 = 1$, 代入得 $p + q = 0, 2p + q = 1$, 解得 $p = 1, q = -1$, 從而\n$$\na_n = 2^n - 1 - n\n$$\n\n所求即\n$$\na_{2020} + b_{2020} = 2^{2020} - 1 - n + n = 2^{2020} - 1\n$$"
+ },
+ {
+  "id": "G-047",
+  "title": "Lattice Points in a Thin Triangle",
+  "difficulty": 2,
+  "topics": [
+   "组合几何",
+   "解析几何与向量复数法"
+  ],
+  "problem": "Problem:\nHow many lattice points are enclosed by the triangle with vertices $(0,99)$, $(5,100)$, and $(2003, 500)$? Don't count boundary points.",
+  "answer": "0",
+  "solution": "Solution:\nUsing the determinant formula, we get that the area of the triangle is\n$$\n\\left|\\begin{array}{cc}\n5 & 1 \\\\\n2003 & 401\n\\end{array}\\right| / 2 = 1\n$$\nThere are 4 lattice points on the boundary of the triangle (the three vertices and $(1004, 300)$), so it follows from Pick's Theorem that there are 0 in the interior."
+ },
+ {
+  "id": "G-048",
+  "title": "Maximum Area Almost-Equilateral Polygon",
+  "difficulty": 2,
+  "topics": [
+   "组合几何",
+   "不等式",
+   "面积法与三角法"
+  ],
+  "problem": "Problem:\nLet $P$ be a $2023$-sided polygon. All but one side has length $1$. What is the maximum possible area of $P$?",
+  "answer": "1011/2 * cot(pi/4044)",
+  "solution": "Solution:\nFirst, we claim $P$ must be convex to maximize its area. If not, let $A$ and $B$ be consecutive vertices on the perimeter of its convex hull that aren't consecutive vertices of $P$. Reflecting the path between $A$ and $B$ over line $AB$ must increase the area of $P$ as the new shape strictly contains $P$.\n\nThus we assume $P$ is convex. Let $\\ell$ be the line containing the side with length not equal to $1$. Let $P'$ be the reflection of $P$ over $\\ell$. By convexity, $P$ and $P'$ do not overlap, so the union of $P$ and $P'$ is a polygon, specifically an equilateral $4044$-gon with sides of length $1$.\n\nThe area of an equilateral polygon is maximized when it is regular, so this union has maximum area that of a regular $4044$-gon, which is $1011 \\cot \\dfrac{\\pi}{4044}$. Thus, the answer is half of this, i.e.\n$$\n\\frac{1011}{2} \\cdot \\cot \\frac{\\pi}{4044}\n$$"
+ },
+ {
+  "id": "G-049",
+  "title": "Maximum Regions from Ten Parabolas",
+  "difficulty": 3,
+  "topics": [
+   "组合几何"
+  ],
+  "problem": "Problem:\nInto how many regions can a circle be cut by 10 parabolas?",
+  "answer": "201",
+  "solution": "Solution:\nAnswer: $201$\n\nWe will consider the general case of $n$ parabolas, for which the answer is $2 n^{2} + 1$.\n\nWe will start with some rough intuition, then fill in the details afterwards. The intuition is that, if we make the parabolas steep enough, we can basically treat them as two parallel lines. Furthermore, the number of regions is given in terms of the number of intersections of the parabolas that occur within the circle, since every time two parabolas cross a new region is created. Since two pairs of parallel lines intersect in $4$ points, and pairs of parabolas also intersect in $4$ points, as long as we can always make all $4$ points of intersection lie inside the circle, the parallel lines case is the best we can do.\n\nIn other words, the answer is the same as the answer if we were trying to add ten pairs of parallel lines. We can compute the answer for pairs of parallel lines as follows: when we add the $k$th set of parallel lines, there are already $2k-2$ lines that the two new lines can intersect, meaning that each of the lines adds $2k-1$ new regions. This means that we add $4k-2$ regions when adding the $k$th set of lines, making the answer\n$$\n1 + 2 + 6 + 10 + 14 + \\cdots + (4n-2) = 1 + 2(1 + 3 + 5 + 7 + \\cdots + (2n-1)) = 1 + 2 \\cdot n^{2} = 2n^{2} + 1.\n$$\n\nNow that we have sketched out the solution, we will fill in the details more rigorously. First, if there are $n$ parabolas inside the circle, and they intersect in $K$ points total, then we claim that the number of regions the circle is divided into will be at most $K + n + r + 1$, where $r$ is the number of parabolas that intersect the circle itself in exactly four points.\n\nWe will prove this by induction. In the base case of $n=0$, we are just saying that the circle itself consists of exactly one region.\n\nTo prove the inductive step, suppose that we have $n$ parabolas with $K$ points of intersection. We want to show that if we add an additional parabola, and this parabola intersects the other parabolas in $p$ points, then this new parabola adds either $p+1$ or $p+2$ regions to the circle, and that we get $p+2$ regions if and only if the parabola intersects the circle in exactly four points.\n\nWe will do this by considering how many regions the parabola cuts through, following its path from when it initially enters the circle to when it exits the circle for the last time. When it initially enters the circle, it cuts through one region, thereby increasing the number of regions by one. Then, for each other parabola that this parabola crosses, we cut through one additional region. It is also possible for the parabola to leave and then re-enter the circle, which happens if and only if the parabola intersects the circle in four points, and also adds one additional region. Therefore, the number of regions is either $p+1$ or $p+2$, and it is $p+2$ if and only if the parabola intersects the circle in four points. This completes the induction and proves the claim.\n\nSo, we are left with trying to maximize $K + n + r + 1$. Since a pair of parabolas intersects in at most $4$ points, and there are $\\binom{n}{2}$ pairs of parabolas, we have $K \\leq 4 \\binom{n}{2} = 2n^{2} - 2n$. Also, $r \\leq n$, so $K + n + r + 1 \\leq 2n^{2} + 1$. On the other hand, as explained in the paragraphs giving the intuition, we can attain $2n^{2} + 1$ by making the parabolas sufficiently steep that they act like pairs of parallel lines. Therefore, the answer is $2n^{2} + 1$, as claimed.\n\nFor $n = 10$, the answer is $2 \\times 10^{2} + 1 = 201$."
+ }
+]

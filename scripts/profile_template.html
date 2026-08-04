@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学生能力图</title>
+<style>
+  .viz-root {
+    color-scheme: light;
+    --surface-1:#fcfcfb; --page:#f9f9f7;
+    --ink-1:#0b0b0b; --ink-2:#52514e; --ink-mut:#898781;
+    --grid:#e1e0d9; --border:rgba(11,11,11,0.10);
+    --ok:#2e7d4f; --okbg:#e3f2e9; --mid:#a86a00; --midbg:#fdf0dc;
+    --weak:#b3362b; --weakbg:#fbe4e1; --bar:#2a78d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1:#1a1a19; --page:#0d0d0d;
+      --ink-1:#ffffff; --ink-2:#c3c2b7; --ink-mut:#898781;
+      --grid:#2c2c2a; --border:rgba(255,255,255,0.10);
+      --ok:#5abb87; --okbg:#173626; --mid:#e0a24a; --midbg:#3a2c12;
+      --weak:#e2766a; --weakbg:#3d1c18; --bar:#6da7ec;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1:#1a1a19; --page:#0d0d0d;
+    --ink-1:#ffffff; --ink-2:#c3c2b7; --ink-mut:#898781;
+    --grid:#2c2c2a; --border:rgba(255,255,255,0.10);
+    --ok:#5abb87; --okbg:#173626; --mid:#e0a24a; --midbg:#3a2c12;
+    --weak:#e2766a; --weakbg:#3d1c18; --bar:#6da7ec;
+  }
+  * { box-sizing:border-box; margin:0; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .viz-root { background:var(--page); color:var(--ink-1); min-height:100vh; padding:20px 22px 48px; }
+  header { display:flex; flex-wrap:wrap; align-items:baseline; gap:14px; margin-bottom:6px; }
+  h1 { font-size:20px; font-weight:700; }
+  .meta { color:var(--ink-2); font-size:13px; }
+  #themeBtn { padding:5px 10px; border:1px solid var(--grid); border-radius:999px; background:var(--surface-1); color:var(--ink-2); font-size:12px; cursor:pointer; }
+  .controls { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:12px 0 4px; }
+  .fbtn { padding:5px 10px; border:1px solid var(--grid); border-radius:999px; background:var(--surface-1); color:var(--ink-2); font-size:12px; cursor:pointer; }
+  .fbtn.on { border-color:var(--bar); color:var(--ink-1); font-weight:600; }
+  /* 基础值走势表 */
+  table.waves { border-collapse:collapse; margin:14px 0 6px; font-size:12.5px; background:var(--surface-1); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+  table.waves th, table.waves td { padding:6px 14px; text-align:right; border-bottom:1px solid var(--grid); }
+  table.waves th:first-child, table.waves td:first-child { text-align:left; }
+  table.waves th { color:var(--ink-2); font-weight:600; }
+  table.waves tr.cur td { font-weight:700; border-top:2px solid var(--grid); }
+  .wnote { color:var(--ink-mut); font-size:12px; margin-bottom:14px; }
+  h2.cat { font-size:15px; margin:26px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--grid); display:flex; justify-content:space-between; align-items:baseline;}
+  h2.cat .sub { color:var(--ink-mut); font-size:12px; font-weight:400; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:12px; }
+  .node { background:var(--surface-1); border:1px solid var(--border); border-radius:12px; padding:12px 14px; }
+  .node.hide { display:none; }
+  .node.s0 { border-style:dashed; }                 /* 未测 */
+  .node.s1 { border-left:4px solid var(--weak); }   /* 薄弱 */
+  .node.s2 { border-left:4px solid var(--mid); }    /* 进行中 */
+  .node.s3 { border-left:4px solid var(--ok); }     /* 稳固 */
+  .nhead { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .nname { font-size:13.5px; font-weight:650; }
+  .badge { font-size:11px; padding:2px 8px; border-radius:999px; white-space:nowrap; }
+  .s0 .badge { color:var(--ink-mut); border:1px dashed var(--grid); }
+  .s1 .badge { color:var(--weak); background:var(--weakbg); }
+  .s2 .badge { color:var(--mid); background:var(--midbg); }
+  .s3 .badge { color:var(--ok); background:var(--okbg); }
+  .mrow { display:flex; align-items:center; gap:8px; margin-top:9px; font-size:12px; color:var(--ink-2); }
+  .mbar { flex:1; height:7px; border-radius:4px; background:var(--grid); overflow:hidden; }
+  .mbar i { display:block; height:100%; border-radius:4px; }
+  .s1 .mbar i { background:var(--weak); } .s2 .mbar i { background:var(--mid); } .s3 .mbar i { background:var(--ok); }
+  .nmeta { color:var(--ink-mut); font-size:11.5px; margin-top:7px; }
+  details { margin-top:8px; }
+  summary { color:var(--ink-2); font-size:12px; cursor:pointer; user-select:none; }
+  .clist { margin-top:6px; font-size:11.5px; color:var(--ink-2); line-height:1.7; }
+  .clist b { color:var(--ink-1); font-weight:600; }
+  /* 补齐 / 细分 面板 */
+  .panel { background:var(--surface-1); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-top:22px; }
+  .panel h3 { font-size:14px; margin-bottom:8px; }
+  .panel ul { margin-left:18px; font-size:12.5px; color:var(--ink-2); line-height:1.9; }
+  .panel b { color:var(--ink-1); }
+</style>
+</head>
+<body>
+<div class="viz-root" id="root">
+  <header>
+    <h1 id="title">学生能力图</h1>
+    <span class="meta" id="metaLine"></span>
+    <button id="themeBtn" title="切换明暗">◐ 明暗</button>
+  </header>
+  <div id="wavesBox"></div>
+  <div class="controls">
+    <span style="color:var(--ink-mut);font-size:12px">状态筛选：</span>
+    <button class="fbtn on" data-s="all">全部</button>
+    <button class="fbtn" data-s="稳固">✅ 稳固</button>
+    <button class="fbtn" data-s="进行中">🔶 进行中</button>
+    <button class="fbtn" data-s="薄弱">⚠️ 薄弱</button>
+    <button class="fbtn" data-s="未测">⬜ 未测</button>
+  </div>
+  <div id="app"></div>
+  <div id="panels"></div>
+</div>
+<script>
+const DATA = __PROFILE_DATA__;
+const CLS = {'未测':'s0','薄弱':'s1','进行中':'s2','稳固':'s3'};
+const KIND = {assessment:'测评', attempt:'训练'};
+const pct = v => v==null ? '—' : Math.round(v*100)+'%';
+const esc = s => String(s??'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const st = DATA.student;
+document.getElementById('title').textContent = `能力图 · ${st.name||st.id}`;
+document.getElementById('metaLine').textContent =
+  [st.target?`目标 ${st.target}`:null, st.since?`建档 ${st.since}`:null,
+   `证据 ${DATA.totals.assess+DATA.totals.attempts} 条（测评 ${DATA.totals.assess}/${DATA.totals.waves} 波 + 训练 ${DATA.totals.attempts}）`,
+   `生成于 ${DATA.generated}`].filter(Boolean).join(' · ');
+/* 基础值走势 */
+const CATS = DATA.cats.map(c=>c.cat), LABEL = Object.fromEntries(DATA.cats.map(c=>[c.cat,c.label]));
+let wh = '<table class="waves"><tr><th>波次</th>' + CATS.map(c=>`<th>${LABEL[c]}</th>`).join('') + '</tr>';
+for (const w of DATA.waves)
+  wh += `<tr><td>${esc(w.date)} ${esc(w.wave)}</td>` + CATS.map(c=>`<td>${pct(w.cats[c]?.v)}</td>`).join('') + '</tr>';
+wh += `<tr class="cur"><td>全部证据累计</td>` + CATS.map(c=>`<td>${pct(DATA.current[c]?.v)}</td>`).join('') + '</tr></table>';
+wh += `<div class="wnote">基础值 = 难度加权掌握率 Σ(得分×★)/Σ(★)；波次行只含该波测评，累计行含全部测评＋训练证据。</div>`;
+document.getElementById('wavesBox').innerHTML = wh;
+/* 节点卡片 */
+const app = document.getElementById('app');
+for (const c of DATA.cats) {
+  const h2 = document.createElement('h2'); h2.className='cat';
+  const cur = c.cur ? ` · 当前 ${pct(c.cur.v)}` : '';
+  h2.innerHTML = `<span>${c.label}</span><span class="sub">覆盖 ${c.coverage.tested}/${c.coverage.total} 节点 · 稳固 ${c.coverage.solid}${cur}</span>`;
+  app.appendChild(h2);
+  const grid = document.createElement('div'); grid.className='grid'; app.appendChild(grid);
+  for (const n of c.nodes) {
+    const el = document.createElement('div'); el.className = 'node ' + CLS[n.status];
+    el.dataset.s = n.status;
+    const cases = n.cases.map(x=>
+      `<div><b>${esc(x.ref)}</b> ★${x.d} → ${pct(x.v)} · ${KIND[x.kind]}${x.wave?`（${esc(x.wave)}）`:''} · ${esc(x.date)}</div>`).join('');
+    el.innerHTML = `<div class="nhead"><span class="nname">${esc(n.name)}</span><span class="badge">${n.icon} ${n.status}</span></div>
+      ${n.status==='未测' ? '' :
+        `<div class="mrow"><div class="mbar"><i style="width:${Math.round((n.mastery||0)*100)}%"></i></div><span>${pct(n.mastery)}</span></div>
+         <div class="nmeta">证据 ${n.n} 条 · ${n.best?`已证★${n.best}`:'尚无满分证据'} · 最近 ${esc(n.last)||'?'}</div>
+         <details><summary>证据明细（最近 ${n.cases.length} 条）</summary><div class="clist">${cases}</div></details>`}`;
+    grid.appendChild(el);
+  }
+}
+/* 补齐队列 + 细分建议 */
+const panels = document.getElementById('panels');
+const gp = DATA.gaps.filter(g=>g.picks.length);
+if (DATA.gaps.length) {
+  const li = gp.map(g=>`<li><b>${LABEL[g.cat]}/${esc(g.node)}</b>（${g.status==='薄弱'?`${pct(g.mastery)} n=${g.n}`:'未测'}）→ ${g.picks.map(p=>`${p.id}（★${p.d}）`).join('，')}</li>`).join('');
+  const dry = DATA.gaps.length - gp.length;
+  panels.insertAdjacentHTML('beforeend',
+    `<div class="panel"><h3>补齐队列（薄弱优先）</h3><ul>${li||''}</ul>
+     ${dry?`<div class="wnote">另有 ${dry} 个缺口节点库内暂无可用题（candidates --gaps 看扩容采购单）。</div>`:''}</div>`);
+}
+if (DATA.splits.length) {
+  const li = DATA.splits.map(s=>
+    `<li><b>${LABEL[s.cat]}/${esc(s.node)}</b>：n=${s.n}，强 ${s.strong.slice(0,5).map(esc).join('、')}｜弱 ${s.weak.slice(0,5).map(esc).join('、')}</li>`).join('');
+  panels.insertAdjacentHTML('beforeend',
+    `<div class="panel"><h3>分类细分建议（强弱分化 → 该节点对此生过粗，AI+教练按案例迭代 registry）</h3><ul>${li}</ul></div>`);
+}
+/* 状态筛选 */
+document.querySelectorAll('.fbtn').forEach(b=>b.addEventListener('click', ()=>{
+  document.querySelectorAll('.fbtn').forEach(x=>x.classList.toggle('on', x===b));
+  const s = b.dataset.s;
+  document.querySelectorAll('.node').forEach(nd=>nd.classList.toggle('hide', s!=='all' && nd.dataset.s!==s));
+}));
+/* 主题切换 */
+document.getElementById('themeBtn').addEventListener('click', ()=>{
+  const r = document.documentElement;
+  const cur = r.getAttribute('data-theme');
+  const sysDark = matchMedia('(prefers-color-scheme: dark)').matches;
+  r.setAttribute('data-theme', cur ? (cur==='dark'?'light':'dark') : (sysDark?'light':'dark'));
+});
+</script>
+</body>
+</html>

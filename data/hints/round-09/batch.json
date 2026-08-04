@@ -1,0 +1,301 @@
+[
+ {
+  "id": "G-019",
+  "title": "Tangent-Circle Distance Sum",
+  "difficulty": 3,
+  "topics": [
+   "圆与四点共圆",
+   "根轴与幂",
+   "反演变换",
+   "相似位似与全等",
+   "共线共点定理"
+  ],
+  "problem": "Problem:\nLet $\\Gamma_{1}$ and $\\Gamma_{2}$ be two circles externally tangent to each other at $N$ that are both internally tangent to $\\Gamma$ at points $U$ and $V$, respectively. A common external tangent of $\\Gamma_{1}$ and $\\Gamma_{2}$ is tangent to $\\Gamma_{1}$ and $\\Gamma_{2}$ at $P$ and $Q$, respectively, and intersects $\\Gamma$ at points $X$ and $Y$. Let $M$ be the midpoint of the arc $\\widehat{X Y}$ that does not contain $U$ and $V$. Let $Z$ be on $\\Gamma$ such that $M Z \\perp N Z$, and suppose the circumcircles of $Q V Z$ and $P U Z$ intersect at $T \\neq Z$. Find, with proof, the value of $T U+T V$, in terms of $R, r_{1}$, and $r_{2}$, the radii of $\\Gamma, \\Gamma_{1}$, and $\\Gamma_{2}$, respectively.",
+  "answer": "2 (R r1 + R r2 - 2 r1 r2) sqrt(r1 r2) / (|r1 - r2| sqrt((R - r1)(R - r2)))",
+  "solution": "Solution:\nBy Archimedes lemma, we have $M, Q, V$ are collinear and $M, P, U$ are collinear as well. Note that inversion at $M$ with radius $M X$ shows that $P Q U V$ is cyclic. Thus, we have $M P \\cdot M U = M Q \\cdot M V$, so $M$ lies on the radical axis of $(P U Z)$ and $(Q V Z)$, thus $T$ must lie on the line $M Z$. Thus, we have $M Z \\cdot M T = M Q \\cdot M V = M N^{2}$, which implies triangles $M Z N$ and $M N T$ are similar. Thus, we have $N T \\perp M N$. However, since the line through $O_{1}$ and $O_{2}$ passes through $N$ and is perpendicular to $M N$, we have $T$ lies on line $O_{1} O_{2}$. Additionally, since $M Z \\cdot M T = M N^{2} = M X^{2}$, inversion at $M$ with radius $M X$ swaps $Z$ and $T$, and since $(M X Y)$ maps to line $X Y$, this means $T$ also lies on $X Y$.\n\nTherefore, $T$ is the intersection of $P Q$ and $O_{1} O_{2}$, and thus by Monge's Theorem, we must have $T$ lies on $U V$.\n\nNow, to finish, we will consider triangle $O U V$. Since $O_{1} O_{2} T$ is a line that cuts this triangle, by Menelaus, we have\n$$\n\\frac{O O_{1}}{O_{1} U} \\cdot \\frac{U T}{V T} \\cdot \\frac{V O_{2}}{O_{2} O} = 1\n$$\nUsing the values of the radii, this simplifies to\n$$\n\\frac{R - r_{1}}{r_{1}} \\cdot \\frac{U T}{V T} \\cdot \\frac{r_{2}}{R - r_{2}} = 1 \\Longrightarrow \\frac{U T}{V T} = \\frac{r_{1}(R - r_{2})}{r_{2}(R - r_{1})}\n$$\nNow, note that\n$$\nT U \\cdot T V = T P \\cdot T Q = \\frac{4 r_{1}^{2} r_{2}^{2}}{(r_{1} - r_{2})^{2}}\n$$\nNow, let $T U = r_{1}(R - r_{2}) k$ and $T V = r_{2}(R - r_{1}) k$. Plugging this into the above equation gives\n$$\nr_{1} r_{2} (R - r_{1})(R - r_{2}) k^{2} = \\frac{4 (r_{1} r_{2})^{2}}{(r_{1} - r_{2})^{2}}\n$$\nSolving gives\n$$\nk = \\frac{2 \\sqrt{r_{1} r_{2}}}{|r_{1} - r_{2}| \\sqrt{(R - r_{1})(R - r_{2})}}\n$$\nTo finish, note that\n$$\nT U + T V = k (R r_{1} + R r_{2} - 2 r_{1} r_{2}) = \\frac{2 (R r_{1} + R r_{2} - 2 r_{1} r_{2}) \\sqrt{r_{1} r_{2}}}{|r_{1} - r_{2}| \\sqrt{(R - r_{1})(R - r_{2})}}\n$$"
+ },
+ {
+  "id": "G-020",
+  "title": "Concurrent Lines in Parallel Grids",
+  "difficulty": 2,
+  "topics": [
+   "共线共点定理"
+  ],
+  "problem": "An arbitrary triangle $ABC$ is given together with two lines $p$ and $q$ which are not parallel to each other and are not perpendicular to any of the sides of the triangle. We denote the perpendiculars through $A$, $B$ and $C$ to the line $p$ by $p_A$, $p_B$ and $p_C$ respectively, and the perpendiculars to $q$ by $q_A$, $q_B$ and $q_C$ respectively. Let us denote the points of intersection of the lines $p_A$, $q_A$, $p_B$, $q_B$, $p_C$ and $q_C$ with $q_B$, $p_B$, $q_C$, $p_C$, $q_A$ and $p_A$ respectively by $K$, $L$, $P$, $Q$, $N$ and $M$. Prove that the lines $KL$, $MN$ and $PQ$ intersect at one point.",
+  "answer": "证明题",
+  "solution": "Without loss of generality we can assume that $p_B$ is between $p_A$ and $p_C$. The first case is if $q_A$ is between $q_B$ and $q_C$ as shown in the picture, obviously $KL$ intersects $PN$. Analogously, if $q_C$ is between $q_A$ and $q_B$ the case is symmetrical to the one we are considering. The second case, if $q_B$ is between $q_A$ and $q_C$, then $MQ$ and $PN$ are not parallel, so $KL$ intersects at least one of them and the two cases are equivalent. According to this we can assume that $KL$ intersects $PN$. The line $MN$ cannot be parallel to $p_B$, since in that case $p$ is perpendicular to $AC$ and analogously $PQ$ is not parallel to $q_A$.\n\nLet $X$, $Y$ and $Z$ be the points of intersection of the lines $PN$, $q_A$ and $p_B$ with $KL$, $PQ$ and $MN$ respectively. From the similarity of the triangles $LNZ$ and $PMZ$ we get\n$$\n\\frac{LZ}{PZ} = \\frac{LN}{PM} \\quad (1)\n$$\nSimilarly from the similarity of $LPY$ and $NQY$ we get\n$$\n\\frac{NQ}{LY} = \\frac{NQ}{LP} \\quad (2)\n$$\nIf $KL$ does not pass through $C$, let it intersect $NC$ and $MC$ in $U$ and $V$ respectively. From the triangle $CPN$ and Menelaus' theorem for the line $KL$ we get\n$$\n\\frac{PX}{XN} = \\frac{NU}{UC} = \\frac{CV}{VP} = -1, \\text{ i.e.}\n$$\n$$\n\\frac{PX}{NX} = \\frac{UC}{NU} = \\frac{VP}{CV} \\quad (3).\n$$\nFrom the similarity of the triangles $KQU$ and $LNU$ we get $\\frac{UQ}{UN} = \\frac{KQ}{LN}$, from where\n$$\n1 + \\frac{NQ}{UN} = 1 + \\frac{KB}{LN}, \\text{ so } \\overline{UN} = \\frac{\\overline{LN NQ}}{KB} \\text{ and } \\overline{UC} = \\overline{UN} + \\overline{NC} = \\frac{\\overline{LN NQ} + \\overline{NC KB}}{KB} \\text{ and from here}\n$$\n$$\n\\frac{\\overline{LN NQ}}{\\overline{NU}} = \\frac{\\overline{KB}}{\\overline{LN NQ} + \\overline{NC KB}} = \\frac{-\\overline{LN NQ}}{\\overline{LN NQ} + \\overline{NC KB}} \\quad (4)\n$$\nAnalogously, for the similar triangles $KMV$ and $LPV$ we get\n$$\n\\frac{CV}{VP} = \\frac{LPPM + PCKA}{-LPPM} \\quad (5)\n$$\nIf we substitute (4) and (5) in (3) we get:\n$$\n\\frac{PX}{NX} = \\frac{UC}{NU} = \\frac{VP}{CV} = \\frac{LN NQ + NC KB}{-LN NQ} = \\frac{-LPPM}{LPPM + PCKA} = \\frac{LN NQ + NC KB}{LPPM + PCKA} = \\frac{LPPM}{LN NQ} = \\frac{LPPM}{LN NQ} \\quad (6)\n$$\n\nIf we now substitute (1), (2) and (6) in Ceva's equality for the triangle $LNP$ and the lines $LK$, $NM$ and $PQ$ we get:\n$$\n\\frac{\\overline{LZ}}{\\overline{PZ}} \\frac{\\overline{PX}}{\\overline{NX}} \\frac{\\overline{NY}}{\\overline{LY}} = \\frac{\\overline{LN}}{\\overline{PM}} \\frac{\\overline{NQ}}{\\overline{LP}} - \\frac{\\overline{LP}}{\\overline{NM}} \\frac{\\overline{PM}}{\\overline{NQ}} = -1\n$$\nIf $KL$ passes through $C$, then $X$ is the midpoint of $PN$ and\n$$\n\\frac{\\overline{LN}}{\\overline{BK}} = \\frac{\\overline{NC}}{\\overline{LB}}\n$$\n(7)\nIf we now substitute (1), (2) and (7) in Ceva's equality for the triangle $LNP$ and the lines $LK$, $NM$ and $PQ$ we get:\n$$\n\\frac{\\overline{LZ}}{\\overline{PZ}} \\frac{\\overline{PX}}{\\overline{NX}} \\frac{\\overline{NY}}{\\overline{LY}} = -\\frac{\\overline{LN}}{\\overline{PM}} \\frac{\\overline{NQ}}{\\overline{LP}} = -\\frac{\\overline{NC}}{\\overline{LB}} \\frac{\\overline{NQ}}{\\overline{LP}} = -1\n$$\nFrom the converse of Ceva's theorem, the lines $KL$, $MN$ and $PQ$ intersect in one point or are parallel. Without loss of generality we can assume that $p_B$ is between $p_A$ and $p_C$. If $q_B$ is not between $q_A$ and $q_C$ as shown in the picture it is obvious that the lines cannot be parallel. If $q_B$ is between $q_A$ and $q_C$, then in order for the lines to be parallel it is required that $\\frac{\\overline{AK}}{\\overline{AM}} = \\frac{\\overline{AL}}{\\overline{AN}}$, but then $\\frac{\\overline{AK}}{\\overline{AM}} = \\frac{\\overline{AL}}{\\overline{AN}} = \\frac{\\overline{KB}}{\\overline{MC}}$, therefore $AB$ is parallel to $AC$, which is impossible since $ABC$ is a triangle."
+ },
+ {
+  "id": "G-021",
+  "title": "Quadrilateral Area from Side Data",
+  "difficulty": 2,
+  "topics": [
+   "共线共点定理",
+   "面积法与三角法"
+  ],
+  "problem": "Problem:\n\nTriangle $A B C$ has side lengths $A B=2 \\sqrt{5}$, $B C=1$, and $C A=5$. Point $D$ is on side $A C$ such that $C D=1$, and $F$ is a point such that $B F=2$ and $C F=3$. Let $E$ be the intersection of lines $A B$ and $D F$. Find the area of $C D E B$.",
+  "answer": "22/35",
+  "solution": "Solution:\n\nDraw segment $A F$. Then notice $A F=4$, and we have a right triangle. Now draw line $C E$, let it intersect $A F$ at $G$. By Ceva, $F G=\\frac{4}{3}$ and $A G=\\frac{8}{3}$. Using mass points we find that $\\frac{A E}{E B}=6$ so $\\frac{[A E F]}{[B E F]}=6$, and since $[A B F]=4$, $[B E F]=\\frac{4}{7}$.\n\nIt's easy to see that $[C D F]=\\frac{1}{5}[A C F]=\\frac{6}{5}$, so\n$$\n[B C D E]=[C D F]-[B E F]=\\frac{6}{5}-\\frac{4}{7}=\\frac{22}{35}\n$$"
+ },
+ {
+  "id": "G-022",
+  "title": "Concurrent Cevian Ratio Sum",
+  "difficulty": 2,
+  "topics": [
+   "共线共点定理",
+   "三角形五心与经典引理"
+  ],
+  "problem": "Let $ABC$ be a triangle, and let $X$, $Y$, $Z$ be points on $BC$, $CA$, $AB$, respectively. Suppose that $AX$, $BY$ and $CZ$ intersect in a point $P$. Prove that\n$$\n\\frac{AP}{AX} + \\frac{BP}{BY} + \\frac{CP}{CZ} = 2.\n$$",
+  "answer": "证明题",
+  "solution": "Assign weights $p, q, r$ to the vertices $A, B, C$, respectively, in such a way that the centre of mass is $P$. Draw the line $L$ through $P$, parallel to $BC$. Let $d$ denote the distance of $A$ to $L$, and let $h$ denote the distance of $A$ to $BC$. Since the triangle will be in static equilibrium when balanced (horizontally) upon $L$, we infer that $pd = (q+r)(h-d)$. This leads to\n$$\n\\frac{p}{q+r} = \\frac{h-d}{d} = \\frac{AX-AP}{AP},\n$$\nwhich is equivalent to\n$$\n\\frac{AP}{AX} = \\frac{q+r}{p+q+r}.\n$$\nSince one may similarly derive\n$$\n\\frac{BP}{BY} = \\frac{r+p}{p+q+r} \\quad \\text{and} \\quad \\frac{CP}{CZ} = \\frac{p+q}{p+q+r},\n$$\nthe desired conclusion follows by summation."
+ },
+ {
+  "id": "G-023",
+  "title": "Incircle Symmedian Collinearity",
+  "difficulty": 3,
+  "topics": [
+   "共线共点定理",
+   "三角形五心与经典引理",
+   "圆与四点共圆",
+   "面积法与三角法"
+  ],
+  "problem": "Inscribed circle $\\omega$ of a triangle $ABC$ touches its sides $AB$, $BC$, $CA$ at the points $K$, $L$, $M$ respectively. On the arc $KL$ of the circle $\\omega$ that does not contain the point $M$ a point $S$ is chosen. Let $P$, $Q$, $R$, $T$ be the points of intersection of the lines $AS$ and $KM$, $ML$ and $SC$, $LP$ and $KQ$, $AQ$ and $PC$ respectively. If the points $R$, $S$ and $M$ are collinear, prove that $T$ also belongs to the line $SM$.",
+  "answer": "证明题",
+  "solution": "Consider the triangle $SLM$. $LC$ and $MC$ are the tangent lines to the circumscribed circle of this triangle drawn at the points $L$ and $M$, therefore $SC$ is a simedian, and so $\\frac{MQ}{CL} = \\frac{MS^2}{SL^2}$.\n\nSimilarly, $\\frac{KP}{PM} = \\frac{KS^2}{SM^2}$. Let $E$ be the point of intersection of the lines $KL$ and $MR$. Since the lines $ME$, $KQ$ and $LP$ are concurrent, by the Ceva's theorem we have that $\\frac{KP}{PM} \\cdot \\frac{MQ}{QL} \\cdot \\frac{LE}{EK} = 1$, hence applying the above equalities we obtain that $\\frac{LE}{EK} = \\frac{SL^2}{KS^2}$. This implies that the line $SE$ is a simedian of the triangle $SKL$, therefore it passes through the point of intersection of the tangents to the circumscribed circle of the triangle $KSL$ that are drawn at the points $L$ and $K$, that is through the point $B$ (Fig. 49). So, we have proved that the points $B$, $S$, $R$ and $M$ are collinear.\n\nNext we will prove that the point $T$ also belongs to this line. By the Ceva's theorem, it is sufficient to prove that $\\frac{AP}{\\sin \\angle AMP} = \\frac{AM}{\\sin \\angle APM}$, $\\frac{PS}{\\sin \\angle KMB} = \\frac{MS}{\\sin \\angle SPM}$. Dividing the last two inequalities we obtain that $\\frac{AP}{PS} = \\frac{AM \\sin \\angle AMK}{MS \\sin \\angle KMB}$. Similarly, $\\frac{CQ}{QS} = \\frac{MC \\sin \\angle CML}{MS \\sin \\angle LMB}$. Substitute the last two relations into the equality that we need to prove:\n$$\n\\frac{AP}{PS} \\cdot \\frac{SQ}{QC} \\cdot \\frac{CM}{MA} = \\frac{AP}{PS} = \\frac{AM \\sin \\angle AMK}{MS \\sin \\angle KMB} \\cdot \\frac{MS \\sin \\angle LMB}{MC \\sin \\angle CML} \\cdot \\frac{CM}{MA} = \\frac{\\sin \\angle AMK \\cdot \\sin \\angle LMB}{\\sin \\angle KMB \\cdot \\sin \\angle CML}\n$$\nBy the sine theorem for the triangles $BLM$ and $BMK$, we obtain:\n$$\n\\frac{BL}{BM} = \\frac{\\sin \\angle LMB}{\\sin \\angle BLM} = \\frac{\\sin \\angle LMB}{\\sin \\angle MLC} = \\frac{\\sin \\angle LMB}{\\sin \\angle CML}, \\text{ since the triangle MLC is isosceles. Similarly, } \\frac{BK}{BM} = \\frac{\\sin \\angle KMB}{\\sin \\angle AMK}\n$$\nTherefore,\n$$\n\\frac{AP}{PS} \\cdot \\frac{SQ}{QC} \\cdot \\frac{CM}{MA} = \\frac{\\sin \\angle AMK \\cdot \\sin \\angle LMB}{\\sin \\angle KMB \\cdot \\sin \\angle CML} = \\frac{BM}{BK} \\cdot \\frac{BL}{BM} = 1,\n$$"
+ },
+ {
+  "id": "G-024",
+  "title": "Fixed Point of Variable Chords",
+  "difficulty": 2,
+  "topics": [
+   "圆与四点共圆",
+   "解析几何与向量复数法",
+   "面积法与三角法",
+   "反演变换"
+  ],
+  "problem": "Problem:\nLet $AB$ be a diameter of a circle $S$, and let $L$ be the tangent at $A$. Furthermore, let $c$ be a fixed, positive real, and consider all pairs of points $X$ and $Y$ lying on $L$, on opposite sides of $A$, such that $|AX| \\cdot |AY| = c$. The lines $BX$ and $BY$ intersect $S$ at points $P$ and $Q$, respectively. Show that all the lines $PQ$ pass through a common point.",
+  "answer": "证明题",
+  "solution": "Solution:\nLet $S$ be the unit circle in the $xy$-plane with origin $O$, put $A = (1, 0)$, $B = (-1, 0)$, take $L$ as the line $x = 1$, and suppose $X = (1, 2p)$ and $Y = (1, -2q)$, where $p$ and $q$ are positive real numbers with $pq = \\frac{c}{4}$. If $\\alpha = \\angle ABP$ and $\\beta = \\angle ABQ$, then $\\tan \\alpha = p$ and $\\tan \\beta = q$.\n\nLet $PQ$ intersect the $x$-axis in the point $R$. By the Inscribed Angle Theorem, $\\angle ROP = 2\\alpha$ and $\\angle ROQ = 2\\beta$. The triangle $OPQ$ is isosceles, from which $\\angle OPQ = \\angle OQP = 90^{\\circ} - \\alpha - \\beta$, and $\\angle ORP = 90^{\\circ} - \\alpha + \\beta$. The Law of Sines gives\n$$\n\\frac{OR}{\\sin \\angle OPR} = \\frac{OP}{\\sin \\angle ORP}\n$$\nwhich implies\n$$\n\\begin{aligned}\nOR & = \\frac{\\sin \\angle OPR}{\\sin \\angle ORP} = \\frac{\\sin (90^{\\circ} - \\alpha - \\beta)}{\\sin (90^{\\circ} - \\alpha + \\beta)} = \\frac{\\cos (\\alpha + \\beta)}{\\cos (\\alpha - \\beta)} \\\\\n& = \\frac{\\cos \\alpha \\cos \\beta - \\sin \\alpha \\sin \\beta}{\\cos \\alpha \\cos \\beta + \\sin \\alpha \\sin \\beta} = \\frac{1 - \\tan \\alpha \\tan \\beta}{1 + \\tan \\alpha \\tan \\beta} \\\\\n& = \\frac{1 - pq}{1 + pq} = \\frac{1 - \\frac{c}{4}}{1 + \\frac{c}{4}} = \\frac{4 - c}{4 + c} .\n\\end{aligned}\n$$\nHence the point $R$ lies on all lines $PQ$.\n\n---\n\nSolution 2:\nPerform an inversion in the point $B$. Since angles are preserved under inversion, the problem transforms into the following: Let $S$ be a line, let the circle $L$ be tangent to it at point $A$, with $\\infty$ as the diametrically opposite point. Consider all points $X$ and $Y$ lying on $L$, on opposite sides of $A$, such that if $\\alpha = \\angle ABX$ and $\\beta = \\angle ABY$, then $\\tan \\alpha \\tan \\beta = \\frac{c}{4}$. The lines $X\\infty$ and $Y\\infty$ will intersect $S$ in points $P$ and $Q$, respectively. Show that all the circles $PQ\\infty$ will pass through a common point.\n\nTo prove this, draw the line through $A$ and $\\infty$, and define $R$ as the point lying on this line, opposite to $\\infty$, and at distance $\\frac{cr}{2}$ from $A$, where $r$ is the radius of $L$. Since\n$$\n\\tan \\alpha = \\frac{|AP|}{2r}, \\quad \\tan \\beta = \\frac{|AQ|}{2r},\n$$\nwe have\n$$\n\\frac{c}{4} = \\tan \\alpha \\tan \\beta = \\frac{|AP||AQ|}{4r^2}\n$$\nso that $|AP| = \\frac{cr^2}{|AQ|}$, whence\n$$\n\\tan \\angle \\infty RP = \\frac{|AP|}{|AR|} = \\frac{\\frac{cr^2}{|AQ|}}{\\frac{cr}{2}} = \\frac{2r}{|AQ|} = \\tan \\angle \\infty QP\n$$\nConsequently, $\\infty, P, Q$, and $R$ are concyclic."
+ },
+ {
+  "id": "G-025",
+  "title": "Compass-Only Midpoint Construction",
+  "difficulty": 3,
+  "topics": [
+   "反演变换"
+  ],
+  "problem": "Problem:\n\na. Sejam $\\mathcal{C}$ uma circunferência com centro $O$ e raio $r$ e $X$ um ponto exterior a $\\mathcal{C}$. Construímos uma circunferência de centro em $X$ passando por $O$, a qual intersecta $\\mathcal{C}$ nos pontos $P$ e $Q$. Com centro em $P$ construímos uma circunferência passando por $O$ e com centro em $Q$ construímos uma outra circunferência passando por $O$. Estas duas circunferências intersectam-se nos pontos $O$ e $Y$.\n\nProve que $OX \\times OY = r^2$.\n\nb. É dado um segmento $AB$. Mostre como construir, usando somente compasso, um ponto $C$ tal que $B$ seja o ponto médio do segmento $AC$.\n\nc. É dado um segmento $AB$. Mostre como construir, usando somente compasso, o ponto médio do segmento $AB$.",
+  "answer": "证明题",
+  "solution": "Solution:\n\na. Observe que os triângulos $XOP$ e $PYO$ são ambos isósceles, de bases $OP$ e $YO$, respectivamente. Estes triângulos possuem ângulos da base de mesma medida, pois o ângulo $P\\hat{O}X = Y\\hat{O}P$ é comum aos dois triângulos. Deste modo, os triângulos $XOP$ e $PYO$ são semelhantes e podemos escrever $OX/OP = OP/OY$. Como $OP = r$, concluímos que $OX \\times OY = r^2$.\n\nb. Determinamos um ponto $R$ tal que o triângulo $ABR$ seja equilátero. Em seguida, determinamos um ponto $S \\neq A$ de modo que o triângulo $RBS$ seja equilátero e construímos $C \\neq R$ de forma que o triângulo $BSC$ também seja equilátero. Assim, $BC = BS = BR = AB$ e $A$, $B$ e $C$ são colineares ($A\\hat{B}C = 60^\\circ + 60^\\circ + 60^\\circ = 180^\\circ$), logo $B$ é o ponto médio de $AC$.\n\nc. Seja $M$ o ponto médio de $AB$. Construa a circunferência com centro em $A$ e raio $r = AB$. Como no item anterior, com o compasso construímos um ponto $C$ tal que $B$ é o ponto médio de $AC$.\nObserve que $AM \\times AC = (r/2) \\times 2r = r^2$ e, portanto, podemos construir o ponto $M$ utilizando o processo de construção do item (a): determinamos os pontos $P$ e $Q$, pontos de interseção da circunferência de centro $C$ que contém $A$ e da circunferência de centro $A$ que contém $B$. O ponto $M$ é obtido pela interseção das circunferências de centros $P$ e $Q$ que passam por $A$."
+ },
+ {
+  "id": "G-026",
+  "title": "Nine-Point Circle Tangent Concurrency",
+  "difficulty": 4,
+  "topics": [
+   "三角形五心与经典引理",
+   "圆与四点共圆",
+   "射影几何与调和点列",
+   "共线共点定理"
+  ],
+  "problem": "Let $ABC$ be a scalene triangle. The tangents to the nine-point circle at the foot of the perpendicular dropped from $A$ on the line $BC$ and at the midpoint of the side $BC$ meet at the point $A'$; the points $B'$ and $C'$ are defined similarly. Prove that the lines $AA'$, $BB'$ and $CC'$ are concurrent.\n\nGazeta Matematică",
+  "answer": "证明题",
+  "solution": "The tangent at $A$ to the circumcircle $ABC$ meets the line $BC$ at the point $A''$; the points $B''$ and $C''$ are defined similarly. The points $A''$, $B''$ and $C''$ are collinear on Lemoine's line. We shall prove that the lines $AA'$, $BB'$ and $CC'$ are the polars of the points $A''$, $B''$ and $C''$, respectively, relative to the nine-point circle $\\gamma$, so they are indeed concurrent. Clearly, it is sufficient to prove that that $AA'$ is the polar of $A''$ with respect to $\\gamma$.\n\nLet $A_1, B_1$ and $C_1$ be the perpendicular feet dropped from $A, B$ and $C$, respectively, on the lines $BC, CA$ and $AB$, respectively. Let further $A_2$ be the midpoint of the side $BC$, and let $A_3$ be the midpoint of the segment joining $A$ to the orthocenter of the triangle $ABC$. It is easily seen that the line $A_2A_3$ is the perpendicular bisector of the segment $B_1C_1$, so it is perpendicular to the tangent at $A$ to the circumcircle $ABC$. Consequently, $A_3$ is the orthocenter of the triangle $AA''A_2$, so the lines $AA_2$ and $A''A_3$ are perpendicular; it is easily seen that they meet at some point on $\\gamma$, so $A''$ lies on the polar of $A$ with respect to $\\gamma$. Finally, $A''$ lies on $BC$, which is the polar of $A'$ with respect to $\\gamma$, so $A''$ is the pole of $AA'$ with respect to $\\gamma$."
+ },
+ {
+  "id": "G-027",
+  "title": "Polar Criterion for Circle Tangency",
+  "difficulty": 3,
+  "topics": [
+   "圆与四点共圆",
+   "射影几何与调和点列"
+  ],
+  "problem": "Let $ABC$ be an isosceles triangle with $AC = BC$. Let $D$ be a point on a line $BA$ such that $A$ lies between $B$ and $D$. Let $O_1$ be the circumcircle of triangle $DAC$. $O_1$ meets $BC$ at point $E$. Let $F$ be the point on the line $BC$ such that $FD$ is tangent to circle $O_1$, and let $O_2$ be the circumcircle of triangle $DBF$. Two circles $O_1, O_2$ meet at point $G$ ($G \\neq D$). Let $O$ be the circumcenter of triangle $BEG$. Prove that the line $FG$ is tangent to circle $O$ if and only if $DG$ is perpendicular to $FO$.",
+  "answer": "证明题",
+  "solution": "We first show that both $DB$ and $DE$ are tangent to circle $O$. Since $DFBG$ is concyclic, we have $\\angle FDG = \\angle GBE$. Since $FD$ is tangent to $O_1$, we have $\\angle DEG = \\angle FDG$. Hence $\\angle GBE = \\angle DEG$, which means that $DE$ is tangent to $O$. On the other hand, since $ACED$ is concyclic, $\\angle BAC = \\angle CED$. Since $ABC$ is an isosceles triangle, $\\angle BAC = \\angle ABC = \\angle DBE$. Thus we have $\\angle DBE = \\angle DEB$, that is, the triangle $DBE$ is an isosceles triangle with $DB = DE$, which means that $DB$ is also tangent to $O$.\n\nSince $DB$ and $DE$ are tangent to $O$, the line $FE$ is the polar of the pole $D$ with respect to $O$. By La Hire theorem, $D$ lies on the polar of $F$. Hence $FG$ is tangent to circle $O$ if and only if $DG$ is the polar of $F$, which is equivalent to the fact that $DG$ is perpendicular to $FO$."
+ },
+ {
+  "id": "G-028",
+  "title": "Excircle and MPQ Circle Tangency",
+  "difficulty": 4,
+  "topics": [
+   "圆与四点共圆",
+   "根轴与幂",
+   "射影几何与调和点列"
+  ],
+  "problem": "Let $\\triangle ABC$ be a triangle and let $\\omega$ be its $A$-excircle (excircle opposite vertex $A$). Let $D, E, F$ be the points where $\\omega$ touches the lines $BC, CA, AB$, respectively. The circle $AEF$ crosses the line $BC$ at $P$ and $Q$. Let $M$ be the midpoint of the line segment $AD$. Prove that the circles $\\omega$ and $MPQ$ are tangent.",
+  "answer": "证明题",
+  "solution": "For convenience, let $\\Omega$ and $\\gamma$ denote the circles $AEFPQ$ and $MPQ$, respectively. Letting the line $AD$ cross $\\omega$ again at $T$, we will show that $\\gamma$ and $\\omega$ are tangent at $T$.\n\nWe first prove that the points $M, P, Q, T$ are concyclic, so $T$ lies on $\\gamma$. Let $A'$ be the center of $\\omega$, and notice that $AA'$ is a diameter of $\\Omega$, since $A'E$ and $A'F$ are perpendicular to $AE$ and $AF$, respectively. Let $N$ be the midpoint of the line segment $DT$. Since $A'D = A'T$, the angle $A'NA$ is right, so $N$ also lies on $\\Omega$, and therefore $DP \\cdot DQ = DA \\cdot DN$; and since $DA = 2DM$ and $DT = 2DN$, it follows that $DP \\cdot DQ = DM \\cdot DT$, showing that $M, P, Q, T$ are indeed concyclic.\n\nIf $EF$ and $BC$ are parallel, then the triangle $ABC$ is isosceles with apex at $A$ and the conclusion follows by symmetry.\n\nOtherwise, the lines $PQ$ and $EF$ cross at a point $R$; these lines are the radical axes of $\\Omega, \\gamma$ and $\\Omega, \\omega$, respectively, so $R$ is the radical center of the three circles, and $RT$ is the radical axis of $\\gamma$ and $\\omega$.\n\nTo conclude the proof, it is therefore sufficient to show that $RT$ is tangent to $\\omega$. With respect to this circle, the line $DR$ is the polar of $D$, and the line $EF$ is the polar of $A$, so $R = DR \\cap EF$ is the pole of the line $ADT$. Consequently, $RT$ is indeed tangent to $\\omega$."
+ },
+ {
+  "id": "G-029",
+  "title": "Right-Triangle Circle Intersection Distance",
+  "difficulty": 2,
+  "topics": [
+   "圆与四点共圆",
+   "三角形五心与经典引理",
+   "解析几何与向量复数法",
+   "射影几何与调和点列"
+  ],
+  "problem": "Problem:\n\nLet $ABC$ be a right triangle with $\\angle A = 90^{\\circ}$. A circle $\\omega$ centered on $BC$ is tangent to $AB$ at $D$ and $AC$ at $E$. Let $F$ and $G$ be the intersections of $\\omega$ and $BC$ so that $F$ lies between $B$ and $G$. If lines $DG$ and $EF$ intersect at $X$, show that $AX = AD$.",
+  "answer": "证明题",
+  "solution": "Solution:\n\nIn all solutions, let $O$ be the center of $\\omega$. Then $\\angle DOE = 90^{\\circ}$, so $\\angle DFE = 45^{\\circ}$, so $\\angle DXE = 135^{\\circ}$. Let $\\Gamma$ be the circle centered at $A$ with radius $AD = AE$, and let $X' = \\overrightarrow{AX} \\cap \\Gamma$. Then $\\angle DXE = \\angle DX'E = 135^{\\circ}$, so $X = X'$.\n\n---\n\nSolution:\n\nLet $N$ be the midpoint of arc $FDEG$. Note that $DOEA$ is a square. Also, $DXEN$ is a parallelogram; one way to see this is that by considering inscribed angles, $\\angle NEX = \\angle NEF = 45^{\\circ}$, $\\angle NDX = \\angle NDG = 45^{\\circ}$, and $\\angle END = 135^{\\circ}$. This means that $\\triangle AXD \\cong \\triangle ONE$, because $AD = OE$, $XD = NE$, and $\\angle ADX = \\angle OEN$ by considering parallel lines. So $AX = ON = OE = AD$.\n\n---\n\nSolution:\n\nLet $Y = DF \\cap EG$. Since $GX \\perp FY$ and $FX \\perp GY$, $X$ is the orthocenter of $\\triangle FGY$. Since $(AODE)$ passes through the midpoint of $FG$, and the feet of altitudes from $F$ and $G$, $(AODE)$ is the nine-point circle of $\\triangle FGY$. Since $AO$ is the diameter of $(AODE)$, it follows that $A$ is the midpoint of $XY$, so $A$ is the center of $(DXEY)$, so $AX = AD$.\n\n---\n\nSolution:\n\nLet $Z = DE \\cap FG$, possibly at infinity. Then $A$ and $X$ are on the polar of $Z$ with respect to $\\omega$, so $AX \\perp BC$. Let $J = AX \\cap BC$. Then $(XJFD)$ is cyclic, so $\\angle ADX = \\angle DFJ = \\angle DXA$, so $AX = AD$.\n\n---\n\nSolution:\n\nWe use complex numbers, with $(FDEG)$ being the unit circle, and $d = -1$, $e = -i$. As $FG$ is a diameter of the unit circle, we have $g = -f$. We have $a = -1 - i$, from either intersecting the tangents to the unit circle at $D$ and $E$ or noting that $ADOE$ is a square.\nNow, intersecting the chords $DG$ and $EF$, we obtain\n$$\nx = \\frac{dg(e+f) - ef(d+g)}{dg - ef} = \\frac{f(i+f) + if(1-f)}{f + if} = \\frac{f - i - i - if}{1 + i} = -1 - i + f \\cdot \\frac{1 - i}{1 + i}.\n$$\nSo,\n$$\n|x - a| = \\left|f \\cdot \\frac{1 - i}{1 + i}\\right| = 1 \\cdot \\frac{\\sqrt{2}}{\\sqrt{2}} = 1\n$$\nSo $AX$ and $AD$ have the same length (1 unit), as desired."
+ },
+ {
+  "id": "G-030",
+  "title": "Commuting Plane Transformations",
+  "difficulty": 1,
+  "topics": [
+   "变换几何",
+   "相似位似与全等",
+   "解析几何与向量复数法"
+  ],
+  "problem": "Two transformations are said to *commute* if applying the first followed by the second gives the same result as applying the second followed by the first. Consider these four transformations of the coordinate plane:\n* a translation 2 units to the right,\n* a $90^\\circ$-rotation counterclockwise about the origin,\n* a reflection across the $x$-axis, and\n* a dilation centered at the origin with scale factor $2$.\nOf the $6$ pairs of distinct transformations from this list, how many commute?\n(A) $1$ (B) $2$ (C) $3$ (D) $4$ (E) $5$",
+  "answer": "C",
+  "solution": "Denote the transformations by $T$, $R$, $F$, and $D$ in the order given in the problem statement. Then the images of point $(x, y)$ are $T(x, y) = (x + 2, y)$, $R(x, y) = (-y, x)$, $F(x, y) = (x, -y)$, and $D(x, y) = (2x, 2y)$. The results of applying a pair of transformations in either order are as follows:\n* $T(R(x, y)) = T(-y, x) = (-y + 2, x)$ and $R(T(x, y)) = R(x + 2, y) = (-y, x + 2)$. The results are different, so $T$ and $R$ do not commute.\n* $T(F(x, y)) = T(x, -y) = (x + 2, -y)$ and $F(T(x, y)) = F(x + 2, y) = (x + 2, -y)$. The results are the same, so $T$ and $F$ do commute.\n\n* $T(D(x, y)) = T(2x, 2y) = (2x+2, 2y)$ and $D(T(x, y)) = D(x+2, y) = (2x+4, 2y)$. The results are different, so $T$ and $D$ do not commute.\n* $R(F(x, y)) = R(x, -y) = (y, x)$ and $F(R(x, y)) = F(-y, x) = (-y, -x)$. The results are different, so $R$ and $F$ do not commute.\n* $R(D(x, y)) = R(2x, 2y) = (-2y, 2x)$ and $D(R(x, y)) = D(-y, x) = (-2y, 2x)$. The results are the same, so $R$ and $D$ do commute.\n* $D(F(x, y)) = D(x, -y) = (2x, -2y)$ and $F(D(x, y)) = F(2x, 2y) = (2x, -2y)$. The results are the same, so $D$ and $F$ do commute.\nThus $3$ of the $6$ pairs commute."
+ },
+ {
+  "id": "G-031",
+  "title": "Rotated Interior Point Distance Sum",
+  "difficulty": 3,
+  "topics": [
+   "变换几何"
+  ],
+  "problem": "Problem:\n\nLet triangle $ABC$ be such that $AB = AC = 22$ and $BC = 11$. Point $D$ is chosen in the interior of the triangle such that $AD = 19$ and $\\angle ABD + \\angle ACD = 90^\\circ$. The value of $BD^2 + CD^2$ can be expressed as $\\frac{a}{b}$, where $a$ and $b$ are relatively prime positive integers. Compute $100a + b$.",
+  "answer": "36104",
+  "solution": "Solution:\n\nRotate triangle $ABD$ about $A$ so that $B$ coincides with $C$. Let $D$ map to $D'$ under this. Note that $CDD'$ is a right triangle with right angle at $C$. Also, note that $ADD'$ is similar to $ABC$. Thus, we have $DD' = \\frac{AD}{2} = \\frac{19}{2}$. Finally, note that\n$$\nBD^2 + CD^2 = CD'^2 + CD^2 = DD'^2 = \\frac{361}{4}\n$$"
+ },
+ {
+  "id": "G-032",
+  "title": "Opposite Supporting Vertices",
+  "difficulty": 2,
+  "topics": [
+   "变换几何",
+   "染色与不变量"
+  ],
+  "problem": "Problem:\n\nLet $A_{1} A_{2} \\cdots A_{2 n}$ be a convex $2 n$-gon. Prove that there is an $i$ ($1 \\leq i \\leq n$) and a pair of parallel lines, each intersecting the $2 n$-gon only once, one at $A_{i}$ and one at $A_{n+i}$.",
+  "answer": "证明题",
+  "solution": "Solution:\n\nConsider the \"highest\" and \"lowest\" points of the $2 n$-gon, with respect to any chosen orientation. Unless a side of the $2 n$-gon is perfectly horizontal, these points will be unique and thus a horizontal line through them will not meet the $2 n$-gon again. These two points will also be vertices of the $2 n$-gon; call them $A_{i}$ and $A_{j}$ respectively. Say that the imbalance in this situation is $i-j \\bmod 2 n$, which (being nonzero) we can think of as an integer from $1$ to $2 n-1$ inclusive. We would like to prove that the $2 n$-gon can be rotated such that the imbalance is $n$.\n\nConsider smoothly rotating the $2 n$-gon counterclockwise (assume that the vertices are labeled $A_{1}, \\ldots, A_{2 n}$ in counterclockwise order). Note that the imbalance does not change unless one of the sides becomes momentarily horizontal. If the top side becomes horizontal, it goes down by $1$; if the bottom side becomes horizontal, it goes up by $1$; and if both sides momentarily become horizontal, it does not change at all. But after rotating by $180^{\\circ}$, the top and bottom vertices are switched: if the imbalance was between $0$ and $n$, it is now between $n$ and $2 n$ and vice versa. Since the imbalance can never be $0$ and never jumps by more than $1$, it must be $n$ at some point."
+ },
+ {
+  "id": "G-033",
+  "title": "Reflected Centroid Distance",
+  "difficulty": 2,
+  "topics": [
+   "三角形五心与经典引理",
+   "变换几何",
+   "面积法与三角法"
+  ],
+  "problem": "Problem:\n\nConsider triangle $ABC$ where $BC = 7$, $CA = 8$, and $AB = 9$. $D$ and $E$ are the midpoints of $BC$ and $CA$, respectively, and $AD$ and $BE$ meet at $G$. The reflection of $G$ across $D$ is $G'$, and $G'E$ meets $CG$ at $P$. Find the length $PG$.",
+  "answer": "sqrt(145)/9",
+  "solution": "Solution:\n\nAnswer: $\\frac{\\sqrt{145}}{9}$\n\nObserve that since $G'$ is a reflection and $GD = \\frac{1}{2} AG$, we have $AG = GG'$ and therefore, $P$ is the centroid of triangle $ACG'$. Thus, extending $CG$ to hit $AB$ at $F$, $PG = \\frac{1}{3} CG = \\frac{2}{9} CF = \\frac{2}{9} \\sqrt{\\frac{2(8^2 + 7^2) - 9^2}{4}} = \\frac{\\sqrt{145}}{9}$ by the formula for the length of a median."
+ },
+ {
+  "id": "G-034",
+  "title": "Reflected Right-Triangle Area Ratio",
+  "difficulty": 2,
+  "topics": [
+   "三角形与四边形基本性质"
+  ],
+  "problem": "Problem:\n\nLet $ABC$ be a right triangle with hypotenuse $AC$. Let $B'$ be the reflection of point $B$ across $AC$, and let $C'$ be the reflection of $C$ across $AB'$. Find the ratio of $[BCB']$ to $[BC'B']$.",
+  "answer": "1",
+  "solution": "Solution:\n\nSince $C$, $B'$, and $C'$ are collinear, it is evident that $[BCB'] = \\frac{1}{2}[BCC']$. It immediately follows that $[BCB'] = [BC'B']$. Thus, the ratio is $1$."
+ },
+ {
+  "id": "G-035",
+  "title": "Angles of Pythagorean Triangles",
+  "difficulty": 1,
+  "topics": [
+   "面积法与三角法",
+   "解析几何与向量复数法",
+   "复数与三角"
+  ],
+  "problem": "Let $\\alpha$ be the radian measure of the smallest angle in a $3$-$4$-$5$ right triangle. Let $\\beta$ be the radian measure of the smallest angle in a $7$-$24$-$25$ right triangle. In terms of $\\alpha$, what is $\\beta$?\n(A) $\\frac{\\alpha}{3}$ (B) $\\alpha - \\frac{\\pi}{8}$ (C) $\\frac{\\pi}{2} - 2\\alpha$ (D) $\\frac{\\alpha}{2}$ (E) $\\pi - 4\\alpha$",
+  "answer": "C",
+  "solution": "Because $\\alpha$ and $\\beta$ are the smallest angles in these triangles, $\\sin \\alpha = \\frac{3}{5}$, $\\cos \\alpha = \\frac{4}{5}$, $\\sin \\beta = \\frac{7}{25}$, and $\\cos \\beta = \\frac{24}{25}$. By a Double Angle Formula,\n$$\n\\sin(2\\alpha) = 2 \\sin \\alpha \\cdot \\cos \\alpha = 2 \\cdot \\frac{3}{5} \\cdot \\frac{4}{5} = \\frac{24}{25} = \\cos \\beta = \\sin\\left(\\frac{\\pi}{2} - \\beta\\right).\n$$\nBecause both $2\\alpha$ and $\\beta$ are acute, $2\\alpha = \\frac{\\pi}{2} - \\beta$, so $\\beta = \\frac{\\pi}{2} - 2\\alpha$.\n\n\nUsing complex numbers in polar form, $4 + 3i = 5(\\cos \\alpha + i \\sin \\alpha)$. Squaring gives $7 + 24i = 25(\\cos \\alpha + i \\sin \\alpha)^2$. Similarly, $24 + 7i = 25(\\cos \\beta + i \\sin \\beta)$. Multiplying these two equations yields\n$$\n(7 + 24i)(24 + 7i) = 25(\\cos \\alpha + i \\sin \\alpha)^2 \\cdot 25(\\cos \\beta + i \\sin \\beta) \\\\\n625i = 625 (\\cos(2\\alpha + \\beta) + i \\sin(2\\alpha + \\beta)) \\\\\n\\cos \\frac{\\pi}{2} + i \\sin \\frac{\\pi}{2} = \\cos(2\\alpha + \\beta) + i \\sin(2\\alpha + \\beta).\n$$\nBecause both $2\\alpha$ and $\\beta$ are acute, $2\\alpha + \\beta = \\frac{\\pi}{2}$ and $\\beta = \\frac{\\pi}{2} - 2\\alpha$."
+ },
+ {
+  "id": "G-036",
+  "title": "Right-Triangle Ratio Inequality",
+  "difficulty": 2,
+  "topics": [
+   "三角形与四边形基本性质",
+   "不等式"
+  ],
+  "problem": "Let $a$ and $b$ be the legs, and $c$ the hypotenuse of a right triangle.\nProve that the following inequality holds\n$$\n\\left(1 + \\frac{c}{a}\\right) \\left(1 + \\frac{c}{b}\\right) \\geqslant 3 + 2\\sqrt{2}.\n$$",
+  "answer": "证明题",
+  "solution": "By rearranging the left hand side of the inequality we get\n$$\n\\begin{aligned}\n\\left(1 + \\frac{c}{a}\\right) \\left(1 + \\frac{c}{b}\\right) &= \\frac{(a+c)(b+c)}{ab} = \\frac{c^2 + ab + c(a+b)}{ab} \\\\\n&= \\frac{c^2}{ab} + 1 + \\frac{c(a+b)}{ab}\n\\end{aligned}\n$$\nSince the triangle is right it follows that $a^2 + b^2 = c^2$\n$$\n= \\frac{a^2 + b^2}{ab} + 1 + \\frac{\\sqrt{a^2 + b^2}(a+b)}{ab}\n$$\n\nNow we use $a^2 + b^2 \\ge 2ab$ and $a + b \\ge 2\\sqrt{ab}$ to get\n$$\n\\begin{aligned}\n\\ge & \\frac{2ab}{ab} + 1 + \\frac{\\sqrt{2ab} \\cdot 2\\sqrt{ab}}{ab} \\\\\n= & 2 + 1 + 2\\sqrt{2} = 3 + 2\\sqrt{2}.\n\\end{aligned}\n$$"
+ },
+ {
+  "id": "G-037",
+  "title": "Right Triangle from Inradius and Leg",
+  "difficulty": 2,
+  "topics": [
+   "三角形五心与经典引理",
+   "圆与四点共圆"
+  ],
+  "problem": "Problem:\n\nRight triangle $X Y Z$, with hypotenuse $Y Z$, has an incircle of radius $\\frac{3}{8}$ and one leg of length $3$. Find the area of the triangle.",
+  "answer": "21/16",
+  "solution": "Solution:\n\nLet the other leg have length $x$. Then the tangents from $Y$ and $Z$ to the incircle have length $x - \\frac{3}{8}$ and $3 - \\frac{3}{8}$. So the hypotenuse has length $x + \\frac{9}{4}$, the semiperimeter of the triangle is $x + \\frac{21}{8}$, and the area of the triangle is $\\frac{3}{8}\\left(x + \\frac{21}{8}\\right)$. But the area can also be calculated as $\\frac{3x}{2}$. Setting these expressions equal, we find $x = \\frac{7}{8}$ and the area is $\\frac{21}{16}$."
+ },
+ {
+  "id": "G-038",
+  "title": "Inscribed Isosceles Right Triangle Minimum",
+  "difficulty": 2,
+  "topics": [
+   "解析几何与向量复数法",
+   "变换几何",
+   "不等式"
+  ],
+  "problem": "Problem:\n\nAn isosceles right triangle $ABC$ has area $1$. Points $D$, $E$, $F$ are chosen on $BC$, $CA$, $AB$ respectively such that $DEF$ is also an isosceles right triangle. Find the smallest possible area of $DEF$.\n\nProposed by: Yuan Yao",
+  "answer": "1/5",
+  "solution": "Solution:\n\nWithout loss of generality, suppose that $AB$ is the hypotenuse.\n\nIf $F$ is the right angle, then $F$ must be the midpoint of $AB$. To prove this, let $X$ and $Y$ be the feet from $F$ to $BC$ and $AC$. Since $\\angle XFY = \\angle DFE = 90^{\\circ}$, we have $\\angle XFD = \\angle YFE$ so\n$$\nXF = DF \\cos \\angle XFD = EF \\cos \\angle YFE = YF\n$$\nHence $F$ is equidistant from $AC$ and $BC$ so it is the midpoint of $AB$. Then the minimum area is achieved by minimizing $DF$; this occurs when $DF$ is perpendicular to $BC$. The triangle $DEF$ then becomes the medial triangle of $ABC$, so its area is $\\frac{1}{4}$.\n\nIf $F$ is not the right angle, without loss of generality, let the right angle be $D$. Place this triangle in the complex plane such that $C$ is the origin, $B = \\sqrt{2}$, and $A = \\sqrt{2}i$.\n\nNow since $D$ is on the real axis and $E$ is on the imaginary axis, $D = x$ and $E = yi$, and we can obtain $F$ by a $90$ degree counterclockwise rotation of $D$ around $E$: this evaluates to $F = y + (x + y)i$. For $F$ to be on $AB$, the only constraint is to have $y + (x + y) = \\sqrt{2} \\Longrightarrow x = \\sqrt{2} - 2y$.\n\nTo minimize the area, we minimize\n$$\n\\frac{DE^2}{2} = \\frac{x^2 + y^2}{2} = \\frac{(\\sqrt{2} - 2y)^2 + y^2}{2} = \\frac{5y^2 - 4\\sqrt{2}y + 2}{2}\n$$\nwhich has a minimum of $\\frac{1}{5}$ at $y = \\frac{2\\sqrt{2}}{5}$. Since this is between $0$ and $\\sqrt{2}$, this is indeed a valid configuration.\n\nFinally, we take the smallest area of $\\frac{1}{5}$."
+ },
+ {
+  "id": "G-039",
+  "title": "Parallelogram Intersecting Circumcircles",
+  "difficulty": 3,
+  "topics": [
+   "圆与四点共圆"
+  ],
+  "problem": "Let $ABCD$ be a parallelogram and let $M$ be the intersection of its diagonals. The circumcircle of $\\triangle ABM$ intersects the line segment $AD$ in $E \\ne A$ and the circumcircle of $\\triangle EMD$ intersects the line segment $BE$ in the point $F \\ne E$.\nProve that $\\angle ACB = \\angle DCF$.",
+  "answer": "证明题",
+  "solution": "We first show that $CBFD$ is a cyclic quadrilateral. Note that\n$$\n\\angle BCD = \\angle BAD \\quad \\text{(parallelogram)}\n= \\angle BAE = 180^\\circ - \\angle EMB \\quad \\text{(EABM is cyclic)}\n= \\angle EMD = \\angle EFD \\quad \\text{(inscribed angle theorem in EFMD)}\n= 180^\\circ - \\angle BFD\n$$\nTherefore $CBFD$ is a cyclic quadrilateral. Using the inscribed angle theorem with respect to cyclic quadrilaterals $EABM$, $EFMD$, and $CBFD$ when necessary, we see that\n$$\n\\angle ACD = \\angle CAB = \\angle MAB = \\angle MEB = \\angle MEF \\\\\n= \\angle MDF = \\angle BDF = \\angle BCF.\n$$\nSo $\\angle ACF + \\angle FCD = \\angle ACD = \\angle BCF = \\angle BCA + \\angle ACF$. If we subtract $\\angle ACF$ from this we find that $\\angle ACB = \\angle DCF$, as required. $\\square$"
+ },
+ {
+  "id": "G-040",
+  "title": "Altitude-Line Midpoint Orthogonality",
+  "difficulty": 4,
+  "topics": [
+   "圆与四点共圆"
+  ],
+  "problem": "Let $ABC'$ be a triangle and $D$ the foot of the altitude from $A$. Let $E$ and $F$ be on a line passing through $D$ such that $AE$ is perpendicular to $BE$, $AF$ is perpendicular to $CF$, and $E$ and $F$ are different from $D$. Let $M$ and $N$ be the midpoints of the line segments $BC$ and $EF$, respectively. Prove that $AN$ is perpendicular to $NM$.",
+  "answer": "证明题",
+  "solution": "Let $P$ be such that $ADMP$ is a rectangle. Choose points $Q$ and $R$ on the line $AP$ such that $Q B D A$ and $A D C R$ are rectangles. Points $Q$, $B$ and $D$ lie on the circle of diameter $AB$, hence $ADEQ$ is a cyclic quadrilateral. Similarly, $R$, $C$ and $D$ lie on the circle of diameter $AC$, hence $ADFR$ is a cyclic quadrilateral.\n\nThe two quadrilaterals share a side, and have the same supporting lines for the other two sides. Since they are cyclic, the remaining two sides $EQ$ and $RF$ must be parallel. Thus $E$, $Q$, $R$ and $F$ are vertices of a trapezoid.\n\nOn the other hand, in rectangle $Q B C R$, $M$ is the midpoint of $BC$, and $MP$ is parallel to $QB$, so $P$ is the midpoint of $QR$. Since $N$ is the midpoint of $EF$, we obtain that, in trapezoid $Q E F R$, $NP$ is parallel to $QE$.\n\nThis implies that quadrilateral $ADNP$ is cyclic, having the sides parallel to the sides of $ADFR$. Moreover, $A$ lies on the circle circumscribed to this quadrilateral, because the other three vertices of the rectangle $ADMP$ lie on it. Hence the quadrilateral $ADMN$ is cyclic.\n\nConsequently, $\\angle ANM = 180^{\\circ} - \\angle ADM = 90^{\\circ}$."
+ },
+ {
+  "id": "G-041",
+  "title": "Isolating Rectangles in a Square",
+  "difficulty": 4,
+  "topics": [
+   "不等式",
+   "解析几何与向量复数法",
+   "抽屉原理"
+  ],
+  "problem": "Problem:\nGiven a positive integer $n$, determine the largest real number $\\mu$ satisfying the following condition: for every $4n$-point configuration $C$ in an open unit square $U$, there exists an open rectangle in $U$, whose sides are parallel to those of $U$, which contains exactly one point of $C$, and has an area greater than or equal to $\\mu$.",
+  "answer": "1/(2n+2)",
+  "solution": "Solution:\nThe required maximum is $\\frac{1}{2n+2}$. To show that the condition in the statement is not met if $\\mu > \\frac{1}{2n+2}$, let $U = (0,1) \\times (0,1)$, choose a small enough positive $\\epsilon$, and consider the configuration $C$ consisting of the $n$ four-element clusters of points $\\left(\\frac{i}{n+1} \\pm \\epsilon\\right) \\times \\left(\\frac{1}{2} \\pm \\epsilon\\right)$, $i = 1, \\ldots, n$, the four possible sign combinations being considered for each $i$. Clearly, every open rectangle in $U$, whose sides are parallel to those of $U$, which contains exactly one point of $C$, has area at most $\\left(\\frac{1}{n+1} + \\epsilon\\right) \\cdot \\left(\\frac{1}{2} + \\epsilon\\right) < \\mu$ if $\\epsilon$ is small enough.\n\nWe now show that, given a finite configuration $C$ of points in an open unit square $U$, there always exists an open rectangle in $U$, whose sides are parallel to those of $U$, which contains exactly one point of $C$, and has an area greater than or equal to $\\mu_0 = \\frac{2}{|C|+4}$.\n\nTo prove this, usage will be made of the following two lemmas whose proofs are left at the end of the solution.\n\n**Lemma 1.** Let $k$ be a positive integer, and let $\\lambda < \\frac{1}{\\lfloor k / 2 \\rfloor + 1}$ be a positive real number. If $t_{1}, \\ldots, t_{k}$ are pairwise distinct points in the open unit interval $(0,1)$, then some $t_{i}$ is isolated from the other $t_{j}$ by an open subinterval of $(0,1)$ whose length is greater than or equal to $\\lambda$.\n\n**Lemma 2.** Given an integer $k \\geq 2$ and positive integers $m_{1}, \\ldots, m_{k}$,\n$$\n\\left\\lfloor\\frac{m_{1}}{2}\\right\\rfloor + \\sum_{i=1}^{k} \\left\\lfloor\\frac{m_{i}}{2}\\right\\rfloor + \\left\\lfloor\\frac{m_{k}}{2}\\right\\rfloor \\leq \\sum_{i=1}^{k} m_{i} - k + 2\n$$\n\nBack to the problem, let $U = (0,1) \\times (0,1)$, project $C$ orthogonally on the $x$-axis to obtain the points $x_{1} < \\cdots < x_{k}$ in the open unit interval $(0,1)$, let $\\ell_{i}$ be the vertical through $x_{i}$, and let $m_{i} = |C \\cap \\ell_{i}|$, $i = 1, \\ldots, k$.\n\nSetting $x_{0} = 0$ and $x_{k+1} = 1$, assume that $x_{i+1} - x_{i-1} > (\\lfloor m_{i} / 2 \\rfloor + 1) \\mu_0$ for some index $i$, and apply Lemma 1 to isolate one of the points in $C \\cap \\ell_{i}$ from the other ones by an open subinterval $x_{i} \\times J$ of $x_{i} \\times (0,1)$ whose length is greater than or equal to $\\mu_0 / (x_{i+1} - x_{i-1})$. Consequently, $\\left(x_{i-1}, x_{i+1}\\right) \\times J$ is an open rectangle in $U$, whose sides are parallel to those of $U$, which contains exactly one point of $C$ and has an area greater than or equal to $\\mu_0$.\n\nNext, we rule out the case $x_{i+1} - x_{i-1} \\leq (\\lfloor m_{i} / 2 \\rfloor + 1) \\mu_0$ for all indices $i$. If this were the case, notice that necessarily $k > 1$; also, $x_{1} - x_{0} < x_{2} - x_{0} \\leq (\\lfloor m_{1} / 2 \\rfloor + 1) \\mu_0$ and $x_{k+1} - x_{k} < x_{k+1} - x_{k-1} \\leq (\\lfloor m_{k} / 2 \\rfloor + 1) \\mu_0$. With reference to Lemma 2, write\n$$\n\\begin{aligned}\n2 = 2(x_{k+1} - x_{0}) & = (x_{1} - x_{0}) + \\sum_{i=1}^{k} (x_{i+1} - x_{i-1}) + (x_{k+1} - x_{k}) \\\\\n& < \\left( (\\lfloor \\frac{m_{1}}{2} \\rfloor + 1) + \\sum_{i=1}^{k} (\\lfloor \\frac{m_{i}}{2} \\rfloor + 1) + (\\lfloor \\frac{m_{k}}{2} \\rfloor + 1) \\right) \\cdot \\mu_0 \\\\\n& \\leq (\\sum_{i=1}^{k} m_{i} + 4) \\mu_0 = (|C| + 4) \\mu_0 = 2\n\\end{aligned}\n$$\nand thereby reach a contradiction.\n\nFinally, we prove the two lemmas.\n\n**Proof of Lemma 1.** Suppose, if possible, that no $t_{i}$ is isolated from the other $t_{j}$ by an open subinterval of $(0,1)$ whose length is greater than or equal to $\\lambda$. Without loss of generality, we may (and will) assume that $0 = t_{0} < t_{1} < \\cdots < t_{k} < t_{k+1} = 1$. Since the open interval $(t_{i-1}, t_{i+1})$ isolates $t_{i}$ from the other $t_{j}$, its length, $t_{i+1} - t_{i-1}$, is less than $\\lambda$. Consequently, if $k$ is odd we have $1 = \\sum_{i=0}^{(k-1)/2} (t_{2i+2} - t_{2i}) < \\lambda (1 + \\frac{k-1}{2}) < 1$; if $k$ is even, we have $1 < 1 + t_{k} - t_{k-1} = \\sum_{i=0}^{k/2-1} (t_{2i+2} - t_{2i}) + (t_{k+1} - t_{k-1}) < \\lambda (1 + \\frac{k}{2}) < 1$. A contradiction in either case.\n\n**Proof of Lemma 2.** Let $I_{0}$, respectively $I_{1}$, be the set of all indices $i$ in the range $2, \\ldots, k-1$ such that $m_{i}$ is even, respectively odd. Clearly, $I_{0}$ and $I_{1}$ form a partition of that range. Since $m_{i} \\geq 2$ if $i$ is in $I_{0}$, and $m_{i} \\geq 1$ if $i$ is in $I_{1}$ (recall that the $m_{i}$ are positive integers),\n$$\n\\sum_{i=2}^{k-1} m_{i} = \\sum_{i \\in I_{0}} m_{i} + \\sum_{i \\in I_{1}} m_{i} \\geq 2|I_{0}| + |I_{1}| = 2(k-2) - |I_{1}|, \\quad \\text{or} \\quad |I_{1}| \\geq 2(k-2) - \\sum_{i=2}^{k-1} m_{i}\n$$\nTherefore,\n$$\n\\begin{aligned}\n\\left\\lfloor \\frac{m_{1}}{2} \\right\\rfloor + \\sum_{i=1}^{k} \\left\\lfloor \\frac{m_{i}}{2} \\right\\rfloor + \\left\\lfloor \\frac{m_{k}}{2} \\right\\rfloor & \\leq m_{1} + \\left( \\sum_{i=2}^{k-1} \\frac{m_{i}}{2} - \\frac{|I_{1}|}{2} \\right) + m_{k} \\\\\n& \\leq m_{1} + \\left( \\frac{1}{2} \\sum_{i=2}^{k-1} m_{i} - (k-2) + \\frac{1}{2} \\sum_{i=2}^{k-1} m_{i} \\right) + m_{k} \\\\\n& = \\sum_{i=1}^{k} m_{i} - k + 2\n\\end{aligned}\n$$\n\nRemark. In case $4n$ is replaced by a positive integer $k$ not divisible by $4$, we do not yet know the maximal $\\mu$ satisfying the corresponding condition."
+ },
+ {
+  "id": "G-042",
+  "title": "Reflections and Tangent Circumcircle",
+  "difficulty": 3,
+  "topics": [
+   "圆与四点共圆",
+   "面积法与三角法"
+  ],
+  "problem": "Problem:\n\nTriangle $ABC$ is inscribed in a circle $\\omega$ such that $\\angle A = 60^\\circ$ and $\\angle B = 75^\\circ$. Let the bisector of angle $A$ meet $BC$ and $\\omega$ at $E$ and $D$, respectively. Let the reflections of $A$ across $D$ and $C$ be $D'$ and $C'$, respectively. If the tangent to $\\omega$ at $A$ meets line $BC$ at $P$, and the circumcircle of $APD'$ meets line $AC$ at $F \\neq A$, prove that the circumcircle of $C'FE$ is tangent to $BC$ at $E$.",
+  "answer": "证明题",
+  "solution": "Solution:\n\nWe will show that $CE^2 = (CF)(CC')$. By a simple computation using the given angles, one may find that this is equivalent to $CF = AC - AB$, or $AF = 2AC - AB$.\n\nWe compute $AF$ by trigonometry. Assume for simplicity that $AC = \\frac{1}{2}$, so $AD' = 2AD = 2AC = 1$ because $\\triangle ACD$ is isosceles by angle chasing. We first compute $PD'$ by the law of cosines on triangle $APD'$, which yields\n$$\nPD'^2 = AP^2 + AD'^2 - 2(AP)(AD') \\cos 75 = AP^2 + 1 - 2AP \\cos 75.\n$$\nWe may easily compute $AP$ by the law of sines in triangle $BAP$ to be $\\frac{1}{\\sqrt{2}}$. Thus,\n$$\nPD'^2 = \\frac{1}{2} + 1 - \\sqrt{2} \\cdot \\frac{\\sqrt{6} - \\sqrt{2}}{4} = \\frac{4 - \\sqrt{3}}{2}.\n$$\nBy the law of sines within the circumcircle of $APD'F$, we have\n$$\n\\frac{FD'}{\\sin 30} = \\frac{PD'}{\\sin 75}.\n$$\nFrom this, we find that\n$$\nFD' = \\frac{PD' \\sin 30}{\\sin 75} = \\frac{4 - \\sqrt{3}}{\\sqrt{2} + \\sqrt{6}}.\n$$\nThus, we have by the law of cosines on triangle $D'AF$ that\n$$\nAF^2 + AD'^2 - 2(AF)(AD') \\cos 30 = AF^2 + 1 - \\sqrt{3} AF = FD'^2 = \\frac{4 - \\sqrt{3}}{4 + 2\\sqrt{3}}.\n$$\nFinally, solving for $AF$ yields\n$$\nAF = \\frac{\\sqrt{3} \\pm (2\\sqrt{3} - 3)}{2}\n$$\nfrom which we indeed get $AF = \\frac{3 - \\sqrt{3}}{2}$ which equals $2AC - AB$."
+ }
+]

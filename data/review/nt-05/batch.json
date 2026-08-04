@@ -1,0 +1,109 @@
+[
+ {
+  "mathnet_id": "09ta",
+  "est": 4,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "费马小定理与欧拉定理",
+   "素数与算术基本定理"
+  ],
+  "contest": "IMO-selectietoets III",
+  "problem": "Problem:\n\nBepaal het product van alle positieve gehele getallen $n$ waarvoor $3(n!+1)$ deelbaar is door $2 n-5$.",
+  "solution_head": "Solution:\n\nDe getallen $n=1$ tot en met $n=4$ voldoen, want $2 n-5$ is dan gelijk aan respectievelijk $-3,-1,1$ en $3$, dus altijd een deler dan $3(n!+1)$. Vanaf nu bekijken we alleen $n>4$ en dan is $2 n-5>3$.\n\nWe bewijzen eerst dat als $n$ voldoet, dan $2 n-5$ priem moet zijn. We onderscheiden twee gevallen. Stel eerst dat $2 n-5$ niet priem is en een priemdeler $p>3$ heeft. Omdat $p \\neq 2 n-5$ en omdat $2 n-5$ oneven is, geldt $p \\leq \\frac{2 n-5}{3}<n$. Dus $p \\mid n!$, maar dan $p \\nmid n!+1$ en dus ook $p \\nmid 3(n!+1)$ aangezien $p \\neq 3$. Dus $2 n-5 \\nmid 3(n!+1)$, wat betekent dat $n$ niet voldoet. Stel nu dat $2 n-5$ niet priem is, maar alleen priemdelers $3$ heeft; dan is het dus een driemacht groter dan $3$. Echter, voor $n>4$ is $3 \\nmid n!+1$, dus $3(n!+1)$ is deelbaar door precies één factor $3$ en niet meer. We zien dat $n$ ook in dit geval niet kan voldoen.\n\nVoor een $n>4$ die voldoet, weten we nu dat $2 n-5$ een priemgetal groter dan $3$ is. Schrijf $q=2 n-5$. Dan $q \\mid n!+1$, oftewel $n!\\equiv-1 \\bmod q$. Verder zegt de stelling van Wilson dat $(q-1)!\\equiv-1 \\"
+ },
+ {
+  "mathnet_id": "0b9a",
+  "est": 4,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "素数与算术基本定理",
+   "不定方程",
+   "数列与递推",
+   "不等式"
+  ],
+  "contest": "NMO Selection Tests for the Balkan and International Mathematical Olympiads",
+  "problem": "(a) Given a positive integer $k$, prove that there do not exist two distinct integers in the open interval $(k^2, (k+1)^2)$ whose product is a perfect square.\n\n(b) Given an integer $n > 2$, prove that there exist $n$ distinct integers in the open interval $(k^n, (k+1)^n)$ whose product is the $n$-th power of an integer, for all but a finite number of positive integers $k$.",
+  "solution_head": "(a) Suppose that two such integers, $a < b$, exist. Let $m$ be the squarefree part of $a$; $a = ms^2$, $s \\in \\mathbb{Z}$. Then $mb$ is a square, so since $m$ is squarefree, $b = mt^2$ for some integer $t \\ge s + 1$. Hence\n$$\n\\left(1 + \\frac{1}{s}\\right)^2 \\le \\frac{t^2}{s^2} = \\frac{b}{a} < \\frac{(k+1)^2}{k^2} = \\left(1 + \\frac{1}{k}\\right)^2,\n$$\nso $s > k$. Consequently, $b = mt^2 \\ge m(s+1)^2 > (k+1)^2$ – a contradiction.\n\n(b) We show that the statement holds whenever $k \\ge 3^{n-1}$; if $n$ is odd, the weaker condition $k \\ge 2^{n-1}$ suffices. We require a LEMMA whose proof offers no difficulty.\nLEMMA. If $C > 0$ and $n \\ge 2$, then $(k+1)^n > (k^{n/(n-1)} + C)^{n-1}$ for all $k \\ge C^{n-1}$.\nNow let $n$ be odd, let $a$ be the smallest integer greater than $k^{n/(n-1)}$, and let $b = a+1$. The $n$ integers $a^{n-i-1}b^i$, $i = 0, 1, 2, \\dots, n-1$, are distinct, and their product is the $n$-th power of $(ab)^{(n-1)/2}$. The smallest of them, $a^{n-1}$, exceeds $k^n$, and the largest, $b^{n-1}$, is at most $(k^{n/(n-1)} + 2)^{n-1}$. By the LEMMA, this is at most $(k+1)^n$ when $k"
+ },
+ {
+  "mathnet_id": "0gn3",
+  "est": 4,
+  "conf": "mid",
+  "category": "number-theory",
+  "topics": [
+   "数列与递推",
+   "整除与同余",
+   "素数与算术基本定理"
+  ],
+  "contest": "Team Selection Examination for the International Mathematical Olympiad",
+  "problem": "Find the smallest positive integer $x_1$ such that $2006$ divides $x_{2006}$, if\n$$\nx_{n+1} = x_1^2 + x_2^2 + \\dots + x_n^2 \\text{ for each integer } n \\ge 1.\n$$",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "042m",
+  "est": 4,
+  "conf": "mid",
+  "category": "number-theory",
+  "topics": [
+   "素数与算术基本定理",
+   "数论函数与阶乘估计"
+  ],
+  "contest": "China Team Selection Test",
+  "problem": "For positive integer $k > 1$, let $f(k)$ be the number of ways of factoring $k$ into product of positive integers greater than 1 (The order of factors are not counted, for example $f(12) = 4$, as $12$ can be factored in these 4 ways: $12$, $2 \\times 6$, $3 \\times 4$, $2 \\times 2 \\times 3$).\n\n**Prove:** If $n$ is a positive integer greater than 1, $p$ is a prime factor of $n$, then $f(n) \\le \\frac{n}{p}$.",
+  "solution_head": "Let $P(n)$ stand for the biggest prime divisor of $n$, and define $P(1) = f(1) = 1$. We first prove two lemmas.\n\nLemma 1: For positive integer $n$ and prime $p \\mid n$, we have $f(n) \\le \\sum_{d|\\frac{n}{p}} f(d)$.\n\n**Proof of Lemma 1:** For any factoring of $n$, write $n = n_1 n_2 \\cdots n_k$. Since $p \\mid n$, there exists $i \\in \\{1, \\cdots, k\\}$ such that $p \\mid n_i$ (if there are more than one such $i$, choose any one of them), without loss of generality, assume $i = 1$. Map this factoring to a factoring of $d = \\frac{n}{n_1}$, $d = n_2 n_3 \\cdots n_k$.\n\nFor two different factorings of $n$, $n = n_1 n_2 \\cdots n_k$ and $n = n'_1 n'_2 \\cdots n'_k$ (where $p$ divides $n_1$ and $n'_1$):\n- If $n_1 = n'_1$, then $d = n_2 \\cdots n_k$ and $d = n'_2 \\cdots n'_k$ are two different factorings of $d$ ($d$ is a divisor of $\\frac{n}{p}$).\n- If $n_1 \\ne n'_1$, then $d = \\frac{n}{n_1} \\ne \\frac{n}{n'_1} = d'$, so these two factorings map to a factoring of $d$ and $d'$ respectively ($d$ and $d'$ are divisors of $\\frac{n}{p}$).\n\nThus $f(n) \\le \\sum_{d|\\frac{n}{p}} f(d)$. Lemma 1 is proved.\n\nLem"
+ },
+ {
+  "mathnet_id": "06jz",
+  "est": 4,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "递推与生成结构"
+  ],
+  "contest": "HKG TST",
+  "problem": "Decide if there is a permutation $a_1, a_2, \\dots, a_{6666}$ of the numbers $1, 2, \\dots, 6666$ with the property that the sum $k + a_k$ is a perfect square for all $k = 1, 2, \\dots, 6666$.",
+  "solution_head": "Yes. Consider the permutation\n$3, 2, 1, 12, 11, \\dots, 4, 23, 22, \\dots, 13, 57, 56, \\dots, 24, 6666, 6665, \\dots, 58.$\nMore precisely, we define\n$$\na_k = \\begin{cases} 2^2 - k & \\text{if } 1 \\le k \\le 3, \\\\ 4^2 - k & \\text{if } 4 \\le k \\le 12, \\\\ 6^2 - k & \\text{if } 13 \\le k \\le 23, \\\\ 9^2 - k & \\text{if } 24 \\le k \\le 57, \\\\ 82^2 - k & \\text{if } 58 \\le k \\le 6666. \\end{cases}\n$$\nThe result follows readily."
+ },
+ {
+  "mathnet_id": "09rk",
+  "est": 4,
+  "conf": "mid",
+  "category": "number-theory",
+  "topics": [
+   "计数与容斥",
+   "素数与算术基本定理"
+  ],
+  "contest": "MO-selectietoets",
+  "problem": "Problem:\n\nBepaal alle gehele getallen $n \\geq 2$ waarvoor geldt dat\n$$\ni+j \\equiv \\binom{n}{i} + \\binom{n}{j} \\pmod{2}\n$$\nvoor alle $i$ en $j$ met $0 \\leq i \\leq j \\leq n$.",
+  "solution_head": "Solution:\n\nWe laten eerst zien dat $n$ voldoet dan en slechts dan als $\\binom{n}{i} \\equiv i+1 \\pmod{2}$ voor alle $i$ met $0 \\leq i \\leq n$. Stel dat $\\binom{n}{i} \\equiv i+1 \\pmod{2}$ voor alle $i$, dan geldt $\\binom{n}{i} + \\binom{n}{j} \\equiv i+1 + j+1 \\equiv i+j \\pmod{2}$ voor alle $i$ en $j$. Dus $n$ voldoet dan aan de voorwaarde in de opgave. Stel andersom dat $n$ voldoet. Omdat $\\binom{n}{0} = 1$, geldt dan $i \\equiv 1 + \\binom{n}{i} \\pmod{2}$ voor alle $i$, dus $\\binom{n}{i} \\equiv i-1 \\equiv i+1 \\pmod{2}$ voor alle $i$.\n\nSchrijf nu $n$ als $n = 2^{k} + m$ met $0 \\leq m < 2^{k}$. Omdat $n \\geq 2$, mogen we aannemen $k \\geq 1$. Bekijk\n$$\n\\binom{n}{2^{k}-2} = \\binom{2^{k}+m}{2^{k}-2} = \\frac{(2^{k}+m)(2^{k}+m-1) \\cdots (m+4)(m+3)}{(2^{k}-2)(2^{k}-3) \\cdots 2 \\cdot 1}.\n$$\nHet product in de noemer bevat $\\left\\lfloor \\frac{2^{k}-2}{2} \\right\\rfloor$ factoren deelbaar door $2$, $\\left\\lfloor \\frac{2^{k}-2}{4} \\right\\rfloor$ factoren deelbaar door $4$, $\\ldots$, $\\left\\lfloor \\frac{2^{k}-2}{2^{k-1}} \\right\\rfloor$ factoren deelbaar door $2^{k-1}$ en geen factoren deelbaar door $2^"
+ },
+ {
+  "mathnet_id": "03lh",
+  "est": 4,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "费马小定理与欧拉定理",
+   "计数与容斥"
+  ],
+  "contest": "Canadian Mathematical Olympiad",
+  "problem": "Problem:\nLet $p$ be an odd prime. Prove that\n$$\n\\sum_{k=1}^{p-1} k^{2p-1} \\equiv \\frac{p(p+1)}{2} \\quad\\left(\\bmod p^{2}\\right)\n$$\n[Note that $a \\equiv b(\\bmod m)$ means that $a-b$ is divisible by $m$.]",
+  "solution_head": "Solution:\nSince $p-1$ is even, we can pair up the terms in the summation in the following way (first term with last, 2nd term with 2nd last, etc.):\n$$\n\\sum_{k=1}^{p-1} k^{2p-1} = \\sum_{k=1}^{\\frac{p-1}{2}} \\left(k^{2p-1} + (p-k)^{2p-1}\\right)\n$$\nExpanding $(p-k)^{2p-1}$ with the binomial theorem, we get\n$$\n(p-k)^{2p-1} = p^{2p-1} - \\cdots - \\binom{2p-1}{2} p^{2} k^{2p-3} + \\binom{2p-1}{1} p k^{2p-2} - k^{2p-1},\n$$\nwhere every term on the right-hand side is divisible by $p^{2}$ except the last two. Therefore\n$$\nk^{2p-1} + (p-k)^{2p-1} \\equiv k^{2p-1} + \\binom{2p-1}{1} p k^{2p-2} - k^{2p-1} \\equiv (2p-1) p k^{2p-2} \\pmod{p^{2}}\n$$\nFor $1 \\leq k < p$, $k$ is not divisible by $p$, so $k^{p-1} \\equiv 1 \\pmod{p}$, by Fermat's Little Theorem. So $(2p-1) k^{2p-2} \\equiv (2p-1)(1^{2}) \\equiv -1 \\pmod{p}$, say $(2p-1) k^{2p-2} = m p - 1$ for some integer $m$. Then\n$$\n(2p-1) p k^{2p-2} = m p^{2} - p \\equiv -p \\pmod{p^{2}}\n$$\nFinally,\n$$\n\\begin{aligned}\n\\sum_{k=1}^{p-1} k^{2p-1} &\\equiv \\sum_{k=1}^{\\frac{p-1}{2}} (-p) \\equiv \\left(\\frac{p-1}{2}\\right)(-p) \\pmod{p^{2}} \\\\\n&\\equiv \\frac{p-p^{2}}{2"
+ },
+ {
+  "mathnet_id": "06q2",
+  "est": 4,
+  "conf": "mid",
+  "category": "number-theory",
+  "topics": [
+   "最大公约数与欧几里得算法",
+   "抽屉原理",
+   "解析几何与向量复数法"
+  ],
+  "contest": "49th International Mathematical Olympiad Spain",
+  "problem": "In the coordinate plane consider the set $S$ of all points with integer coordinates. For a positive integer $k$, two distinct points $A, B \\in S$ will be called $k$-friends if there is a point $C \\in S$ such that the area of the triangle $A B C$ is equal to $k$. A set $T \\subset S$ will be called a $k$-clique if every two points in $T$ are $k$-friends. Find the least positive integer $k$ for which there exists a $k$-clique with more than 200 elements.",
+  "solution_head": "To begin, let us describe those points $B \\in S$ which are $k$-friends of the point $(0,0)$. By definition, $B=(u, v)$ satisfies this condition if and only if there is a point $C=(x, y) \\in S$ such that $\\frac{1}{2}|u y-v x|=k$. (This is a well-known formula expressing the area of triangle $A B C$ when $A$ is the origin.)\n\nTo say that there exist integers $x, y$ for which $|u y-v x|=2 k$, is equivalent to saying that the greatest common divisor of $u$ and $v$ is also a divisor of $2 k$. Summing up, a point $B=(u, v) \\in S$ is a $k$-friend of $(0,0)$ if and only if $\\operatorname{gcd}(u, v)$ divides $2 k$.\n\nTranslation by a vector with integer coordinates does not affect $k$-friendship; if two points are $k$-friends, so are their translates. It follows that two points $A, B \\in S$, $A=(s, t)$, $B=(u, v)$, are $k$-friends if and only if the point $(u-s, v-t)$ is a $k$-friend of $(0,0)$; i.e., if $\\operatorname{gcd}(u-s, v-t) \\mid 2 k$.\n\nLet $n$ be a positive integer which does not divide $2 k$. We claim that a $k$-clique cannot have more than $n^{2}$ elements.\n\nIndeed, all points $(x, "
+ }
+]

@@ -1,0 +1,178 @@
+[
+ {
+  "mathnet_id": "0219",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "不等式",
+   "数列与递推"
+  ],
+  "contest": "16th Benelux Mathematical Olympiad",
+  "problem": "Problem:\n\na.\nLet $a_{0}, a_{1}, \\ldots, a_{2024}$ be real numbers such that $\\left|a_{i+1}-a_{i}\\right| \\leqslant 1$ for $i=0,1, \\ldots, 2023$.\nFind the minimum possible value of\n$$\na_{0} a_{1}+a_{1} a_{2}+\\cdots+a_{2023} a_{2024}\n$$\n\nb.\nDoes there exist a real number $C$ such that\n$$\na_{0} a_{1}-a_{1} a_{2}+a_{2} a_{3}-a_{3} a_{4}+\\cdots+a_{2022} a_{2023}-a_{2023} a_{2024} \\geqslant C\n$$\nfor all real numbers $a_{0}, a_{1}, \\ldots, a_{2024}$ such that $\\left|a_{i+1}-a_{i}\\right| \\leqslant 1$ for $i=0,1, \\ldots, 2023$?",
+  "solution_head": "Solution:\n\na.\nThe minimum value is $-506$. Note that from $\\left|a_{i}-a_{i-1}\\right| \\leq 1$ it follows that\n$$\na_{i} a_{i-1}=\\frac{\\left(a_{i}+a_{i-1}\\right)^{2}-\\left(a_{i}-a_{i-1}\\right)^{2}}{4} \\geq-\\frac{\\left(a_{i}-a_{i-1}\\right)^{2}}{4} \\geq-\\frac{1}{4}\n$$\nAdding this for $i=1,2, \\ldots, 2024$, we obtain that\n$$\na_{0} a_{1}+a_{1} a_{2}+a_{2} a_{3}+\\ldots+a_{2023} a_{2024} \\geq 2024 \\cdot-\\frac{1}{4}=-506\n$$\nWe now show that this value can be attained. Indeed, for the sequence $\\left(a_{0}, a_{1}, \\ldots, a_{2024}\\right)=\\left(\\frac{1}{2},-\\frac{1}{2}, \\frac{1}{2},-\\frac{1}{2}, \\frac{1}{2}, \\ldots, \\frac{1}{2}\\right)$ with alternating $\\frac{1}{2}$'s and $-\\frac{1}{2}$'s, each term $a_{i} a_{i-1}$ is equal to $-\\frac{1}{4}$, leading to $a_{0} a_{1}+a_{1} a_{2}+a_{2} a_{3}+\\ldots+a_{2023} a_{2024}=2024 \\cdot-\\frac{1}{4}=-506$.\n\nb.\nNo, such a $C$ does not exist. We argue by contradiction. Suppose $C$ has this property, and consider the sequence defined by $a_{0}=C$ and $a_{i}=C-1$ for $i=1,2, \\ldots, 2024$ satisfies the condition in the problem. For this sequence, we have $a_{i}"
+ },
+ {
+  "mathnet_id": "0anj",
+  "est": 1,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "代数变换技巧"
+  ],
+  "contest": "Qualifying Round",
+  "problem": "Problem:\n\nLet $r = \\log 50$ and $s = \\log 80$. Express $7 \\log 20$ in terms of $r$ and $s$.\n\n(a) $2r + s$\n(b) $2r + 3s$\n(c) $r + 2s$\n(d) $3r + 2s$",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0kz0",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "数列与递推"
+  ],
+  "contest": "2024 AMC 12 B",
+  "problem": "Let $x_n = \\sin^2(n°)$. What is the mean of $x_1, x_2, x_3, \\dots, x_{90}$?\n(A) $\\frac{11}{45}$ (B) $\\frac{22}{45}$ (C) $\\frac{89}{180}$ (D) $\\frac{1}{2}$ (E) $\\frac{91}{180}$",
+  "solution_head": "**Answer (E):** The required mean is\n$$\n\\frac{1}{90} \\sum_{n=1}^{90} \\sin^2(n°).\n$$\n\nGroup the summands into 44 pairs plus two additional terms as follows:\n$$\n\\begin{align*}\n\\sin^2(1^\\circ) + \\sin^2(89^\\circ) &= \\sin^2(1^\\circ) + \\cos^2(1^\\circ) = 1 \\\\\n\\sin^2(2^\\circ) + \\sin^2(88^\\circ) &= \\sin^2(2^\\circ) + \\cos^2(2^\\circ) = 1 \\\\\n\\sin^2(3^\\circ) + \\sin^2(87^\\circ) &= \\sin^2(3^\\circ) + \\cos^2(3^\\circ) = 1 \\\\\n&\\vdots \\\\\n\\sin^2(44^\\circ) + \\sin^2(46^\\circ) &= \\sin^2(44^\\circ) + \\cos^2(44^\\circ) = 1 \\\\\n\\sin^2(45^\\circ) &= \\frac{1}{2} \\\\\n\\sin^2(90^\\circ) &= 1.\n\\end{align*}\n$$\nThis gives a sum of $45\\frac{1}{2} = \\frac{91}{2}$, so the mean is $\\frac{1}{90} \\cdot \\frac{91}{2} = \\frac{91}{180}$."
+ },
+ {
+  "mathnet_id": "0hqx",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "多项式",
+   "函数方程"
+  ],
+  "contest": "Berkeley Math Circle",
+  "problem": "Problem:\nFind all polynomials $f$ that satisfy the equation\n$$\n\\frac{f(9 x)}{f(3 x)} = \\frac{243 x - 729}{x - 81}\n$$\nfor infinitely many values of $x$.",
+  "solution_head": "Solution:\nWe have\n$$\n(x-81) f(9 x) = (243 x - 729) f(3 x)\n$$\nfor infinitely many values of $x$. Since both sides of this equation are polynomials, they must then be equal for all $x$.\n\nPlugging in $x=3$, we get $f(27)=0$. Plugging in $x=9$ then gives $f(81)=0$. Plugging in $x=27$ then gives $f(243)=0$. Thus we have that $f(x) = g(x) \\cdot (x-27)(x-81)(x-243)$ for some polynomial $g(x)$.\n\nPlugging this into the original equation, we get that for infinitely many $x$,\n$$\n243 \\frac{x-3}{x-81} = \\frac{f(9 x)}{f(3 x)} = \\frac{g(9 x)}{g(3 x)} \\cdot \\frac{(9 x-27)(9 x-81)(9 x-243)}{(3 x-27)(3 x-81)(3 x-243)} = \\frac{g(9 x)}{g(3 x)} \\cdot 27 \\frac{x-3}{x-81},\n$$\nso $\\frac{g(9 x)}{g(3 x)} = \\frac{243}{27} = 9$ and thus $f$ works if and only if $g(9 x) = 9 g(3 x)$ for all $x$. Thus, the roots of $g(9 x)$ are those of $g(3 x)$, so they must all be zero, so $g$ must be of the form $a x^{n}$. Plugging in $x=1$ then gives $9^{n} = 9 \\cdot 3^{n}$, so $n=2$. Indeed, $g(x) = x^{2}$ works.\n\nThe solutions are then\n$$\nf(x) = a x^{2} (x-27)(x-81)(x-243)\n$$\nfor real constants $a$."
+ },
+ {
+  "mathnet_id": "0e6h",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "多项式",
+   "方程与设元"
+  ],
+  "contest": "Državno tekmovanje",
+  "problem": "Problem:\n\nDan je polinom $p$ s predpisom $p(x)=x^{4}+3 x^{3}+a x^{2}+b x+7$. Določi števili $a$ in $b$ tako, da bo premica $z$ enačbo $y=2 x+7$ sekala graf polinoma $p$ v točkah $z$ abscisama 1 in -4.",
+  "solution_head": "Solution:\n\nZapišemo enačbo $2 x+7 = x^{4} + 3 x^{3} + a x^{2} + b x + 7$. Enačbo uredimo in dobimo $x^{4} + 3 x^{3} + a x^{2} + (b-2) x = 0$.\n\nV enačbo vstavimo $x=1$ in dobimo $1 + 3 + a + b - 2 = 0$ oziroma $a + b + 2 = 0$.\n\nV enačbo vstavimo še $x = -4$ in dobimo $256 - 192 + 16 a - 4 b + 8 = 0$ oziroma $4 a - b + 18 = 0$.\n\nRešimo sistem enačb:\n\n$a + b + 2 = 0$\n\n$4 a - b + 18 = 0$\n\nSeštejemo obe enačbi:\n\n$a + b + 2 = 0 \\implies b = -a - 2$\n\nVstavimo v drugo enačbo:\n\n$4a - (-a - 2) + 18 = 0$\n\n$4a + a + 2 + 18 = 0$\n\n$5a + 20 = 0$\n\n$a = -4$\n\n$b = -(-4) - 2 = 4 - 2 = 2$\n\nTorej sta $a = -4$ in $b = 2$.\n\n\nDrugi način:\n\nIzračunamo koordinate presečišč premice in grafa polinoma $(1,9)$ in $(-4,-1)$. Koordinate obeh točk vstavimo v predpis za polinom. Dobimo enačbi:\n\nZa $x=1$: $p(1) = 1 + 3 + a + b + 7 = 11 + a + b = 9 \\implies a + b = -2$\n\nZa $x=-4$: $p(-4) = 256 - 192 + 16a - 4b + 7 = 71 + 16a - 4b = -1 \\implies 16a - 4b = -72 \\implies 4a - b = -18$\n\nRešimo sistem:\n\n$a + b = -2$\n\n$4a - b = -18$\n\nSeštejemo obe enačbi:\n\n$a + b = -2 \\implies b = -2 - a$\n\n$4a - (-2 - a) = -18$\n\n$4a + a + 2 ="
+ },
+ {
+  "mathnet_id": "057w",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "多项式",
+   "根与系数"
+  ],
+  "contest": "Estonian Math Competitions",
+  "problem": "Anna, Anne and Anni seek for real solutions $(x, y)$ to the system of equations\n$$\n\\begin{cases} 4x^3y - x^4 - 3x^2y^2 = 2021, \\\\ 4y^3x - y^4 - 3y^2x^2 = 2021. \\end{cases}\n$$\nAnna claims that the system of equations has a solution. Anne claims that the system of equations has no solution but at least one of the two equations has solutions. Anni claims that the system of equations has no solution and, even worse, neither of the two equations alone has a solution. Who is right?",
+  "solution_head": "The system does not have a solution since adding the equation gives $-(x - y)^4 = 4042$ whose l.h.s. is non-positive but r.h.s. is positive.\nWe show that the first equation $4x^3y - x^4 - 3x^2y^2 = 2021$ has solutions (the same could be done for the second equation by symmetry). Dividing the equation by $x^4$ and reordering the terms in the l.h.s. results in\n$$\n-3 \\left(\\frac{y}{x}\\right)^2 + 4 \\left(\\frac{y}{x}\\right) - 1 = \\frac{2021}{x^4}. \\qquad (6)\n$$\nAs the discriminant of the quadratic equation $-3t^2 + 4t - 1 = 0$ is positive, there exists a real number $t$ such that $-3t^2 + 4t - 1$ equals a positive number $\\varepsilon$. Define $x = \\sqrt[4]{\\frac{2021}{\\varepsilon}}$ and $y = xt$; then $x$ and $y$ satisfy (6) and also the first equation of the given system of equations. Hence Anne is right."
+ },
+ {
+  "mathnet_id": "04cx",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "不等式",
+   "多项式"
+  ],
+  "contest": "Mathematica competitions in Croatia",
+  "problem": "Let $x$ and $y$ be real numbers such that $x + y \\ge 0$. Prove that\n$$\n2^{n-1} (x^n + y^n) \\ge (x + y)^n \\quad \\text{for all } n \\in \\mathbb{N}.\n$$",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0agu",
+  "est": 2,
+  "conf": "mid",
+  "category": "algebra",
+  "topics": [
+   "不定方程",
+   "根与系数",
+   "不等式"
+  ],
+  "contest": "XV-th Junior Balkan Mathematical Olympiad",
+  "problem": "Find all the prime numbers $p$ for which there exist positive integers $x$ and $y$ that satisfy the equation\n$$\nx(y^2 - p) + y(x^2 - p) = 5p\n$$",
+  "solution_head": "Given equation is equivalent to\n$$\n(x + y)(xy - p) = 5p.\n$$\nWe consider the following cases:\n1. Let $x + y = 1$ and $xy = 6p$. For prime $p \\geq 2$ the equation $x^2 - x + 6p = 0$ has no solutions.\n\n2. Let $x + y = 5$ and $xy = 2p$. For prime $p \\geq 2$ the equation $x - 5x + 2p = 0$ has the determinant $\\Delta = p^2 - 4p - 20$. The inequality $25 - 8p \\geq 0$ implies $p \\in \\{2, 3\\}$. For $p = 2$ we obtain the solutions $(1, 4)$ and $(4, 1)$.\nFor $p = 3$ we obtain the solutions $(2, 3)$ and $(3, 2)$.\n\n3. Let $x + y = p$ and $xy = p + 5$. For prime $p \\geq 2$ the equation $x^2 - px + p + 5 = 0$ has the diskriminant $\\Delta = p^2 - 4p - 20$. The inequality $p^2 - 4p - 20 \\geq 0$ implies $p \\geq 7$.\nLet $p^2 - 4p - 20 = q^2$ with $1 \\leq q \\leq p$. We obtain the equation $(p-2)^2 - q^2 = 24$ which is equivalent to\n$$\n(p + q - 2)(p - q - 2) = 24.\n$$\nIt follows that both numbers $p+q-2$ and $p-q-2$ shall be even. We have two subcases:\na) $p+q-2=12$ and $p-q-2=2$. We have $p=9$, which is no prime.\nb) $p+q-2=6$ and $p-q-2=4$. We obtain $p=7$ and $q=1$. The equation has the solutions $(3, 4"
+ },
+ {
+  "mathnet_id": "07y1",
+  "est": 2,
+  "conf": "mid",
+  "category": "algebra",
+  "topics": [
+   "数列与递推"
+  ],
+  "contest": "IRL_ABooklet_2025",
+  "problem": "Prove that $1$ is the only positive value of $r$ for which there is a two-way infinite sequence $a(n)$ such that\n$$\na(-n) = 1 - \\sum_{k=0}^{n} r^k a(n-k), \\ n = 0, \\pm 1, \\pm 2, \\dots\n$$\nDetermine $a(n)$, $n = 0, \\pm1, \\pm2, \\dots$, when $r = 1$.",
+  "solution_head": "Suppose, for some $r > 0$, a two-way infinite sequence $a(n)$ satisfies\n$$\na(-n) = 1 - \\sum_{k=0}^{n} r^k a(n-k), \\quad \\text{for all } n \\in \\mathbb{Z}. \\qquad (1)\n$$\n\nFor $n = 0$ this means $a(0) = 1 - a(0)$, hence $a(0) = \\frac{1}{2}$. For $n = \\pm 1$ we get\n$$\na(1) + a(-1) = 1 - r^{-1}a(0) \\quad \\text{and} \\qquad (2)\n$$\n$$\na(-1) + a(1) = 1 - ra(0). \\qquad (3)\n$$\nCombining (2) and (3) gives $r^{-1}a(0) = ra(0)$, whence $r^2 = 1$, so that $r = 1$, as claimed. With $r = 1$, (1) simplifies to\n\n$$\na(-n) = 1 - \\sum_{k=0}^{n} a(n-k), \\quad \\text{for all } n \\in \\mathbb{Z}.\n$$\nWe rewrite this in two ways, using only $n \\ge 0$:\n$$\na(-n) = 1 - \\sum_{k=0}^{n} a(k) \\quad \\text{and} \\qquad (4)\n$$\n$$\na(n) = 1 - \\sum_{k=0}^{n} a(-k). \\qquad (5)\n$$\n\nWriting $d(n) = a(n) - a(-n)$, the difference of (4) and (5) gives\n$$\nd(n) = \\sum_{k=0}^{n} d(k), \\text{ i.e. } \\sum_{k=0}^{n-1} d(k) = 0, \\quad \\text{for all } n \\ge 1, \\qquad (6)\n$$\nClearly, $d(0) = a(0) - a(-0) = 0$ and so induction and (6) gives $d(n) = 0$, i.e. $a(n) = a(-n)$ for all $n \\ge 0$. Now (5) becomes\n$$\na(n) = 1 - \\sum_{k=0}^{n} a(k), "
+ },
+ {
+  "mathnet_id": "0eb5",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "复数与三角"
+  ],
+  "contest": "National Math Olympiad in Slovenia",
+  "problem": "Does the equation $\\cos(\\sin x) = \\sin(\\cos x)$ have at least one real solution?",
+  "solution_head": "Rewrite the equation as $\\cos(\\sin x) = \\cos\\left(\\frac{\\pi}{2} - \\cos x\\right)$. This implies that $\\frac{\\pi}{2} - \\cos x = \\pm \\sin x + 2k\\pi$ for some $k \\in \\mathbb{Z}$, so $\\cos x \\pm \\sin x = \\frac{\\pi}{2} - 2k\\pi$. Since $|\\cos x \\pm \\sin x| \\le |\\cos x| + |\\sin x| \\le 2$, we have $k=0$, and so $\\cos x \\pm \\sin x = \\frac{\\pi}{2}$. Squaring both sides of the equation we get $\\cos^2 x \\pm 2\\cos x\\sin x + \\sin^2 x = \\frac{\\pi^2}{4}$ or $\\pm \\sin 2x = \\frac{\\pi^2}{4} - 1$. Since $\\frac{\\pi^2}{4} - 1 > \\frac{9}{4} - 1 > 1$, this equation has no real solutions, so the initial equation does not have any real solutions either."
+ },
+ {
+  "mathnet_id": "0am1",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "复数与三角"
+  ],
+  "contest": "Area Stage",
+  "problem": "Problem:\n\nFind the exact value of $\\frac{\\sqrt{3}}{\\sin 20^{\\circ}}-\\frac{1}{\\cos 20^{\\circ}}$.",
+  "solution_head": "Solution:\n\nLet us denote the expression as $E$:\n\n$$\nE = \\frac{\\sqrt{3}}{\\sin 20^{\\circ}} - \\frac{1}{\\cos 20^{\\circ}}\n$$\n\nLet us write both terms with a common denominator:\n\n$$\nE = \\frac{\\sqrt{3} \\cos 20^{\\circ} - 1 \\cdot \\sin 20^{\\circ}}{\\sin 20^{\\circ} \\cos 20^{\\circ}}\n$$\n\nRecall that $\\sin 20^{\\circ} \\cos 20^{\\circ} = \\frac{1}{2} \\sin 40^{\\circ}$.\n\nSo,\n$$\nE = \\frac{\\sqrt{3} \\cos 20^{\\circ} - \\sin 20^{\\circ}}{\\frac{1}{2} \\sin 40^{\\circ}} = \\frac{2 (\\sqrt{3} \\cos 20^{\\circ} - \\sin 20^{\\circ})}{\\sin 40^{\\circ}}\n$$\n\nNow, let's try to simplify the numerator:\n\n$\\sqrt{3} \\cos 20^{\\circ} - \\sin 20^{\\circ}$\n\nRecall that $a \\cos x - b \\sin x = R \\cos(x + \\alpha)$, where $R = \\sqrt{a^2 + b^2}$ and $\\tan \\alpha = \\frac{b}{a}$.\n\nHere, $a = \\sqrt{3}$, $b = 1$.\n\nSo,\n$$\nR = \\sqrt{(\\sqrt{3})^2 + 1^2} = \\sqrt{3 + 1} = 2\n$$\n\n$\\tan \\alpha = \\frac{1}{\\sqrt{3}} = \\frac{1}{\\sqrt{3}}$\n\nSo $\\alpha = 30^{\\circ}$.\n\nTherefore,\n$$\n\\sqrt{3} \\cos 20^{\\circ} - \\sin 20^{\\circ} = 2 \\cos(20^{\\circ} + 30^{\\circ}) = 2 \\cos 50^{\\circ}\n$$\n\nSo,\n$$\nE = \\frac{2 \\cdot 2 \\cos 50^{\\circ}}{\\sin 40^{\\circ}} = \\frac{4 \\cos 50^{\\"
+ },
+ {
+  "mathnet_id": "05wc",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "不等式"
+  ],
+  "contest": "PRÉPARATION OLYMPIQUE FRANÇAISE DE MATHÉMATIQUES",
+  "problem": "Problem:\nSoient $a_{1}, \\ldots, a_{101}$ des réels appartenant à l'intervalle $[-2 ; 10]$ tels que\n$$\na_{1}+\\ldots+a_{101}=0\n$$\nMontrer que\n$$\na_{1}^{2}+\\ldots+a_{101}^{2} \\leqslant 2020\n$$",
+  "solution_head": "Solution:\nLorsque l'on effectue des inégalités sur des réels qui ne sont pas forcément positifs, il est essentiel de séparer les variables positives et négatives. Cette idée simple constitue souvent l'idée de départ dans la solution et peut mener à des développements intéressants, en plus de prévenir certaines erreurs lors de manipulations d'inégalités avec des nombres négatifs.\n\nLa deuxième idée, lorsque les variables jouent des rôles symétriques, est d'imposer un ordre aux réels. En plus de permettre, parfois, d'obtenir des résultats intéressants pour le problème, cela simplifie grandement la rédaction de la solution.\n\nQuitte à renuméroter les variables, on suppose donc que $a_{1} \\leqslant a_{2} \\leqslant \\ldots \\leqslant a_{100} \\leqslant a_{101}$. Si tous les réels sont nuls, alors la somme de leur carré est nulle et donc bien inférieure à 2020. On suppose désormais que l'un des réels est non nul. Puisque la somme des $a_{i}$ est nulle, cela impose qu'au moins un réel est strictement positif et un autre strictement négatif. On note alors $p$ l'indice vérifiant $a_{p}<0 \\leqslant"
+ },
+ {
+  "mathnet_id": "04pp",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "不定方程",
+   "根与系数"
+  ],
+  "contest": "Croatian Mathematical Society Competitions",
+  "problem": "Find all pairs $(a, b)$ of integers such that $b \\ge 0$ and\n$$\na^2 + 2ab + b! = 131.\n$$\n(Olimpiada Matemática del Istmo Centroamericano 2017)",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0e2w",
+  "est": 2,
+  "conf": "mid",
+  "category": "algebra",
+  "topics": [
+   "代数变换技巧"
+  ],
+  "contest": "10. tekmovanje v znanju matematike za dijake srednjih tehniških in strokovnih šol, Državno tekmovanje",
+  "problem": "Problem:\n\nReši enačbo $\\log_{4}\\left(1+\\log_{4}\\left(3^{x}-\\sqrt{\\left(5^{0}+4^{2}\\right)^{2}}\\right)\\right)=e^{0}$",
+  "solution_head": "Solution:\n\nUgotovimo, da je $e^{0}=1$. Poenostavimo tudi korenjenec $\\sqrt{\\left(5^{0}+4^{2}\\right)^{2}}=\\sqrt{(17)^{2}}=17$. Uporabimo zvezo $1=\\log_{4} 4$ in dobimo $1+\\log_{4}\\left(3^{x}-17\\right)=4$.\n\nUredimo $\\log_{4}\\left(3^{x}-17\\right)=3$.\n\nUporabimo definicijo logaritma $64=3^{x}-17$.\n\nPoenostavimo $3^{x}=81$.\n\nRešimo in izračunamo $x=4$."
+ }
+]

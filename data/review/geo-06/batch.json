@@ -1,0 +1,82 @@
+[
+ {
+  "mathnet_id": "06cf",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "变换几何"
+  ],
+  "contest": "HKG TST",
+  "problem": "The diagonals of a quadrilateral $ABCD$ intersect at $K$. $M, N$ are the midpoints of $AB$ and $CD$ respectively. Let $k, m, n$ be the lines through $K, M, N$ perpendicular to $AD, BD$ and $AC$ respectively. Show that if $k, m, n$ are concurrent, then $A, B, C, D$ are concyclic.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0kz7",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "变换几何",
+   "相似位似与全等",
+   "解析几何与向量复数法"
+  ],
+  "contest": "AMC 10 A",
+  "problem": "Two transformations are said to *commute* if applying the first followed by the second gives the same result as applying the second followed by the first. Consider these four transformations of the coordinate plane:\n* a translation 2 units to the right,\n* a $90^\\circ$-rotation counterclockwise about the origin,\n* a reflection across the $x$-axis, and\n* a dilation centered at the origin with scale factor $2$.\nOf the $6$ pairs of distinct transformations from this list, how many commute?\n(A) $1$ (B) $2$ (C) $3$ (D) $4$ (E) $5$",
+  "solution_head": "Denote the transformations by $T$, $R$, $F$, and $D$ in the order given in the problem statement. Then the images of point $(x, y)$ are $T(x, y) = (x + 2, y)$, $R(x, y) = (-y, x)$, $F(x, y) = (x, -y)$, and $D(x, y) = (2x, 2y)$. The results of applying a pair of transformations in either order are as follows:\n* $T(R(x, y)) = T(-y, x) = (-y + 2, x)$ and $R(T(x, y)) = R(x + 2, y) = (-y, x + 2)$. The results are different, so $T$ and $R$ do not commute.\n* $T(F(x, y)) = T(x, -y) = (x + 2, -y)$ and $F(T(x, y)) = F(x + 2, y) = (x + 2, -y)$. The results are the same, so $T$ and $F$ do commute.\n\n* $T(D(x, y)) = T(2x, 2y) = (2x+2, 2y)$ and $D(T(x, y)) = D(x+2, y) = (2x+4, 2y)$. The results are different, so $T$ and $D$ do not commute.\n* $R(F(x, y)) = R(x, -y) = (y, x)$ and $F(R(x, y)) = F(-y, x) = (-y, -x)$. The results are different, so $R$ and $F$ do not commute.\n* $R(D(x, y)) = R(2x, 2y) = (-2y, 2x)$ and $D(R(x, y)) = D(-y, x) = (-2y, 2x)$. The results are the same, so $R$ and $D$ do commute.\n* $D(F(x, y)) = D(x, -y) = (2x, -2y)$ and $F(D(x, y)) = F(2x, 2y) = (2x, -2y)$. The results are the"
+ },
+ {
+  "mathnet_id": "0krs",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "变换几何"
+  ],
+  "contest": "HMMT February 2022",
+  "problem": "Problem:\n\nLet triangle $ABC$ be such that $AB = AC = 22$ and $BC = 11$. Point $D$ is chosen in the interior of the triangle such that $AD = 19$ and $\\angle ABD + \\angle ACD = 90^\\circ$. The value of $BD^2 + CD^2$ can be expressed as $\\frac{a}{b}$, where $a$ and $b$ are relatively prime positive integers. Compute $100a + b$.",
+  "solution_head": "Solution:\n\nRotate triangle $ABD$ about $A$ so that $B$ coincides with $C$. Let $D$ map to $D'$ under this. Note that $CDD'$ is a right triangle with right angle at $C$. Also, note that $ADD'$ is similar to $ABC$. Thus, we have $DD' = \\frac{AD}{2} = \\frac{19}{2}$. Finally, note that\n$$\nBD^2 + CD^2 = CD'^2 + CD^2 = DD'^2 = \\frac{361}{4}\n$$"
+ },
+ {
+  "mathnet_id": "0008",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "圆与四点共圆",
+   "变换几何"
+  ],
+  "contest": "XI Olimpiada Matemática Rioplatense",
+  "problem": "Sea $ABC$ un triángulo con $\\hat{C} = 60^\\circ$. El punto $P$ es el simétrico de $A$ respecto del punto de tangencia de la circunferencia inscrita con el lado $BC$. Demostrar que si la mediatriz del segmento $CP$ corta a la recta que contiene a la bisectriz del ángulo $\\hat{B}$ en el punto $Q$, entonces el triángulo $CPQ$ es equilátero.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0hor",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "变换几何",
+   "染色与不变量"
+  ],
+  "contest": "Berkeley Math Circle",
+  "problem": "Problem:\n\nLet $A_{1} A_{2} \\cdots A_{2 n}$ be a convex $2 n$-gon. Prove that there is an $i$ ($1 \\leq i \\leq n$) and a pair of parallel lines, each intersecting the $2 n$-gon only once, one at $A_{i}$ and one at $A_{n+i}$.",
+  "solution_head": "Solution:\n\nConsider the \"highest\" and \"lowest\" points of the $2 n$-gon, with respect to any chosen orientation. Unless a side of the $2 n$-gon is perfectly horizontal, these points will be unique and thus a horizontal line through them will not meet the $2 n$-gon again. These two points will also be vertices of the $2 n$-gon; call them $A_{i}$ and $A_{j}$ respectively. Say that the imbalance in this situation is $i-j \\bmod 2 n$, which (being nonzero) we can think of as an integer from $1$ to $2 n-1$ inclusive. We would like to prove that the $2 n$-gon can be rotated such that the imbalance is $n$.\n\nConsider smoothly rotating the $2 n$-gon counterclockwise (assume that the vertices are labeled $A_{1}, \\ldots, A_{2 n}$ in counterclockwise order). Note that the imbalance does not change unless one of the sides becomes momentarily horizontal. If the top side becomes horizontal, it goes down by $1$; if the bottom side becomes horizontal, it goes up by $1$; and if both sides momentarily become horizontal, it does not change at all. But after rotating by $180^{\\circ}$, the top and bottom ve"
+ },
+ {
+  "mathnet_id": "0jd0",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "变换几何",
+   "面积法与三角法"
+  ],
+  "contest": "HMMT November 2012",
+  "problem": "Problem:\n\nConsider triangle $ABC$ where $BC = 7$, $CA = 8$, and $AB = 9$. $D$ and $E$ are the midpoints of $BC$ and $CA$, respectively, and $AD$ and $BE$ meet at $G$. The reflection of $G$ across $D$ is $G'$, and $G'E$ meets $CG$ at $P$. Find the length $PG$.",
+  "solution_head": "Solution:\n\nAnswer: $\\frac{\\sqrt{145}}{9}$\n\nObserve that since $G'$ is a reflection and $GD = \\frac{1}{2} AG$, we have $AG = GG'$ and therefore, $P$ is the centroid of triangle $ACG'$. Thus, extending $CG$ to hit $AB$ at $F$, $PG = \\frac{1}{3} CG = \\frac{2}{9} CF = \\frac{2}{9} \\sqrt{\\frac{2(8^2 + 7^2) - 9^2}{4}} = \\frac{\\sqrt{145}}{9}$ by the formula for the length of a median."
+ }
+]

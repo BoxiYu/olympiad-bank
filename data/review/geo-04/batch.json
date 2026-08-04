@@ -1,0 +1,86 @@
+[
+ {
+  "mathnet_id": "0150",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "解析几何与向量复数法",
+   "面积法与三角法",
+   "反演变换"
+  ],
+  "contest": "Baltic Way 2008",
+  "problem": "Problem:\nLet $AB$ be a diameter of a circle $S$, and let $L$ be the tangent at $A$. Furthermore, let $c$ be a fixed, positive real, and consider all pairs of points $X$ and $Y$ lying on $L$, on opposite sides of $A$, such that $|AX| \\cdot |AY| = c$. The lines $BX$ and $BY$ intersect $S$ at points $P$ and $Q$, respectively. Show that all the lines $PQ$ pass through a common point.",
+  "solution_head": "Solution:\nLet $S$ be the unit circle in the $xy$-plane with origin $O$, put $A = (1, 0)$, $B = (-1, 0)$, take $L$ as the line $x = 1$, and suppose $X = (1, 2p)$ and $Y = (1, -2q)$, where $p$ and $q$ are positive real numbers with $pq = \\frac{c}{4}$. If $\\alpha = \\angle ABP$ and $\\beta = \\angle ABQ$, then $\\tan \\alpha = p$ and $\\tan \\beta = q$.\n\nLet $PQ$ intersect the $x$-axis in the point $R$. By the Inscribed Angle Theorem, $\\angle ROP = 2\\alpha$ and $\\angle ROQ = 2\\beta$. The triangle $OPQ$ is isosceles, from which $\\angle OPQ = \\angle OQP = 90^{\\circ} - \\alpha - \\beta$, and $\\angle ORP = 90^{\\circ} - \\alpha + \\beta$. The Law of Sines gives\n$$\n\\frac{OR}{\\sin \\angle OPR} = \\frac{OP}{\\sin \\angle ORP}\n$$\nwhich implies\n$$\n\\begin{aligned}\nOR & = \\frac{\\sin \\angle OPR}{\\sin \\angle ORP} = \\frac{\\sin (90^{\\circ} - \\alpha - \\beta)}{\\sin (90^{\\circ} - \\alpha + \\beta)} = \\frac{\\cos (\\alpha + \\beta)}{\\cos (\\alpha - \\beta)} \\\\\n& = \\frac{\\cos \\alpha \\cos \\beta - \\sin \\alpha \\sin \\beta}{\\cos \\alpha \\cos \\beta + \\sin \\alpha \\sin \\beta} = \\frac{1 - \\tan \\alpha \\tan \\beta}{1 + \\tan \\alpha \\tan \\beta"
+ },
+ {
+  "mathnet_id": "0dki",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "根轴与幂",
+   "反演变换",
+   "三角形五心与经典引理",
+   "圆与四点共圆"
+  ],
+  "contest": "Saudi Booklet",
+  "problem": "Let $\\triangle ABC$ be an acute triangle and $\\omega$ be its circumcircle. Points $F$ on $AC$, $E$ on $AB$, and $P$ and $Q$ on $\\omega$ are given such that\n$$\n\\angle AFB = \\angle AEC = \\angle APE = \\angle AQF = 90^\\circ.\n$$\nProve that the lines $BC$, $EF$, and $PQ$ are concurrent.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0ddi",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "圆与四点共圆",
+   "反演变换",
+   "相似位似与全等"
+  ],
+  "contest": "Saudi Arabian Mathematical Competitions",
+  "problem": "Let $ABC$ be a triangle with $AB < AC$ and incircle $(I)$ tangent to $BC$ at $D$. Take $K$ on $AD$ such that $CD = CK$. Suppose that $AD$ cuts $(I)$ at $G$ and $BG$ cuts $CK$ at $L$. Prove that $K$ is the midpoint of $CL$.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0232",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "反演变换"
+  ],
+  "contest": "Nível 3",
+  "problem": "Problem:\n\na. Sejam $\\mathcal{C}$ uma circunferência com centro $O$ e raio $r$ e $X$ um ponto exterior a $\\mathcal{C}$. Construímos uma circunferência de centro em $X$ passando por $O$, a qual intersecta $\\mathcal{C}$ nos pontos $P$ e $Q$. Com centro em $P$ construímos uma circunferência passando por $O$ e com centro em $Q$ construímos uma outra circunferência passando por $O$. Estas duas circunferências intersectam-se nos pontos $O$ e $Y$.\n\nProve que $OX \\times OY = r^2$.\n\nb. É dado um segmento $AB$. Mostre como construir, usando somente compasso, um ponto $C$ tal que $B$ seja o ponto médio do segmento $AC$.\n\nc. É dado um segmento $AB$. Mostre como construir, usando somente compasso, o ponto médio do segmento $AB$.",
+  "solution_head": "Solution:\n\na. Observe que os triângulos $XOP$ e $PYO$ são ambos isósceles, de bases $OP$ e $YO$, respectivamente. Estes triângulos possuem ângulos da base de mesma medida, pois o ângulo $P\\hat{O}X = Y\\hat{O}P$ é comum aos dois triângulos. Deste modo, os triângulos $XOP$ e $PYO$ são semelhantes e podemos escrever $OX/OP = OP/OY$. Como $OP = r$, concluímos que $OX \\times OY = r^2$.\n\nb. Determinamos um ponto $R$ tal que o triângulo $ABR$ seja equilátero. Em seguida, determinamos um ponto $S \\neq A$ de modo que o triângulo $RBS$ seja equilátero e construímos $C \\neq R$ de forma que o triângulo $BSC$ também seja equilátero. Assim, $BC = BS = BR = AB$ e $A$, $B$ e $C$ são colineares ($A\\hat{B}C = 60^\\circ + 60^\\circ + 60^\\circ = 180^\\circ$), logo $B$ é o ponto médio de $AC$.\n\nc. Seja $M$ o ponto médio de $AB$. Construa a circunferência com centro em $A$ e raio $r = AB$. Como no item anterior, com o compasso construímos um ponto $C$ tal que $B$ é o ponto médio de $AC$.\nObserve que $AM \\times AC = (r/2) \\times 2r = r^2$ e, portanto, podemos construir o ponto $M$ utilizando o processo de cons"
+ },
+ {
+  "mathnet_id": "0f6i",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "反演变换",
+   "面积法与三角法"
+  ],
+  "contest": "19th ASU",
+  "problem": "Problem:\n\n$ABCD$ is a parallelogram. A circle through $A$ and $B$ has radius $R$. A circle through $B$ and $D$ has radius $R$ and meets the first circle again at $M$. Show that the circumradius of $AMD$ is $R$.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0708",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "反演变换",
+   "射影几何与调和点列"
+  ],
+  "contest": "Iberoamerican Mathematical Olympiad",
+  "problem": "Problem:\nThe incircle of the triangle $ABC$ touches the sides $BC$, $CA$, $AB$ at $D$, $E$, $F$ respectively. $AD$ meets the circle again at $X$ and $AX = XD$. $BX$ meets the circle again at $Y$ and $CX$ meets the circle again at $Z$. Show that $EY = FZ$.",
+  "solution_head": ""
+ }
+]

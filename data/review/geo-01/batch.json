@@ -1,0 +1,182 @@
+[
+ {
+  "mathnet_id": "04ng",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形与四边形基本性质",
+   "圆与四点共圆"
+  ],
+  "contest": "Croatia_2018",
+  "problem": "In a quadrilateral $ABCD$ it holds that $\\angle DBC = \\angle DCB = 50^\\circ$ and $\\angle DAB = \\angle ABC = \\angle BDC$. Prove that $AC \\perp BD$. (Ratko Višak)",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "082n",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "立体几何",
+   "计数与容斥"
+  ],
+  "contest": "Progetto Olimpiadi di Matematica 2003",
+  "problem": "Problem:\n\nUn dodecaedro è un solido regolare con 12 facce pentagonali. Una diagonale di un solido è un segmento che ha per estremi due vertici del solido che non appartengono ad una stessa faccia. Quante sono le diagonali del dodecaedro?",
+  "solution_head": "Solution:\n\nLa risposta è 100. È necessario contare le coppie (non ordinate) di vertici non appartenenti ad una stessa faccia. In ogni vertice si incontrano 3 facce e in ciascuna di esse ci sono 2 vertici che non sono su una faccia che contiene anche il vertice iniziale (totale 6) più 2 in comune con un'altra faccia (che sono contati due volte e sono quindi in realtà in totale 3) più il vertice stesso: quindi dobbiamo escludere dal conto 10 vertici che non danno luogo a diagonali. Ma i vertici del dodecaedro sono $12 \\cdot 5 / 3 = 20$ (12 facce pentagonali, ma che si incontrano a 3 a 3), quindi per ognuno di questi dobbiamo considerare $20 - 10 = 10$ vertici possibili come altro estremo di una diagonale. In totale le diagonali sono $20 \\cdot 10 / 2 = 100$, dove si è diviso per 2 poiché, moltiplicando, ogni diagonale viene contata due volte."
+ },
+ {
+  "mathnet_id": "05y3",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形与四边形基本性质"
+  ],
+  "contest": "PRÉPARATION OLYMPIQUE FRANÇAISE DE MATHÉMATIQUES",
+  "problem": "Problem:\n\nSoit $n \\geqslant 6$. Prouvez que chaque carré peut être découpé en exactement $n$ carrés (pas nécessairement de même taille).",
+  "solution_head": "Solution:\n\nOn peut le montrer par récurrence. Si on a un découpage du carré en $n$ carrés, on peut obtenir un découpage en $n+3$ carrés en subdivisant l'un des carrés en $4$. Il suffit donc de montrer que l'on peut découper un carré en $6$, $7$ et $8$ carrés.\n\nPour $6$, on subdivise le carré en une grille $3 \\times 3$ et on fusionne les $4$ carrés en haut-gauche.\n\nPour $7$, on subdivise le carré en $4$, puis on subdivise l'un des carrés obtenus en $4$.\n\nPour $8$, on subdivise le carré en une grille $4 \\times 4$ et on fusionne les $9$ carrés en haut-gauche."
+ },
+ {
+  "mathnet_id": "0j13",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "解析几何与向量复数法",
+   "不等式"
+  ],
+  "contest": "Harvard-MIT November Tournament",
+  "problem": "Problem:\n\nDragoons take up $1 \\times 1$ squares in the plane with sides parallel to the coordinate axes such that the interiors of the squares do not intersect. A dragoon can fire at another dragoon if the difference in the $x$-coordinates of their centers and the difference in the $y$-coordinates of their centers are both at most $6$, regardless of any dragoons in between. For example, a dragoon centered at $(4,5)$ can fire at a dragoon centered at the origin, but a dragoon centered at $(7,0)$ can not. A dragoon cannot fire at itself. What is the maximum number of dragoons that can fire at a single dragoon simultaneously?",
+  "solution_head": "Solution:\n\nAssign coordinates in such a way that the dragoon being fired on is centered at $(0,0)$. Any dragoon firing at it must have a center with $x$-coordinates and $y$-coordinates that are no smaller than $-6$ and no greater than $6$. That means that every dragoon firing at it must lie entirely in the region bounded by the lines $x=-6.5$, $x=6.5$, $y=-6.5$, and $y=6.5$. This is a square with sides of length $13$, so there is room for exactly $169$ dragoons in it. One of them is the dragoon being fired on, so there are at most $168$ dragoons firing at it."
+ },
+ {
+  "mathnet_id": "08dc",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "三角形五心与经典引理"
+  ],
+  "contest": "Progetto Olimpiadi della Matematica",
+  "problem": "Problem:\n\nSia $ABC$ un triangolo isoscele su base $BC$ e siano $D, E$ punti sui lati $AB, BC$ rispettivamente, tali che che le rette $DE$ e $AC$ risultino parallele. Si consideri inoltre il punto $F$ sulla retta $DE$ che si trova dalla parte opposta di $D$ rispetto ad $E$ ed è tale che $FE$ sia congruente ad $AD$. Detto $O$ il circocentro del triangolo $BDE$, dimostrare che i punti $O, F, A, D$ giacciono su una circonferenza.",
+  "solution_head": "Solution:\n\nNotiamo che il triangolo $BDE$ è isoscele su base $BE$. Infatti, considerando i segmenti paralleli $ED, CA$ e il segmento $CB$, abbiamo $\\widehat{ACB} = \\widehat{DEB}$. Quindi, dato che $\\widehat{ACB} = \\widehat{CBA}$, otteniamo $\\widehat{DEB} = \\widehat{CBA}$.\n\nConsideriamo ora i triangoli $OED$ e $ODB$: sono congruenti perché $ED = DB$, $OE = OD$, $OD = OB$. In particolare, $\\widehat{DEO} = \\widehat{BDO}$.\n\nOsserviamo infine i triangoli $FEO$ e $ADO$: hanno $\\widehat{OEF} = \\widehat{ODA}$ (perché supplementari di angoli congruenti), $OE = OD$ e $EF = AD$. Dunque i due triangoli sono congruenti, ed in particolare $\\widehat{EFO} = \\widehat{DAO}$, da cui $\\widehat{DFO} = \\widehat{DAO}$. Dato che $F$ ed $A$ si trovano dalla stessa parte della retta $DO$, questo mostra che il quadrilatero $O F A D$ è inscrivibile in una circonferenza."
+ },
+ {
+  "mathnet_id": "0eal",
+  "est": 2,
+  "conf": "mid",
+  "category": "geometry",
+  "topics": [
+   "解析几何与向量复数法"
+  ],
+  "contest": "14. tekmovanje v znanju matematike za dijake srednjih tehniških in strokovnih šol, Državno tekmovanje",
+  "problem": "Problem:\n\nIzračunaj vrednost parametra $a$ tako, da bosta premici z enačbama $y+3=a x-2 x+a^{2}$ in $\\frac{x}{2 a-5}-\\frac{y}{3 a-6}=1$ vzporedni.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0d15",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆"
+  ],
+  "contest": "Saudi Arabia Mathematical Competitions 2012",
+  "problem": "Let $ABC$ be an arbitrary triangle. A circle passes through $B$ and $C$ and intersects the lines $AB$ and $AC$ in $D$ and $E$, respectively. The projections of the points $B$ and $E$ on $CD$ are denoted by $B'$ and $E'$, respectively. The projections of the points $D$ and $C$ on $BE$ are denoted by $D'$ and $C'$, respectively.\n\nProve that the points $B'$, $D'$, $E'$ and $C'$ lie on the same circle.",
+  "solution_head": "Let $I$ be the intersection point of the lines $BE$ and $CD$. The quadrilaterals $BD'B'D$ and $CE'C'E$ are cyclic, so $\\overline{BDB'} = \\overline{B'D'I}$ and $\\overline{CEC'} = \\overline{IE'C'}$. Since $BDEC$ is also cyclic, $\\overline{BDB'} = \\overline{CEC'}$. It follows that $\\overline{B'D'I} = \\overline{IE'C'}$, so $B'D'E'C'$ is a cyclic quadrilateral.\n\n---\n\nUsing the power of a point theorem, one has:\n$$\nIB' \\cdot ID = ID' \\cdot IB\n$$\n$$\nIC' \\cdot IE = IE' \\cdot IC\n$$\n$$\nIE \\cdot IB = ID \\cdot IC\n$$\nFrom these one easily obtains\n$$\nIB' \\cdot IE' = ID' \\cdot IC'\n$$\nwhich proves that the quadrilateral $B'D'E'C'$ is cyclic, using the reciprocal of the power of a point theorem."
+ },
+ {
+  "mathnet_id": "08jw",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "计数与容斥",
+   "组合几何"
+  ],
+  "contest": "Junior Balkan Mathematical Olympiad",
+  "problem": "Problem:\n\nA polygon having $n$ sides is arbitrarily decomposed in triangles having all the vertices among the vertices of the polygon. We paint in black the triangles that have two sides that are also sides of the polygon, in red if only one side of the triangle is side of the polygon and white those triangles that have in common with the polygon only vertices.\nProve that there are 2 more black triangles than white ones.",
+  "solution_head": "Solution:\n\nDenote by $b, r, w$ the number of black, red, and white triangles respectively.\nIt is easy to prove that the polygon is divided into $n-2$ triangles, hence\n$$\nb + r + w = n - 2\n$$\nEach side of the polygon is a side of exactly one triangle of the decomposition, and thus\n$$\n2b + r = n\n$$\nSubtracting the two relations yields $w = b - 2$, as needed."
+ },
+ {
+  "mathnet_id": "04p6",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "解析几何与向量复数法"
+  ],
+  "contest": "Croatian Mathematical Society Competitions",
+  "problem": "Point $P$ is the midpoint of the segment $\\overline{AB}$ of length $2$. Let $T$ be the point at which the tangent from $A$ touches the circle with diameter $\\overline{PB}$. Find the length of the segment $\\overline{PT}$.\n\n(Petar Bakić)",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "083g",
+  "est": 2,
+  "conf": "mid",
+  "category": "geometry",
+  "topics": [
+   "相似位似与全等",
+   "面积法与三角法"
+  ],
+  "contest": "UNIONE MATEMATICA ITALIANA Progetto Olimpiadi di Matematica 2004 - GARA di SECONDO LIVELLO BIENNIO",
+  "problem": "Problem:\n\nUna lampada, che si suppone puntiforme, è collocata in un punto $V$. Essa proietta su un piano $a$ situato a 2 metri da $V$ un fascio di luce avente la forma di cono circolare con asse perpendicolare ad $a$, le cui generatrici formano un angolo di $30^{\\circ}$ con l'asse del cono. Sul piano $a$, al centro della base del cono, viene posto un cubo di cartone, con lo spigolo di 1 metro. Si chiede quale sia l'area complessivamente illuminata dalla lampada (sul piano $a$ e sulla faccia superiore del cubo), espressa in $\\mathrm{m}^{2}$.\n\n(A) $\\frac{2}{\\sqrt{3}}-\\frac{\\pi}{9}$\n(B) $4 \\frac{\\pi}{3}-3$\n(C) $\\frac{\\pi}{9}-\\frac{1}{\\sqrt{3}}$\n(D) $\\pi-\\sqrt{3}$\n(E) $\\frac{4 \\pi}{9}-\\frac{1}{2 \\sqrt{3}}$.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "06gh",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "计数与容斥",
+   "不等式"
+  ],
+  "contest": "CHKMO",
+  "problem": "Let $A_1A_2\\cdots A_n$ be a cyclic polygon ($n \\ge 3$). Find the maximum number of distinct acute-angled triangles whose vertices are chosen from $A_1, A_2, \\dots, A_n$.",
+  "solution_head": "The maximum number of acute-angled triangles is $\\frac{n(n-1)(n+1)}{24}$ if $n$ is odd and is $\\frac{n(n-2)(n+2)}{24}$ if $n$ is even.\n\nWe first count the number $N_1$ of non-acute triangles with $A_1$ as one vertex such that $\\angle A_1 < 90^\\circ$. Let $\\ell$ be the diameter of the circle which passes through $A_1$. Then for points $B, C$ on the circle, $\\triangle A_1BC$ is not acute with $\\angle BA_1C < 90^\\circ$ if and only if $B$ and $C$ lie on the same side of $\\ell$ (possibly on $\\ell$). Suppose there are $a$ points on one side of $\\ell$ and $b$ points on the other side of $\\ell$ other than $A_1$. Note that the two sides share at most one common point which is the other intersection of $\\ell$ and the circle. Therefore, we must have $a+b=n-1$ or $a+b=n$. We find that\n$$\nN_1 = \\binom{a}{2} + \\binom{b}{2}.\n$$\nWe have to minimize $N_1$. Note that $b \\ge n-1-a$ so that $\\binom{b}{2} \\ge \\binom{n-1-a}{2}$.\nWLOG assume $a \\ge n-1-a$. If $n$ is odd, then $(a, n-1-a) > \\left(\\frac{n-1}{2}, \\frac{n-1}{2}\\right)$.\nApplying the majorization inequality, we obtain\n$$\nN_1 \\ge \\binom{a}{2} + "
+ },
+ {
+  "mathnet_id": "04io",
+  "est": 1,
+  "conf": "mid",
+  "category": "geometry",
+  "topics": [
+   "三角形与四边形基本性质"
+  ],
+  "contest": "First round – City competition",
+  "problem": "Let $ABCD$ be a quadrilateral such that $|AB| = 6$, $|BC| = 9$, $|CD| = 18$ and $|AD| = 5$ hold. Determine the length of the diagonal $AC$ if it is known that it is a positive integer.\n(Andrea Aglić-Aljinović)",
+  "solution_head": "**2.5.** Let $a_n$ be the number the grasshopper is located at after the $n^{th}$ jump, i.e.\n$$\na_1 = 1, \\quad a_n = 1 + k + \\dots + k^{n-1}, \\quad n \\ge 2.\n$$\nWe are looking for all numbers $k$ such that $2015 \\nmid a_n$ for all $n = 1, \\dots, 2015$.\nSuppose that $M(k, 2015) = d > 1$. Then every $a_n$ divided by $d$ gives the remainder 1, and since 2015 is divisible by $d$ we have that $2015 \\nmid a_n$ for all $n$. Therefore, all positive integers which are not relatively prime to 2015 comply with the terms of the problem.\nIf $M(k, 2015) = 1$, we observe the remainders of dividing $a_1, \\dots, a_{2015}$ by 2015. If one of them is divisible by 2015, such a $k$ is not good. Otherwise, since there are 2014 possible remainders, at least two numbers give the same remainder. Let these numbers be $a_l$ and $a_m$, $m > l$. In this case, their difference is divisible by 2015. On the other hand, we have that\n$$\na_m - a_l = k^l + \\dots + k^{m-1} = k^l (1 + \\dots + k^{m-l-1}) = k^l \\cdot a_{m-l}.\n$$\nFrom $2015 \\mid k^l \\cdot a_{m-l}$ and $M(k, 2015) = 1$, it follows that $2015 \\mid a_{m-l}$, wh"
+ },
+ {
+  "mathnet_id": "006x",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "解析几何与向量复数法",
+   "面积法与三角法"
+  ],
+  "contest": "Argentina 2009",
+  "problem": "En una circunferencia de centro $O$ sean $A$ y $B$ puntos de la circunferencia tales que $AB = 120^\\circ$. El punto $C$ pertenece al menor arco $AB$ y el punto $D$ pertenece a la cuerda $AB$. Se sabe que $AD = 2$, $BD = 1$ y $CD = \\sqrt{2}$. Calcular el área del triángulo $ABC$.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0hlx",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形与四边形基本性质",
+   "三角形五心与经典引理",
+   "圆与四点共圆"
+  ],
+  "contest": "Berkeley Math Circle",
+  "problem": "Problem:\n\nLet $ABCD$ be a convex quadrilateral. Let $I_{A}$ be the incenter of $BCD$ and define $I_{B}, I_{C}, I_{D}$ similarly. Show that $AC \\perp I_{B}I_{D}$ if and only if $I_{A}I_{C} \\perp BD$.",
+  "solution_head": "Solution:\n\nWe show that both are true if and only if $AB + CD = BC + DA$.\n\nLet's first consider the triangle $ABD$. We know the incircle of $ABD$ is centered at $I_{C}$. Let $X, Y, T_{A}$ denote the points where the incircle is tangent to $AB$, $AD$, and $BD$, respectively. We have that $AX = AY$, $BX = BT_{A}$, and $DT_{A} = DY$ since each of these are segments tangent to the incircle from a common point. Thus,\n$$\nAB - AD = (AX + XB) - (AY + YD) = BX - CY = BT_{A} - DT_{A}.\n$$\nWe now include the triangle $BCD$. Let $T_{C}$ denote the point at which the incircle of $BCD$, centered at $I_{A}$, is tangent to $BD$. Replicating the argument for $ABD$, we see that $BT_{C} - DT_{C} = BC - CD$. Now, $I_{A}I_{C} \\perp BD$ iff $T_{A} = T_{C}$, since the altitudes from $I_{A}$ and $I_{C}$ to diagonal $BD$ must meet at a point. Hence, $I_{A}I_{C} \\perp BD$ is equivalent to\n$$\nBA - DA = BT_{A} - DT_{A} = BT_{C} - DT_{C} = BC - CD,\n$$\nwhich in turn is equivalent to $AB + CD = AD + BC$.\n\nWe use a symmetric argument, but this time considering triangles $ABC$ and $ABD$, to show that a necessary and "
+ }
+]

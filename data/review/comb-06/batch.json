@@ -1,0 +1,104 @@
+[
+ {
+  "mathnet_id": "0gj8",
+  "est": 4,
+  "conf": "mid",
+  "category": "combinatorics",
+  "topics": [
+   "函数方程",
+   "抽屉原理"
+  ],
+  "contest": "IMO 2J, Independent Study 1",
+  "problem": "Find all functions $f : \\mathbb{N} \\to \\mathbb{N}$ such that, for any set $A$ containing exactly 2024 distinct positive integers, the set\n$$\nS_A := \\{f^{(k)}(x) \\mid 1 \\le k \\le 2024,\\ x \\in A\\}\n$$\nis also a set containing exactly 2024 distinct positive integers.\n\n*Remark*: $f^{(k)}$ denotes the $k$-th iteration of $f$. In other words, $f^{(1)}(x) := f(x)$ and for all $n \\ge 1$, $f^{(n+1)}(x) := f(f^{(n)}(x))$.\n\n求所有函數 $f: \\mathbb{N} \\rightarrow \\mathbb{N}$, 使得對於所有由 2024 個相異正整數所成的集合 $A$,\n$$\nS_A := \\{f^{(k)}(x) \\mid 1 \\le k \\le 2024,\\ x \\in A\\}\n$$\n亦為一個由 2024 個相異正整數所成集合。\n\n註：$f^{(k)}$ 表 $f$ 的 $k$ 次疊代。換言之，$f^{(1)}(x) := f(x)$ 且對於所有 $n \\ge 1$，$f^{(n+1)}(x) := f(f^{(n)}(x))$。",
+  "solution_head": "顯然 $f(x) = x$ 為一解。此外，對於任何由 2024 個相異正整數所成集合 $A = \\{a_1, a_2, \\dots, a_{2024}\\}$，任何滿足\n$$\n\\begin{cases} f(a_i) = a_{i-1}, & \\text{其中 } a_0 = a_{2024}, \\\\ f(x) \\in A, & \\text{對於所有 } x \\notin A, \\end{cases}\n$$\n的函數 $f$ 皆滿足題意。讓我們證明以上便是全部的解。\n\n用所有正整數做點，並將 $x$ 連向 $f(x)$ 構成有向圖 $G$ (允許自環)。注意若 $x$ 可通往 2025 個點，則任何包含 $x$ 和 $f(x)$ 的 $A$ 都有 $|S_A| \\ge 2025$，矛盾。這意味著從 $x$ 出發，我們在 2024 步內一定會進入一個環，且這個環的大小至多為 2024。\n\n現在，考慮所有 $G$ 中在環上的點。讓我們考慮 $C$ 的大小。\n\n**Case 1.** $|C| > 2024$:\n注意到此時不能有任何 $x \\in C$ 使得 $f(x) \\ne x$；否則，任取一個包含 $x$ 但不包含 $f(x)$ 的 $A \\subset C$，則 $A \\subset S_A$ (注意 $A$ 的元素都在環上) 且 $f(x) \\in S_A$，從而 $A \\cup \\{f(x)\\} \\subset S_A \\Rightarrow |S_A| \\ge |A| + 1 > 2024$，矛盾。\n\n故我們有 $f(x) = x$ 對於所有 $x \\in C$ 皆成立。此時，若有任何 $y \\notin C$，因為 $y$ 在 2024 步內要到達 $C$，故存在 $z \\notin C$ 使得 $f(z) \\in C$。若我們取 $A = \\{z, f(z), b_1, \\dots, b_{2022}\\}$，其中 $b_i$ 為 $C$ 中 2022 個異於 $f(z)$ 的元素，則 $S_A = A - \\{z\\}$，從而 $|S_A| = |A| - 1 < 2024$，矛盾。故 $C = \\mathbb{N}$，也就是 $f(x) = x$。\n\n**Case 2.** $|C| \\le 2024$:\n由於所有 $x \\in \\mathbb{N}$ 在 2024 步內都要抵達 $C$，而 $C$ 是有限集，故存在 $y \\in \\mathbb{N}$ 使得 $f^{-1}(y) := \\{x : f(x) = y\\}$ 是無限集。此時取 $A \\su"
+ },
+ {
+  "mathnet_id": "0fv9",
+  "est": 4,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "图论"
+  ],
+  "contest": "IMO Selektion",
+  "problem": "Problem:\n\nEine Raumstation besteht aus 25 Kammern, und je zwei Kammern sind mit einem Tunnel verbunden. Es gibt insgesamt 50 Haupttunnel, die in beide Richtungen benutzt werden können, die restlichen sind alle Einbahntunnel. Eine Gruppe von vier Kammern heisst verbunden, falls man von jeder dieser Kammern in jede andere gelangen kann, indem man nur die sechs Tunnel verwendet, welche diese Kammern untereinander verbinden. Bestimme die grösstmögliche Anzahl verbundener Vierergruppen.",
+  "solution_head": "Solution:\n\nGibt es in einer Vierergruppe eine Kammer, von der drei Einwegtunnel wegführen, so ist diese Gruppe sicher nicht verbunden. Wir nennen eine solche Kammer isoliert in der Gruppe. Nummeriere die Kammern und nehme an, von der $k$-ten Kammer führen $a_{k}$ Einwegtunnel weg. Insgesamt gibt es $\\binom{25}{2}-50=250$ Einwegtunnel. Es gilt daher $a_{1}+\\ldots+a_{25}=250$, denn jeder Einwegtunnel führt aus genau einer Kammer heraus. Die $k$-te Kammer ist in genau $\\binom{a_{k}}{3}$ Vierergruppen isoliert, es gibt also mindestens\n$$\nX=\\binom{a_{1}}{3}+\\binom{a_{2}}{3}+\\ldots+\\binom{a_{25}}{3}\n$$\nnicht verbundene Vierergruppen. Wir behaupten nun, dass $X$ den kleinstmöglichen Wert annimmt, wenn alle $a_{k}$ gleich gross sind. Gilt nämlich $r-2 \\geq s \\geq 0$, dann zeigt eine kurze Rechnung\n$$\n\\binom{r}{3}+\\binom{s}{3}>\\binom{r-1}{3}+\\binom{s+1}{3} \\Longleftrightarrow (r-1)(r-2)>s(s-1)\n$$\nund letzteres stimmt nach Annahme. Wenn $X$ also sein Minimum annimmt, dann dürfen sich je zwei der $a_{k}$ um höchstens 1 unterscheiden. Da deren Summe 250 aber durch 25 teilbar ist, müssen sogar al"
+ },
+ {
+  "mathnet_id": "0ixl",
+  "est": 4,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "染色与不变量"
+  ],
+  "contest": "Team Selection Test 2009",
+  "problem": "Let $N > M > 1$ be fixed integers. There are $N$ people playing in a chess tournament; each pair of players plays each other once, with no draws. It turns out that for each sequence of $M + 1$ distinct players $P_0, P_1, \\dots, P_M$ such that $P_{i-1}$ beat $P_i$ for each $i = 1, \\dots, M$, player $P_0$ also beat $P_M$. Prove that the players can be numbered $1, 2, \\dots, N$ in such a way that, whenever $a \\ge b + M - 1$, player $a$ beat player $b$.",
+  "solution_head": "Write $P \\succ Q$ if player $P$ beat player $Q$.\n\n**Lemma 1.** Any set of $K > 1$ players can be arranged in a sequence $P_1, \\dots, P_K$ such that $P_1 \\succ P_2 \\succ \\dots \\succ P_K$.\n\n*Proof.* Let $P_1 \\succ \\dots \\succ P_J$ be the longest such sequence that can be formed from any subset of the given players, and suppose for contradiction that some player $Q$ among the $K$ players does not appear in the sequence. If all of $P_1, \\dots, P_J$ beat $Q$, we append $Q$ to the end of the sequence. Otherwise, there exists a smallest $i$ such that $Q \\succ P_i$, and then we can insert $Q$ into the sequence just before $P_i$. Either way, we have created a sequence of length $J+1$, contradicting the maximality of $J$. $\\square$\n\nNow, we will prove the problem statement for all $N \\ge 0$ by induction. For the base case, if $N < M$, just assign numbers arbitrarily, and the conclusion holds vacuously.\n\nNow suppose the result holds for any number of players less than $N$; we will show it for $N$ players. Let $P$ be the player who beat the most opponents. If $P$ beat all other players, we can a"
+ },
+ {
+  "mathnet_id": "0cs3",
+  "est": 4,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "多项式",
+   "染色与不变量"
+  ],
+  "contest": "XL Russian mathematical olympiad",
+  "problem": "Initially, the blackboard contains two polynomials $x^3-3x^2+5$ and $x^2-4x$. If the polynomials $f(x)$ and $g(x)$ are written on the blackboard, it is permitted to write onto the board any polynomial of the form $f(x) \\pm g(x)$, $f(x)g(x)$, $f(g(x))$, or $cf(x)$, where $c$ may be any (not necessarily integer) constant. Is it possible after several such operations to write on the board a nonzero polynomial of the form $x^n - 1$? (K. Tyschuk)",
+  "solution_head": "**Ответ.** Не может.\nПусть $f(x)$ и $g(x)$ — два многочлена, и для некоторой точки $x_0$ выполняются равенства $f'(x_0) = 0$ и $g'(x_0) = 0$. Тогда, очевидно, $(f \\pm g)'(x_0) = 0$ и $cf'(x_0) = 0$. Также $(fg)'(x_0) = f(x_0)g'(x_0) + f'(x_0)g(x_0) = 0$. Наконец, если $h(x)$ — многочлен, то $(h(g(x_0)))' = h'(g(x_0))g'(x_0) = 0$. Таким образом, если у исходных многочленов в некоторой точке производные обращаются в нуль, то и после решённых условием операций также может получиться лишь многочлен, производная которого обращается в нуль в этой точке.\n\nЗаметим, что производные обоих исходных многочленов обращаются в нуль при $x = 2$. Действительно, $(x^2 - 4x)' = 2x - 4 = 0$ при $x = 2$, и $(x^3 - 3x^2 + 5)' = 3x^2 - 6x = 0$ при $x = 2$. Однако $(x^n - 1)' = nx^{n-1} = n2^{n-1} \\neq 0$ при $x = 2$. Поэтому многочлен вида $x^n - 1$ получить нельзя."
+ },
+ {
+  "mathnet_id": "0g1f",
+  "est": 4,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "抽屉原理",
+   "不等式"
+  ],
+  "contest": "IMO-Selektion",
+  "problem": "Problem:\n\nDéterminer la plus petite constante réelle $C$ telle que pour tous $a_{1}, a_{2}, a_{3}, a_{4}, a_{5} \\in \\mathbb{R}_{>0}$, pas nécessairement distincts, il existe toujours quatre indices distincts $i, j, k, l$ tels que:\n$$\n\\left|\\frac{a_{i}}{a_{j}}-\\frac{a_{k}}{a_{l}}\\right| \\leq C\n$$",
+  "solution_head": "Solution:\n\nAprès quelques essais, on remarque que $C=1/2$ est optimal.\n\n- $C \\geq 1/2$ : en substituant $(1/2, 1, 1, 1, n)$ et en laissant $n \\rightarrow \\infty$, on obtient $C \\geq 1/2$.\n\n- $C \\leq 1/2$ : supposons que $a_{5} \\geq a_{4} \\geq \\ldots \\geq a_{1}$. On découpe $[0,1]$ en deux sous intervalles disjoints : $I = [0, 1/2)$ et $J = [1/2, 1]$. Regardons les fractions $0 < \\frac{a_{1}}{a_{3}}, \\frac{a_{1}}{a_{5}}, \\frac{a_{3}}{a_{5}} \\leq 1$.\n\nSi les trois fractions sont dans le même intervalle $I$ ou $J$, alors on remarque que cet intervalle contient aussi $\\frac{a_{2}}{a_{5}}$ car $\\frac{a_{1}}{a_{5}} \\leq \\frac{a_{2}}{a_{5}} \\leq \\frac{a_{3}}{a_{5}}$. Ainsi, $\\frac{a_{2}}{a_{5}}$ et $\\frac{a_{1}}{a_{3}}$ se trouvent dans le même intervalle et donc à une distance inférieure à $1/2$.\n\nSinon, $I$ et $J$ contiennent au moins une des fractions $\\frac{a_{1}}{a_{3}}, \\frac{a_{1}}{a_{5}}, \\frac{a_{3}}{a_{5}}$. Or $\\frac{a_{2}}{a_{4}}$ se trouve soit dans $I$, soit dans $J$. On obtient à nouveau deux fractions avec indices différents dans le même intervalle."
+ },
+ {
+  "mathnet_id": "0cv1",
+  "est": 4,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "抽屉原理",
+   "染色与不变量",
+   "数列与递推",
+   "不等式"
+  ],
+  "contest": "XLIII Russian mathematical olympiad",
+  "problem": "100 dwarves whose weights are $1$, $2$, $\\ldots$, $100$ lb came to the left bank of a river. They cannot swim, but they have a boat which can take up to $100$ lb. When a boat crosses the river, one of the dwarves in it is an oarsman; while performing one crossing, the oarsman remains the same. Due to the stream, it is difficult to oar from the right bank to the left one, so each dwarf can oar in this direction at most once. Can the whole company of dwarves reach the right bank?",
+  "solution_head": "Answer. No.\nCall the dwarves weighing at least $50$ lb heavy; assume they oared backwards $d$ times. Then there were at least $51 + d$ their forward passages, and hence at least $50$ backward passages with no heavy dwarves oaring. But who could oar during these $50$ passages?\n\nПервое решение. Предположим, что переправа гномам удалась. Назовём рейсы лодки с левого берега на правый прямым, а с правого на левый – обратными. Пусть было $k$ обратных рейсов; тогда прямых рейсов было $k+1$.\nВ $k$ обратных рейсах гребли $k$ разных гномов; значит, суммарный вес гномов, участвовавших в обратных рейсах, не меньше $1+2+\\ldots+k = \\frac{k(k+1)}{2}$ (здесь и далее все веса измеряются в фунтах). На любом прямом рейсе суммарный вес гномов не превосходит $100$, так что в итоге суммарный вес гномов на левом берегу уменьшился не более, чем $100(k+1) - \\frac{k(k+1)}{2} = \\frac{(200-k)(k+1)}{2}$. С другой стороны, этот вес уменьшился на $1+2+\\ldots+100 = \\frac{100 \\cdot 101}{2}$, откуда\n$$\n(200-k)(k+1) \\ge 100 \\cdot 101, \\text{ или } (k-100)(k-99) \\le 0.\n$$\nЭто может случиться лишь если $k=99$ или $k=100"
+ },
+ {
+  "mathnet_id": "0gsd",
+  "est": 4,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "图论"
+  ],
+  "contest": "Team Selection Test for IMO 2019",
+  "problem": "For positive integer $k$, let\n$$\nR_n = \\{-k, -(k-1), \\dots, -1, 1, \\dots, k-1, k\\} \\text{ for } n = 2k \\text{ and}\n$$\n$$\nR_n = \\{-k, -(k-1), \\dots, -1, 0, 1, \\dots, k-1, k\\} \\text{ for } n = 2k+1.\n$$\nA device consists of several balls and red or white ropes connecting some ball pairs. A *labeling* is a coloring of each ball by one of the elements of $R_n$. We say that a labeling is *good* if colors of any two connected balls are different. We say that a labeling is *sensitive* if the colors of any two balls connected by white rope are different and the sum of colors of any two balls connected by red rope is not equal to $0$.\nLet $n \\ge 3$ be fixed. Suppose that any device which has a good labeling by $R_n$ has also a sensitive labeling by $R_m$. Find the smallest possible value of $m = m(n)$.",
+  "solution_head": "Answer: $m = 2n-1$.\nLet us show that if a device has a good labeling by $R_n$ then it has a sensitive labeling by $R_m$, where $m = 2n-1$. In\n$$\nR_m = R_{2n-1} = \\{-(n-1), -(n-2), \\dots, -1, 0, 1, \\dots, n-2, n-1\\}\n$$\nthere are $n$ non-negative elements. Any good labeling of the device by these $n$ non-negative elements will be also a sensitive labeling.\n\nNow we construct a device which has a good labeling by $R_n$ and has no sensitive labeling for any $m < 2n-1$. Let us define a grid $2n-1 \\times n$ ($2n-1$ lines and $n$ columns) and place a ball into each cell. Let us connect any two balls belonging to the same line by red rope and any two balls belonging to different lines and different columns by white rope (there is no rope between any two balls from the same column). The device has a good labeling by $R_n$. Indeed, there are $n$ distinct colors and if we color all balls from the same column identically and balls from different columns differently then we get a good labeling.\n\nSuppose that the device has a sensitive coloring by $R_m$.\n\n**Case 1.** There is a line all balls of wh"
+ },
+ {
+  "mathnet_id": "073b",
+  "est": 4,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "计数与容斥"
+  ],
+  "contest": "Indija TS 2007",
+  "problem": "Let $X$ be the set of all bijective functions from the set $S = \\{1, 2, 3, ..., n\\}$ to itself. For each $f \\in X$, define\n$$\nT_f(j) = \\begin{cases} 1, & \\text{if } f^{(12)}(j) = j, \\\\ 0, & \\text{otherwise.} \\end{cases}\n$$\n\nDetermine\n$$ \\sum_{f \\in X} \\sum_{j=1}^{n} T_f(j). $$\n(Here $f^{(k)}(x) = f(f^{(k-1)}(x))$ for $k \\ge 2$.)",
+  "solution_head": "Suppose $n \\ge 12$. The elements of $X$ are permutations of $\\{1, 2, 3, ..., n\\}$. If $j$ belongs to a $k$-cycle of $f$, where $k$ is a divisor of $12$, then $f^{(k)}(j) = j$. The number of divisors of $12$ is $6$. Let $m(j,k)$ be the number of elements $f$ of $T$ in which $j$ belongs to a $k$-cycle of $f$, $1 \\le j \\le n$. Then\n$$\nm(j,k) = (n-1)(n-2)\\cdots(n-k+1)(n-k)! = (n-1)!\n$$\nThe required sum is, therefore, $n(n-1)! \\times 8 = 6(n!)$ If $n < 12$, the answer is $t(n)(n!)$, where $t(n)$ is the number of positive divisors of $12$ which are less than or equal to $n$. Thus, they are $1, 2(2!), 3(3!), 4(4!), 4(5!), 5(6!), 5(7!), 5(8!), 5(9!), 5(10!), 5(11!)$."
+ }
+]

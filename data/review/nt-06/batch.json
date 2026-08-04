@@ -1,0 +1,85 @@
+[
+ {
+  "mathnet_id": "03yu",
+  "est": 5,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "中国剩余定理",
+   "抽屉原理"
+  ],
+  "contest": "China National Team Selection Test",
+  "problem": "Let $n > 1$ be an integer, $k$ be the number of distinct prime factors of $n$. Prove that there exists an integer $a$, $1 < a < \\frac{n}{k} + 1$, such that $n \\mid a^2 - a$. (posed by Yu Hongbing)",
+  "solution_head": "Let $n = p_1^{a_1} \\cdots p_k^{a_k}$ be the standard factorization of $n$. Since $p_1^{a_1}, \\dots, p_k^{a_k}$ are pairwise coprime, by the Chinese Remainder Theorem, for each $i$, $1 \\le i \\le k$, congruence equations\n$$\n\\begin{cases} x \\equiv 1 \\pmod{p_i^{a_i}} \\\\ x \\equiv 0 \\pmod{p_j^{a_j}}, \\quad j \\neq i \\end{cases}\n$$\nhave solution $x_i$.\nFor any solution of $x_0^2 = x_0 \\pmod{n}$, we see that $x_0(x_0 - 1) \\equiv 0 \\pmod{n}$. Then for each $i = 1, 2, \\dots, k$, either $x_0 \\equiv 0 \\pmod{p_i^{a_i}}$ or $x_0 \\equiv 1 \\pmod{p_i^{a_i}}$. Further, let $S(A)$ be the sum of elements of subset $\\{x_1, x_2, \\dots, x_k\\}$ (particularly, $S(\\emptyset) = 0$). Obviously, we have\n$$\nS(A)(S(A) - 1) \\equiv 0 \\pmod{n}.\n$$\n(This is because of the selection of $x_i$, such that $S(A) \\pmod{p_i^{a_i}}$ is either 0 or 1.) Moreover if $A \\neq A'$, then $S(A) \\neq S(A') \\pmod{n}$. Therefore, the sum of all subsets of $\\{x_1, x_2, \\dots, x_n\\}$ is exactly all solutions of $x(x - 1) \\equiv 0 \\pmod{n}$.\nLet $S_0 = n$, $S_r$ be the least non-negative remainder of $x_1 + x_2 + \\dots + x_r$ modulo $n$, $r"
+ },
+ {
+  "mathnet_id": "06le",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "中国剩余定理",
+   "素数与算术基本定理",
+   "染色与不变量"
+  ],
+  "contest": "CHKMO",
+  "problem": "For each positive integer $n$ larger than $1$ with prime factorization $p_1^{\\alpha_1} p_2^{\\alpha_2} \\cdots p_k^{\\alpha_k}$, its *signature* is defined as the sum $\\alpha_1 + \\alpha_2 + \\cdots + \\alpha_k$. Does there exist $2020$ consecutive positive integers such that among them, there are exactly $1812$ integers whose signatures are strictly smaller than $11$?",
+  "solution_head": "Yes. Let $f(n)$ be the number of integers among $n+1, n+2, \\dots, n+2020$ having signatures less than $11$. Since $2^{11} = 2048 > 2021$, all of $2, 3, \\dots, 2021$ have signatures smaller than $11$. Therefore, we have $f(1) = 2020$.\n\nNext, let $p_1, p_2, \\dots, p_{2020}$ be distinct primes. By the Chinese remainder theorem,\n\nthere exists a positive integer $m$ such that\n$$\n\\begin{array}{l@{\\quad}l@{\\quad}l}\nm & \\equiv & -1 \\pmod{p_1^{11}}, \\\\\nm & \\equiv & -2 \\pmod{p_2^{11}}, \\\\\n\\multicolumn{3}{c}{\\dots} \\\\\nm & \\equiv & -2020 \\pmod{p_{2020}^{11}}.\n\\end{array}\n$$\nFor this $m$, since $p_j^{11}$ divides $m+j$ for $j = 1, 2, \\dots, 2020$, each of the integers $m+1, m+2, \\dots, m+2020$ has signature larger than or equal to $11$. This implies $f(m) = 0$.\n\nNow, when we move from the integers $n+1, n+2, \\dots, n+2020$ to the integers $n+2, n+3, \\dots, n+2021$, the number of integers with signature less than $11$ will be increased or decreased by $1$, or remain unchanged. Thus, the difference between $f(n)$ and $f(n+1)$ is at most $1$. Therefore, in order to decrease $f(1) = 2020$ to $f(m) = "
+ },
+ {
+  "mathnet_id": "02l6",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "中国剩余定理",
+   "最大公约数与欧几里得算法"
+  ],
+  "contest": "Brazilian Mathematical Olympiad",
+  "problem": "Problem:\n\nA sala do Newton- Professor Newton dividiu seus alunos em grupos de $4$ e sobraram $2$. Ele dividiu seus alunos em grupos de $5$ e um aluno ficou de fora. Se $15$ alunos são mulheres e tem mais mulheres do que homens, o número de alunos homens é:\n(a) $7$\n(b) $8$\n(c) $9$\n(d) $10$\n(e) $11$",
+  "solution_head": "Solution:\n\nComo o número de alunos homens é menor do que $15$ e das mulheres é $15$, temos\n$$\n15 < \\text{alunos homens} + \\text{alunas mulheres} < 15 + 15 = 30\n$$\nou seja: o número de alunos está entre $15$ e $30$.\n\nPor outro lado, quando dividimos por $4$ sobram $2$ alunos, então o número de alunos é par. Quando dividimos por $5$ sobra um, então o último algarismo do número é $1$ ou $6$, mas sendo par só pode ser $6$. Assim só temos dois possíveis valores: $16$ e $26$. Descartamos $16$ porque é divisível por $4$. Logo, a resposta é $26$.\n\n---\n\nSolution:\n\nComo acima, o número de alunos está entre $15$ e $30$. Observemos que o número $6$ dividido por $4$ deixa resto $2$ e dividido por $5$ deixa resto $1$. Logo, se somamos a $6$ um múltiplo comum de $4$ e $5$, o número obtido também terá esta propriedade. O menor múltiplo comum de $4$ e $5$ é $20$, assim os possíveis valores para o número de alunos são $6, 26, 46, 66, \\ldots$ Dado que o número de alunos está entre $15$ e $30$ então a solução é $26$."
+ },
+ {
+  "mathnet_id": "0jff",
+  "est": 3,
+  "conf": "mid",
+  "category": "number-theory",
+  "topics": [
+   "素数与算术基本定理",
+   "最大公约数与欧几里得算法",
+   "中国剩余定理",
+   "函数方程"
+  ],
+  "contest": "TSTST",
+  "problem": "Let $N$ be the set of positive integers. Let $f: \\mathbb{N} \\to \\mathbb{N}$ be a function satisfying the following two conditions:\n\na. $f(m)$ and $f(n)$ are relatively prime whenever $m$ and $n$ are relatively prime.\n\nb. $n \\le f(n) \\le n + 2012$ for all $n$.\n\nProve that for any natural number $n$ and any prime $p$, if $p$ divides $f(n)$ then $p$ divides $n$.",
+  "solution_head": "Let $g(n)$ be the smallest prime factor of $f(n)$. (Since $f(n) \\ge n$, $f(n)$ must have a prime factor unless $n=1$ and $f(1)=1$. In this case, we define $g(1)=1$.) First, we show that for any prime $p$ and any $k \\ge 1$, $f(p^k)$ is a power of $g(p)$.\n\nSuppose for the sake of contradiction that $f(p^k)$ is not a power of $g(p)$ for some $p$ and $k$. Choose $M$ sufficiently large so that $p^k < M \\cdot 2013!$, and let $P$ be the set of primes less than or equal to $M \\cdot 2013! + 1$. For any $q \\in P$, we have\n$$\ng(q) \\le f(q) \\le q + 2012 \\le M \\cdot 2013! + 2013,\n$$\nand furthermore the numbers $M \\cdot 2013! + i$ are composite for $2 \\le i \\le 2013$. It follows that $g(q) \\in P$, and so $g$ can be treated as a function from $P$ to $P$. Clearly, $g$ is injective because $f(q_1)$ and $f(q_2)$ are relatively prime for any distinct $q_1, q_2 \\in P$. Then, $g$ is bijective and in particular surjective.\n\nNow we can apply the same reasoning we used on primes in $P$ to $p^k$. We have\n$$\nf(p^k) \\le p^k + 2012 \\le M \\cdot 2013! + 2013,\n$$\nand so $f(p^k)$ has only prime factors in $P$. Supp"
+ },
+ {
+  "mathnet_id": "0b2x",
+  "est": 3,
+  "conf": "mid",
+  "category": "number-theory",
+  "topics": [
+   "中国剩余定理",
+   "最大公约数与欧几里得算法",
+   "计数与容斥"
+  ],
+  "contest": "23rd Philippine Mathematical Olympiad Qualifying Stage",
+  "problem": "Problem:\nFind the number of functions $f$ from the set $S=\\{0,1,2, \\ldots, 2020\\}$ to itself such that, for all $a, b, c \\in S$, all three of the following conditions are satisfied:\n(i) If $f(a)=a$, then $a=0$;\n(ii) If $f(a)=f(b)$, then $a=b$; and\n(iii) If $c \\equiv a+b(\\bmod 2021)$, then $f(c) \\equiv f(a)+f(b)(\\bmod 2021)$.",
+  "solution_head": "Solution:\nNote that, from (i), our function is completely determined by $f(1)$; i.e., $f(a) \\equiv a f(1)$ $(\\bmod 2021)$. Then, from (i) and (ii), we need that $f(a) \\neq 0$ if $a \\neq 0$; otherwise, if $a \\neq 0$ but $f(a)=0, f(b)=f(a+b)$ for any $b$. Thus, if $a \\neq 0$, we need that $a f(1) \\neq 0(\\bmod 2021)$ for any $a \\in S \\backslash\\{0\\}$. If \\operatorname{gcd}(f(1), 2021)=d>1$, then note that $a=\\frac{2021}{d} \\in S \\backslash\\{0\\}$, and from (i), $f(a) \\equiv a f(1) \\equiv 2021 \\equiv 0(\\bmod 2021)$. As we just established, this is not allowed. Hence, \\operatorname{gcd}(f(1), 2021)=1$.\n\nMoreover, from (iii), we need that $f(a)=a f(1) \\not \\equiv a(\\bmod 2021)$ if $a \\neq 0$; in other words, $2021 \\nmid a(f(1)-1)$ if $a \\neq 0$. By similar reasoning to earlier, suppose that \\operatorname{gcd}(f(1)-1,2021)=d>1$. Then $a=\\frac{2021}{d} \\in S \\backslash\\{0\\}$, and $2021 \\mid a(f(1)-1)$; thus, $f(a)=a$. We thus need that \\operatorname{gcd}(f(1)-1,2021)=1$ as well.\n\nWe count the number of integers that satisfy both these conditions. We use complementary counting here; thus, we s"
+ },
+ {
+  "mathnet_id": "0jtg",
+  "est": 3,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "中国剩余定理",
+   "费马小定理与欧拉定理",
+   "阶与原根"
+  ],
+  "contest": "HMMT February",
+  "problem": "Problem:\n\nFor positive integers $a, b$, $a \\uparrow \\uparrow b$ is defined as follows: $a \\uparrow \\uparrow 1 = a$, and $a \\uparrow \\uparrow b = a^{a \\uparrow \\uparrow (b-1)}$ if $b > 1$.\nFind the smallest positive integer $n$ for which there exists a positive integer $a$ such that $a \\uparrow \\uparrow 6 \\not\\equiv a \\uparrow \\uparrow 7 \\pmod{n}$.",
+  "solution_head": "Solution:\n\nWe see that the smallest such $n$ must be a prime power, because if two numbers are distinct mod $n$, they must be distinct mod at least one of the prime powers that divide $n$. For $k \\geq 2$, if $a \\uparrow \\uparrow k$ and $a \\uparrow \\uparrow (k+1)$ are distinct $\\bmod p^{r}$, then $a \\uparrow \\uparrow (k-1)$ and $a \\uparrow \\uparrow k$ must be distinct $\\bmod \\phi\\left(p^{r}\\right)$. In fact they need to be distinct $\\bmod \\frac{\\phi\\left(p^{r}\\right)}{2}$ if $p=2$ and $r \\geq 3$ because then there are no primitive roots mod $p^{r}$.\n\nUsing this, for $1 \\leq k \\leq 5$ we find the smallest prime $p$ such that there exists $a$ such that $a \\uparrow \\uparrow k$ and $a \\uparrow \\uparrow (k+1)$ are distinct $\\bmod p$. The list is: $3, 5, 11, 23, 47$. We can easily check that the next largest prime for $k=5$ is $139$, and also any prime power other than $121$ for which $a \\uparrow \\uparrow 5$ and $a \\uparrow \\uparrow 6$ are distinct is also larger than $139$.\n\nNow if $a \\uparrow \\uparrow 6$ and $a \\uparrow \\uparrow 7$ are distinct $\\bmod p$, then $p-1$ must be a multiple of "
+ }
+]

@@ -1,0 +1,81 @@
+[
+ {
+  "mathnet_id": "0ixo",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形与四边形基本性质"
+  ],
+  "contest": "12th Annual Harvard-MIT Mathematics Tournament",
+  "problem": "Problem:\n\nLet $ABC$ be a right triangle with hypotenuse $AC$. Let $B'$ be the reflection of point $B$ across $AC$, and let $C'$ be the reflection of $C$ across $AB'$. Find the ratio of $[BCB']$ to $[BC'B']$.",
+  "solution_head": "Solution:\n\nSince $C$, $B'$, and $C'$ are collinear, it is evident that $[BCB'] = \\frac{1}{2}[BCC']$. It immediately follows that $[BCB'] = [BC'B']$. Thus, the ratio is $1$."
+ },
+ {
+  "mathnet_id": "0kjd",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "解析几何与向量复数法"
+  ],
+  "contest": "AMC 12 B",
+  "problem": "Right triangle $ABC$ has side lengths $BC = 6$, $AC = 8$, and $AB = 10$. A circle centered at $O$ is tangent to line $BC$ at $B$ and passes through $A$. A circle centered at $P$ is tangent to line $AC$ at $A$ and passes through $B$. What is $OP$?\n(A) $\\frac{23}{8}$ (B) $\\frac{29}{10}$ (C) $\\frac{35}{12}$ (D) $\\frac{73}{25}$ (E) $3$",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0kyo",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "面积法与三角法",
+   "解析几何与向量复数法",
+   "复数与三角"
+  ],
+  "contest": "AMC 12 A",
+  "problem": "Let $\\alpha$ be the radian measure of the smallest angle in a $3$-$4$-$5$ right triangle. Let $\\beta$ be the radian measure of the smallest angle in a $7$-$24$-$25$ right triangle. In terms of $\\alpha$, what is $\\beta$?\n(A) $\\frac{\\alpha}{3}$ (B) $\\alpha - \\frac{\\pi}{8}$ (C) $\\frac{\\pi}{2} - 2\\alpha$ (D) $\\frac{\\alpha}{2}$ (E) $\\pi - 4\\alpha$",
+  "solution_head": "Because $\\alpha$ and $\\beta$ are the smallest angles in these triangles, $\\sin \\alpha = \\frac{3}{5}$, $\\cos \\alpha = \\frac{4}{5}$, $\\sin \\beta = \\frac{7}{25}$, and $\\cos \\beta = \\frac{24}{25}$. By a Double Angle Formula,\n$$\n\\sin(2\\alpha) = 2 \\sin \\alpha \\cdot \\cos \\alpha = 2 \\cdot \\frac{3}{5} \\cdot \\frac{4}{5} = \\frac{24}{25} = \\cos \\beta = \\sin\\left(\\frac{\\pi}{2} - \\beta\\right).\n$$\nBecause both $2\\alpha$ and $\\beta$ are acute, $2\\alpha = \\frac{\\pi}{2} - \\beta$, so $\\beta = \\frac{\\pi}{2} - 2\\alpha$.\n\n\nUsing complex numbers in polar form, $4 + 3i = 5(\\cos \\alpha + i \\sin \\alpha)$. Squaring gives $7 + 24i = 25(\\cos \\alpha + i \\sin \\alpha)^2$. Similarly, $24 + 7i = 25(\\cos \\beta + i \\sin \\beta)$. Multiplying these two equations yields\n$$\n(7 + 24i)(24 + 7i) = 25(\\cos \\alpha + i \\sin \\alpha)^2 \\cdot 25(\\cos \\beta + i \\sin \\beta) \\\\\n625i = 625 (\\cos(2\\alpha + \\beta) + i \\sin(2\\alpha + \\beta)) \\\\\n\\cos \\frac{\\pi}{2} + i \\sin \\frac{\\pi}{2} = \\cos(2\\alpha + \\beta) + i \\sin(2\\alpha + \\beta).\n$$\nBecause both $2\\alpha$ and $\\beta$ are acute, $2\\alpha + \\beta = \\frac{\\pi}{2}$ and $\\beta = \\frac{\\p"
+ },
+ {
+  "mathnet_id": "04dl",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形与四边形基本性质",
+   "不等式"
+  ],
+  "contest": "Mathematica competitions in Croatia",
+  "problem": "Let $a$ and $b$ be the legs, and $c$ the hypotenuse of a right triangle.\nProve that the following inequality holds\n$$\n\\left(1 + \\frac{c}{a}\\right) \\left(1 + \\frac{c}{b}\\right) \\geqslant 3 + 2\\sqrt{2}.\n$$",
+  "solution_head": "By rearranging the left hand side of the inequality we get\n$$\n\\begin{aligned}\n\\left(1 + \\frac{c}{a}\\right) \\left(1 + \\frac{c}{b}\\right) &= \\frac{(a+c)(b+c)}{ab} = \\frac{c^2 + ab + c(a+b)}{ab} \\\\\n&= \\frac{c^2}{ab} + 1 + \\frac{c(a+b)}{ab}\n\\end{aligned}\n$$\nSince the triangle is right it follows that $a^2 + b^2 = c^2$\n$$\n= \\frac{a^2 + b^2}{ab} + 1 + \\frac{\\sqrt{a^2 + b^2}(a+b)}{ab}\n$$\n\nNow we use $a^2 + b^2 \\ge 2ab$ and $a + b \\ge 2\\sqrt{ab}$ to get\n$$\n\\begin{aligned}\n\\ge & \\frac{2ab}{ab} + 1 + \\frac{\\sqrt{2ab} \\cdot 2\\sqrt{ab}}{ab} \\\\\n= & 2 + 1 + 2\\sqrt{2} = 3 + 2\\sqrt{2}.\n\\end{aligned}\n$$"
+ },
+ {
+  "mathnet_id": "0isb",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "圆与四点共圆"
+  ],
+  "contest": "1st Annual Harvard-MIT November Tournament",
+  "problem": "Problem:\n\nRight triangle $X Y Z$, with hypotenuse $Y Z$, has an incircle of radius $\\frac{3}{8}$ and one leg of length $3$. Find the area of the triangle.",
+  "solution_head": "Solution:\n\nLet the other leg have length $x$. Then the tangents from $Y$ and $Z$ to the incircle have length $x - \\frac{3}{8}$ and $3 - \\frac{3}{8}$. So the hypotenuse has length $x + \\frac{9}{4}$, the semiperimeter of the triangle is $x + \\frac{21}{8}$, and the area of the triangle is $\\frac{3}{8}\\left(x + \\frac{21}{8}\\right)$. But the area can also be calculated as $\\frac{3x}{2}$. Setting these expressions equal, we find $x = \\frac{7}{8}$ and the area is $\\frac{21}{16}$."
+ },
+ {
+  "mathnet_id": "0k2o",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "解析几何与向量复数法",
+   "变换几何",
+   "不等式"
+  ],
+  "contest": "HMMT November 2018",
+  "problem": "Problem:\n\nAn isosceles right triangle $ABC$ has area $1$. Points $D$, $E$, $F$ are chosen on $BC$, $CA$, $AB$ respectively such that $DEF$ is also an isosceles right triangle. Find the smallest possible area of $DEF$.\n\nProposed by: Yuan Yao",
+  "solution_head": "Solution:\n\nWithout loss of generality, suppose that $AB$ is the hypotenuse.\n\nIf $F$ is the right angle, then $F$ must be the midpoint of $AB$. To prove this, let $X$ and $Y$ be the feet from $F$ to $BC$ and $AC$. Since $\\angle XFY = \\angle DFE = 90^{\\circ}$, we have $\\angle XFD = \\angle YFE$ so\n$$\nXF = DF \\cos \\angle XFD = EF \\cos \\angle YFE = YF\n$$\nHence $F$ is equidistant from $AC$ and $BC$ so it is the midpoint of $AB$. Then the minimum area is achieved by minimizing $DF$; this occurs when $DF$ is perpendicular to $BC$. The triangle $DEF$ then becomes the medial triangle of $ABC$, so its area is $\\frac{1}{4}$.\n\nIf $F$ is not the right angle, without loss of generality, let the right angle be $D$. Place this triangle in the complex plane such that $C$ is the origin, $B = \\sqrt{2}$, and $A = \\sqrt{2}i$.\n\nNow since $D$ is on the real axis and $E$ is on the imaginary axis, $D = x$ and $E = yi$, and we can obtain $F$ by a $90$ degree counterclockwise rotation of $D$ around $E$: this evaluates to $F = y + (x + y)i$. For $F$ to be on $AB$, the only constraint is to have $y + (x + y) = \\s"
+ }
+]

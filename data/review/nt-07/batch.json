@@ -1,0 +1,87 @@
+[
+ {
+  "mathnet_id": "07vr",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "不定方程",
+   "费马小定理与欧拉定理",
+   "阶与原根"
+  ],
+  "contest": "IRL_ABooklet_2023",
+  "problem": "Find all integer solutions $(x, y)$ to the equation\n$$\nx^2 - x y + y^2 = 2023.\n$$",
+  "solution_head": "Note that $2023 = 17^2 \\cdot 7$ and let $(x, y)$ be a solution. If we assume that $y$ is not divisible by $17$, there exists a number $a$ such that $a y \\equiv x \\pmod{17}$. We then have\n$$\n0 = x^2 - x y + y^2 \\equiv y^2 (a^2 - a + 1) \\pmod{17},\n$$\nhence $a^2 - a + 1 \\equiv 0 \\pmod{17}$. This implies that $a^6 \\equiv 1 \\pmod{17}$, because\n$$\na^6 - 1 = (a^3 - 1)(a^3 + 1) = (a^3 - 1)(a + 1)(a^2 - a + 1).\n$$\nOn the other hand, by Fermat's little theorem, $a^{16} \\equiv 1 \\pmod{17}$. Then $a^2 \\equiv a^2 \\cdot a^{16} \\equiv a^{18} \\equiv (a^6)^3 \\equiv 1 \\pmod{17}$, hence $a \\equiv \\pm 1 \\pmod{17}$. But for these two values of $a$ we get $a^2 - a + 1 \\equiv 2 - a \\equiv 2 \\mp 1 \\not\\equiv 0 \\pmod{17}$, a contradiction. Hence, $y$ must be divisible by $17$.\n\nIt follows that $x$ must also be divisible by $17$, and we look for solutions $(x, y) = (17u, 17v)$. Let $N(x, y) = x^2 - x y + y^2$ and note that\n$$\nN(x, y) = \\frac{(2x - y)^2 + 3y^2}{4}.\n$$\nThen $2023 = N(17u, 17v) = 17^2 N(u, v)$, iff $7 = N(u, v)$, or equivalently\n$$\n28 = (2u - v)^2 + 3v^2.\n$$\nBecause $v^2 \\le 28/3$ and $28$ is no"
+ },
+ {
+  "mathnet_id": "0jud",
+  "est": 3,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "费马小定理与欧拉定理",
+   "阶与原根",
+   "中国剩余定理",
+   "数列与递推"
+  ],
+  "contest": "HMMT February 2016",
+  "problem": "Problem:\nDetermine the remainder when\n$$\n\\sum_{i=0}^{2015}\\left\\lfloor\\frac{2^{i}}{25}\\right\\rfloor\n$$\nis divided by $100$, where $\\lfloor x\\rfloor$ denotes the largest integer not greater than $x$.",
+  "solution_head": "Solution:\nLet $r_{i}$ denote the remainder when $2^{i}$ is divided by $25$. Note that because $2^{\\phi(25)} \\equiv 2^{20} \\equiv 1 \\pmod{25}$, $r$ is periodic with length $20$. In addition, we find that $20$ is the order of $2 \\bmod 25$. Since $2^{i}$ is never a multiple of $5$, all possible integers from $1$ to $24$ are represented by $r_{1}, r_{2}, \\ldots, r_{20}$ with the exceptions of $5, 10, 15$, and $20$. Hence,\n$$\n\\sum_{i=1}^{20} r_{i} = \\sum_{i=1}^{24} i - (5+10+15+20) = 250.\n$$\nWe also have\n$$\n\\begin{aligned}\n\\sum_{i=0}^{2015}\\left\\lfloor\\frac{2^{i}}{25}\\right\\rfloor &= \\sum_{i=0}^{2015} \\frac{2^{i} - r_{i}}{25} \\\\\n&= \\sum_{i=0}^{2015} \\frac{2^{i}}{25} - \\sum_{i=0}^{2015} \\frac{r_{i}}{25} \\\\\n&= \\frac{2^{2016} - 1}{25} - \\sum_{i=0}^{1999} \\frac{r_{i}}{25} - \\sum_{i=0}^{15} \\frac{r_{i}}{25} \\\\\n&= \\frac{2^{2016} - 1}{25} - 100\\left(\\frac{250}{25}\\right) - \\sum_{i=0}^{15} \\frac{r_{i}}{25} \\\\\n&\\equiv \\frac{2^{2016} - 1}{25} - \\sum_{i=0}^{15} \\frac{r_{i}}{25} \\pmod{100}\n\\end{aligned}\n$$\nWe can calculate $\\sum_{i=0}^{15} r_{i} = 185$, so\n$$\n\\sum_{i=0}^{2015}\\left\\lfloor\\frac{2^{i}}"
+ },
+ {
+  "mathnet_id": "04ev",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "素数与算术基本定理",
+   "费马小定理与欧拉定理",
+   "阶与原根"
+  ],
+  "contest": "Mathematica competitions in Croatia",
+  "problem": "Prove that the number whose decimal representation consists of 2187 digits 1 is divisible by 2187.",
+  "solution_head": "Let $N$ be the number whose decimal representation consists of 2187 digits 1. Then\n$$\nN = \\underbrace{111\\ldots 1}_{2187\\ \\text{digits}} = \\frac{10^{2187} - 1}{9}.\n$$\n\nWe want to show that $2187$ divides $N$.\n\nNote that $2187 = 3^7$.\n\nIt suffices to show that $3^7$ divides $N$.\n\nSince $N = \\frac{10^{2187} - 1}{9}$, we need to show that $3^7$ divides $10^{2187} - 1$.\n\nObserve that $10^k \\equiv 1 \\pmod{9}$ for any $k$, but we need divisibility by $3^7$.\n\nLet us use Euler's theorem:\n\nSince $\\gcd(10, 3^7) = 1$, Euler's theorem gives $10^{\\varphi(3^7)} \\equiv 1 \\pmod{3^7}$, where $\\varphi(3^7) = 3^7 - 3^6 = 2187 - 729 = 1458$.\n\nSo $10^{1458} \\equiv 1 \\pmod{2187}$.\n\nBut $2187 = 3^7$, and $2187$ divides $10^{2187} - 1$ if and only if the order of $10$ modulo $2187$ divides $2187$.\n\nAlternatively, note that $N = \\frac{10^{2187} - 1}{9}$, so $N$ is an integer, and $3^7$ divides $N$ if and only if $10^{2187} \\equiv 1 \\pmod{3^8}$, since $N = \\frac{10^{2187} - 1}{9}$ and $3^7$ divides $N$ if $10^{2187} \\equiv 1 \\pmod{3^8}$.\n\nBut actually, since $N$ is a repunit, and $3^k$ divides $10^{3^k} - 1$ "
+ },
+ {
+  "mathnet_id": "05ad",
+  "est": 3,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "整除与同余",
+   "阶与原根",
+   "不定方程"
+  ],
+  "contest": "Estonian Mathematical Olympiad",
+  "problem": "Does there exist a positive integer $n$ such that\n$$\n1950^n + 1934^n = 2024^n?\n$$",
+  "solution_head": "Answer: No.\n\nThe numbers $1950$, $1934$, and $2024$ give remainders $4$, $2$, and $1$, respectively, when divided by $7$. Raising $4$ to powers $n = 1, 2, 3, 4, 5, 6, \\dots$ results in remainders $4, 2, 1, 4, 2, 1, \\dots$, and raising $2$ to the same powers results in remainders $2, 4, 1, 2, 4, 1, \\dots$. Thus, the remainders of the left side of the given equation for powers $n = 1, 2, 3, 4, 5, 6, \\dots$ are $6, 6, 2, 6, 6, 2, \\dots$. The remainder of the right side is $1$ for every $n$. The contradiction shows that there is no positive integer $n$ that satisfies the given equation.\n\nClearly $n = 1$ is not suitable, because $1950 + 1934 > 2024$. It is also easy to verify that\n\n$$\n1950^2 + 1934^2 = 3802500 + 3740356 = 7542856 > 4096576 = 2024^2.\n$$\n\nFor $n \\ge 3$, there are no integer solutions to the equation $a^n + b^n = c^n$ by Fermat's Last Theorem."
+ },
+ {
+  "mathnet_id": "0b2l",
+  "est": 2,
+  "conf": "mid",
+  "category": "number-theory",
+  "topics": [
+   "费马小定理与欧拉定理",
+   "阶与原根"
+  ],
+  "contest": "23rd Philippine Mathematical Olympiad Qualifying Stage",
+  "problem": "Problem:\nFind the remainder when $\\sum_{n=2}^{2021} n^{n}$ is divided by $5$.\n\n(a) $1$\n(b) $2$\n(c) $3$\n(d) $4$",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0g42",
+  "est": 4,
+  "conf": "mid",
+  "category": "number-theory",
+  "topics": [
+   "整除与同余",
+   "最大公约数与欧几里得算法",
+   "费马小定理与欧拉定理",
+   "阶与原根"
+  ],
+  "contest": "IMO Selection",
+  "problem": "Problem:\nLet $n \\geq 2$ be an integer. Prove that if\n$$\n\\frac{n^{2}+4^{n}+7^{n}}{n}\n$$\nis an integer, then it is divisible by $11$.",
+  "solution_head": "Solution:\nThe \"Lifting the Exponent\" lemma tells us that\n$$\nv_{11}\\left(4^{n}+7^{n}\\right)=v_{11}(4+7)+v_{11}(n)=1+v_{11}(n)\n$$\nand we therefore have $11 \\mid\\left(4^{n}+7^{n}\\right) / n$.\n\nNow let $p$ denote the smallest prime factor of $n$. By assumption we have $p \\mid n \\mid 4^{n}+7^{n}$, with $p \\neq 2,7$. Now setting $x \\equiv 4 \\cdot 7^{-1} \\bmod p$, we find:\n$$\n4^{n} \\equiv -7^{n} \\bmod p \\Longrightarrow x^{n} \\equiv -1 \\quad \\bmod p \\Longrightarrow x^{2 n} \\equiv 1 \\quad \\bmod p\n$$\nIf $d$ denotes the order of $x \\bmod p$, the above implies $d \\mid 2 n$. By Euler-Fermat we also have $d \\mid \\varphi(p)=p-1$. By minimality of $p$, we have $\\gcd(n, p-1)=1$, and thus $d \\mid 2$. Therefore,\n$$\nx^{2} \\equiv 1 \\quad \\bmod p \\Longrightarrow 4^{2} \\equiv 7^{2} \\quad \\bmod p \\Longrightarrow p \\mid 49-16=33 \\Longrightarrow p=3,11\n$$\nBut since $4^{n} \\equiv 7^{n} \\equiv 1 \\bmod 3$, we cannot have $p=3 \\mid n$, since otherwise $n$ does not divide $4^{n}+7^{n}$. We conclude that $p=11 \\mid n$ and the result follows."
+ }
+]

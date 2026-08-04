@@ -1,0 +1,85 @@
+[
+ {
+  "mathnet_id": "0ktn",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "根轴与幂",
+   "反演变换",
+   "相似位似与全等",
+   "共线共点定理"
+  ],
+  "contest": "HMMT February 2022",
+  "problem": "Problem:\nLet $\\Gamma_{1}$ and $\\Gamma_{2}$ be two circles externally tangent to each other at $N$ that are both internally tangent to $\\Gamma$ at points $U$ and $V$, respectively. A common external tangent of $\\Gamma_{1}$ and $\\Gamma_{2}$ is tangent to $\\Gamma_{1}$ and $\\Gamma_{2}$ at $P$ and $Q$, respectively, and intersects $\\Gamma$ at points $X$ and $Y$. Let $M$ be the midpoint of the arc $\\widehat{X Y}$ that does not contain $U$ and $V$. Let $Z$ be on $\\Gamma$ such that $M Z \\perp N Z$, and suppose the circumcircles of $Q V Z$ and $P U Z$ intersect at $T \\neq Z$. Find, with proof, the value of $T U+T V$, in terms of $R, r_{1}$, and $r_{2}$, the radii of $\\Gamma, \\Gamma_{1}$, and $\\Gamma_{2}$, respectively.",
+  "solution_head": "Solution:\nBy Archimedes lemma, we have $M, Q, V$ are collinear and $M, P, U$ are collinear as well. Note that inversion at $M$ with radius $M X$ shows that $P Q U V$ is cyclic. Thus, we have $M P \\cdot M U = M Q \\cdot M V$, so $M$ lies on the radical axis of $(P U Z)$ and $(Q V Z)$, thus $T$ must lie on the line $M Z$. Thus, we have $M Z \\cdot M T = M Q \\cdot M V = M N^{2}$, which implies triangles $M Z N$ and $M N T$ are similar. Thus, we have $N T \\perp M N$. However, since the line through $O_{1}$ and $O_{2}$ passes through $N$ and is perpendicular to $M N$, we have $T$ lies on line $O_{1} O_{2}$. Additionally, since $M Z \\cdot M T = M N^{2} = M X^{2}$, inversion at $M$ with radius $M X$ swaps $Z$ and $T$, and since $(M X Y)$ maps to line $X Y$, this means $T$ also lies on $X Y$.\n\nTherefore, $T$ is the intersection of $P Q$ and $O_{1} O_{2}$, and thus by Monge's Theorem, we must have $T$ lies on $U V$.\n\nNow, to finish, we will consider triangle $O U V$. Since $O_{1} O_{2} T$ is a line that cuts this triangle, by Menelaus, we have\n$$\n\\frac{O O_{1}}{O_{1} U} \\cdot \\frac{U T}{V T} \\c"
+ },
+ {
+  "mathnet_id": "0ahm",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "共线共点定理"
+  ],
+  "contest": "Macedonian Mathematical Olympiad",
+  "problem": "An arbitrary triangle $ABC$ is given together with two lines $p$ and $q$ which are not parallel to each other and are not perpendicular to any of the sides of the triangle. We denote the perpendiculars through $A$, $B$ and $C$ to the line $p$ by $p_A$, $p_B$ and $p_C$ respectively, and the perpendiculars to $q$ by $q_A$, $q_B$ and $q_C$ respectively. Let us denote the points of intersection of the lines $p_A$, $q_A$, $p_B$, $q_B$, $p_C$ and $q_C$ with $q_B$, $p_B$, $q_C$, $p_C$, $q_A$ and $p_A$ respectively by $K$, $L$, $P$, $Q$, $N$ and $M$. Prove that the lines $KL$, $MN$ and $PQ$ intersect at one point.",
+  "solution_head": "Without loss of generality we can assume that $p_B$ is between $p_A$ and $p_C$. The first case is if $q_A$ is between $q_B$ and $q_C$ as shown in the picture, obviously $KL$ intersects $PN$. Analogously, if $q_C$ is between $q_A$ and $q_B$ the case is symmetrical to the one we are considering. The second case, if $q_B$ is between $q_A$ and $q_C$, then $MQ$ and $PN$ are not parallel, so $KL$ intersects at least one of them and the two cases are equivalent. According to this we can assume that $KL$ intersects $PN$. The line $MN$ cannot be parallel to $p_B$, since in that case $p$ is perpendicular to $AC$ and analogously $PQ$ is not parallel to $q_A$.\n\nLet $X$, $Y$ and $Z$ be the points of intersection of the lines $PN$, $q_A$ and $p_B$ with $KL$, $PQ$ and $MN$ respectively. From the similarity of the triangles $LNZ$ and $PMZ$ we get\n$$\n\\frac{LZ}{PZ} = \\frac{LN}{PM} \\quad (1)\n$$\nSimilarly from the similarity of $LPY$ and $NQY$ we get\n$$\n\\frac{NQ}{LY} = \\frac{NQ}{LP} \\quad (2)\n$$\nIf $KL$ does not pass through $C$, let it intersect $NC$ and $MC$ in $U$ and $V$ respectively. From the trian"
+ },
+ {
+  "mathnet_id": "0ik6",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "共线共点定理",
+   "面积法与三角法"
+  ],
+  "contest": "Harvard-MIT Mathematics Tournament",
+  "problem": "Problem:\n\nTriangle $A B C$ has side lengths $A B=2 \\sqrt{5}$, $B C=1$, and $C A=5$. Point $D$ is on side $A C$ such that $C D=1$, and $F$ is a point such that $B F=2$ and $C F=3$. Let $E$ be the intersection of lines $A B$ and $D F$. Find the area of $C D E B$.",
+  "solution_head": "Solution:\n\nDraw segment $A F$. Then notice $A F=4$, and we have a right triangle. Now draw line $C E$, let it intersect $A F$ at $G$. By Ceva, $F G=\\frac{4}{3}$ and $A G=\\frac{8}{3}$. Using mass points we find that $\\frac{A E}{E B}=6$ so $\\frac{[A E F]}{[B E F]}=6$, and since $[A B F]=4$, $[B E F]=\\frac{4}{7}$.\n\nIt's easy to see that $[C D F]=\\frac{1}{5}[A C F]=\\frac{6}{5}$, so\n$$\n[B C D E]=[C D F]-[B E F]=\\frac{6}{5}-\\frac{4}{7}=\\frac{22}{35}\n$$"
+ },
+ {
+  "mathnet_id": "01ai",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "共线共点定理",
+   "三角形五心与经典引理"
+  ],
+  "contest": "Baltic Way 2013",
+  "problem": "Let $ABC$ be a triangle, and let $X$, $Y$, $Z$ be points on $BC$, $CA$, $AB$, respectively. Suppose that $AX$, $BY$ and $CZ$ intersect in a point $P$. Prove that\n$$\n\\frac{AP}{AX} + \\frac{BP}{BY} + \\frac{CP}{CZ} = 2.\n$$",
+  "solution_head": "Assign weights $p, q, r$ to the vertices $A, B, C$, respectively, in such a way that the centre of mass is $P$. Draw the line $L$ through $P$, parallel to $BC$. Let $d$ denote the distance of $A$ to $L$, and let $h$ denote the distance of $A$ to $BC$. Since the triangle will be in static equilibrium when balanced (horizontally) upon $L$, we infer that $pd = (q+r)(h-d)$. This leads to\n$$\n\\frac{p}{q+r} = \\frac{h-d}{d} = \\frac{AX-AP}{AP},\n$$\nwhich is equivalent to\n$$\n\\frac{AP}{AX} = \\frac{q+r}{p+q+r}.\n$$\nSince one may similarly derive\n$$\n\\frac{BP}{BY} = \\frac{r+p}{p+q+r} \\quad \\text{and} \\quad \\frac{CP}{CZ} = \\frac{p+q}{p+q+r},\n$$\nthe desired conclusion follows by summation."
+ },
+ {
+  "mathnet_id": "0e4c",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "共线共点定理",
+   "圆与四点共圆"
+  ],
+  "contest": "Selection Examinations for the IMO",
+  "problem": "Let $O$ be the circumcentre of the acute triangle $ABC$. Let $H$ denote the orthocentre and let $D$ be the foot of the altitude from $C$. The line perpendicular to $OD$ at $D$ intersects the segment $BC$ at $E$. The circumcircle of the triangle $BCH$ intersects the line $AB$ at $B$ and $F$. Prove that the points $E, F$ and $H$ lie on the same line.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0h22",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "共线共点定理",
+   "三角形五心与经典引理",
+   "圆与四点共圆",
+   "面积法与三角法"
+  ],
+  "contest": "Problems of Ukrainian Authors",
+  "problem": "Inscribed circle $\\omega$ of a triangle $ABC$ touches its sides $AB$, $BC$, $CA$ at the points $K$, $L$, $M$ respectively. On the arc $KL$ of the circle $\\omega$ that does not contain the point $M$ a point $S$ is chosen. Let $P$, $Q$, $R$, $T$ be the points of intersection of the lines $AS$ and $KM$, $ML$ and $SC$, $LP$ and $KQ$, $AQ$ and $PC$ respectively. If the points $R$, $S$ and $M$ are collinear, prove that $T$ also belongs to the line $SM$.",
+  "solution_head": "Consider the triangle $SLM$. $LC$ and $MC$ are the tangent lines to the circumscribed circle of this triangle drawn at the points $L$ and $M$, therefore $SC$ is a simedian, and so $\\frac{MQ}{CL} = \\frac{MS^2}{SL^2}$.\n\nSimilarly, $\\frac{KP}{PM} = \\frac{KS^2}{SM^2}$. Let $E$ be the point of intersection of the lines $KL$ and $MR$. Since the lines $ME$, $KQ$ and $LP$ are concurrent, by the Ceva's theorem we have that $\\frac{KP}{PM} \\cdot \\frac{MQ}{QL} \\cdot \\frac{LE}{EK} = 1$, hence applying the above equalities we obtain that $\\frac{LE}{EK} = \\frac{SL^2}{KS^2}$. This implies that the line $SE$ is a simedian of the triangle $SKL$, therefore it passes through the point of intersection of the tangents to the circumscribed circle of the triangle $KSL$ that are drawn at the points $L$ and $K$, that is through the point $B$ (Fig. 49). So, we have proved that the points $B$, $S$, $R$ and $M$ are collinear.\n\nNext we will prove that the point $T$ also belongs to this line. By the Ceva's theorem, it is sufficient to prove that $\\frac{AP}{\\sin \\angle AMP} = \\frac{AM}{\\sin \\angle APM}$, $\\frac{PS}"
+ }
+]

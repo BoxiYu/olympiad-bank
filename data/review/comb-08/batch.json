@@ -1,0 +1,100 @@
+[
+ {
+  "mathnet_id": "06rs",
+  "est": 4,
+  "conf": "mid",
+  "category": "combinatorics",
+  "topics": [
+   "计数与容斥",
+   "不等式"
+  ],
+  "contest": "53rd International Mathematical Olympiad Shortlisted Problems with Solutions",
+  "problem": "Let $n \\geq 1$ be an integer. What is the maximum number of disjoint pairs of elements of the set $\\{1,2, \\ldots, n\\}$ such that the sums of the different pairs are different integers not exceeding $n$?",
+  "solution_head": "Consider $x$ such pairs in $\\{1,2, \\ldots, n\\}$. The sum $S$ of the $2x$ numbers in them is at least $1+2+\\cdots+2x$ since the pairs are disjoint. On the other hand $S \\leq n+(n-1)+\\cdots+(n-x+1)$ because the sums of the pairs are different and do not exceed $n$. This gives the inequality\n$$\n\\frac{2x(2x+1)}{2} \\leq nx-\\frac{x(x-1)}{2}\n$$\nwhich leads to $x \\leq \\frac{2n-1}{5}$. Hence there are at most $\\left\\lfloor\\frac{2n-1}{5}\\right\\rfloor$ pairs with the given properties.\n\nWe show a construction with exactly $\\left\\lfloor\\frac{2n-1}{5}\\right\\rfloor$ pairs. First consider the case $n=5k+3$ with $k \\geq 0$, where $\\left\\lfloor\\frac{2n-1}{5}\\right\\rfloor=2k+1$. The pairs are displayed in the following table.\n\n| Pairs | $3k+1$ | $3k$ | $\\cdots$ | $2k+2$ | $4k+2$ | $4k+1$ | $\\cdots$ | $3k+3$ | $3k+2$ |\n| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |\n|       | 2     | 4     | $\\cdots$ | $2k$   | 1     | 3     | $\\cdots$ | $2k-1$ | $2k+1$ |\n| Sums  | $3k+3$ | $3k+4$ | $\\cdots$ | $4k+2$ | $4k+3$ | $4k+4$ | $\\cdots$ | $5k+2$ | $5k+3$ |\n\nThe $2k+1$ pairs inv"
+ },
+ {
+  "mathnet_id": "0htn",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "计数与容斥"
+  ],
+  "contest": "Berkeley Math Circle",
+  "problem": "Problem:\n\nOne marks 16 points on a circle. What is the maximum number of acute triangles with vertices in these points?",
+  "solution_head": "Solution:\n\nConsider the set of all angles $M_{1} M_{2} M_{3}$, where $M_{1}$, $M_{2}$ and $M_{3}$ is an arbitrary triple of selected points. There are $\\frac{16 \\cdot 15 \\cdot 14}{2} = 1680$ different angles in this set. Suppose $n$ of them are not acute. We shall prove $n \\geq 392$.\n\nFor each integer $m$ between 1 and 7, take a chord with endpoints among the selected points such that there are exactly $m$ selected points to one side of the chord (not including the endpoints). We will call such a chord an $m$-chord. Each $m$-chord subtends not less than $m$ nonacute angles with vertices among the marked points. For each $m \\leq 6$ there are exactly $16$ $m$-chords, and for $m=7$ there are exactly $8$ of them. So the total number of nonacute angles is at least $16(1+2+\\ldots+6) + 8 \\times 7 = 392$.\n\nThere are $\\frac{16 \\cdot 15 \\cdot 14}{6} = 560$ triangles with vertices among the marked points. Each nonacute angle will \"spoil\" exactly one triangle, so the number of acute triangles is not greater than $560 - 392 = 168$.\n\nIt is only left to construct an example with exactly 168 acute t"
+ },
+ {
+  "mathnet_id": "09ng",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "递推与生成结构",
+   "数列与递推"
+  ],
+  "contest": "Mongolian Mathematical Olympiad",
+  "problem": "For a word $S$ written in letters $A$ and $B$, let $f(S)$ denote the maximum number of non-intersecting $ABA$ subwords in $S$. For example, $f(ABBABBA) = 0$, $f(ABABABBA) = 1$ and $f(ABABABA) = 2$.\nFor $n = 4k + 1$, find the sum $\\sum f(S)$ where $S$ runs over all $n$ letter words written in letters $A$ and $B$.\n(Nyamdavaa Amar)",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0iza",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "抽屉原理"
+  ],
+  "contest": "Harvard-MIT Mathematics Tournament",
+  "problem": "Problem:\nIn a $16 \\times 16$ table of integers, each row and column contains at most 4 distinct integers. What is the maximum number of distinct integers that there can be in the whole table?",
+  "solution_head": "Solution:\nAnswer: 49\n\nFirst, we show that 50 is too big. Assume for sake of contradiction that a labeling with at least 50 distinct integers exists. By the Pigeonhole Principle, there must be at least one row, say the first row, with at least 4 distinct integers in it; in this case, that is exactly 4, since that is the maximum number of distinct integers in one row. Then, in the remaining 15 rows there must be at least 46 distinct integers (these 46 will also be distinct from the 4 in the first row). Using Pigeonhole again, there will be another row, say the second row, with 4 distinct integers in it. Call the set of integers in the first and second rows $S$. Because the 4 distinct integers in the second row are distinct from the 4 in the first row, there are 8 distinct values in the first two rows, so $|S|=8$.\n\nNow consider the subcolumns containing the cells in rows 3 to 16. In each subcolumn, there are at most 2 values not in $S$, because there are already two distinct values in that column from the cells in the first two rows. So, the maximum number of distinct values in the tabl"
+ },
+ {
+  "mathnet_id": "04kv",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "染色与不变量"
+  ],
+  "contest": "Mathematical competitions in Croatia",
+  "problem": "What is the maximum number of elements that a subset of $\\{1, 2, 3, \\dots, 2017\\}$ can have so that for any two distinct elements $a$ and $b$ of that subset, the number $a + b$ is not divisible by $a - b$? (Hong Kong 1992)",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0dl2",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "多项式"
+  ],
+  "contest": "Saudi Booklet",
+  "problem": "The monic polynomial $P(x)$ is called “nice” if its coefficients are in $\\{-1, 0, 1\\}$. Given a nice polynomial $P(x)$ of degree $2025$ and it is divisible by $x^7 - 1$, what is the maximum number of non-zero coefficients in $P(x)$?",
+  "solution_head": "Let $f(x) = x^7 - 1$. We have $x^{7k+r} \\equiv x^r \\pmod{f(x)}$ for all $r = 0, 1, \\ldots, 6$ and $k$ is a positive integer. We will group together all exponents divided by $7$ with remainder $r$. We have\n$$\n\\begin{aligned}\nP(x) &= a_{2025}x^{2025} + \\cdots + a_2x^2 + a_1x + a_0 \\\\\n&\\equiv (a_0 + a_7 + \\cdots + a_{2023}) + (a_1 + a_8 + \\cdots + a_{2024})x + \\cdots \\\\\n&\\quad + (a_6 + a_{13} + \\cdots + a_{2022})x^6 \\pmod{f(x)}.\n\\end{aligned}\n$$\nWe see that the right-hand side is a polynomial of degree not exceeding $6$, so to have congruence $0$ modulo $f(x)$, we need the right-hand side to be identically $0$. From that, we will get\n$$\n\\sum_{i=0}^{289} a_{7i} = \\sum_{i=0}^{289} a_{7i+1} = \\sum_{i=0}^{289} a_{7i+2} = \\sum_{i=0}^{288} a_{7i+3} = \\sum_{i=0}^{288} a_{7i+4} = \\sum_{i=0}^{288} a_{7i+5} = \\sum_{i=0}^{288} a_{7i+6} = 0.\n$$\nWe see that in the first three sums, there are $290$ terms and in the remaining sums, there are $289$ terms. So in the first three sums, we choose $145$ number $1$ and $145$ number $-1$, and the remaining sums have at least one $0$ (otherwise the sum of $289"
+ },
+ {
+  "mathnet_id": "07f7",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "递推与生成结构"
+  ],
+  "contest": "37th Iranian Mathematical Olympiad",
+  "problem": "Let $n, k$ be positive integers such that $n \\ge k$. Find the maximum number of binary sequences of length $n$ such that by fixing any arbitrary $k$ bits, the achieved sequences do not produce all binary sequences of length $k$. For example if $k = 1$, we can only have one sequence, otherwise they will differ in at least one bit which means that fixing that bit produces all binary sequences of length 1.",
+  "solution_head": "Let the answer be $f(n,k)$. We will prove by induction on $n+k$ that\n$$\nf(n,k) = \\sum_{i=0}^{k-1} \\binom{n}{i}.\n$$\nCase $n=k=1$ is obvious.\n\nAssume that $S$ is the maximum set of the desired sequences and let $T$ be the set of all binary sequences of length $n-1$. Define the sets $A, B, C$ as follows:\n$$\n\\begin{align*}\nA &= \\{a \\in T \\mid \\text{there exists } b \\in S \\text{ with } b = \\overline{0a}, \\text{ but there is no } c \\in S \\text{ with } c = \\overline{1a}\\} \\\\\nB &= \\{a \\in T \\mid \\text{there exists } b \\in S \\text{ with } b = \\overline{1a}, \\text{ but there is no } c \\in S \\text{ with } c = \\overline{0a}\\} \\\\\nC &= \\{a \\in T \\mid \\text{there exists } b, c \\in S \\text{ with } b = \\overline{0a}, c = \\overline{1a}\\}.\n\\end{align*}\n$$\nClearly, $f(n,k) = |A| + |B| + 2|C|$. Because we can't choose $k$ bits from the last $n-1$ bits of the sequences that produce all the binary sequences of length $k$, we have $|A| + |B| + |C| \\le f(n-1,k)$. Now consider the set $C$. If $|C| \\ge f(n-1,k-1)$, we can fix $k-1$ bits from the last $n-1$ bits to produce all sequences of length $k-1$. So beca"
+ },
+ {
+  "mathnet_id": "0dez",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "染色与不变量"
+  ],
+  "contest": "Saudi Arabian IMO Booklet",
+  "problem": "What is the maximum number of $2 \\times 3 \\times 3$ bricks that can be fit inside an $8 \\times 8 \\times 9$ box?",
+  "solution_head": ""
+ }
+]

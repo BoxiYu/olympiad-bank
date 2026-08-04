@@ -1,0 +1,16 @@
+[
+ {
+  "mathnet_id": "0dlo",
+  "est": 2,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "数论函数与阶乘估计",
+   "素数与算术基本定理",
+   "p-adic 赋值与 LTE"
+  ],
+  "contest": "Saudi Booklet",
+  "problem": "Define the function $S: \\mathbb{Z}^+ \\to \\mathbb{Z}^+$ to be the sum of prime divisors (not necessarily distinct) of $n$ (if $v_p(n) = a$ then add $p \\cdot a$ to the sum). Prove that\n$$\n\\frac{\\tau(n!)}{\\tau((n-1)!)} \\le \\frac{4S(n)}{n}.\n$$",
+  "solution_head": ""
+ }
+]

@@ -5,6 +5,25 @@
 
 **现状一句话**：题库供给自 MathNet 数据集，经 Codex 逐题评审通过后入库；规模与分布一律以 `uv run python scripts/bank.py stats` 的输出为准，本文不手写任何数字。
 
+## 零基础快速开始（非程序员向）
+
+只需做一次的准备：
+
+1. **装 uv**（Python 环境管家，装完一切依赖自动搞定）：
+   - macOS：打开「终端」，粘贴运行 `curl -LsSf https://astral.sh/uv/install.sh | sh`
+   - Windows：打开 PowerShell，粘贴运行 `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
+2. **下载本项目**：仓库页绿色 Code 按钮 → Download ZIP，解压到任意位置（或 `git clone`）。
+
+日常使用（三选一，效果相同）：
+
+- macOS 双击 [开始.command](开始.command)（首次被系统拦截时：右键 → 打开）；
+- Windows 双击 [开始.bat](开始.bat)；
+- 终端：`uv run python scripts/menu.py`。
+
+首次运行会自动下载 Python 环境与依赖（联网等几分钟），之后日常训练离线可用。
+菜单覆盖学生训练全流程（开卡/提示/看解/收卡/复习）与教练动作（周计划/能力图）；
+训练纪律的一页纸在 [docs/学生手册.md](docs/学生手册.md)。
+
 ## 读者路由
 
 | 你是 | 从这里开始 |
