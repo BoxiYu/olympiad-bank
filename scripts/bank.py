@@ -619,6 +619,66 @@ def doclint():
     return 0
 
 
+# ---------------- 外链检查 linkcheck ----------------
+# 刻意不并入 lint/doclint：联网慢且外站抖动不该挡入库。CI 按月跑（.github/workflows/linkcheck.yml），
+# 处置纪律的正本在 docs/入库SOP-MathNet.md 凭证纪律节（修复或换 archive.org 快照，不得静默删引用）。
+
+
+def _fetch_status(url):
+    """HEAD 优先（403/405/网络错时降级 GET）→ HTTP 状态码；彻底失败 → None。"""
+    import urllib.error
+    import urllib.request
+    for method in ('HEAD', 'GET'):
+        req = urllib.request.Request(url, method=method,
+                                     headers={'User-Agent': 'olympiad-bank-linkcheck/1.0'})
+        try:
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                return resp.status
+        except urllib.error.HTTPError as e:
+            if method == 'HEAD' and e.code in (403, 405):
+                continue
+            return e.code
+        except OSError:
+            if method == 'HEAD':
+                continue
+            return None
+    return None
+
+
+def collect_external_links():
+    """全仓 md 正文的 http(s) 外链 → {url: [出现位置]}。docs/archive/ 豁免（史料链接允许腐）。"""
+    link_re = re.compile(r'\[[^\]]*\]\((https?://[^)\s]+)\)')
+    links = {}
+    for path in _walk_md():
+        rel = os.path.relpath(path, ROOT)
+        if rel.startswith(os.path.join('docs', 'archive') + os.sep):
+            continue
+        for i, line in enumerate(open(path, encoding='utf-8').read().splitlines(), 1):
+            for m in link_re.finditer(line):
+                links.setdefault(m.group(1), []).append(f'{rel}:{i}')
+    return links
+
+
+def linkcheck(fetch=None):
+    fetch = fetch or _fetch_status
+    links = collect_external_links()
+    dead = []
+    for url in sorted(links):
+        status = fetch(url)
+        ok = status is not None and status < 400
+        print(f'{"ok  " if ok else "DEAD"} {status if status is not None else "ERR "}  {url}')
+        if not ok:
+            dead.append(url)
+    if dead:
+        print(f'\nLINKCHECK FAILED: {len(dead)} 个死链（处置纪律见 docs/入库SOP-MathNet.md 凭证纪律节）')
+        for url in dead:
+            for loc in links[url]:
+                print(f'  {loc}: {url}')
+        return 1
+    print(f'LINKCHECK OK: {len(links)} 个外链全部可达')
+    return 0
+
+
 # ---------------- MathNet 候选池 ----------------
 CANDIDATES = os.path.join(ROOT, 'candidates', 'mathnet.jsonl')
 
@@ -738,6 +798,7 @@ def main():
     sub = ap.add_subparsers(dest='cmd', required=True)
     sub.add_parser('lint')
     sub.add_parser('doclint', help='全仓 md 文档校验：死链 / 禁词 / taxonomy 树一致性 / 前置依赖图')
+    sub.add_parser('linkcheck', help='联网检查文档外链（不属于 lint；CI 按月跑）')
     q = sub.add_parser('query')
     q.add_argument('--difficulty', type=int)
     q.add_argument('--topic')
@@ -821,6 +882,8 @@ def main():
     args = ap.parse_args()
     if args.cmd == 'doclint':
         sys.exit(doclint())
+    if args.cmd == 'linkcheck':
+        sys.exit(linkcheck())
     if args.cmd == 'web':
         import threading, webbrowser
         import uvicorn

@@ -11,6 +11,9 @@
   Codex 逐题评审，评审产物 `verdicts.json` 落盘在 `data/review/<batch>/` 并**随仓库提交**。
 - 入库题 frontmatter 的 `review_ref` 必须指向该 verdicts.json（写法见第 5 步）。指不到凭证的题即为未核验，lint 应拒绝、评审时应退回。
 - 教训出处：旧库 83% sourced 题为裸声明、2 道实质错题（`docs/archive/审计存档-旧题库核验真相-2026-08.md`）。裸声明字段不再被信任。
+- **外链纪律（本条是正本）**：文档引用外链优先稳定源；被 `bank.py linkcheck`（月度 CI）判死的链接，
+  修复或改指 archive.org 快照并注明快照日期，**不得静默删除引用**——链接背后是论据，删链接=丢论据。
+  添加重要外链时建议同步存一份互联网档案馆快照。`docs/archive/` 史料豁免。
 
 ## 流程总览
 
