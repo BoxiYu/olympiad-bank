@@ -135,6 +135,13 @@ source_url: https://huggingface.co/datasets/ShadenA/MathNet
 
 ## 6. 来源与版权
 
+- **项目原创软件代码**采用 GNU Affero General Public License v3.0 or later（AGPL-3.0-or-later），
+  许可正本为仓库根目录 `LICENSE`。该许可允许商业使用，但要求修改版经网络向用户提供服务时，
+  按许可向这些用户提供对应源码；它只覆盖项目有权许可的软件部分。
+- **项目拥有权利的原创教学与文档内容**采用 CC BY-SA 4.0，适用范围与排除项以
+  `LICENSE-CONTENT.md` 为准。它允许传播、改编和商业使用，但要求署名及相同方式共享；
+  第三方材料、公共领域事实和项目无权许可的内容不进入该授权范围。
+- 项目名称、Logo 与其他标识不随代码或内容许可授权；合理署名和描述来源除外。
 - MathNet（`ShadenA/MathNet`，Hugging Face）数据集以 CC-BY-4.0 发布，但这是**混合权利**局面：
   数据集许可覆盖的是其编排与转录，**不等于底层竞赛题面与官方解的版权**——各赛事对题面
   另有各自的权利政策。两层权利须分开对待。
@@ -142,6 +149,8 @@ source_url: https://huggingface.co/datasets/ShadenA/MathNet
   引用数据集时保留署名（source_url + mathnet_id）即满足 CC-BY 的署名要求。
 - **转公开分发前必须另行评估**：逐赛事核查题面版权政策，并重新审视数据集许可与
   底层权利的兼容性。默认按不可公开对待。
+- 第三方署名、许可与排除说明集中记录在 `THIRD_PARTY_NOTICES.md`；该文件是告知与溯源清单，
+  不替任何第三方权利人授予许可。
 - 不对 AoPS 等社区站做批量爬取（robots/ToS 禁止，社区解答有作者版权）；
   本库供给链只有 MathNet 一条（决策①），不再维护官方 PDF 抓取路径。
 

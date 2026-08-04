@@ -31,3 +31,10 @@ bash scripts/lint.sh                         # 入库校验唯一执行正本，
 ```
 
 依赖由 `pyproject.toml` + `uv.lock` 声明，装好 [uv](https://docs.astral.sh/uv/) 后 `uv run` 自动解决，无需手动装包。
+
+## 许可与第三方材料
+
+- 项目原创的软件代码及软件配套文件采用 [GNU AGPL v3.0 or later](LICENSE)：允许个人、学校与企业使用和商用；修改后通过网络向用户提供服务时，须按许可证向这些用户提供对应源码。
+- 项目拥有权利的原创教学与文档内容采用 [CC BY-SA 4.0](LICENSE-CONTENT.md)：允许传播、改编和商用，但必须署名并以相同或兼容许可分享改编内容。
+- `problems/`、`candidates/`、`data/`、`docs/archive/` 及其他第三方材料不因上述许可而被重新授权；具体来源与边界见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) 和 [SPEC §6](SPEC.md#6-来源与版权)。
+- 项目名称、Logo 与其他标识不随代码或内容许可授权，但合理署名和描述来源不受影响。
