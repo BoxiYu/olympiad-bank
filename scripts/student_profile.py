@@ -247,17 +247,48 @@ def split_suggestions(ntable):
     return sorted(out, key=lambda s: (-s['n'], s['cat'], s['node']))
 
 
-def gap_queue(ntable, reg, problems, resolve, seen_refs):
-    """补齐队列：薄弱在前、未测在后；每个缺口给 ≤2 道库内未做过的题（★升序）。"""
+def _prereq_depth(prereq):
+    """'cat/node' → 拓扑深度（无前置=0）。环由 doclint 挡住，这里对脏数据只保证不死循环。"""
+    depth = {}
+
+    def walk(key, trail):
+        if key in depth:
+            return depth[key]
+        if key in trail:
+            return 0
+        pres = prereq.get(key) or []
+        depth[key] = 1 + max((walk(p, trail | {key}) for p in pres), default=-1)
+        return depth[key]
+
+    for k in prereq:
+        walk(k, frozenset())
+    return depth
+
+
+def gap_queue(ntable, reg, problems, resolve, seen_refs, prereq=None):
+    """补齐队列：薄弱在前、未测在后；每个缺口给 ≤2 道库内未做过的题（★升序）。
+
+    prereq 非 None（bank.load_prereq() 的结果）时：同状态桶内按拓扑深度升序——先补最
+    上游的缺口；每项附 blocked_by = 该节点前置中当前为薄弱/未测的节点列表（教练话术：
+    「先补 X 再打这里」）。
+    """
     by_node = {}
     for p in problems:
         fm = p['fm'] or {}
         nodes, _ = resolve_nodes(reg, resolve, fm.get('category'), fm.get('topics'))
         for key in nodes:
             by_node.setdefault(key, []).append(fm)
+    depth = _prereq_depth(prereq) if prereq else {}
+
+    def weak(key):
+        cat, _, node = key.partition('/')
+        st = ntable.get((cat, node))
+        return st is not None and st['status'] in ('薄弱', '未测')
+
     queue = []
     for cat in CATEGORIES:
         for status in ('薄弱', '未测'):
+            bucket = []
             for node in (reg.get(cat) or {}):
                 st = ntable.get((cat, node))
                 if not st or st['status'] != status:
@@ -265,13 +296,20 @@ def gap_queue(ntable, reg, problems, resolve, seen_refs):
                 picks = sorted((fm for fm in by_node.get((cat, node), [])
                                 if fm['id'] not in seen_refs),
                                key=lambda f: (f['difficulty'], f['id']))[:2]
-                queue.append({'cat': cat, 'node': node, 'status': status,
-                              'mastery': st['mastery'], 'n': st['n'],
-                              'picks': [{'id': f['id'], 'd': f['difficulty']} for f in picks]})
+                item = {'cat': cat, 'node': node, 'status': status,
+                        'mastery': st['mastery'], 'n': st['n'],
+                        'picks': [{'id': f['id'], 'd': f['difficulty']} for f in picks]}
+                if prereq is not None:
+                    item['blocked_by'] = [k for k in (prereq.get(f'{cat}/{node}') or [])
+                                          if weak(k)]
+                bucket.append(item)
+            if prereq is not None:
+                bucket.sort(key=lambda it: depth.get(f"{it['cat']}/{it['node']}", 0))
+            queue.extend(bucket)
     return queue
 
 
-def build_profile_data(prof, evidence, warns, skipped, reg, problems, resolve):
+def build_profile_data(prof, evidence, warns, skipped, reg, problems, resolve, prereq=None):
     """终端报告与 HTML 共用的数据装配（唯一装配点，便于测试）。"""
     ntable = node_table(evidence, reg)
     seen_refs = {e['ref'] for e in evidence}
@@ -297,7 +335,7 @@ def build_profile_data(prof, evidence, warns, skipped, reg, problems, resolve):
             'totals': {'assess': n_assess, 'attempts': len(evidence) - n_assess,
                        'waves': len(wave_rows(evidence)), 'skipped_attempts': skipped},
             'waves': wave_rows(evidence), 'current': current_by_cat(evidence),
-            'cats': cats, 'gaps': gap_queue(ntable, reg, problems, resolve, seen_refs),
+            'cats': cats, 'gaps': gap_queue(ntable, reg, problems, resolve, seen_refs, prereq),
             'splits': split_suggestions(ntable), 'warns': warns}
 
 
@@ -353,7 +391,9 @@ def print_profile(data):
         for g in gaps_with_picks:
             m = f"{_pct(g['mastery']).strip()}% n={g['n']}" if g['status'] == '薄弱' else '未测'
             picks = '，'.join(f"{p['id']}（★{p['d']}）" for p in g['picks'])
-            print(f"  {CAT_LABEL[g['cat']]}/{g['node']}：{m} → {picks}")
+            blocked = '，'.join(k.split('/')[1] for k in g.get('blocked_by') or [])
+            print(f"  {CAT_LABEL[g['cat']]}/{g['node']}：{m} → {picks}"
+                  + (f"（先补：{blocked}）" if blocked else ''))
         n_dry = sum(1 for g in data['gaps'] if not g['picks'])
         if n_dry:
             print(f'  （另有 {n_dry} 个缺口节点库内暂无可用题——扩容看 candidates --gaps）')
@@ -451,7 +491,7 @@ def cmd_assess(problems, reg, resolve, args):
         print(f'  警告：「{t}」未注册（taxonomy/registry.yml）——只计入板块值，不计入节点')
 
 
-def cmd_profile(problems, reg, resolve, args):
+def cmd_profile(problems, reg, resolve, args, prereq=None):
     prof = load_student(args.sid)
     if prof is None:
         print(f'学生 {args.sid} 不存在。已有档案：{", ".join(list_students()) or "（无）"}')
@@ -459,7 +499,7 @@ def cmd_profile(problems, reg, resolve, args):
     fmmap = {p['fm']['id']: p['fm'] for p in problems if p['fm']}
     evidence, warns, skipped = build_evidence(
         prof, load_assessments(args.sid), sp.load_attempts_v2(), fmmap, reg, resolve)
-    data = build_profile_data(prof, evidence, warns, skipped, reg, problems, resolve)
+    data = build_profile_data(prof, evidence, warns, skipped, reg, problems, resolve, prereq)
     print_profile(data)
     if getattr(args, 'html', False):
         rel = render_html(data)

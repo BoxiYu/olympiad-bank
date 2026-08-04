@@ -1,0 +1,68 @@
+# 知识点前置依赖图（依赖边唯一正本，SPEC §7 已登记）。
+# 语义：学 key 节点之前，建议先掌握 value 列表里的节点——教学建议，不是出题硬闸门。
+# 端点写 <板块>/<规范节点名>，只认 registry.yml 的节点名，别名不合法；跨板块边合法。
+# doclint 强制：端点存在于 registry、无自环、全图无环（DAG）。
+# 消费方：bank.py map（指示图前置 chips）、student_profile 补齐队列（先补最上游）。
+# 增量维护：只登高置信的教学顺序边，拿不准的不登——错误的边会误导补弱路径。
+prereq:
+  algebra/不等式:
+    - algebra/代数变换技巧
+  algebra/根与系数:
+    - algebra/多项式
+  algebra/函数方程:
+    - algebra/方程与设元
+    - algebra/多项式
+  combinatorics/递推与生成结构:
+    - combinatorics/计数与容斥
+    - algebra/数列与递推
+  combinatorics/概率与期望:
+    - combinatorics/计数与容斥
+  combinatorics/Ramsey 型问题:
+    - combinatorics/抽屉原理
+    - combinatorics/图论
+  geometry/勾股定理与直角三角形:
+    - geometry/三角形与四边形基本性质
+  geometry/相似位似与全等:
+    - geometry/三角形与四边形基本性质
+  geometry/圆与四点共圆:
+    - geometry/三角形与四边形基本性质
+  geometry/面积法与三角法:
+    - geometry/三角形与四边形基本性质
+    - geometry/勾股定理与直角三角形
+  geometry/三角形五心与经典引理:
+    - geometry/相似位似与全等
+    - geometry/圆与四点共圆
+  geometry/根轴与幂:
+    - geometry/圆与四点共圆
+  geometry/共线共点定理:
+    - geometry/相似位似与全等
+    - geometry/面积法与三角法
+  geometry/反演变换:
+    - geometry/根轴与幂
+  geometry/射影几何与调和点列:
+    - geometry/共线共点定理
+  geometry/变换几何:
+    - geometry/相似位似与全等
+  geometry/解析几何与向量复数法:
+    - geometry/勾股定理与直角三角形
+    - algebra/复数与三角
+  number-theory/素数与算术基本定理:
+    - number-theory/整除与同余
+  number-theory/最大公约数与欧几里得算法:
+    - number-theory/整除与同余
+  number-theory/费马小定理与欧拉定理:
+    - number-theory/整除与同余
+    - number-theory/素数与算术基本定理
+  number-theory/中国剩余定理:
+    - number-theory/整除与同余
+    - number-theory/最大公约数与欧几里得算法
+  number-theory/阶与原根:
+    - number-theory/费马小定理与欧拉定理
+  number-theory/二次剩余与平方数判别:
+    - number-theory/费马小定理与欧拉定理
+    - number-theory/阶与原根
+  number-theory/p-adic 赋值与 LTE:
+    - number-theory/素数与算术基本定理
+  number-theory/不定方程:
+    - number-theory/整除与同余
+    - number-theory/最大公约数与欧几里得算法
