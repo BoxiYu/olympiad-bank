@@ -419,3 +419,37 @@ class TestAdmissionGate:
         with pytest.raises(SystemExit) as e:
             mi.main()
         assert e.value.code == 2
+
+
+# ---------------- 语言闸门（SPEC §3：新题题面即英文原文，不设译文节）----------------
+class TestLanguageGate:
+    """候选池约 22% 是非英文题面，此前无任何环节拦截；翻译即改写（铁律 1），故只能拒收。"""
+
+    def test_english_statement_passes(self):
+        """防误杀：常规英文题面必须放行。"""
+        assert mi.looks_english(
+            'Let $n$ be a positive integer. Prove that the sum of all divisors is divisible by three.')
+
+    def test_latex_commands_do_not_forge_english_votes(self):
+        """防 \\in、\\sec 等 LaTeX 命令被当成英文单词投票，掩盖外语题面。"""
+        assert not mi.looks_english(
+            r'Sei $x \in \mathbb{R}$ und sei $A$ die Menge. Zeige, dass die Summe durch drei teilbar ist.')
+
+    @pytest.mark.parametrize('text', [
+        'Soit $ABC$ un triangle. Montrer que les points sont alignés pour tous les nombres.',
+        'Sei $n$ eine natürliche Zahl und sei $A$ die Menge der Teiler. Zeige, dass die Summe.',
+        'Fie $n$ un număr natural. Să se demonstreze că pentru care sunt două numere care este.',
+        'Siano $a$ e $b$ due numeri interi. Dimostrare che il prodotto della somma non è.',
+    ])
+    def test_latin_script_foreign_statements_rejected(self, text):
+        """法/德/罗/意四语种题面必须判非英文——它们在新规范下没有合法表示。"""
+        assert not mi.looks_english(text)
+
+    def test_non_latin_script_rejected(self):
+        """非拉丁书写系统（俄/中/日/韩）出现即证明原文不是英文。"""
+        assert not mi.looks_english('Пусть дано натуральное число $n$. Докажите, что сумма делится.')
+        assert not mi.looks_english('设 $n$ 为正整数，证明其所有约数之和被三整除。')
+
+    def test_symbol_only_statement_is_not_killed(self):
+        """排除法的保守性：几乎全是公式、无停用词证据的题面不得误判为外语。"""
+        assert mi.looks_english(r'$\forall n \in \mathbb{N}: \sum_{d \mid n} d \equiv 0 \pmod 3$')

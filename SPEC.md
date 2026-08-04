@@ -175,4 +175,5 @@ source_url: https://huggingface.co/datasets/ShadenA/MathNet
 | 版权边界 | SPEC §6 | AGENTS.md（路由指针） |
 | lint 执行命令 | `scripts/lint.sh` | CI workflow、AGENTS.md |
 | 训练日志 v2 数据契约 | `spar_session.py` 模块 docstring | `tests/test_learning_loop.py` 锁定 |
+| 题面语言闸门（非英文拒收） | `mathnet_import.looks_english` | SPEC §3（语义）、`tests/test_import_pipeline.py` 锁定 |
 | 规则归属表（本表） | SPEC §7 | ——（本文件自身也受本表约束） |
