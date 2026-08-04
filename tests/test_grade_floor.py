@@ -6,12 +6,14 @@ lint 是最后一道门，但入库脚本若放行 ★1，题号与板块配额�
 
 运行：uv run --group dev pytest -q
 """
+import argparse
 import os
 import sys
 
 sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'scripts'))
 import bank  # noqa: E402
+from bank import apply_grade_floor  # noqa: E402
 import mathnet_import as mi  # noqa: E402
 import mathnet_review as mr  # noqa: E402
 
@@ -74,3 +76,72 @@ def test_bank_has_nothing_below_floor():
              if isinstance((p['fm'] or {}).get('difficulty'), int)
              and (p['fm'] or {})['difficulty'] < bank.MIN_DIFFICULTY]
     assert below == [], f'库内存在低于学段下界的题：{below}'
+
+
+# ---------------- 4. 池过滤：共用过滤器与浏览工具 ----------------
+
+def _cand(mid, est, cat='algebra', **kw):
+    """合成候选行——候选池 candidates/mathnet.jsonl 是 gitignore 的，测试不依赖它。"""
+    r = {'mathnet_id': mid, 'difficulty_est': est, 'category': cat, 'status': 'ok',
+         'has_images': False, 'difficulty_conf': 'high', 'topics': ['不等式'],
+         'contest_raw': 'Test Cup', 'comp_norm': 'test cup', 'language': 'english',
+         'head': 'prove that', 'year': 2020}
+    r.update(kw)
+    return r
+
+
+def test_apply_grade_floor_drops_and_counts():
+    """共用过滤器：滤掉低于下界的行并如实报被滤条数。"""
+    rows = [_cand('a', 1), _cand('b', 2), _cand('c', 1), _cand('d', 5)]
+    kept, dropped = apply_grade_floor(rows)
+    assert [r['mathnet_id'] for r in kept] == ['b', 'd']
+    assert dropped == 2
+
+
+def test_apply_grade_floor_is_noop_when_all_legal():
+    kept, dropped = apply_grade_floor([_cand('a', 2), _cand('b', 3)])
+    assert len(kept) == 2 and dropped == 0
+
+
+def test_review_batch_uses_the_shared_floor():
+    """评审池与共用过滤器必须是同一个实现，不是各写一份。"""
+    import mathnet_review
+    assert mathnet_review.apply_grade_floor is apply_grade_floor
+
+
+def _args(**kw):
+    ns = argparse.Namespace(gaps=False, with_images=False, conf='mid', category=None,
+                            difficulty=None, node=None, contest=None, lang=None,
+                            grep=None, stats=False, limit=50)
+    for k, v in kw.items():
+        setattr(ns, k, v)
+    return ns
+
+
+def _run_candidates(monkeypatch, capsys, rows, **kw):
+    monkeypatch.setattr(bank, 'load_candidates', lambda: rows)
+    bank.candidates_cmd([], _args(**kw))
+    return capsys.readouterr().out
+
+
+def test_candidates_defaults_to_floor(monkeypatch, capsys):
+    """不给 --difficulty 时，★1 不该占选题视野。"""
+    out = _run_candidates(monkeypatch, capsys,
+                          [_cand('low1', 1), _cand('ok2', 2), _cand('ok4', 4)])
+    assert 'MN-low1' not in out
+    assert 'MN-ok2' in out and 'MN-ok4' in out
+
+
+def test_candidates_honours_explicit_low_bound(monkeypatch, capsys):
+    """显式点名低档要照出并警告——赛名表校准需要翻低档候选，硬闸不该设在浏览工具上。"""
+    out = _run_candidates(monkeypatch, capsys,
+                          [_cand('low1', 1), _cand('ok2', 2)], difficulty='1-2')
+    assert 'MN-low1' in out, '显式 --difficulty 1-2 必须能看到 ★1'
+    assert '入不了库' in out, '照出的同时必须警告它进不了库'
+
+
+def test_candidates_upper_bound_still_works(monkeypatch, capsys):
+    """抬下界不能顺手把上界弄坏。"""
+    out = _run_candidates(monkeypatch, capsys,
+                          [_cand('a2', 2), _cand('b5', 5)], difficulty='2-3')
+    assert 'MN-a2' in out and 'MN-b5' not in out

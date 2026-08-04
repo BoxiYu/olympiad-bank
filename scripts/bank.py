@@ -542,6 +542,16 @@ def load_candidates():
     return [json.loads(l) for l in open(CANDIDATES, encoding='utf-8') if l.strip()]
 
 
+def apply_grade_floor(rows):
+    """滤掉 est 低于学段下界的候选（SPEC §4）→ (保留行, 被滤条数)。
+
+    评审池与采购单共用：★1 送评审是白烧预算，计进采购单是虚报可补量。
+    浏览用的 candidates 不走这里——它允许显式点名低档查看，硬闸在入库路径。
+    """
+    kept = [r for r in rows if r['difficulty_est'] >= MIN_DIFFICULTY]
+    return kept, len(rows) - len(kept)
+
+
 def _parse_diff(s):
     """'3' → (3,3)；'2-3' → (2,3)。"""
     a, _, b = s.partition('-')
@@ -563,10 +573,13 @@ def candidates_cmd(problems, args):
     pool = [r for r in pool if CONF_RANK[r['difficulty_conf']] >= min_conf]
     if args.category:
         pool = [r for r in pool if r['category'] == args.category]
+    # 学段下界（SPEC §4）只作默认值：★1 进不了库，不该默认占选题视野。
+    # 但 candidates 是给人看的浏览工具——显式点名低档时照出并警告，否则赛名表校准这类
+    # 需要翻低档候选的活就没法做了。硬闸在入库路径（mathnet_import.below_floor），不在这里。
     lo, hi = _parse_diff(args.difficulty) if args.difficulty else (MIN_DIFFICULTY, 5)
-    if lo < MIN_DIFFICULTY:  # 学段下界，SPEC §4：★1 无论如何都进不了库，不让它占浏览视野
-        print(f'注：--difficulty 下限 {lo} 已抬到学段下界 ★{MIN_DIFFICULTY}（本库只收初中+高中，SPEC §4）')
-        lo = MIN_DIFFICULTY
+    if lo < MIN_DIFFICULTY:
+        print(f'注：est ★<{MIN_DIFFICULTY} 的候选入不了库（学段下界，SPEC §4）；'
+              f'本次按你显式指定的下限 ★{lo} 照出，仅供查看与校准')
     pool = [r for r in pool if lo <= r['difficulty_est'] <= hi]
     if args.node:
         pool = [r for r in pool if any(args.node in t for t in r['topics'])]
@@ -613,10 +626,9 @@ def candidates_gaps(problems, rows):
             if node:
                 bank.setdefault((fm['category'], node), set()).add(fm['id'])
     cand, cand_low = {}, {}
-    for r in rows:
-        # 学段下界（SPEC §4）：★1 进不了库，计进采购单会虚报可补量
-        if r['status'] != 'ok' or r['difficulty_est'] < MIN_DIFFICULTY:
-            continue
+    # 学段下界（SPEC §4）：★1 进不了库，计进采购单会虚报可补量
+    ok, _ = apply_grade_floor([r for r in rows if r['status'] == 'ok'])
+    for r in ok:
         for node in r['topics']:
             k = (r['category'], node)
             cand[k] = cand.get(k, 0) + 1

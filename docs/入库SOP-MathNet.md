@@ -43,15 +43,20 @@ uv run python scripts/bank.py candidates --grep Ramsey                          
 **学段下界（语义正本 SPEC §4，阈值正本 `bank.py` 的 `MIN_DIFFICULTY`）：本库只收初中与高中，
 ★1 是小学/低龄档，不予入库。** 这条不靠自觉，四道执行点各自拦一次：
 
-| 环节 | 执行点 | 行为 |
-| --- | --- | --- |
-| 选池 | `bank.py candidates` | 默认只出 est ★2–5；`--difficulty` 给了更低下限会被抬回并打印提示 |
-| 评审池 | `mathnet_review.py batch` | est ★1 的候选不进批次，打印跳过条数（不浪费评审预算） |
-| 入库准入 | `mathnet_import.py` 的 `below_floor` | `min(est, codex) < 下界` 即跳过，**写盘之前**，不占题号与板块配额 |
-| 最终门槛 | `bank.py lint` | `difficulty: 1` 判红 |
+| 环节 | 执行点 | 性质 | 行为 |
+| --- | --- | --- | --- |
+| 选池 | `bank.py candidates` | **默认值** | 不给 `--difficulty` 时只出 est ★2–5；显式点名低档（如 `--difficulty 1-2`）照出并警告 |
+| 采购单 | `bank.py candidates --gaps` | 硬闸 | ★1 不计入「候选可补」，否则虚报缺口 |
+| 评审池 | `mathnet_review.py batch` | 硬闸 | est ★1 不进批次，打印跳过条数（不浪费评审预算） |
+| 入库准入 | `mathnet_import.py` 的 `below_floor` | 硬闸 | `min(est, codex) < 下界` 即跳过，**写盘之前**，不占题号与板块配额 |
+| 最终门槛 | `bank.py lint` | 硬闸 | `difficulty: 1` 判红 |
 
-第三道是关键：`needs_review` 只查 est 与 Codex 的**分歧幅度**，est★2 + Codex★1 这类分歧仅
-1 档的组合能整个躲过它，而「就低不就高」定稿正是 ★1。所以下界必须是独立一道判定。
+**入库准入那道是关键**：`needs_review` 只查 est 与 Codex 的**分歧幅度**，est★2 + Codex★1 这类
+分歧仅 1 档的组合能整个躲过它，而「就低不就高」定稿正是 ★1。所以下界必须是独立一道判定，
+且必须在写盘之前——否则题号与板块配额已被占掉，事后修复要动重号。
+
+**选池那道刻意只是默认值**：`candidates` 是给人看的浏览工具，赛名表校准这类活需要翻低档候选。
+硬闸设在入库路径，不设在浏览工具上。
 
 ## 2｜batch：出评审批次
 
