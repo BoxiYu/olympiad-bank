@@ -5,14 +5,22 @@ description = "奥数题库：竞赛数学题库与训练工作流"
 requires-python = ">=3.11"
 dependencies = [
     "pyyaml>=6",
+    # 浏览器训练台（scripts/web_app.py，入口 bank.py web）——放主依赖，保证学生一条命令能起
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "jinja2>=3.1",
+    "python-multipart>=0.0.9",
 ]
 
 # 一次性核验脚本（如 scripts/verify/recheck_*.py 需要 sympy）临时跑：
 #   uv run --with sympy python scripts/verify/recheck_xxx.py
 
 [dependency-groups]
-# 测试（tests/）：uv run --group dev pytest -q
-dev = ["pytest>=8"]
+# 测试（tests/）：uv run --group dev pytest -q（httpx2 供 web 测试的 TestClient 用）
+dev = [
+    "pytest>=8",
+    "httpx2>=2.9.1",
+]
 # MathNet 候选池构建（scripts/mathnet_ingest.py）：uv run --group mathnet python ...
 mathnet = ["datasets>=3.0", "pillow>=10"]
 # 相似度设施（scripts/similar_index.py）：uv run --group similar python ...

@@ -157,11 +157,12 @@ source_url: https://huggingface.co/datasets/ShadenA/MathNet
 | verification 合法枚举 | `spar_session.py` `VALID_VERIFICATION` | `bank.py lint` 与 spar 出卡执行；SPEC §2 只写语义 |
 | 必需小节名单 | `bank.py` `SECTIONS` | SPEC §3（语义） |
 | 允许小节名单（防泄答白名单） | `spar_session.py` `KNOWN_SECTIONS` | SPEC §3（语义）；spar 解析时执行 |
-| 题卡小节名单 | `spar_session.py` `CARD_SECTIONS` | spar 出卡执行 |
+| 题卡小节名单 | `spar_session.py` `CARD_SECTIONS` | spar 出卡与 web 训练台题面渲染执行 |
+| 训练台页面防泄答（未解锁的提示/答案不出服务端） | `scripts/web_app.py`（渲染仅经 spar_session 白名单通道） | `tests/test_web.py` 锁定 |
 | 难度星级语义与锚点 | SPEC §4 | `taxonomy/contest_tiers.yml` 头注、`mathnet_review.py` 评审提示 |
 | 赛名→难度底档映射 | `taxonomy/contest_tiers.yml` | `mathnet_ingest.py` 估级管线 |
 | 知识点正名与别名 | `taxonomy/registry.yml`（检索别名 `aliases.yml`） | `bank.py lint` 告警、map/query |
-| 攻坚限时/复习间隔/毕业条件 | `spar_session.py` 契约常量（`TIME_LIMIT`/`INTERVALS`/`GRADUATE_STREAK`） | docs/ 两手册、`bank.py` coach/review |
+| 攻坚限时/复习间隔/毕业条件 | `spar_session.py` 契约常量（`TIME_LIMIT`/`INTERVALS`/`GRADUATE_STREAK`） | docs/ 两手册、`bank.py` coach/review、`web_app.py`（数值由服务端下发，前端不复制） |
 | 入库铁律 v2 | SPEC §5 | AGENTS.md（路由指针） |
 | 版权边界 | SPEC §6 | AGENTS.md（路由指针） |
 | lint 执行命令 | `scripts/lint.sh` | CI workflow、AGENTS.md |
