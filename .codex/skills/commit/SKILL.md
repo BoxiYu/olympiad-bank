@@ -22,11 +22,11 @@ description:
 
 1. 读会话历史，确认这一批的范围与动机。
 2. 检查工作区与暂存区（`git status`、`git diff`、`git diff --staged`）。
-3. **提交前先跑门槛**：`uv run python scripts/bank.py lint`，必须 `LINT OK`。
+3. **提交前先跑门槛**：`bash scripts/lint.sh`，必须 `LINT OK`。
 4. 确认范围后暂存（`git add -A`）。
 5. 逐一核对新增文件。如果混进了构建产物、日志、临时文件，或
    `__pycache__/`、`*.pyc`、`.DS_Store`，先从索引里剔除。
-   `docs/sources/*.pdf` 按规范随仓库提交（远端为私有仓），不要剔除。
+   `docs/archive/sources/*.pdf` 按规范随仓库提交（远端为私有仓），不要剔除。
 6. 如果暂存内容包含与本次工单无关的文件，先修索引，不要靠提交信息糊过去。
 7. 写主题行：中文，一行说清这一批做了什么，尽量控制在 50 字以内，不加句号。
    参照既有风格，可带批次/版本前缀，例如
@@ -35,8 +35,8 @@ description:
    - **改了什么**：题号范围、文件、行为变化。
    - **为什么**：动机与取舍。
    - **核验**：跑了哪些命令、题面/答案来源、抽样比对结果；没跑就明确写「未跑（原因）」。
-9. 涉及新题时，正文必须能回答：题面来源？答案来源？做了哪些核验？
-   仅凭记忆写出的题目**不允许提交**。
+9. 涉及新题时，正文必须能回答：`mathnet_id`？`review_ref`？评审结论？
+   （三者格式见 `docs/入库SOP-MathNet.md`。）没有落盘评审凭证的题目**不允许提交**。
 10. 用 here-doc 或临时文件写信息，然后 `git commit -F <file>`，
     避免 `-m` 里的 `\n` 变成字面量。
 11. 追加 `Co-authored-by: Codex <codex@openai.com>` 尾注，除非用户另有要求。
@@ -55,8 +55,8 @@ description:
 - <为什么>
 
 核验：
-- uv run python scripts/bank.py lint → LINT OK（NNN 题）
-- <题号>：题面 <来源>，答案 <来源>，<逐字比对/程序验证>
+- bash scripts/lint.sh → LINT OK（NNN 题）
+- <题号>：mathnet_id <id>，review_ref <data/review/<batch>/verdicts.json>，评审结论 <通过/…>
 - 抽样：<比例>，<结果>
 
 Co-authored-by: Codex <codex@openai.com>

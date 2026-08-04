@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""把候选题批量派给本地 Codex 逐题评审，产出跨模型第二意见。
+"""把候选题批量派给本地 Codex 逐题评审。**评审即正式核验档（mathnet-reviewed）**：
+本脚本产出的 verdicts.json 是入库题 `verification: mathnet-reviewed` 的评审凭证，
+归档于 data/review/<batch>/ 并随仓库提交，入库题 frontmatter 的 review_ref 必须指向它。
+凭证纪律：数据集声称 ≠ 已核验，无 verdicts.json 不入库（端到端流程见 docs/入库SOP-MathNet.md）。
 
 用法：
   # 1) 出批次（从候选池按条件抽题，附题面与官方解摘录）
@@ -12,16 +15,24 @@
   # 3) 合并回填候选池 + 出分歧报告
   uv run python scripts/mathnet_review.py merge --dir data/review/geo-01
 
-Codex 的价值不是替代规则层，而是**独立第二意见**：它读题面，规则层只看赛事名。
+Codex 同时给出难度的**独立第二意见**：它读题面，规则层只看赛事名。
 两者分歧 ≥2 档的题自动标 needs_review，交人工定夺——这是难度估级唯一的可证伪校验。
-产出只写 data/review/（不进 problems/），不改动任何正式题目。
+本脚本只写 data/review/ 与候选池回填，不改动 problems/ 里任何正式题目。
 """
-import argparse, json, os, re, subprocess, sys
+import argparse, glob, json, os, re, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 POOL = os.path.join(ROOT, 'candidates', 'mathnet.jsonl')
-COMPANION = os.path.expanduser(
-    '~/.claude/plugins/cache/openai-codex/codex/1.0.4/scripts/codex-companion.mjs')
+COMPANION_GLOB = '~/.claude/plugins/cache/openai-codex/codex/*/scripts/codex-companion.mjs'
+
+
+def find_companion():
+    """glob 发现 codex-companion，插件版本目录取最高版本（不再硬编码具体版本路径）。"""
+    def ver_key(path):
+        seg = path.split(os.sep)[-3]   # …/codex/<版本>/scripts/codex-companion.mjs
+        return [int(x) if x.isdigit() else -1 for x in re.split(r'[.\-+]', seg)]
+    hits = glob.glob(os.path.expanduser(COMPANION_GLOB))
+    return max(hits, key=ver_key) if hits else None
 
 PROMPT = """你是奥数题库的候选题评审员。读同目录 batch.json（{n} 道 MathNet 候选题，含题面、
 部分官方解摘录、我方规则层给出的板块/知识点/难度估级），逐题独立评估，把结果写成 verdicts.json。
@@ -34,7 +45,9 @@ PROMPT = """你是奥数题库的候选题评审员。读同目录 batch.json（
 ★5 需深刻洞察或长链论证（IMO P3/P6）
 
 每题一个对象，字段严格如下：
-{{"mathnet_id":"...", "difficulty_codex":1-5 整数,
+{{"mathnet_id":"...",
+  "short_title":"≤8 词英文短标题：名词短语概括题目核心对象与性质，入库时直接用作 title",
+  "difficulty_codex":1-5 整数,
   "difficulty_reason":"一句话：关键突破口与思维跨度",
   "topics_verdict":"agree|partial|wrong", "topics_comment":"标签是否贴切；不贴切说明该往哪个方向",
   "text_quality":"clean|minor_issues|broken", "text_comment":"转录质量：LaTeX 完整性、OCR 残缺、题意自洽性",
@@ -91,10 +104,11 @@ def cmd_dispatch(args):
     d = os.path.join(ROOT, args.dir)
     if not os.path.exists(os.path.join(d, 'batch.json')):
         print(f'{args.dir}/batch.json 不存在，先跑 batch'); sys.exit(2)
-    if not os.path.exists(COMPANION):
-        print(f'找不到 codex-companion：{COMPANION}\n先确认 Codex 插件已安装'); sys.exit(2)
+    companion = find_companion()
+    if not companion:
+        print(f'找不到 codex-companion（找遍 {COMPANION_GLOB}）\n先确认 Codex 插件已安装'); sys.exit(2)
     print('派给 Codex（大批次可能数分钟）…')
-    p = subprocess.run(['node', COMPANION, 'task', '--prompt-file', os.path.join(d, 'task.md'),
+    p = subprocess.run(['node', companion, 'task', '--prompt-file', os.path.join(d, 'task.md'),
                         '--cwd', d, '--write', '--json'], capture_output=True, text=True)
     print(p.stdout[-600:] or p.stderr[-600:])
     if not os.path.exists(os.path.join(d, 'verdicts.json')):

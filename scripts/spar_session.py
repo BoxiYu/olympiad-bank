@@ -33,11 +33,11 @@ STUCK_CHOICES = ('建模', '识别结构', '关键引理', '技术执行', '证�
 RELATIONS = ('duplicate', 'near_isomorphic', 'same_method', 'related')
 HINT_COOLDOWN_MIN = 15
 GRADUATE_STREAK = 2
-VALID_VERIFICATION = ('sourced', 'independent-derivation')
+VALID_VERIFICATION = ('sourced', 'independent-derivation', 'mathnet-reviewed')  # 枚举唯一正本，bank.py lint 亦用此
 
 # 题文件小节白名单：出现名单外小节即拒绝解析（防未来新小节把答案泄进题卡）
-KNOWN_SECTIONS = ('题面', '原文（English）', '答案', '解法要点', '核验', '提示阶梯')
-CARD_SECTIONS = ('题面', '原文（English）')  # statement.md 只允许这两节
+KNOWN_SECTIONS = ('题面', '答案', '解法要点', '核验', '提示阶梯')
+CARD_SECTIONS = ('题面',)  # statement.md 只允许题面（legacy「原文（English）」节已随旧库清退收回）
 
 CLI = 'uv run python scripts/bank.py'
 
@@ -340,10 +340,10 @@ def spar_start(problems, args, pid):
     if pid not in fmmap:
         sys.exit(f'未知题号 {pid}')
     fm = fmmap[pid]['fm']
-    # 铁律：verification 必须 sourced / independent-derivation，否则拒绝出卡
+    # 铁律：verification 必须在 VALID_VERIFICATION 白名单（含 mathnet-reviewed），否则拒绝出卡
     if not _verification_ok(fm):
         sys.exit(f"铁律：{pid} 的 verification={fm.get('verification')!r} "
-                 f'不在 {VALID_VERIFICATION}，拒绝出卡——先补官方源核验')
+                 f'不在 {VALID_VERIFICATION}，拒绝出卡——先走评审入库流程（docs/入库SOP-MathNet.md）')
     sess = find_open_session()
     if sess:
         sid0, meta0 = sess

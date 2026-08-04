@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""题库工具：lint / query / stats / plan / coach / spar / review / similar
+"""题库工具：lint / doclint / query / stats / plan / coach / spar / review / similar
 
 用法：
   uv run python scripts/bank.py lint
+  uv run python scripts/bank.py doclint    # 全仓 md：死链 / 禁词 / taxonomy 树一致性
   uv run python scripts/bank.py query [--difficulty 3] [--topic 韦达] [--contest IMO] [--category algebra] [--unverified]
   uv run python scripts/bank.py stats
   uv run python scripts/bank.py coach --target IMO --save     # 周计划 → data/plan.json
@@ -36,6 +37,18 @@ def load_all():
     return problems
 
 
+def _verdict_ids(ref, _cache={}):
+    """review_ref（仓库相对路径）→ 该评审凭证覆盖的 mathnet_id 集合；缺失/不可解析 → None。"""
+    if ref not in _cache:
+        import json
+        try:
+            rows = json.load(open(os.path.join(ROOT, ref), encoding='utf-8'))
+            _cache[ref] = {str(r.get('mathnet_id')) for r in rows if isinstance(r, dict)}
+        except (OSError, ValueError):
+            _cache[ref] = None
+    return _cache[ref]
+
+
 def lint(problems):
     errors = []
     seen = {}
@@ -58,8 +71,22 @@ def lint(problems):
         url = str(fm.get('source_url', ''))
         if not url.startswith('http'):
             errors.append(f'{rel}: source_url 不是链接')
-        if fm.get('verification') not in ('sourced', 'independent-derivation'):
-            errors.append(f'{rel}: verification 取值非法')
+        if fm.get('verification') not in sp.VALID_VERIFICATION:  # 枚举正本在 spar_session.VALID_VERIFICATION
+            errors.append(f'{rel}: verification 取值非法（合法：{"/".join(sp.VALID_VERIFICATION)}）')
+        if fm.get('verification') == 'mathnet-reviewed':
+            # 铁律 3/4：凭证必须落盘且真实覆盖本题——裸声明字段不被信任
+            mid = str(fm.get('mathnet_id') or '')
+            ref = str(fm.get('review_ref') or '')
+            if not mid:
+                errors.append(f'{rel}: verification=mathnet-reviewed 缺少必填溯源字段 mathnet_id')
+            if not ref:
+                errors.append(f'{rel}: verification=mathnet-reviewed 缺少评审凭证字段 review_ref')
+            else:
+                ids = _verdict_ids(ref)
+                if ids is None:
+                    errors.append(f'{rel}: review_ref 指向的评审凭证不存在或无法解析：{ref}')
+                elif mid and mid not in ids:
+                    errors.append(f'{rel}: 评审凭证 {ref} 未覆盖 mathnet_id={mid}——「数据集声称≠已核验」')
         for s in SECTIONS:
             if s not in p['body']:
                 errors.append(f'{rel}: 缺少小节 {s}')
@@ -85,26 +112,21 @@ def lint(problems):
     return 0
 
 
-def load_aliases():
-    path = os.path.join(ROOT, 'taxonomy', 'aliases.yml')
-    if not os.path.exists(path):
-        return {}
-    return yaml.safe_load(open(path, encoding='utf-8')) or {}
-
-
-def topic_match(q, topics, title, aliases):
+def topic_match(q, topics, title, reg):
     ql = q.lower()
     if any(q in t for t in topics) or q in title:
         return True
-    # 英文查询 → 命中英文别名的中文标准名出现在 topics 中
-    for zh, ens in aliases.items():
-        if any(ql in en.lower() for en in ens) and any(zh in t for t in topics):
-            return True
+    # 别名查询（中英同源 registry）：查询词命中某节点的节点名/任一别名 → 该节点写法出现在 topics 中
+    for nodes in (reg or {}).values():
+        for node, aliases in (nodes or {}).items():
+            names = [node] + [str(a) for a in (aliases or [])]
+            if any(ql in n.lower() for n in names) and any(n in t for n in names for t in topics):
+                return True
     return False
 
 
 def query(problems, args):
-    aliases = load_aliases()
+    reg = load_registry()
     rows = []
     for p in problems:
         fm = p['fm'] or {}
@@ -114,7 +136,7 @@ def query(problems, args):
             continue
         if args.contest and args.contest.lower() not in str(fm.get('contest', '')).lower():
             continue
-        if args.topic and not topic_match(args.topic, fm.get('topics', []), fm.get('title', ''), aliases):
+        if args.topic and not topic_match(args.topic, fm.get('topics', []), fm.get('title', ''), reg):
             continue
         if args.unverified and fm.get('verification') == 'sourced':
             continue
@@ -149,7 +171,7 @@ def stats(problems):
         print(f'{s:<12}' + ''.join(f'{row.get(c, 0):>10}' for c in CATEGORIES) + f'{sum(row.values()):>8}')
 
 
-# 目标赛事 → 星级配比（权重，按比例取题）。锚点见 docs/赛事地图与官方题源.md
+# 目标赛事 → 星级配比（权重，按比例取题）。锚点见 docs/archive/赛事地图与官方题源.md
 PLAN_PROFILES = {
     'AMC8':   {1: 6, 2: 4},
     'AMC10':  {2: 5, 3: 4, 4: 1},
@@ -369,8 +391,12 @@ def registry_report(problems):
     for p in problems:
         fm = p['fm'] or {}
         for t in fm.get('topics', []) or []:
-            if resolve_topic(reg, fm.get('category'), t) is None:
-                bad.append(f"{fm.get('id')}: 「{t}」")
+            if resolve_topic(reg, fm.get('category'), t) is not None:
+                continue
+            # 跨界题允许并列他板块的规范节点名（SPEC §1）——任一板块能解析即视为已注册
+            if any(resolve_topic(reg, c, t) for c in reg):
+                continue
+            bad.append(f"{fm.get('id')}: 「{t}」")
     return bad
 
 
@@ -417,6 +443,69 @@ def gen_map(problems):
     print(f'maps/指示图.html 已生成：{len(problems)} 题 → {n_nodes} 个知识点节点')
     if unresolved:
         print(f'未注册 topic {len(unresolved)} 处（跑 lint 看明细）')
+
+
+# ---------------- 文档一致性校验 doclint ----------------
+# 扫描范围：全仓 .md（跳过 . 开头的隐藏目录与 node_modules）；docs/archive/ 为历史存档白名单（免禁词检查）。
+DOCLINT_FORBIDDEN = ['origin/main', 'scripts/symphony-start.sh', 'docs/sources/']
+TAXONOMY_BOARDS = {'algebra': 'algebra.md', 'combinatorics': 'combinatorics.md',
+                   'geometry': 'geometry.md', 'number-theory': 'number-theory.md'}
+
+
+def _walk_md():
+    for dirpath, dirnames, filenames in os.walk(ROOT):
+        dirnames[:] = sorted(d for d in dirnames if not d.startswith('.') and d != 'node_modules')
+        for fn in sorted(filenames):
+            if fn.endswith('.md'):
+                yield os.path.join(dirpath, fn)
+
+
+def doclint():
+    errors = []
+    link_re = re.compile(r'\[[^\]]*\]\(([^)\s]+)\)')
+    n_files = 0
+    for path in _walk_md():
+        n_files += 1
+        rel = os.path.relpath(path, ROOT)
+        text = open(path, encoding='utf-8').read()
+        # a) 死链：相对路径引用的文件必须存在（跳过 URL/锚点/绝对路径）
+        for m in link_re.finditer(text):
+            tgt = m.group(1)
+            if tgt.startswith(('http://', 'https://', 'mailto:', '#', '/')) or '://' in tgt:
+                continue
+            tgt = tgt.split('#')[0]
+            if tgt and not os.path.exists(os.path.normpath(os.path.join(os.path.dirname(path), tgt))):
+                errors.append(f'{rel}: 死链 {m.group(1)}')
+        # b) 禁词：已废弃指针不得再出现（历史存档 docs/archive/ 豁免）
+        if not rel.startswith(os.path.join('docs', 'archive') + os.sep):
+            for i, line in enumerate(text.splitlines(), 1):
+                for word in DOCLINT_FORBIDDEN:
+                    if word in line:
+                        errors.append(f'{rel}:{i}: 禁词「{word}」')
+    # c) taxonomy 四板块 .md 的 ### 标题集合 == registry 对应板块节点集合
+    reg = load_registry()
+    if reg is None:
+        errors.append('taxonomy/registry.yml 缺失')
+    else:
+        head_re = re.compile(r'###\s+(?:\d+[.、．]\s*)?(.+?)\s*$')
+        for cat, fname in TAXONOMY_BOARDS.items():
+            path = os.path.join(ROOT, 'taxonomy', fname)
+            if not os.path.exists(path):
+                errors.append(f'taxonomy/{fname} 缺失')
+                continue
+            heads = {m.group(1) for line in open(path, encoding='utf-8')
+                     if (m := head_re.match(line.strip()))}
+            nodes = set(reg.get(cat) or {})
+            for n in sorted(nodes - heads):
+                errors.append(f'taxonomy/{fname}: 缺少 registry 节点小节「### {n}」')
+            for h in sorted(heads - nodes):
+                errors.append(f'taxonomy/{fname}: 小节「{h}」不是 registry 的 {cat} 节点（树漂移）')
+    if errors:
+        print('\n'.join(errors))
+        print(f'\nDOCLINT FAILED: {len(errors)} 个问题')
+        return 1
+    print(f'DOCLINT OK: {n_files} 个 md 文件（死链/禁词/树一致性）全部通过')
+    return 0
 
 
 # ---------------- MathNet 候选池 ----------------
@@ -522,6 +611,7 @@ def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest='cmd', required=True)
     sub.add_parser('lint')
+    sub.add_parser('doclint', help='全仓 md 文档校验：死链 / 禁词 / taxonomy 树一致性')
     q = sub.add_parser('query')
     q.add_argument('--difficulty', type=int)
     q.add_argument('--topic')
@@ -577,6 +667,8 @@ def main():
     ca.add_argument('--stats', action='store_true', help='只看 难度×板块 分布')
     ca.add_argument('--gaps', action='store_true', help='45 节点缺口采购单：库内 vs 候选')
     args = ap.parse_args()
+    if args.cmd == 'doclint':
+        sys.exit(doclint())
     problems = load_all()
     if args.cmd == 'lint':
         sys.exit(lint(problems))

@@ -119,10 +119,6 @@ title: 测试题
 
 设 $x+y=3$，求 $(x+y)^2$。
 
-## 原文（English）
-
-Given $x+y=3$, find $(x+y)^2$.
-
 ## 答案
 
 SECRET-ANSWER $9$
@@ -145,7 +141,6 @@ class TestCardNoLeak:
               'contest': 'TEST', 'year': 2026, 'source_ref': 'ref'}
         card = sp.build_card(fm, secs, '20260803-T-001-1', 'fresh', 40)
         assert '设 $x+y=3$' in card                 # 题面在
-        assert 'Given $x+y=3$' in card              # 原文小节在
         for leak in ('SECRET-ANSWER', 'SECRET-SOLUTION', 'SECRET-HINT',
                      '## 答案', '## 解法要点', '## 提示阶梯'):
             assert leak not in card, f'题卡泄漏：{leak}'
@@ -159,6 +154,12 @@ class TestCardNoLeak:
     def test_unknown_section_rejected(self):
         with pytest.raises(ValueError, match='白名单'):
             sp.split_sections(BODY.replace('## 提示阶梯', '## 出题人吐槽'), 'T-001')
+
+    def test_legacy_original_lang_section_rejected(self):
+        # legacy「原文（English）」节已随旧库清退从白名单收回（SPEC §3）
+        legacy = BODY.replace('## 答案', '## 原文（English）\n\nGiven.\n\n## 答案')
+        with pytest.raises(ValueError, match='白名单'):
+            sp.split_sections(legacy, 'T-001')
 
     def test_missing_statement_rejected(self):
         with pytest.raises(ValueError, match='题面'):

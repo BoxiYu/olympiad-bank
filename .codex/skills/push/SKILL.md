@@ -25,11 +25,11 @@ description:
 ## 步骤
 
 1. 确认当前分支与远端状态。
-2. **推之前先过门槛**：`uv run python scripts/bank.py lint` 必须 `LINT OK`。
+2. **推之前先过门槛**：`bash scripts/lint.sh` 必须 `LINT OK`。
    红了就修到绿再推，不要带着红的 lint 推分支。
 3. 用现有的 remote URL 推分支，必要时建立 upstream 跟踪。
 4. push 不干净时：
-   - 属于 non-fast-forward / 落后：走 `pull` skill 合 `origin/main`、解冲突、重跑 lint，再推。
+   - 属于 non-fast-forward / 落后：走 `pull` skill 合 `origin/master`、解冲突、重跑 lint，再推。
    - 只有在确实改写过历史时才用 `--force-with-lease`。
    - 属于认证、权限或 workflow 限制：**停下来把原始错误如实报出**，
      不要改 remote、不要换协议绕过。
@@ -40,8 +40,9 @@ description:
 6. 按 `.github/pull_request_template.md` 写/刷新 PR 描述：
    - 每一节都填具体内容，替换掉所有 `<!-- ... -->` 占位注释。
    - 保留模板的清单结构。
-   - **「题目来源与核验」一节是本仓库特有的必填项**：逐题写清题面来源、
-     答案来源、核验方式、抽样比例与结果。这一节留空的 PR 不允许交人工评审。
+   - **「核验记录」一节是本仓库特有的必填项**：MathNet 入库题逐题写清
+     `mathnet_id`、`review_ref`、评审结论；非入库改动写「不涉及」。
+     这一节留空的 PR 不允许交人工评审。
    - 分支更新时刷新描述，使其覆盖**整条分支的全部范围**，而不只是最新几个提交；
      不要沿用过时的旧描述。
 7. 给 PR 打上 `symphony` 标签，并在描述里关联 issue（`Closes #<n>`）。
@@ -53,7 +54,7 @@ description:
 branch=$(git branch --show-current)
 
 # 门槛
-uv run python scripts/bank.py lint
+bash scripts/lint.sh
 
 # 首次推送：沿用当前 origin
 git push -u origin HEAD
@@ -88,4 +89,3 @@ gh pr view --json url -q .url
 - 区分两类失败：
   - 同步问题（non-fast-forward、分支落后）→ 走 `pull` skill。
   - 认证 / 权限 / workflow 限制 → 直接如实上报，不做绕过。
-- 不要推送 `docs/sources/*.pdf`。

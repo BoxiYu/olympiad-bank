@@ -1,8 +1,9 @@
 # 知识点正名注册表（2026-08-03 建立）
-# 结构：category → 规范节点 → 别名列表（历史在用写法，全部收敛到规范节点）
+# 结构：category → 规范节点 → 别名列表（历史在用写法 + 中英检索别名，全部收敛到规范节点）
 # 规则：题目 frontmatter 的 topics 必须能解析到本表节点（节点名或别名）；
-#       lint 对未注册词发警告；bank.py map 据此生成指示图。
+#       lint 对未注册词发警告；bank.py map 据此生成指示图；query --topic 中英文均查本表。
 # 新增细分写法时：优先复用节点名；确需细分词，先在此登记为别名再入库。
+# （原 taxonomy/aliases.yml 中英对照表已于 2026-08-04 并入本表并删除，本表是词表唯一正本。）
 
 algebra:
   不等式:
@@ -20,6 +21,22 @@ algebra:
     - 边界极值
     - 构造与估计
     - 组合优化
+    - AM-GM inequality
+    - Cauchy-Schwarz
+    - Holder inequality
+    - Schur
+    - Schur inequality
+    - Jensen
+    - Jensen inequality
+    - SOS
+    - sum of squares
+    - 切线法
+    - tangent line trick
+    - 排序
+    - rearrangement inequality
+    - homogenization
+    - normalization
+    - smoothing
   函数方程:
     - 不动点
     - 单射性
@@ -27,6 +44,13 @@ algebra:
     - 完全可加性
     - 乘性结构
     - 唯一性条件
+    - 满射
+    - functional equation
+    - fixed point
+    - injective
+    - injectivity
+    - surjective
+    - surjectivity
   多项式:
     - 恒等式定次数
     - 二次型
@@ -46,10 +70,13 @@ algebra:
     - 复数
     - 垂直条件
     - 对称幂和递推
+    - Newton's sums
+    - power sums
   根与系数:
     - 韦达定理
     - 复因式配对
     - 根与系数（Vieta）
+    - Vieta's formulas
   代数变换技巧:
     - 代入技巧
     - 换元
@@ -88,27 +115,46 @@ combinatorics:
     - 双计数与极值
     - 同余分类
     - 组合估计
+    - inclusion-exclusion
+    - double counting
   递推与生成结构:
     - 递推
-  抽屉原理: []
-  极端原理: []
+    - 生成结构
+    - recursion
+    - recurrence
+    - generating structure
+    - Catalan
+  抽屉原理:
+    - pigeonhole principle
+  极端原理:
+    - extremal principle
   染色与不变量:
     - 不变量
     - 染色论证
     - 数论化的染色论证
     - 单调量
+    - 染色
+    - 势函数
+    - invariant
+    - coloring
+    - monovariant
+    - potential function
   组合构造:
     - 贪心与对抗构造
     - 贪心与算法构造
     - 最优化
     - 组合几何
+    - combinatorial construction
   图论:
     - 图论（有向图、扩张性）
     - 图论（连通分支）
     - 图论（连通性）
   组合博弈与策略:
     - 追逃
-  Ramsey 型问题: []
+    - 组合博弈
+    - combinatorial game
+  Ramsey 型问题:
+    - Ramsey theory
   算法与过程类问题:
     - 自适应搜索
     - 组合几何过程
@@ -120,6 +166,7 @@ geometry:
     - 中垂线
     - 中线长公式
     - 角度计数
+    - perpendicular bisector
   勾股定理与直角三角形:
     - 勾股定理
     - 直角条件
@@ -135,6 +182,8 @@ geometry:
     - 圆心距
     - 圆的切线
     - 圆的相切
+    - concyclic
+    - cyclic quadrilateral
   三角形五心与经典引理:
     - 内切圆切点三角形
     - 内切圆切线长
@@ -145,6 +194,18 @@ geometry:
     - 外心连线
     - 鸡爪定理
     - 西姆松线
+    - 九点圆
+    - 欧拉线
+    - 旁心
+    - incenter
+    - circumcenter
+    - orthocenter
+    - excenter
+    - incenter-excenter lemma
+    - Fact 5
+    - nine-point circle
+    - Euler line
+    - Simson line
   相似位似与全等:
     - 位似
     - 旋转相似
@@ -152,6 +213,8 @@ geometry:
     - 相似与位似
     - 相似位似与旋转相似
     - 相似比
+    - homothety
+    - spiral similarity
   面积法与三角法:
     - 面积比
     - 面积法
@@ -164,19 +227,37 @@ geometry:
     - 根轴与根心
     - 圆幂
     - 相交弦定理
+    - radical axis
+    - radical center
+    - power of a point
   解析几何与向量复数法:
     - 解析几何（坐标法）
-  共线共点定理: []
-  反演变换: []
+  共线共点定理:
+    - Menelaus
+    - Menelaus theorem
+    - Ceva
+    - Ceva theorem
+    - Pascal
+    - Pascal theorem
+    - Desargues
+    - Desargues theorem
+  反演变换:
+    - inversion
   射影几何与调和点列:
     - 极点极线与调和点列
     - 调和四边形
+    - pole and polar
+    - harmonic bundle
+    - harmonic division
   变换几何:
     - 轴对称变换
   立体几何:
     - 立体几何（旋转体）
     - 立体几何（柱体与球）
-  组合几何: []
+    - solid geometry
+    - 3D geometry
+  组合几何:
+    - combinatorial geometry
 
 number-theory:
   整除与同余:
@@ -205,34 +286,56 @@ number-theory:
     - Zsygmondy 型分解
     - 链分解
     - 平方差分解
+    - 唯一分解
+    - fundamental theorem of arithmetic
+    - unique factorization
   最大公约数与欧几里得算法:
     - 最大公约数
     - 欧几里得算法
     - 相邻项 gcd
     - 最小公倍数
+    - gcd
+    - greatest common divisor
+    - Euclidean algorithm
   费马小定理与欧拉定理:
     - 费马小定理
     - 欧拉定理
+    - Fermat's little theorem
+    - Euler's theorem
   中国剩余定理:
     - 同余方程组
+    - Chinese remainder theorem
+    - CRT
   阶与原根:
     - 阶
     - 阶与循环
+    - 原根
+    - multiplicative order
+    - primitive root
   二次剩余与平方数判别:
     - 二次剩余
     - 完全平方数分布
     - 平方数分布
+    - quadratic residue
   不定方程:
     - 韦达跳跃
     - 韦达跳跃（Vieta jumping）
     - 无穷递降
     - 勾股数参数化
+    - Pell 方程
+    - Pell equation
+    - Vieta jumping
+    - infinite descent
   p-adic 赋值与 LTE:
     - $2$-adic 赋值
     - $2$-adic 赋值（LTE 雏形）
     - $p$-adic 赋值
     - LTE
     - Legendre 公式
+    - p-adic 赋值
+    - p-adic valuation
+    - lifting the exponent
+    - Legendre's formula
     - 阶乘与素数幂
     - 阶乘的素因子分析
     - 阶乘的素因子指数

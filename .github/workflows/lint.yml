@@ -15,7 +15,11 @@ jobs:
       - uses: astral-sh/setup-uv@v9.0.0
 
       - name: 入库校验
-        run: uv run python scripts/bank.py lint
+        run: bash scripts/lint.sh
+
+      - name: 文档校验（doclint）
+        if: always()
+        run: uv run python scripts/bank.py doclint
 
       - name: 分布统计（参考）
         if: always()

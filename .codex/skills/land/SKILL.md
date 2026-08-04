@@ -9,7 +9,7 @@ description:
 
 ## 目标
 
-- 让 PR 与 `main` 无冲突。
+- 让 PR 与 `master` 无冲突。
 - CI 保持绿，红了就修。
 - 全绿且评审意见处理完后 squash 合并。
 - **不要中途把控制权交回用户**：保持监视循环，除非遇到真正的阻塞。
@@ -23,10 +23,10 @@ description:
 ## 步骤
 
 1. 定位当前分支对应的 PR。
-2. 本地先过门槛：`uv run python scripts/bank.py lint` 必须 `LINT OK`。
+2. 本地先过门槛：`bash scripts/lint.sh` 必须 `LINT OK`。
 3. 工作区若有未提交改动，用 `commit` skill 提交、`push` skill 推送，再继续。
-4. 检查与 `main` 的可合并性（`gh pr view --json mergeable`）。
-5. 有冲突：走 `pull` skill 合 `origin/main` 并解冲突，重跑 lint，
+4. 检查与 `master` 的可合并性（`gh pr view --json mergeable`）。
+5. 有冲突：走 `pull` skill 合 `origin/master` 并解冲突，重跑 lint，
    再走 `push` skill 发布。
 6. 处理评审意见（见下）。有未处理的意见时**不许合并**。
 7. 等 CI 完成：`gh pr checks --watch`。
@@ -44,7 +44,7 @@ pr_title=$(gh pr view --json title -q .title)
 pr_body=$(gh pr view --json body -q .body)
 
 # 门槛
-uv run python scripts/bank.py lint
+bash scripts/lint.sh
 
 # 可合并性
 mergeable=$(gh pr view --json mergeable -q .mergeable)
@@ -81,8 +81,8 @@ gh pr merge --squash --subject "$pr_title" --body "$pr_body"
   不是 GraphQL node id；路径必须带 PR 编号。
 - 每条意见归类为：正确性 / 设计 / 风格 / 澄清 / 范围。
 - **正确性问题必须给出具体验证**（命令、输出或推理）才能关闭。
-  涉及题面或答案正确性的意见，验证方式必须回到官方来源逐字比对——
-  不许用「看起来没问题」结案。
+  涉及题面或答案正确性的意见，核验标准以 `SPEC.md` §5「入库铁律 v2」为准
+  （MathNet 数据集溯源 + 评审凭证）——不许用「看起来没问题」结案。
 - 反驳时给出理由 + 替代方案；接受时补一行动机说明。
 - 一批修改后发一条汇总的根级 `[codex]` 评论，不要发很多条碎片更新。
 
@@ -96,8 +96,11 @@ gh pr merge --squash --subject "$pr_title" --body "$pr_body"
 
 ## 护栏
 
+- **触碰规则正本需教练确认**：PR 若改动了规则正本（`SPEC.md`、`AGENTS.md`、
+  `WORKFLOW.md`、`.codex/skills/`、`scripts/lint.sh`），合并前必须有教练（人类）
+  的明确确认记录，CI 绿不构成合入依据。
 - 合并前 PR 标题与描述必须覆盖整条分支的全部范围，而不只是最后一次修复。
 - 评审要求扩大范围时，决定「现在做」还是「另开 issue」，
   并在根级 `[codex]` 更新里说明理由。
-- 不要为了让 CI 变绿而放宽 `bank.py lint` 的规则或删改校验逻辑。
+- 不要为了让 CI 变绿而放宽 lint 的校验规则或删改 `scripts/bank.py` 的校验逻辑。
   lint 报错说明数据有问题，要修数据，不是修尺子。

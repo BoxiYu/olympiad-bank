@@ -1,7 +1,7 @@
 ---
 name: pull
 description:
-  Pull latest origin/main into the current local branch and resolve merge
+  Pull latest origin/master into the current local branch and resolve merge
   conflicts (aka update-branch). Use when Codex needs to sync a feature branch
   with origin, perform a merge-based update (not rebase), and guide conflict
   resolution best practices.
@@ -23,14 +23,14 @@ description:
 5. Sync the remote feature branch first:
    - `git pull --ff-only origin $(git branch --show-current)`
    - This pulls branch updates made remotely (for example, a GitHub auto-commit)
-     before merging `origin/main`.
+     before merging `origin/master`.
 6. Merge in order:
-   - Prefer `git -c merge.conflictstyle=zdiff3 merge origin/main` for clearer
+   - Prefer `git -c merge.conflictstyle=zdiff3 merge origin/master` for clearer
      conflict context.
 7. If conflicts appear, resolve them (see conflict guidance below), then:
    - `git add <files>`
    - `git commit` (or `git merge --continue` if the merge is paused)
-8. Verify with project checks: run `uv run python scripts/bank.py lint` and require
+8. Verify with project checks: run `bash scripts/lint.sh` and require
    `LINT OK` before considering the merge done (see `AGENTS.md`). A merge that
    leaves lint red is not resolved, however clean the conflict markers look.
 9. Summarize the merge:

@@ -1,5 +1,10 @@
 # docs/sources —— 官方赛题 PDF 弹药库
 
+> 归档日期：2026-08-03
+> 原用途：官方赛题 PDF 弹药库使用说明（PDF 落盘 + 浏览器文本抽取双通道）。
+> 死因/取代者：题库供给全换 MathNet（决策①），官方 PDF 不再是入库弹药；目录随迁至 docs/archive/sources/。
+> 勘误注：`scripts/browser_pdf_extract.js` 未随迁，仍在 scripts/；文中「本目录」均指 docs/archive/sources/。
+
 把官方赛题 PDF 放到本目录（如 `IMO2024SL.pdf`），会话内即可全文精读入库/终审。
 
 ## 文本通道（主力，2026-08-03 打通）
