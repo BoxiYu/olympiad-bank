@@ -93,11 +93,15 @@ source_url: https://huggingface.co/datasets/ShadenA/MathNet
 
 ## 4. 难度分级（★1–★5）
 
-跨小学到 IMO 的统一标尺，**以解法所需思维跨度定级，不以赛事名气定级**。
+跨初中到 IMO 的统一标尺，**以解法所需思维跨度定级，不以赛事名气定级**。
+
+**学段范围（本节是正本）：本库只收初中与高中数学竞赛，下界是初中竞赛主体（★2）。**
+★1 档保留在标尺里只为让定级有一个"低于准入线"的落点——**判为 ★1 即不予入库**，
+不是"收进来标个一星"。上界不设限：IMO/ISL/RMM 属高中范畴，★5 照收。
 
 | 星级 | 定位锚点 | 典型用时 | 关键特征 |
 | --- | --- | --- | --- |
-| ★1 | 华杯赛初赛、AMC 8 前中段、MATHCOUNTS 主体 | 2–5 分钟 | 单步套用公式或一次设元 |
+| ★1 | 小学/低龄档：华杯赛初赛、AMC 8 前中段、MATHCOUNTS 主体 | 2–5 分钟 | 单步套用公式或一次设元；**低于准入线，不入库** |
 | ★2 | 初中竞赛主体、AMC 10/12 中前段、高联一试主体、HMMT November | 5–12 分钟 | 两三步组合，需一个不显然的转化 |
 | ★3 | AIME、高联一试压轴/加试前两题、HMMT February、东南赛/西部赛、Balkan MO | 15–30 分钟 | 需调用具名工具或一个非显然引理，有明确答案可验算 |
 | ★4 | 高联加试后两题、CMO 主体、USAMO/USAJMO、IMO P1/P4、APMO、EGMO | 45–90 分钟 | 完整证明题；主动构造辅助对象或不变量 |
@@ -168,6 +172,7 @@ source_url: https://huggingface.co/datasets/ShadenA/MathNet
 | 允许小节名单（防泄答白名单） | `spar_session.py` `KNOWN_SECTIONS` | SPEC §3（语义）；spar 解析时执行 |
 | 题卡小节名单 | `spar_session.py` `CARD_SECTIONS` | spar 出卡执行 |
 | 难度星级语义与锚点 | SPEC §4 | `taxonomy/contest_tiers.yml` 头注、`mathnet_review.py` 评审提示 |
+| 学段范围（初中+高中，★1 不入库） | SPEC §4 | `bank.py` `MIN_DIFFICULTY`（lint 执行）、`docs/入库SOP-MathNet.md` 筛题环节、`contest_tiers.yml` 头注 |
 | 赛名→难度底档映射 | `taxonomy/contest_tiers.yml` | `mathnet_ingest.py` 估级管线 |
 | 知识点正名与别名 | `taxonomy/registry.yml`（检索别名 `aliases.yml`） | `bank.py lint` 告警、map/query |
 | 攻坚限时/复习间隔/毕业条件 | `spar_session.py` 契约常量（`TIME_LIMIT`/`INTERVALS`/`GRADUATE_STREAK`） | docs/ 两手册、`bank.py` coach/review |
