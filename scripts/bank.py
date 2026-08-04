@@ -82,6 +82,11 @@ def lint(problems):
         elif fm['difficulty'] < MIN_DIFFICULTY:  # 学段下界正本：SPEC §4（初中+高中，★1 是小学档）
             errors.append(f'{rel}: difficulty {fm["difficulty"]} 低于学段下界 ★{MIN_DIFFICULTY}'
                           f'——本库只收初中与高中，★1 不入库（SPEC §4）')
+        tv = fm.get('topics')
+        if isinstance(tv, list) and len(tv) > 4:
+            errors.append(f'{rel}: topics 有 {len(tv)} 个，超出上限 4（SPEC §2：1–4 个规范节点，只留解题主线）')
+        elif tv is not None and not isinstance(tv, list):
+            errors.append(f'{rel}: topics 必须是列表（SPEC §2）')
         url = str(fm.get('source_url', ''))
         if not url.startswith('http'):
             errors.append(f'{rel}: source_url 不是链接')

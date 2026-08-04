@@ -19,8 +19,6 @@ algebra:
     - 归纳放缩
     - 最优常数
     - 边界极值
-    - 构造与估计
-    - 组合优化
     - AM-GM inequality
     - Cauchy-Schwarz
     - Holder inequality

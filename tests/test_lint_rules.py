@@ -395,3 +395,26 @@ class TestDoclint:
         rc, out = run_doclint(capsys)
         assert rc == 1
         assert 'taxonomy/geometry.md 缺失' in out
+
+
+class TestTopicsCount:
+    # 上限正本是 SPEC §2「1–4 个中文规范节点」；下限（空列表）由必填字段检查兜底。
+    def test_topics_over_four_rejected(self, repo, capsys):
+        """防回归：topics 超过 4 个（标签堆砌）必须拒收——历史上有题挂到 5 个。"""
+        make_problem(repo, topics=['不等式', '函数方程', '多项式', '数列与递推', '根与系数'])
+        rc, out = run_lint(capsys)
+        assert rc == 1
+        assert 'problems/algebra/A-001.md: topics 有 5 个，超出上限 4' in out
+
+    def test_topics_four_passes(self, repo, capsys):
+        """4 个正好在上限内，不得误伤。"""
+        make_problem(repo, topics=['不等式', '函数方程', '不等式', '函数方程'])
+        rc, out = run_lint(capsys)
+        assert rc == 0, out
+
+    def test_topics_non_list_rejected(self, repo, capsys):
+        """防回归：topics 写成裸字符串（YAML 少写方括号）要报类型错，而不是被逐字符迭代。"""
+        make_problem(repo, topics='不等式')
+        rc, out = run_lint(capsys)
+        assert rc == 1
+        assert 'problems/algebra/A-001.md: topics 必须是列表' in out
