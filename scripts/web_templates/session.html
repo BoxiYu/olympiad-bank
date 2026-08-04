@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}{{ p.id }} 攻坚中 · 奥数训练台{% endblock %}
+{% block content %}
+
+<section class="sess-head">
+  <div>
+    <h1>{{ p.id }}<span class="sess-title">｜{{ p.title }}</span></h1>
+    <p class="sub">
+      <span class="stars">{{ p.stars }}</span> · {{ p.contest }} {{ p.year }} ·
+      <span class="tag">{{ '复习' if mode == 'review' else ('变式' if mode == 'variant' else '新题') }}</span>
+    </p>
+  </div>
+  <div class="timer" id="timer" data-elapsed="{{ elapsed_s }}" data-limit="{{ limit_min or 0 }}">
+    <div class="timer-num" id="timerNum">--:--</div>
+    <div class="timer-cap" id="timerCap">限时 {{ limit_min }} 分钟</div>
+  </div>
+</section>
+
+<section class="card statement">
+  <h2>题面</h2>
+  <div class="md">{{ statement_html | safe }}</div>
+  <p class="discipline">纪律：合上其他资料，纸笔限时独立攻坚。超时不拦，但会计入判定。</p>
+</section>
+
+<section class="card">
+  <h2>提示阶梯 <span class="sub-inline">{{ hints | length }}/{{ ladder_total }} 已解锁</span></h2>
+  {% if ladder_total == 0 %}
+  <p class="sub">本题暂无提示阶梯。</p>
+  {% else %}
+  {% for h in hints %}
+  <div class="hint-card" id="hint-{{ h.level }}">
+    <div class="hint-head">提示 {{ h.level }}/{{ ladder_total }}{% if h.early %}<span class="tag early">提前解锁</span>{% endif %}</div>
+    <div class="md">{{ h.html | safe }}</div>
+  </div>
+  {% endfor %}
+  {% if can_hint %}
+  <form method="post" action="/session/hint" id="hintForm" data-cooldown="{{ cooldown_s }}" data-cooldown-min="{{ cooldown_min }}">
+    <button class="btn" type="submit" id="hintBtn">🔓 解锁提示 {{ hints | length + 1 }}/{{ ladder_total }}</button>
+    <span class="sub" id="hintNote"></span>
+  </form>
+  {% else %}
+  <p class="sub">提示已全部解锁——再战一会儿，或看解法 / 收卷。</p>
+  {% endif %}
+  {% endif %}
+</section>
+
+{% if revealed %}
+<section class="card solution" id="solution">
+  <h2>答案与解法要点 <span class="tag reveal-tag">已记入日志</span></h2>
+  <h3>答案</h3>
+  <div class="md">{{ solution.answer | safe }}</div>
+  <h3>解法要点</h3>
+  <div class="md">{{ solution.keypoints | safe }}</div>
+  <p class="discipline">看完请<strong>合卷</strong>，不看任何材料凭记忆复述完整证明——收卷时会问复述结果。</p>
+</section>
+{% else %}
+<section class="card">
+  <h2>弹尽粮绝？</h2>
+  <p class="sub">看解法会永久记入本次日志（revealed_at）——之后判定只能是「看解后复述通过」或「未通过」。先把提示用完再来。</p>
+  <form method="post" action="/session/reveal" id="revealForm">
+    <button class="btn danger" type="submit">👀 看答案与解法要点</button>
+  </form>
+</section>
+{% endif %}
+
+<section class="sess-actions">
+  <a class="btn primary big" href="/session/finish">📥 收卷落账</a>
+  <form method="post" action="/abandon" id="abandonForm">
+    <button class="btn ghost" type="submit">放弃本卷（不写记录）</button>
+  </form>
+</section>
+
+{% endblock %}

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""题库工具：lint / doclint / query / stats / plan / coach / spar / review / similar / student / assess / profile
+"""题库工具：lint / doclint / query / stats / plan / coach / spar / review / similar / web / student / assess / profile
 
 用法：
+  uv run python scripts/bank.py web        # 浏览器训练台（学生推荐入口，scripts/web_app.py）
   uv run python scripts/bank.py lint
   uv run python scripts/bank.py doclint    # 全仓 md：死链 / 禁词 / taxonomy 树一致性
   uv run python scripts/bank.py query [--difficulty 3] [--topic 韦达] [--contest IMO] [--category algebra] [--unverified]
@@ -24,6 +25,7 @@ CATEGORIES = ['algebra', 'number-theory', 'combinatorics', 'geometry']
 PREFIX = {'algebra': 'A', 'number-theory': 'N', 'combinatorics': 'C', 'geometry': 'G'}
 REQUIRED = ['id', 'title', 'category', 'source_ref', 'difficulty', 'topics', 'verification', 'source_url']
 SECTIONS = ['## 题面', '## 答案', '## 解法要点']
+MIN_DIFFICULTY = 2  # 学段下界：本库只收初中+高中，★1 为小学/低龄档不入库（语义正本 SPEC §4）
 
 
 def load_all():
@@ -41,16 +43,19 @@ def load_all():
     return problems
 
 
-def _verdict_ids(ref, _cache={}):
+_VERDICT_CACHE = {}
+
+
+def _verdict_ids(ref):
     """review_ref（仓库相对路径）→ 该评审凭证覆盖的 mathnet_id 集合；缺失/不可解析 → None。"""
-    if ref not in _cache:
+    if ref not in _VERDICT_CACHE:
         import json
         try:
             rows = json.load(open(os.path.join(ROOT, ref), encoding='utf-8'))
-            _cache[ref] = {str(r.get('mathnet_id')) for r in rows if isinstance(r, dict)}
+            _VERDICT_CACHE[ref] = {str(r.get('mathnet_id')) for r in rows if isinstance(r, dict)}
         except (OSError, ValueError):
-            _cache[ref] = None
-    return _cache[ref]
+            _VERDICT_CACHE[ref] = None
+    return _VERDICT_CACHE[ref]
 
 
 def lint(problems):
@@ -70,8 +75,13 @@ def lint(problems):
             errors.append(f'{rel}: id({pid}) 与文件名不一致')
         if not pid.startswith(PREFIX[p['cat']] + '-'):
             errors.append(f'{rel}: id 前缀与目录 {p["cat"]} 不匹配')
-        if not isinstance(fm.get('difficulty'), int) or not 1 <= fm['difficulty'] <= 5:
+        # bool 是 int 的子类：YAML 的 difficulty: true/yes 会读成 True，不排除就被静默当成 ★1
+        dv = fm.get('difficulty')
+        if isinstance(dv, bool) or not isinstance(dv, int) or not 1 <= dv <= 5:
             errors.append(f'{rel}: difficulty 必须是 1-5 的整数')
+        elif fm['difficulty'] < MIN_DIFFICULTY:  # 学段下界正本：SPEC §4（初中+高中，★1 是小学档）
+            errors.append(f'{rel}: difficulty {fm["difficulty"]} 低于学段下界 ★{MIN_DIFFICULTY}'
+                          f'——本库只收初中与高中，★1 不入库（SPEC §4）')
         url = str(fm.get('source_url', ''))
         if not url.startswith('http'):
             errors.append(f'{rel}: source_url 不是链接')
@@ -311,17 +321,8 @@ def _pick_rotating(cands, k, rng):
     return sel
 
 
-def coach(problems, args):
-    import datetime, random
-    profile = PLAN_PROFILES.get(args.target)
-    if not profile:
-        print(f'未知目标赛事。可选：{"、".join(PLAN_PROFILES)}')
-        sys.exit(2)
-    rng = random.Random(args.seed)
-    hist = sp.history_by_id(sp.load_attempts_v2())
-    graduated = {pid for pid, recs in hist.items() if sp.is_graduated(recs)}
-    excluded = set(hist) | graduated   # 做过的走复习队列；毕业题永久不进周计划
-    total_w = sum(profile.values())
+def build_coach_pool(problems, profile, excluded, rng):
+    """周计划候选池：{难度: [fm]}（排除已做/毕业题，随机洗牌）。coach 与 web 训练台共用。"""
     pool = {}
     for p in problems:
         fm = p['fm'] or {}
@@ -332,20 +333,41 @@ def coach(problems, args):
             pool.setdefault(d, []).append(fm)
     for lst in pool.values():
         rng.shuffle(lst)
+    return pool
+
+
+def pick_week(pool, profile, n, rng):
+    """从候选池按星级配比取一周题目（就地消耗 pool），按（难度, 题号）排序返回。"""
+    total_w = sum(profile.values())
+    picked = []
+    for d, wt in sorted(profile.items()):
+        k = max(1, round(n * wt / total_w))
+        sel = _pick_rotating(pool.get(d, []), k, rng)
+        for fm in sel:
+            pool[d].remove(fm)
+        picked += sel
+    picked.sort(key=lambda f: (f['difficulty'], f['id']))
+    return picked
+
+
+def coach(problems, args):
+    import datetime, random
+    profile = PLAN_PROFILES.get(args.target)
+    if not profile:
+        print(f'未知目标赛事。可选：{"、".join(PLAN_PROFILES)}')
+        sys.exit(2)
+    rng = random.Random(args.seed)
+    hist = sp.history_by_id(sp.load_attempts_v2())
+    graduated = {pid for pid, recs in hist.items() if sp.is_graduated(recs)}
+    excluded = set(hist) | graduated   # 做过的走复习队列；毕业题永久不进周计划
+    pool = build_coach_pool(problems, profile, excluded, rng)
     print(f'=== 教练周计划 | 目标 {args.target} | {args.weeks} 周 × 每周 {args.n} 题 | seed={args.seed} ===\n')
     print('攻坚纪律：限时独立攻坚（' + '，'.join(f'★{d}≤{m}min' for d, m in sorted(TIME_LIMIT.items()) if d in profile)
           + '）；卡住按「提示阶梯」逐级解锁，每级之间再战 15 分钟；无论成败必须 spar finish 落账。\n')
     week1 = []
     for w in range(1, args.weeks + 1):
         print(f'—— 第 {w} 周 ——')
-        picked = []
-        for d, wt in sorted(profile.items()):
-            k = max(1, round(args.n * wt / total_w))
-            sel = _pick_rotating(pool.get(d, []), k, rng)
-            for fm in sel:
-                pool[d].remove(fm)
-            picked += sel
-        picked.sort(key=lambda f: (f['difficulty'], f['id']))
+        picked = pick_week(pool, profile, args.n, rng)
         for fm in picked:
             print(f"  {fm['id']}  {'★' * fm['difficulty']:<5} {fm.get('contest') or '?':<6} {fm['title']}"
                   f"  → uv run python scripts/bank.py spar {fm['id']}")
@@ -683,6 +705,10 @@ def main():
     pf = sub.add_parser('profile', help='能力图：基础值走势 + 节点状态 + 补齐队列 + 细分建议')
     pf.add_argument('sid', help='学生 id')
     pf.add_argument('--html', action='store_true', help='另生成 maps/能力图-<id>.html')
+    wb = sub.add_parser('web', help='浏览器训练台（学生推荐入口，本地服务）')
+    wb.add_argument('--host', default='127.0.0.1')
+    wb.add_argument('--port', type=int, default=8642)
+    wb.add_argument('--no-open', action='store_true', help='启动后不自动打开浏览器')
     ca = sub.add_parser('candidates')
     ca.add_argument('--category', choices=CATEGORIES)
     ca.add_argument('--difficulty', help='单值 3 或区间 2-3（估级）')
@@ -698,6 +724,16 @@ def main():
     args = ap.parse_args()
     if args.cmd == 'doclint':
         sys.exit(doclint())
+    if args.cmd == 'web':
+        import threading, webbrowser
+        import uvicorn
+        from web_app import app as web_application
+        url = f'http://{args.host}:{args.port}'
+        print(f'训练台已启动：{url}（关闭：终端里按 Ctrl+C）')
+        if not args.no_open:
+            threading.Timer(0.8, webbrowser.open, args=(url,)).start()
+        uvicorn.run(web_application, host=args.host, port=args.port, log_level='warning')
+        return
     problems = load_all()
     if args.cmd == 'lint':
         sys.exit(lint(problems))

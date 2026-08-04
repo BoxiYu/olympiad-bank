@@ -5,16 +5,37 @@ description = "奥数题库：竞赛数学题库与训练工作流"
 requires-python = ">=3.11"
 dependencies = [
     "pyyaml>=6",
+    # 浏览器训练台（scripts/web_app.py，入口 bank.py web）——放主依赖，保证学生一条命令能起
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "jinja2>=3.1",
+    "python-multipart>=0.0.9",
 ]
 
 # 一次性核验脚本（如 scripts/verify/recheck_*.py 需要 sympy）临时跑：
 #   uv run --with sympy python scripts/verify/recheck_xxx.py
 
 [dependency-groups]
-# 测试（tests/）：uv run --group dev pytest -q
-dev = ["pytest>=8"]
+# 测试与代码检查：uv run --group dev pytest -q ／ uv run --group dev ruff check scripts tests
+# （httpx2 供 web 训练台测试的 TestClient 用）
+dev = ["pytest>=8", "ruff>=0.9", "httpx2>=2.9.1"]
 # MathNet 候选池构建（scripts/mathnet_ingest.py）：uv run --group mathnet python ...
 mathnet = ["datasets>=3.0", "pillow>=10"]
 # 相似度设施（scripts/similar_index.py）：uv run --group similar python ...
 # （候选池全量/子集 build 需读 HF 缓存，再叠加 --group mathnet）
 similar = ["sentence-transformers>=3"]
+
+[tool.ruff]
+line-length = 110          # 现有脚本的实际书写宽度
+target-version = "py311"
+# 冻结的历史脚本：verify/ 是已退役旧题库的核验凭证、archive/ 是一次性迁移脚本，
+# 二者作为史料原样保留，不按活代码标准整改。
+exclude = ["scripts/verify", "scripts/archive"]
+
+[tool.ruff.lint]
+# 只抓真 bug，不改风格：F=pyflakes（未定义/未用/遮蔽），B=bugbear（可变默认值、闭包捕获循环变量等），
+# E9=语法与运行时错误。本仓库脚本刻意用紧凑写法（一行多 import、分号连写），故不启用 E1-E7/I/UP。
+select = ["F", "B", "E9"]
+ignore = [
+    "B905",   # zip(strict=) 对等长序列是噪声
+]

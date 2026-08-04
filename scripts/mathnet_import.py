@@ -22,6 +22,53 @@ PREFIX = {'algebra': 'A', 'number-theory': 'N', 'combinatorics': 'C', 'geometry'
 SOURCE_URL = 'https://huggingface.co/datasets/ShadenA/MathNet'
 
 
+# 语言闸门用词表（SPEC §3：新题题面即英文原文）。只做「排除法」：外语证据占优才判非英文，
+# 证据不足时一律放行，宁可漏判也不误杀纯符号题面。
+EN_STOP = {
+    'the', 'of', 'and', 'is', 'are', 'be', 'that', 'for', 'with', 'all', 'such',
+    'prove', 'find', 'show', 'let', 'if', 'then', 'each', 'there', 'exists',
+    'we', 'any', 'every', 'which', 'has', 'have', 'in', 'on', 'to', 'an', 'it',
+    'its', 'from', 'given', 'number', 'numbers', 'point', 'points', 'triangle',
+    'determine', 'suppose', 'where', 'what', 'how', 'many', 'at', 'by', 'this',
+    'these', 'can', 'so', 'not', 'one', 'two', 'three', 'first', 'second',
+}
+NON_EN_STOP = {
+    # 德语
+    'der', 'die', 'das', 'und', 'ist', 'sind', 'nicht', 'ein', 'eine', 'einen',
+    'sich', 'mit', 'den', 'dem', 'für', 'oder', 'sei', 'seien', 'zwei', 'drei',
+    'wenn', 'dass', 'wird', 'werden', 'man', 'auf', 'aus', 'zeige', 'zeigen',
+    'einer', 'eines', 'durch', 'über', 'nach', 'beweisen',
+    # 意大利语
+    'che', 'non', 'per', 'con', 'sono', 'uno', 'una', 'della', 'delle', 'dei',
+    'degli', 'gli', 'alla', 'nel', 'questo', 'quando', 'sia', 'siano', 'il',
+    'lo', 'le', 'ha', 'hanno', 'più', 'essere', 'quale', 'quanti',
+    # 法语
+    'les', 'des', 'dans', 'avec', 'pour', 'être', 'soit', 'nombre', 'nombres',
+    'montrer', 'trouver', 'tous', 'toutes', 'est', 'sur', 'aux',
+    # 西班牙语 / 葡萄牙语
+    'los', 'las', 'para', 'que', 'son', 'sea', 'sean', 'del', 'por', 'como',
+    'uma', 'são', 'seja', 'dos', 'pelo', 'demostrar', 'hallar',   # 'das' 见德语段
+    # 罗马尼亚语
+    'și', 'sunt', 'care', 'este', 'pentru', 'două', 'dacă', 'fie', 'cu', 'la',
+    # 波兰语等其余拉丁字母语种
+    'jest', 'oraz', 'niech', 'wykaż', 'liczby',
+}
+# 非拉丁字母书写系统：出现即证明原文不是英文（候选池里确有俄语、中文题）。
+FOREIGN_SCRIPT_RE = re.compile(r'[Ѐ-ӿ぀-ヿ㐀-䶿一-鿿가-힯]')
+
+
+def looks_english(text):
+    """题面/解答是否为英文原文。先剥数学环境与 LaTeX 命令（\\in、\\sec 等会污染词表），
+    再按停用词投票；非拉丁书写系统出现即判非英文。外语票数不占优就放行（保守，避免误杀）。"""
+    t = re.sub(r'\$\$.*?\$\$', ' ', text or '', flags=re.S)
+    t = re.sub(r'\$[^$]*\$', ' ', t)
+    t = re.sub(r'\\[A-Za-z]+', ' ', t)
+    if len(FOREIGN_SCRIPT_RE.findall(t)) >= 3:
+        return False
+    words = re.findall(r'[^\W\d_]+', t.lower(), re.UNICODE)
+    return sum(w in NON_EN_STOP for w in words) <= sum(w in EN_STOP for w in words)
+
+
 def q(s):
     """YAML 安全的双引号标量（JSON 字符串是合法 YAML）。"""
     return json.dumps(s, ensure_ascii=False)
@@ -59,6 +106,10 @@ def render(pid, title, row, v, full, review_ref):
     sols = [s.strip() for s in (full['solutions_markdown'] or []) if s and s.strip()]
     if not prob or not sols:
         return None, '题面或官方解为空'
+    # SPEC §3：新题题面即英文原文、不设译文节——非英文原文在新规范下没有合法表示，
+    # 翻译即改写（铁律 1）。候选池实测约 22% 非英文，此前无任何环节拦截。
+    if not looks_english(prob):
+        return None, '题面非英文原文（SPEC §3：不设译文节，不翻译即不收）'
     answer = (row.get('final_answer') or '').strip()
     if not answer:
         if 'answer' in (row.get('problem_type') or ''):
@@ -104,6 +155,11 @@ def main():
     ap.add_argument('--dir', required=True, help='评审批次目录，如 data/review/import-01')
     ap.add_argument('--per-category', type=int, default=5, help='每板块最多入库题数（默认 5）')
     ap.add_argument('--dry-run', action='store_true', help='只报告不写盘')
+    # 人工裁定要在入库前生效：lint 强制题号连号，事后删题就得重排编号，极易出错。
+    ap.add_argument('--exclude', nargs='*', default=[], metavar='MATHNET_ID',
+                    help='入库者裁定放弃的题（如题面非英文、官方解为空指针），入库前剔除')
+    ap.add_argument('--only', nargs='*', default=None, metavar='MATHNET_ID',
+                    help='只入库这些题（与 --exclude 互补，用于挑选式入库）')
     args = ap.parse_args()
     d = os.path.join(ROOT, args.dir)
     review_ref = os.path.relpath(os.path.join(d, 'verdicts.json'), ROOT)
@@ -124,6 +180,10 @@ def main():
     done, skipped = [], []
     for b in batch:                     # 按批次顺序 = 确定性入库顺序
         mid = b['mathnet_id']
+        if mid in set(args.exclude):
+            skipped.append((mid, '入库者裁定放弃（--exclude）')); continue
+        if args.only is not None and mid not in set(args.only):
+            skipped.append((mid, '不在 --only 名单')); continue
         v, row = verdicts.get(mid), rows.get(mid)
         if not v or not row:
             skipped.append((mid, '缺 verdict 或候选池行')); continue

@@ -1,5 +1,6 @@
 #!/bin/bash
-# macOS 双击入口：打开训练菜单（菜单本体在 scripts/menu.py，本文件只负责启动）。
+# macOS 双击入口：拉起浏览器训练台（bank.py web，正本在 scripts/web_app.py）。
+# 不想开浏览器可在终端用 scripts/menu.py 的命令行菜单。
 # 首次被系统拦截时：右键本文件 → 打开。
 cd "$(dirname "$0")" || exit 1
 if ! command -v uv >/dev/null 2>&1 && [ -x "$HOME/.local/bin/uv" ]; then
@@ -14,5 +15,5 @@ if ! command -v uv >/dev/null 2>&1; then
   read -r -p "（回车关闭）"
   exit 1
 fi
-uv run python scripts/menu.py
+uv run python scripts/bank.py web   # 浏览器训练台（学生推荐入口）；关掉本窗口即停止
 read -r -p "（回车关闭窗口）"

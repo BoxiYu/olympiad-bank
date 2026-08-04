@@ -40,6 +40,11 @@ uv run python scripts/bank.py candidates --category geometry --difficulty 2-3 \
 uv run python scripts/bank.py candidates --grep Ramsey                              # 题面正则旁路召回
 ```
 
+**学段下界（正本 SPEC §4）：本库只收初中与高中，★1 是小学/低龄档，不予入库。**
+筛题时 `--difficulty` 从 2 起（`--difficulty 2-5`）；`difficulty_est` 为 1 的候选直接跳过，
+不必送评审。评审阶段若 Codex 判定 `difficulty_codex: 1`，按退回处理而非降星收录——
+lint 也会拒绝 `difficulty: 1` 的题（见 `bank.py`）。
+
 ## 2｜batch：出评审批次
 
 ```bash
@@ -108,7 +113,7 @@ review_ref: data/review/geo-01/verdicts.json
 ## 6｜import：转格式入库
 
 ```bash
-uv run python scripts/mathnet_import.py --dir data/review/geo-01
+uv run --group mathnet python scripts/mathnet_import.py --dir data/review/geo-01
 ```
 
 （参数以脚本 `--help` 为准。）题文件字段全集、正文小节、编号规则**一律以 SPEC.md 为正本**，本文只规定评审产物到字段的取值映射：
