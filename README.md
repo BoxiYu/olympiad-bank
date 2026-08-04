@@ -17,7 +17,10 @@
 ## 常用命令
 
 ```bash
-# 训练闭环（流程与语义见 docs/学生手册.md）
+# 浏览器训练台（学生/教练推荐入口：开卡/提示/收卷/周计划全部点选完成，自动打开浏览器）
+uv run python scripts/bank.py web
+
+# 训练闭环命令行等价流程（流程与语义见 docs/学生手册.md）
 uv run python scripts/bank.py spar next      # 开无答案题卡（复习到期优先于周计划）
 uv run python scripts/bank.py spar hint      # 逐级解锁提示
 uv run python scripts/bank.py spar reveal    # 亮出解法要点（之后须合卷复述）

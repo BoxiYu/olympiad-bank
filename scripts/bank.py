@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""题库工具：lint / doclint / query / stats / plan / coach / spar / review / similar
+"""题库工具：lint / doclint / query / stats / plan / coach / spar / review / similar / web
 
 用法：
+  uv run python scripts/bank.py web        # 浏览器训练台（学生推荐入口，scripts/web_app.py）
   uv run python scripts/bank.py lint
   uv run python scripts/bank.py doclint    # 全仓 md：死链 / 禁词 / taxonomy 树一致性
   uv run python scripts/bank.py query [--difficulty 3] [--topic 韦达] [--contest IMO] [--category algebra] [--unverified]
@@ -316,17 +317,8 @@ def _pick_rotating(cands, k, rng):
     return sel
 
 
-def coach(problems, args):
-    import datetime, random
-    profile = PLAN_PROFILES.get(args.target)
-    if not profile:
-        print(f'未知目标赛事。可选：{"、".join(PLAN_PROFILES)}')
-        sys.exit(2)
-    rng = random.Random(args.seed)
-    hist = sp.history_by_id(sp.load_attempts_v2())
-    graduated = {pid for pid, recs in hist.items() if sp.is_graduated(recs)}
-    excluded = set(hist) | graduated   # 做过的走复习队列；毕业题永久不进周计划
-    total_w = sum(profile.values())
+def build_coach_pool(problems, profile, excluded, rng):
+    """周计划候选池：{难度: [fm]}（排除已做/毕业题，随机洗牌）。coach 与 web 训练台共用。"""
     pool = {}
     for p in problems:
         fm = p['fm'] or {}
@@ -337,20 +329,41 @@ def coach(problems, args):
             pool.setdefault(d, []).append(fm)
     for lst in pool.values():
         rng.shuffle(lst)
+    return pool
+
+
+def pick_week(pool, profile, n, rng):
+    """从候选池按星级配比取一周题目（就地消耗 pool），按（难度, 题号）排序返回。"""
+    total_w = sum(profile.values())
+    picked = []
+    for d, wt in sorted(profile.items()):
+        k = max(1, round(n * wt / total_w))
+        sel = _pick_rotating(pool.get(d, []), k, rng)
+        for fm in sel:
+            pool[d].remove(fm)
+        picked += sel
+    picked.sort(key=lambda f: (f['difficulty'], f['id']))
+    return picked
+
+
+def coach(problems, args):
+    import datetime, random
+    profile = PLAN_PROFILES.get(args.target)
+    if not profile:
+        print(f'未知目标赛事。可选：{"、".join(PLAN_PROFILES)}')
+        sys.exit(2)
+    rng = random.Random(args.seed)
+    hist = sp.history_by_id(sp.load_attempts_v2())
+    graduated = {pid for pid, recs in hist.items() if sp.is_graduated(recs)}
+    excluded = set(hist) | graduated   # 做过的走复习队列；毕业题永久不进周计划
+    pool = build_coach_pool(problems, profile, excluded, rng)
     print(f'=== 教练周计划 | 目标 {args.target} | {args.weeks} 周 × 每周 {args.n} 题 | seed={args.seed} ===\n')
     print('攻坚纪律：限时独立攻坚（' + '，'.join(f'★{d}≤{m}min' for d, m in sorted(TIME_LIMIT.items()) if d in profile)
           + '）；卡住按「提示阶梯」逐级解锁，每级之间再战 15 分钟；无论成败必须 spar finish 落账。\n')
     week1 = []
     for w in range(1, args.weeks + 1):
         print(f'—— 第 {w} 周 ——')
-        picked = []
-        for d, wt in sorted(profile.items()):
-            k = max(1, round(args.n * wt / total_w))
-            sel = _pick_rotating(pool.get(d, []), k, rng)
-            for fm in sel:
-                pool[d].remove(fm)
-            picked += sel
-        picked.sort(key=lambda f: (f['difficulty'], f['id']))
+        picked = pick_week(pool, profile, args.n, rng)
         for fm in picked:
             print(f"  {fm['id']}  {'★' * fm['difficulty']:<5} {fm.get('contest') or '?':<6} {fm['title']}"
                   f"  → uv run python scripts/bank.py spar {fm['id']}")
@@ -663,6 +676,10 @@ def main():
     lg.add_argument('--note')
     sub.add_parser('review')
     sub.add_parser('map')
+    wb = sub.add_parser('web', help='浏览器训练台（学生推荐入口，本地服务）')
+    wb.add_argument('--host', default='127.0.0.1')
+    wb.add_argument('--port', type=int, default=8642)
+    wb.add_argument('--no-open', action='store_true', help='启动后不自动打开浏览器')
     ca = sub.add_parser('candidates')
     ca.add_argument('--category', choices=CATEGORIES)
     ca.add_argument('--difficulty', help='单值 3 或区间 2-3（估级）')
@@ -678,6 +695,16 @@ def main():
     args = ap.parse_args()
     if args.cmd == 'doclint':
         sys.exit(doclint())
+    if args.cmd == 'web':
+        import threading, webbrowser
+        import uvicorn
+        from web_app import app as web_application
+        url = f'http://{args.host}:{args.port}'
+        print(f'训练台已启动：{url}（关闭：终端里按 Ctrl+C）')
+        if not args.no_open:
+            threading.Timer(0.8, webbrowser.open, args=(url,)).start()
+        uvicorn.run(web_application, host=args.host, port=args.port, log_level='warning')
+        return
     problems = load_all()
     if args.cmd == 'lint':
         sys.exit(lint(problems))

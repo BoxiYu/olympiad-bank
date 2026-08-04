@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}收卷 · {{ pid }} · 奥数训练台{% endblock %}
+{% block content %}
+
+<section class="sess-head">
+  <div>
+    <h1>收卷落账<span class="sess-title">｜{{ pid }} {{ title }}</span></h1>
+    <p class="sub">用时 {{ time_min }} 分钟{% if limit %}（限时 {{ limit }} 分钟）{% endif %} · 提示 {{ n_hints }} 级 · {{ '已看答案' if revealed else '未看答案' }}</p>
+  </div>
+  <a class="btn ghost" href="/session">← 回到题目</a>
+</section>
+
+<form method="post" action="/session/finish" class="card finish-form" id="finishForm" data-revealed="{{ 1 if revealed else 0 }}">
+
+  {% if revealed %}
+  <h2>① 合卷复述通过了吗？</h2>
+  <p class="sub">标准：不看任何材料，独立写出完整证明。改判可以，自欺没用。</p>
+  <div class="opt-list">
+    <label class="opt"><input type="radio" name="retell" value="yes" required>
+      <span><strong>通过</strong><small>合卷复述出了完整证明</small></span></label>
+    <label class="opt"><input type="radio" name="retell" value="no" required>
+      <span><strong>未通过</strong><small>复述卡壳，或没做复述</small></span></label>
+  </div>
+  <h2>② 判定</h2>
+  {% else %}
+  <h2>① 判定</h2>
+  <p class="sub">系统建议：<strong>{{ suggested }}</strong>（{{ why }}）——可改判，判定标准只有一套。</p>
+  {% endif %}
+
+  <div class="opt-list" id="resultList">
+    {% for r, label, desc, days in results %}
+    <label class="opt">
+      <input type="radio" name="result" value="{{ r }}" {% if r == suggested %}checked{% endif %} required>
+      <span><strong>{{ label }} <code>{{ r }}</code></strong><small>{{ desc }} → {{ days }} 天后复习</small></span>
+    </label>
+    {% endfor %}
+  </div>
+
+  <h2>{{ '③' if revealed else '②' }} 卡在哪一步？<span class="sub-inline">fail / 复述通过时必选；顺利做出可跳过。选<strong>最早</strong>卡住的环节</span></h2>
+  <div class="opt-list" id="stuckList">
+    {% for c, desc in stucks %}
+    <label class="opt"><input type="radio" name="stuck" value="{{ c }}">
+      <span><strong>{{ c }}</strong><small>{{ desc }}</small></span></label>
+    {% endfor %}
+    <label class="opt"><input type="radio" name="stuck" value="" checked>
+      <span><strong>不选</strong><small>没有明显卡点</small></span></label>
+  </div>
+
+  <h2>{{ '④' if revealed else '③' }} 备注 <span class="sub-inline">可留空</span></h2>
+  <textarea name="note" rows="3" placeholder="思路要点、错在哪、值得记的一句话……"></textarea>
+
+  <div class="finish-actions">
+    <button class="btn primary big" type="submit">✔ 落账，写入训练日志</button>
+  </div>
+</form>
+
+{% endblock %}

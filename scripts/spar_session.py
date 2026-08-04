@@ -42,6 +42,10 @@ CARD_SECTIONS = ('题面',)  # statement.md 只允许题面（legacy「原文（
 CLI = 'uv run python scripts/bank.py'
 
 
+class SparError(Exception):
+    """会话流程错误。核心函数（*_core / commit_finish）抛出；CLI 侧转 sys.exit，web 侧转页面提示。"""
+
+
 # ---------------- 时间 ----------------
 def _now():
     return datetime.datetime.now().astimezone()
@@ -89,8 +93,9 @@ def normalize_attempt(rec):
     return r
 
 
-def load_attempts_v2(path=ATTEMPTS_PATH):
+def load_attempts_v2(path=None):
     """读取全部训练记录（含旧格式归一化），供 review / coach / spar 共用。"""
+    path = path or ATTEMPTS_PATH  # 调用时解析，便于测试重定向数据目录
     if not os.path.exists(path):
         return []
     out = []
@@ -108,7 +113,8 @@ def load_attempts_v2(path=ATTEMPTS_PATH):
     return out
 
 
-def append_attempt(rec, path=ATTEMPTS_PATH):
+def append_attempt(rec, path=None):
+    path = path or ATTEMPTS_PATH
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'a', encoding='utf-8') as f:
         f.write(json.dumps(rec, ensure_ascii=False) + '\n')
@@ -149,7 +155,8 @@ def due_date_of(recs):
 
 
 # ---------------- data/plan.json ----------------
-def load_plan(path=PLAN_PATH):
+def load_plan(path=None):
+    path = path or PLAN_PATH
     if not os.path.exists(path):
         return None
     try:
@@ -159,7 +166,8 @@ def load_plan(path=PLAN_PATH):
         return None
 
 
-def save_plan(week, target, seed, items, path=PLAN_PATH):
+def save_plan(week, target, seed, items, path=None):
+    path = path or PLAN_PATH
     os.makedirs(os.path.dirname(path), exist_ok=True)
     data = {'week': week, 'target': target, 'seed': seed, 'items': items}
     with open(path, 'w', encoding='utf-8') as f:
@@ -280,24 +288,29 @@ def _verification_ok(fm):
     return fm.get('verification') in VALID_VERIFICATION
 
 
-def pick_next(fmmap, hist):
-    """选题顺序：复习到期 > plan.json 未完成项 > 提示先跑 coach --save。"""
-    today = datetime.date.today()
+def review_due_list(fmmap, hist, today=None):
+    """到期复习题 [(到期日, 题号)]，按 (到期日, 题号) 排序；跳过毕业与未过核验铁律的题。"""
+    today = today or datetime.date.today()
     due = []
     for pid, recs in hist.items():
         if pid not in fmmap or is_graduated(recs):
             continue
         dd = due_date_of(recs)
-        if dd is not None and dd <= today:
-            due.append((dd, pid))
-    for _, pid in sorted(due):
-        if _verification_ok(fmmap[pid]['fm']):
-            return pid, 'review'
-        print(f'跳过复习到期但未过核验铁律的 {pid}', file=sys.stderr)
-    plan = load_plan()
+        if dd is None or dd > today:
+            continue
+        if not _verification_ok(fmmap[pid]['fm']):
+            print(f'跳过复习到期但未过核验铁律的 {pid}', file=sys.stderr)
+            continue
+        due.append((dd, pid))
+    return sorted(due)
+
+
+def plan_remaining(fmmap, hist, plan):
+    """周计划中本周尚未完成的题（保序）[(题号, mode)]；跳过毕业与未过核验铁律的题。"""
     if not plan:
-        sys.exit(f'复习队列为空，且无 data/plan.json——先生成周计划：{CLI} coach --target <赛事> --save')
+        return []
     monday = _week_monday(plan.get('week'))
+    out = []
     for pid in plan.get('items', []):
         if pid not in fmmap:
             continue
@@ -311,7 +324,21 @@ def pick_next(fmmap, hist):
         if not _verification_ok(fmmap[pid]['fm']):
             print(f'跳过未过核验铁律的计划题 {pid}', file=sys.stderr)
             continue
-        return pid, ('review' if recs else 'fresh')
+        out.append((pid, 'review' if recs else 'fresh'))
+    return out
+
+
+def pick_next(fmmap, hist):
+    """选题顺序：复习到期 > plan.json 未完成项 > 提示先跑 coach --save。"""
+    due = review_due_list(fmmap, hist)
+    if due:
+        return due[0][1], 'review'
+    plan = load_plan()
+    if not plan:
+        sys.exit(f'复习队列为空，且无 data/plan.json——先生成周计划：{CLI} coach --target <赛事> --save')
+    rem = plan_remaining(fmmap, hist, plan)
+    if rem:
+        return rem[0]
     sys.exit(f'复习队列为空，周计划（{plan.get("week")}）已全部完成 🎉——'
              f'换一批：{CLI} coach --target {plan.get("target", "<赛事>")} --save')
 
@@ -331,37 +358,43 @@ def build_card(fm, sections, sid, mode, limit):
     return '\n'.join(lines).rstrip() + '\n'
 
 
-def spar_start(problems, args, pid):
+def abandon_open_session():
+    """放弃当前 open 会话（不写训练记录）；无会话返回 None，有则返回 (sid, 题号)。"""
+    sess = find_open_session()
+    if not sess:
+        return None
+    sid0, meta0 = sess
+    meta0['status'] = 'abandoned'
+    meta0['ended_at'] = iso(_now())
+    save_meta(sid0, meta0)
+    return sid0, meta0.get('id')
+
+
+def start_session_core(problems, pid, mode=None, abandon=False):
+    """开卡核心（无打印/无交互），CLI 与 web 共用。返回信息 dict；流程错误抛 SparError。"""
     fmmap = _fmmap(problems)
     hist = history_by_id(load_attempts_v2())
-    mode = None
-    if pid is None:
-        pid, mode = pick_next(fmmap, hist)
     if pid not in fmmap:
-        sys.exit(f'未知题号 {pid}')
+        raise SparError(f'未知题号 {pid}')
     fm = fmmap[pid]['fm']
     # 铁律：verification 必须在 VALID_VERIFICATION 白名单（含 mathnet-reviewed），否则拒绝出卡
     if not _verification_ok(fm):
-        sys.exit(f"铁律：{pid} 的 verification={fm.get('verification')!r} "
-                 f'不在 {VALID_VERIFICATION}，拒绝出卡——先走评审入库流程（docs/入库SOP-MathNet.md）')
+        raise SparError(f"铁律：{pid} 的 verification={fm.get('verification')!r} "
+                        f'不在 {VALID_VERIFICATION}，拒绝出卡——先走评审入库流程（docs/入库SOP-MathNet.md）')
+    abandoned = None
     sess = find_open_session()
     if sess:
         sid0, meta0 = sess
-        if getattr(args, 'abandon', False):
-            meta0['status'] = 'abandoned'
-            meta0['ended_at'] = iso(_now())
-            save_meta(sid0, meta0)
-            print(f"已放弃会话 {sid0}（{meta0.get('id')}，不写训练记录）")
-        else:
-            sys.exit(f"已有进行中的会话 {sid0}（{meta0.get('id')}）——"
-                     f'先 spar finish 落账，或 spar start {pid} --abandon 放弃重开')
+        if not abandon:
+            raise SparError(f"已有进行中的会话 {sid0}（{meta0.get('id')}）——"
+                            f'先 spar finish 落账，或 spar start {pid} --abandon 放弃重开')
+        abandoned = abandon_open_session()
     try:
         sections = split_sections(fmmap[pid]['body'], pid)
     except ValueError as e:
-        sys.exit(str(e))
-    mode = getattr(args, 'mode', None) or mode or ('review' if hist.get(pid) else 'fresh')
-    if is_graduated(hist.get(pid, [])):
-        print(f'注意：{pid} 已毕业（连续 {GRADUATE_STREAK} 次 independent_ok），本次为自选加练')
+        raise SparError(str(e)) from e
+    mode = mode or ('review' if hist.get(pid) else 'fresh')
+    graduated_extra = is_graduated(hist.get(pid, []))
     start = _now()
     sid = new_session_id(pid, start)
     sdir = _session_dir(sid)
@@ -376,37 +409,66 @@ def spar_start(problems, args, pid):
             'started_at': iso(start), 'hints': [], 'revealed_at': None,
             'difficulty': d, 'time_limit_min': limit, 'title': fm.get('title', '')}
     save_meta(sid, meta)
-    n_hints = len(parse_hint_ladder(sections))
+    return {'sid': sid, 'meta': meta, 'card': card, 'card_path': card_path,
+            'n_hints': len(parse_hint_ladder(sections)),
+            'graduated_extra': graduated_extra, 'abandoned': abandoned}
+
+
+def spar_start(problems, args, pid):
+    mode = None
+    if pid is None:
+        pid, mode = pick_next(_fmmap(problems), history_by_id(load_attempts_v2()))
+    try:
+        info = start_session_core(problems, pid, mode=getattr(args, 'mode', None) or mode,
+                                  abandon=getattr(args, 'abandon', False))
+    except SparError as e:
+        sys.exit(str(e))
+    if info['abandoned']:
+        sid0, pid0 = info['abandoned']
+        print(f'已放弃会话 {sid0}（{pid0}，不写训练记录）')
+    if info['graduated_extra']:
+        print(f'注意：{pid} 已毕业（连续 {GRADUATE_STREAK} 次 independent_ok），本次为自选加练')
+    meta, n_hints = info['meta'], info['n_hints']
     ladder_note = f'提示阶梯 {n_hints} 级' if n_hints else '本题暂无提示阶梯'
-    print(f'会话已开：{sid}（{mode}）')
-    print(f'题卡：{_rel(card_path)}')
-    print(f'限时：★{d} ≤ {limit} 分钟（超时不拦，finish 时计入判定）；{ladder_note}')
+    print(f"会话已开：{info['sid']}（{meta['mode']}）")
+    print(f"题卡：{_rel(info['card_path'])}")
+    print(f"限时：★{meta['difficulty']} ≤ {meta['time_limit_min']} 分钟（超时不拦，finish 时计入判定）；{ladder_note}")
     print(f'卡住：{CLI} spar hint')
     print(f'看解：{CLI} spar reveal')
     print(f'落账：{CLI} spar finish')
     print('（嫌长？alias ob="uv run python scripts/bank.py" 之后 ob spar hint）')
     if getattr(args, 'print_card', False):
-        print('\n' + card)
+        print('\n' + info['card'])
 
 
-def spar_hint(problems, args):
-    sid, meta = _require_open_session()
+def _open_session_sections(problems):
+    """(sid, meta, sections) 三连取；hint/reveal 核心共用。错误抛 SparError。"""
+    sess = find_open_session()
+    if not sess:
+        raise SparError(f'没有进行中的会话——先开卡：{CLI} spar start <ID>（或 spar next）')
+    sid, meta = sess
     fmmap = _fmmap(problems)
     pid = meta['id']
     if pid not in fmmap:
-        sys.exit(f'会话 {sid} 指向未知题号 {pid}')
+        raise SparError(f'会话 {sid} 指向未知题号 {pid}')
     try:
         sections = split_sections(fmmap[pid]['body'], pid)
     except ValueError as e:
-        sys.exit(str(e))
+        raise SparError(str(e)) from e
+    return sid, meta, sections
+
+
+def unlock_hint_core(problems):
+    """解锁下一级提示核心（无打印），CLI 与 web 共用。
+    返回 {'status': 'no_ladder'|'exhausted'|'ok', ...}；'ok' 时含 level/total/text/early/mins/ref_name/path。"""
+    sid, meta, sections = _open_session_sections(problems)
+    pid = meta['id']
     ladder = parse_hint_ladder(sections)
     if not ladder:
-        print('本题暂无阶梯')
-        return
+        return {'status': 'no_ladder'}
     used = len(meta.get('hints', []))
     if used >= len(ladder):
-        print(f'提示已全部解锁（共 {len(ladder)} 级）——再战一会儿，或 spar reveal / spar finish')
-        return
+        return {'status': 'exhausted', 'total': len(ladder)}
     now = _now()
     if used:
         ref = datetime.datetime.fromisoformat(meta['hints'][-1]['at'])
@@ -416,9 +478,6 @@ def spar_hint(problems, args):
         ref_name = '开卡'
     mins = (now - ref).total_seconds() / 60
     early = mins < HINT_COOLDOWN_MIN
-    if early:
-        print(f'⚠️ 距{ref_name}仅 {mins:.0f} 分钟（纪律：每级之间再战 {HINT_COOLDOWN_MIN} 分钟）'
-              '——照常解锁，已记 early')
     level = used + 1
     text = ladder[level - 1]
     hints_dir = os.path.join(_session_dir(sid), 'hints')
@@ -428,29 +487,52 @@ def spar_hint(problems, args):
         f.write(f'# {pid} 提示 {level}/{len(ladder)}\n\n{text}\n')
     meta.setdefault('hints', []).append({'level': level, 'at': iso(now), 'early': early})
     save_meta(sid, meta)
-    print(f'—— 提示 {level}/{len(ladder)}（{_rel(hint_path)}）——\n{text}')
+    return {'status': 'ok', 'level': level, 'total': len(ladder), 'text': text,
+            'early': early, 'mins': mins, 'ref_name': ref_name, 'path': hint_path}
 
 
-def spar_reveal(problems, args):
-    sid, meta = _require_open_session()
-    fmmap = _fmmap(problems)
-    pid = meta['id']
-    if pid not in fmmap:
-        sys.exit(f'会话 {sid} 指向未知题号 {pid}')
+def spar_hint(problems, args):
     try:
-        sections = split_sections(fmmap[pid]['body'], pid)
-    except ValueError as e:
+        info = unlock_hint_core(problems)
+    except SparError as e:
         sys.exit(str(e))
-    sol = (f'# {pid} 答案与解法要点\n\n## 答案\n\n{sections.get("答案", "").strip()}\n\n'
-           f'## 解法要点\n\n{sections.get("解法要点", "").strip()}\n')
+    if info['status'] == 'no_ladder':
+        print('本题暂无阶梯')
+        return
+    if info['status'] == 'exhausted':
+        print(f"提示已全部解锁（共 {info['total']} 级）——再战一会儿，或 spar reveal / spar finish")
+        return
+    if info['early']:
+        print(f"⚠️ 距{info['ref_name']}仅 {info['mins']:.0f} 分钟（纪律：每级之间再战 {HINT_COOLDOWN_MIN} 分钟）"
+              '——照常解锁，已记 early')
+    print(f"—— 提示 {info['level']}/{info['total']}（{_rel(info['path'])}）——\n{info['text']}")
+
+
+def reveal_core(problems):
+    """亮出答案与解法要点核心（无打印），CLI 与 web 共用；首次调用落盘 revealed_at。"""
+    sid, meta, sections = _open_session_sections(problems)
+    pid = meta['id']
+    answer = sections.get('答案', '').strip()
+    keypoints = sections.get('解法要点', '').strip()
+    sol = (f'# {pid} 答案与解法要点\n\n## 答案\n\n{answer}\n\n'
+           f'## 解法要点\n\n{keypoints}\n')
     sol_path = os.path.join(_session_dir(sid), 'solution.md')
     with open(sol_path, 'w', encoding='utf-8') as f:
         f.write(sol)
     if not meta.get('revealed_at'):
         meta['revealed_at'] = iso(_now())
         save_meta(sid, meta)
-    print(sol)
-    print(f'已记 revealed_at（{_rel(sol_path)}）。合卷凭记忆复述一遍，再 {CLI} spar finish——会询问复述结果')
+    return {'sid': sid, 'pid': pid, 'answer': answer, 'keypoints': keypoints,
+            'text': sol, 'path': sol_path}
+
+
+def spar_reveal(problems, args):
+    try:
+        info = reveal_core(problems)
+    except SparError as e:
+        sys.exit(str(e))
+    print(info['text'])
+    print(f"已记 revealed_at（{_rel(info['path'])}）。合卷凭记忆复述一遍，再 {CLI} spar finish——会询问复述结果")
 
 
 def _ask(prompt, default=''):
@@ -472,22 +554,88 @@ def _suggest_result(meta, time_min):
     return 'hinted_ok', why
 
 
+def session_time_min(meta, end=None):
+    """会话已用时长（分钟，至少 1），CLI 与 web 共用。"""
+    end = end or _now()
+    start = datetime.datetime.fromisoformat(meta['started_at'])
+    return max(1, round((end - start).total_seconds() / 60))
+
+
+def finish_suggestion(meta, time_min, retell=None):
+    """收卷判定建议 (suggested, why)。retell：已看答案时的合卷复述结果（True/False）；
+    已看答案但 retell 未回答 → (None, 提示语)。契约同 _suggest_result。"""
+    if meta.get('revealed_at'):
+        if retell is None:
+            return None, '已看答案——先回答合卷复述是否通过'
+        return ('solution_reconstructed' if retell else 'fail',
+                '已看答案，复述' + ('通过' if retell else '未通过'))
+    return _suggest_result(meta, time_min)
+
+
+def week_and_streak(attempts, ref_date):
+    """(本周攻坚次数, 连击天数)——以 ref_date 所在 ISO 周与向前连续训练日计。"""
+    y, w, _ = ref_date.isocalendar()
+    week_cnt = 0
+    days = set()
+    for r in attempts:
+        try:
+            d = datetime.date.fromisoformat(str(r.get('date')))
+        except ValueError:
+            continue
+        days.add(d)
+        if d.isocalendar()[:2] == (y, w):
+            week_cnt += 1
+    streak, d = 0, ref_date
+    while d in days:
+        streak += 1
+        d -= datetime.timedelta(days=1)
+    return week_cnt, streak
+
+
+def commit_finish(sid, meta, result, stuck=None, note='', end=None):
+    """落账核心（无打印）：写 attempts.jsonl + 会话置 finished，CLI 与 web 共用。
+    返回摘要 dict（rec/graduated_now/graduated_before/next_review/interval/week_count/streak）。"""
+    if result not in RESULTS:
+        raise SparError(f'非法判定 {result!r}（合法：{"/".join(RESULTS)}）')
+    if stuck and stuck not in STUCK_CHOICES:
+        raise SparError(f'非法卡点 {stuck!r}（合法：{"/".join(STUCK_CHOICES)}）')
+    end = end or _now()
+    time_min = session_time_min(meta, end)
+    rec = {'id': meta['id'], 'result': result, 'date': end.date().isoformat(),
+           'session': sid, 'mode': meta.get('mode', 'fresh'),
+           'started_at': meta['started_at'], 'ended_at': iso(end), 'time_min': time_min,
+           'hints': meta.get('hints', []), 'revealed_at': meta.get('revealed_at'),
+           'stuck': stuck or None, 'note': note or '', 'student': 'self'}
+    append_attempt(rec)
+    meta.update(status='finished', ended_at=iso(end), result=result)
+    save_meta(sid, meta)
+    attempts = load_attempts_v2()
+    recs = history_by_id(attempts).get(meta['id'], [])
+    graduated = is_graduated(recs)
+    graduated_before = is_graduated(recs[:-1])
+    week_cnt, streak = week_and_streak(attempts, end.date())
+    return {'rec': rec, 'time_min': time_min,
+            'graduated_now': graduated and not graduated_before,
+            'graduated_before': graduated_before,
+            'next_review': None if graduated else (end.date() + datetime.timedelta(days=INTERVALS[result])).isoformat(),
+            'interval': None if graduated else INTERVALS[result],
+            'week_count': week_cnt, 'streak': streak}
+
+
 def spar_finish(problems, args):
     sid, meta = _require_open_session()
     pid = meta['id']
     end = _now()
-    start = datetime.datetime.fromisoformat(meta['started_at'])
-    time_min = max(1, round((end - start).total_seconds() / 60))
+    time_min = session_time_min(meta, end)
     if meta.get('revealed_at'):
         retell = getattr(args, 'retell', None)
         if retell:
             ok = retell == 'yes'
         else:
             ok = _ask('已看答案——合卷复述通过了吗？[y/N]：').lower() in ('y', 'yes', '是', '通过')
-        suggested = 'solution_reconstructed' if ok else 'fail'
-        why = '已看答案，复述' + ('通过' if ok else '未通过')
+        suggested, why = finish_suggestion(meta, time_min, retell=ok)
     else:
-        suggested, why = _suggest_result(meta, time_min)
+        suggested, why = finish_suggestion(meta, time_min)
     result = getattr(args, 'result', None)
     if not result:
         num = {str(i + 1): r for i, r in enumerate(RESULTS)}
@@ -503,41 +651,18 @@ def spar_finish(problems, args):
     note = getattr(args, 'note', None)
     if note is None:
         note = _ask('备注（回车跳过）：')
-    rec = {'id': pid, 'result': result, 'date': end.date().isoformat(),
-           'session': sid, 'mode': meta.get('mode', 'fresh'),
-           'started_at': meta['started_at'], 'ended_at': iso(end), 'time_min': time_min,
-           'hints': meta.get('hints', []), 'revealed_at': meta.get('revealed_at'),
-           'stuck': stuck, 'note': note or '', 'student': 'self'}
-    append_attempt(rec)
-    meta.update(status='finished', ended_at=iso(end), result=result)
-    save_meta(sid, meta)
-    print(f'已记录 {pid}：{result}（用时 {time_min} 分钟，提示 {len(rec["hints"])} 级）→ data/attempts.jsonl')
-    attempts = load_attempts_v2()
-    recs = history_by_id(attempts).get(pid, [])
-    if is_graduated(recs):
-        if is_graduated(recs[:-1]):
-            print(f'{pid} 已毕业，本次为加练，不再排复习。')
-        else:
-            print(f'🎓 连续 {GRADUATE_STREAK} 次 independent_ok——{pid} 毕业，永久退出复习队列！')
+    try:
+        s = commit_finish(sid, meta, result, stuck=stuck, note=note, end=end)
+    except SparError as e:
+        sys.exit(str(e))
+    print(f"已记录 {pid}：{result}（用时 {s['time_min']} 分钟，提示 {len(s['rec']['hints'])} 级）→ data/attempts.jsonl")
+    if s['graduated_before']:
+        print(f'{pid} 已毕业，本次为加练，不再排复习。')
+    elif s['graduated_now']:
+        print(f'🎓 连续 {GRADUATE_STREAK} 次 independent_ok——{pid} 毕业，永久退出复习队列！')
     else:
-        nxt = end.date() + datetime.timedelta(days=INTERVALS[result])
-        print(f'下次复习：{nxt.isoformat()}（{INTERVALS[result]} 天后）')
-    y, w, _ = end.date().isocalendar()
-    week_cnt = 0
-    days = set()
-    for r in attempts:
-        try:
-            d = datetime.date.fromisoformat(str(r.get('date')))
-        except ValueError:
-            continue
-        days.add(d)
-        if d.isocalendar()[:2] == (y, w):
-            week_cnt += 1
-    streak, d = 0, end.date()
-    while d in days:
-        streak += 1
-        d -= datetime.timedelta(days=1)
-    print(f'本周已完成 {week_cnt} 次攻坚；连击 {streak} 天' + ('　🔥' if streak >= 3 else ''))
+        print(f"下次复习：{s['next_review']}（{s['interval']} 天后）")
+    print(f"本周已完成 {s['week_count']} 次攻坚；连击 {s['streak']} 天" + ('　🔥' if s['streak'] >= 3 else ''))
 
 
 # ---------------- similar 薄壳 ----------------
