@@ -104,6 +104,11 @@ def main():
     ap.add_argument('--dir', required=True, help='评审批次目录，如 data/review/import-01')
     ap.add_argument('--per-category', type=int, default=5, help='每板块最多入库题数（默认 5）')
     ap.add_argument('--dry-run', action='store_true', help='只报告不写盘')
+    # 人工裁定要在入库前生效：lint 强制题号连号，事后删题就得重排编号，极易出错。
+    ap.add_argument('--exclude', nargs='*', default=[], metavar='MATHNET_ID',
+                    help='入库者裁定放弃的题（如题面非英文、官方解为空指针），入库前剔除')
+    ap.add_argument('--only', nargs='*', default=None, metavar='MATHNET_ID',
+                    help='只入库这些题（与 --exclude 互补，用于挑选式入库）')
     args = ap.parse_args()
     d = os.path.join(ROOT, args.dir)
     review_ref = os.path.relpath(os.path.join(d, 'verdicts.json'), ROOT)
@@ -124,6 +129,10 @@ def main():
     done, skipped = [], []
     for b in batch:                     # 按批次顺序 = 确定性入库顺序
         mid = b['mathnet_id']
+        if mid in set(args.exclude):
+            skipped.append((mid, '入库者裁定放弃（--exclude）')); continue
+        if args.only is not None and mid not in set(args.only):
+            skipped.append((mid, '不在 --only 名单')); continue
         v, row = verdicts.get(mid), rows.get(mid)
         if not v or not row:
             skipped.append((mid, '缺 verdict 或候选池行')); continue

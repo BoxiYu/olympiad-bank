@@ -201,7 +201,8 @@ def selfcheck(mp, tr):
         if d['category'] not in reg:
             errs.append(f'board_only 非法板块 {p}')
     for name, d in (tr.get('tiers') or {}).items():
-        if not (isinstance(d.get('base'), int) and 1 <= d['base'] <= 5):
+        b = d.get('base')   # bool 是 int 子类：base: yes 会读成 True，不排除就当 ★1 混过校验
+        if isinstance(b, bool) or not (isinstance(b, int) and 1 <= b <= 5):
             errs.append(f'tier 非法 base: {name}')
     compile_modifiers(tr.get('fallback_modifiers') or [])  # 语法可解析
     return errs

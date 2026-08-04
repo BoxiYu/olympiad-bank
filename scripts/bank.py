@@ -69,7 +69,9 @@ def lint(problems):
             errors.append(f'{rel}: id({pid}) 与文件名不一致')
         if not pid.startswith(PREFIX[p['cat']] + '-'):
             errors.append(f'{rel}: id 前缀与目录 {p["cat"]} 不匹配')
-        if not isinstance(fm.get('difficulty'), int) or not 1 <= fm['difficulty'] <= 5:
+        # bool 是 int 的子类：YAML 的 difficulty: true/yes 会读成 True，不排除就被静默当成 ★1
+        dv = fm.get('difficulty')
+        if isinstance(dv, bool) or not isinstance(dv, int) or not 1 <= dv <= 5:
             errors.append(f'{rel}: difficulty 必须是 1-5 的整数')
         url = str(fm.get('source_url', ''))
         if not url.startswith('http'):
