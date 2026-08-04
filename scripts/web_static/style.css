@@ -103,11 +103,12 @@ h3 { font-size: 14.5px; margin: 16px 0 8px; color: var(--ink-2); }
 .qrow {
   display: flex; align-items: center; gap: 10px; padding: 9px 12px;
   border: 1px solid var(--grid); border-radius: 10px; font-size: 14px;
+  flex-wrap: wrap;
 }
 .stars { color: var(--accent-deep); letter-spacing: 1px; white-space: nowrap; }
 .qid { font-weight: 700; font-family: ui-monospace, Menlo, monospace; white-space: nowrap; }
-.qtitle { flex: 1; min-width: 120px; }
-.qmeta { color: var(--ink-mut); font-size: 12.5px; white-space: nowrap; }
+.qtitle { flex: 1 1 40%; min-width: 0; }
+.qmeta { color: var(--ink-mut); font-size: 12.5px; min-width: 0; overflow-wrap: anywhere; }
 .tag {
   border: 1px solid var(--grid); border-radius: 999px; padding: 2px 9px;
   font-size: 12px; color: var(--ink-2); white-space: nowrap; background: var(--surface-1);
@@ -162,7 +163,21 @@ textarea {
 }
 .finish-actions { margin-top: 18px; }
 
-@media (max-width: 560px) {
-  .qrow { flex-wrap: wrap; }
+/* 长公式块（KaTeX display）在窄屏自己横向滚动，不撑破页面 */
+.md .katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }
+
+@media (max-width: 620px) {
+  .wrap { width: calc(100% - 20px); margin: 16px auto; }
+  .card { padding: 16px 15px; }
+  .topbar { padding: 10px 14px; }
+  .qrow { gap: 7px; }
+  .qmeta { flex-basis: 100%; }
+  .qrow form { margin-left: auto; }
   .timer { text-align: left; }
+  .timer-num { font-size: 28px; }
+  .statement .md { font-size: 15.5px; }
+  .plan-form { gap: 10px; }
+  .plan-form label, .plan-form select, .plan-form input { width: 100%; }
+  .sess-actions { flex-direction: column-reverse; align-items: stretch; }
+  .sess-actions .btn { text-align: center; }
 }
