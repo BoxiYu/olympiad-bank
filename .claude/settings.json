@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath // empty' | { read -r f; case \"$f\" in */problems/*|*/taxonomy/*|*/scripts/*) out=$(bash scripts/lint.sh 2>&1) || echo \"$out\";; esac; } 2>/dev/null || true",
+            "timeout": 60,
+            "statusMessage": "lint 校验中…"
+          }
+        ]
+      }
+    ]
+  }
+}

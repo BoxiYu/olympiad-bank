@@ -154,7 +154,7 @@ def grade(comp_norm, ptype, tiers, modifiers, default, tier_keys_by_len=()):
         junior_hit = any('junior' in rx.pattern for rx, k, v, lc in matched)
         first_hit = any('first round' in rx.pattern for rx, k, v, lc in matched)
         low_conf_only = False
-        for rx, kind, val, lc in matched:
+        for rx, kind, val, _lc in matched:
             if kind == 'set':
                 est, conf = val, 'mid'
                 break

@@ -37,16 +37,19 @@ def load_all():
     return problems
 
 
-def _verdict_ids(ref, _cache={}):
+_VERDICT_CACHE = {}
+
+
+def _verdict_ids(ref):
     """review_ref（仓库相对路径）→ 该评审凭证覆盖的 mathnet_id 集合；缺失/不可解析 → None。"""
-    if ref not in _cache:
+    if ref not in _VERDICT_CACHE:
         import json
         try:
             rows = json.load(open(os.path.join(ROOT, ref), encoding='utf-8'))
-            _cache[ref] = {str(r.get('mathnet_id')) for r in rows if isinstance(r, dict)}
+            _VERDICT_CACHE[ref] = {str(r.get('mathnet_id')) for r in rows if isinstance(r, dict)}
         except (OSError, ValueError):
-            _cache[ref] = None
-    return _cache[ref]
+            _VERDICT_CACHE[ref] = None
+    return _VERDICT_CACHE[ref]
 
 
 def lint(problems):
