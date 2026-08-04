@@ -40,10 +40,18 @@ uv run python scripts/bank.py candidates --category geometry --difficulty 2-3 \
 uv run python scripts/bank.py candidates --grep Ramsey                              # 题面正则旁路召回
 ```
 
-**学段下界（正本 SPEC §4）：本库只收初中与高中，★1 是小学/低龄档，不予入库。**
-筛题时 `--difficulty` 从 2 起（`--difficulty 2-5`）；`difficulty_est` 为 1 的候选直接跳过，
-不必送评审。评审阶段若 Codex 判定 `difficulty_codex: 1`，按退回处理而非降星收录——
-lint 也会拒绝 `difficulty: 1` 的题（见 `bank.py`）。
+**学段下界（语义正本 SPEC §4，阈值正本 `bank.py` 的 `MIN_DIFFICULTY`）：本库只收初中与高中，
+★1 是小学/低龄档，不予入库。** 这条不靠自觉，四道执行点各自拦一次：
+
+| 环节 | 执行点 | 行为 |
+| --- | --- | --- |
+| 选池 | `bank.py candidates` | 默认只出 est ★2–5；`--difficulty` 给了更低下限会被抬回并打印提示 |
+| 评审池 | `mathnet_review.py batch` | est ★1 的候选不进批次，打印跳过条数（不浪费评审预算） |
+| 入库准入 | `mathnet_import.py` 的 `below_floor` | `min(est, codex) < 下界` 即跳过，**写盘之前**，不占题号与板块配额 |
+| 最终门槛 | `bank.py lint` | `difficulty: 1` 判红 |
+
+第三道是关键：`needs_review` 只查 est 与 Codex 的**分歧幅度**，est★2 + Codex★1 这类分歧仅
+1 档的组合能整个躲过它，而「就低不就高」定稿正是 ★1。所以下界必须是独立一道判定。
 
 ## 2｜batch：出评审批次
 

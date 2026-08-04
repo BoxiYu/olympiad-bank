@@ -563,9 +563,11 @@ def candidates_cmd(problems, args):
     pool = [r for r in pool if CONF_RANK[r['difficulty_conf']] >= min_conf]
     if args.category:
         pool = [r for r in pool if r['category'] == args.category]
-    if args.difficulty:
-        lo, hi = _parse_diff(args.difficulty)
-        pool = [r for r in pool if lo <= r['difficulty_est'] <= hi]
+    lo, hi = _parse_diff(args.difficulty) if args.difficulty else (MIN_DIFFICULTY, 5)
+    if lo < MIN_DIFFICULTY:  # 学段下界，SPEC §4：★1 无论如何都进不了库，不让它占浏览视野
+        print(f'注：--difficulty 下限 {lo} 已抬到学段下界 ★{MIN_DIFFICULTY}（本库只收初中+高中，SPEC §4）')
+        lo = MIN_DIFFICULTY
+    pool = [r for r in pool if lo <= r['difficulty_est'] <= hi]
     if args.node:
         pool = [r for r in pool if any(args.node in t for t in r['topics'])]
     if args.contest:
@@ -612,7 +614,8 @@ def candidates_gaps(problems, rows):
                 bank.setdefault((fm['category'], node), set()).add(fm['id'])
     cand, cand_low = {}, {}
     for r in rows:
-        if r['status'] != 'ok':
+        # 学段下界（SPEC §4）：★1 进不了库，计进采购单会虚报可补量
+        if r['status'] != 'ok' or r['difficulty_est'] < MIN_DIFFICULTY:
             continue
         for node in r['topics']:
             k = (r['category'], node)

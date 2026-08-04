@@ -21,6 +21,8 @@ Codex 同时给出难度的**独立第二意见**：它读题面，规则层只�
 """
 import argparse, glob, json, os, re, subprocess, sys
 
+from bank import MIN_DIFFICULTY  # 学段下界唯一常量正本，勿在此另设阈值
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 POOL = os.path.join(ROOT, 'candidates', 'mathnet.jsonl')
 COMPANION_GLOB = '~/.claude/plugins/cache/openai-codex/codex/*/scripts/codex-companion.mjs'
@@ -68,6 +70,11 @@ def cmd_batch(args):
     from datasets import load_dataset
     rows = [json.loads(l) for l in open(POOL, encoding='utf-8') if l.strip()]
     pool = [r for r in rows if r['status'] == 'ok' and not r['has_images']]
+    dropped_low = len(pool)
+    pool = [r for r in pool if r['difficulty_est'] >= MIN_DIFFICULTY]  # 学段下界，SPEC §4
+    dropped_low -= len(pool)
+    if dropped_low:
+        print(f'学段下界：跳过 est★<{MIN_DIFFICULTY} 的候选 {dropped_low} 条（不送评审，SPEC §4）')
     if args.category:
         pool = [r for r in pool if r['category'] == args.category]
     if args.difficulty:
