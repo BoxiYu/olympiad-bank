@@ -1,0 +1,151 @@
+[
+ {
+  "id": "A-032",
+  "title": "Polynomial Divisibility Construction",
+  "difficulty": 2,
+  "topics": [
+   "素数与算术基本定理",
+   "多项式",
+   "代数变换技巧"
+  ],
+  "problem": "Problem:\nShow that there exist infinitely many positive integers $n$ such that\n$$\n\\frac{4^{n}+2^{n}+1}{n^{2}+n+1}\n$$\nis an integer.",
+  "answer": "证明题",
+  "solution": "Solution:\nLet $f(n) = n^{2} + n + 1$. Note that\n$$\nf\\left(n^{2}\\right) = n^{4} + n^{2} + 1 = \\left(n^{2} + n + 1\\right)\\left(n^{2} - n + 1\\right)\n$$\nThis means that $f(n) \\mid f\\left(n^{2}\\right)$ for every positive integer $n$. By induction on $k$, one can easily see that $f(n) \\mid f\\left(n^{2^{k}}\\right)$ for every positive integers $n$ and $k$. Note that the required condition is equivalent to $f(n) \\mid f\\left(2^{n}\\right)$. From the discussion above, if there exists a positive integer $n$ so that $2^{n}$ can be written as $n^{2^{k}}$, for some positive integer $k$, then $f(n) \\mid f\\left(2^{n}\\right)$. If we choose $n = 2^{2^{m}}$ and $k = 2^{m} - m$ for some positive integer $m$, then $2^{n} = n^{2^{k}}$ and since there are infinitely many positive integers of the form $n = 2^{2^{m}}$, we have the desired result."
+ },
+ {
+  "id": "A-033",
+  "title": "Finite Möbius Iteration",
+  "difficulty": 3,
+  "topics": [
+   "代数变换技巧"
+  ],
+  "problem": "Given that $f(x) = \\frac{ax+b}{cx+d}$, $f(0) \\neq 0$, $f(f(0)) \\neq 0$. Let $F(x) = \\underbrace{f(\\dots(f(x)\\dots))}_{n \\text{ times}}$. If $F(0) = 0$, show that $F(x) = x$ for all $x$ where the expression is defined.",
+  "answer": "证明题",
+  "solution": "Put $f^k(x) = \\underbrace{f(\\dots(f(x))\\dots)}_{k \\text{ times}}$. Then we have $f^k(x) = \\frac{a_k x + b_k}{c_k x + d_k}$. From\n$f^{k+1}(x) = f(f^k(x))$ we get:\n$$\n\\begin{align*} \na_{k+1} &= a a_k + b c_k \\\nb_{k+1} &= a b_k + b d_k \\\nc_{k+1} &= c a_k + d c_k \\\nd_{k+1} &= c b_k + d d_k \n\\end{align*}\n$$\nBut we also have $f^{k+1}(x) = f^k(f(x))$, so\n$$\n\\begin{align*} \na_{k+1} &= a a_k + c b_k \\\nb_{k+1} &= b a_k + d b_k \\\nc_{k+1} &= a c_k + c d_k \\\nd_{k+1} &= b c_k + d d_k \n\\end{align*}\n$$\nComparing, we get $b c_k = c b_k$ and $(a-d) b_k = b(a_k - d_k)$.\nIf $f^n(0) = 0$, then $b_n = 0$, so $b c_n = 0$. We are given that $f(0) \\neq 0$, so $b \\neq 0$. Hence $c_n = 0$. Also $b(a_n - d_n) = 0$ and hence $a_n = d_n$. Hence $f^n(x) = x$."
+ },
+ {
+  "id": "A-034",
+  "title": "Symmetric Absolute Logarithms",
+  "difficulty": 2,
+  "topics": [
+   "代数变换技巧"
+  ],
+  "problem": "Given function $f(x) = |2 - \\log_3 x|$, positive real numbers $a, b, c$ satisfy $a < b < c$ and $f(a) = 2f(b) = 2f(c)$. Find the value of $\\frac{ac}{b}$.",
+  "answer": "9",
+  "solution": "Note that $f(x) = |\\log_3(\\frac{x}{9})|$ is monotonically decreasing on $(0, 9]$ and monotonically increasing on $[9, +\\infty)$.\nBy the conditions satisfied by $a, b, c$, we know that $0 < a < b < 9 < c$ and\n$$\n\\log_3\\left(\\frac{9}{a}\\right) = 2\\log_3\\left(\\frac{9}{b}\\right) = 2\\log_3\\left(\\frac{c}{9}\\right).\n$$\nTherefore,\n$$\n\\begin{aligned}\n\\log_3\\left(\\frac{ac}{b}\\right) &= \\log_3\\left(9 \\cdot \\frac{a}{9} \\cdot \\frac{9}{b} \\cdot \\frac{c}{9}\\right) \\\\\n&= 2 - \\log_3\\left(\\frac{9}{a}\\right) + \\log_3\\left(\\frac{9}{b}\\right) + \\log_3\\left(\\frac{c}{9}\\right) \\\\\n&= 2,\n\\end{aligned}\n$$\nnamely, $\\frac{ac}{b} = 3^2 = 9$."
+ },
+ {
+  "id": "A-035",
+  "title": "Quadratic Logarithmic Equation",
+  "difficulty": 2,
+  "topics": [
+   "代数变换技巧"
+  ],
+  "problem": "Problem:\n\nReši enačbo:\n$$\n\\log \\left(\\frac{1}{x}\\right) \\cdot \\log \\left(\\frac{4}{x}\\right) = \\frac{3}{4} \\cdot (\\log 4)^2\n$$",
+  "answer": "8, 1/2",
+  "solution": "Solution:\n\nNajprej uporabimo pravilo za logaritmiranje količnika:\n$$(\\log 1 - \\log x) \\cdot (\\log 4 - \\log x) = \\frac{3}{4}(\\log 4)^2.$$\nKer je $\\log 1 = 0$, dobimo:\n$$(-\\log x) \\cdot (\\log 4 - \\log x) = \\frac{3}{4}(\\log 4)^2.$$\nRazpremo oklepaj:\n$$-\\log x \\cdot \\log 4 + (\\log x)^2 = \\frac{3}{4}(\\log 4)^2.$$\nPreuredimo enačbo:\n$$(\\log x)^2 - \\log x \\cdot \\log 4 - \\frac{3}{4}(\\log 4)^2 = 0.$$\nTo je kvadratna enačba oblike $a^2 - ab - c = 0$ za $a = \\log x$.\n\nIzračunamo diskriminanto:\n$$D = (\\log 4)^2 - 4 \\cdot 1 \\cdot \\left(-\\frac{3}{4}(\\log 4)^2\\right) = (\\log 4)^2 + 3(\\log 4)^2 = 4(\\log 4)^2.$$\n\nRešitvi kvadratne enačbe sta:\n$$\\log x_{1,2} = \\frac{\\log 4 \\pm 2\\log 4}{2} = \\frac{1}{2}\\log 4 \\pm \\log 4.$$\nTorej:\n$$\\log x_1 = \\frac{1}{2}\\log 4 + \\log 4 = \\frac{3}{2}\\log 4 = \\log 8,$$\n$$\\log x_2 = \\frac{1}{2}\\log 4 - \\log 4 = -\\frac{1}{2}\\log 4 = \\log \\frac{1}{2}.$$\n\nIz teh rešitev dobimo:\n$$x_1 = 8,$$\n$$x_2 = \\frac{1}{2}.$$"
+ },
+ {
+  "id": "A-036",
+  "title": "Rational Logarithmic Recurrence",
+  "difficulty": 3,
+  "topics": [
+   "数列与递推",
+   "代数变换技巧",
+   "素数与算术基本定理"
+  ],
+  "problem": "Consider a real number $a \\ge 1$. The sequence $(x_n)_{n \\ge 1}$ is given by $x_1 = a$ and $x_{n+1} = 1 + \\log_2 x_n$, for any $n \\in \\mathbb{N}^*$. Determine values of $a$ such that all terms of the sequence are rational numbers.",
+  "answer": "a = 1 or a = 2",
+  "solution": "For $a = 1$ or $a = 2$ we get the constant sequence $1$ or $2$ respectively.\nWe shall prove that these are the only values satisfying the problem.\nTo see this, let $x_n = \\frac{k}{l}$ and $x_{n+1} = \\frac{p}{q}$, with $k, l$ coprime positive integers, $p, q$ coprime positive integers with $q \\ge 2$. Then\n$$\n\\frac{k}{l} = x_n = 2^{x_{n+1}-1} = \\sqrt[q]{2^{p-q}},\n$$\nimplying $l^q 2^p = k^q 2^q$.\nThe last equality cannot be true, as the left hand side number has $2$ as factor at an exponent which is not divisible by $q$ ($p$ and $q$ are coprime), and the right hand side has the factor $2$ at an exponent divisible by $q$. So $q = 1$, thus $l = 1$, so, if all terms of the sequence would be rationals, they should be natural numbers.\nAs $2^n > n + 1$, for $n \\ge 2, n \\in \\mathbb{N}$, we get $1 + \\log_2 x < x$, for $x \\in \\mathbb{N}, x \\ge 3$. As a conclusion, if all terms are positive integers and $x > 2$, an inductive argument shows that the sequence is decreasing, a contradiction. That is $a = x_1 \\in \\{1, 2\\}$."
+ },
+ {
+  "id": "A-037",
+  "title": "Coupled Logarithmic Equations",
+  "difficulty": 2,
+  "topics": [
+   "代数变换技巧"
+  ],
+  "problem": "Problem:\n\nReal numbers $x$ and $y$ satisfy the following equations:\n$$\n\\begin{aligned}\nx & = \\log_{10}\\left(10^{y-1}+1\\right)-1 \\\\\ny & = \\log_{10}\\left(10^{x}+1\\right)-1\n\\end{aligned}\n$$\nCompute $10^{x-y}$.",
+  "answer": "101/110",
+  "solution": "Solution:\n\nTaking 10 to the power of both sides in each equation, these equations become:\n$$\n\\begin{aligned}\n& 10^{x} = \\left(10^{y-1} + 1\\right) \\cdot 10^{-1} \\\\\n& 10^{y} = \\left(10^{x} + 1\\right) \\cdot 10^{-1}\n\\end{aligned}\n$$\nLet $a = 10^{x}$ and $b = 10^{y}$. Our equations become:\n$$\n\\begin{aligned}\n10a & = b/10 + 1 \\\\\n10b & = a + 1\n\\end{aligned}\n$$\nand we are asked to compute $a / b$. Subtracting the equations gives\n$$\n10a - 10b = b/10 - a \\Longrightarrow 11a = 101b/10\n$$\ngiving an answer of $\\frac{101}{110}$."
+ },
+ {
+  "id": "A-038",
+  "title": "Three Exponential Sum",
+  "difficulty": 2,
+  "topics": [
+   "代数变换技巧"
+  ],
+  "problem": "Problem:\nHow many real numbers $x$ are solutions to the following equation?\n$$\n2003^{x} + 2004^{x} = 2005^{x}\n$$",
+  "answer": "1",
+  "solution": "Solution:\nRewrite the equation as $(2003 / 2005)^{x} + (2004 / 2005)^{x} = 1$. The left side is strictly decreasing in $x$, so there cannot be more than one solution. On the other hand, the left side equals $2 > 1$ when $x = 0$ and goes to $0$ when $x$ is very large, so it must equal $1$ somewhere in between. Therefore there is one solution."
+ },
+ {
+  "id": "A-039",
+  "title": "Shifted Radical Equation",
+  "difficulty": 3,
+  "topics": [
+   "代数变换技巧"
+  ],
+  "problem": "Solve the equation:\n$$\n\\frac{1}{\\sqrt{2014}-\\sqrt{x}} + \\frac{1}{\\sqrt{2015}-\\sqrt{x+1}} + \\frac{1}{\\sqrt{2016}-\\sqrt{x+2}} = \n\\frac{1}{\\sqrt{2015-x}-\\sqrt{1}} + \\frac{1}{\\sqrt{2016-x}-\\sqrt{2}} + \\frac{1}{\\sqrt{2017-x}-\\sqrt{3}}\n$$",
+  "answer": "1",
+  "solution": "Multiply both numerator and denominator by the conjugate:\n$$\n\\frac{\\sqrt{2014+\\sqrt{x}}}{2014-x} + \\frac{\\sqrt{2015+\\sqrt{x+1}}}{2015-(x+1)} + \\frac{\\sqrt{2016+\\sqrt{x+2}}}{2016-(x+2)} = \\frac{\\sqrt{2015-x+\\sqrt{1}}}{(2015-x)-1} + \\frac{\\sqrt{2016-x+\\sqrt{2}}}{(2016-x)-2} + \\frac{\\sqrt{2017-x+\\sqrt{3}}}{(2017-x)-3}\n$$\nAfter multiplying by the common denominator we have:\n$$\n\\sqrt{2014+\\sqrt{x}} + \\sqrt{2015+\\sqrt{x+1}} + \\sqrt{2016+\\sqrt{x+2}} = \n\\sqrt{2015-x} + \\sqrt{1} + \\sqrt{2016-x} + \\sqrt{2} + \\sqrt{2017-x} + \\sqrt{3},\n$$\n\n1) $x=1$ is the solution of the equation:\n$$\n\\sqrt{2014} + \\sqrt{1} + \\sqrt{2015} + \\sqrt{2} + \\sqrt{2016} + \\sqrt{3} = \\sqrt{2014} + \\sqrt{1} + \\sqrt{2015} + \\sqrt{2} + \\sqrt{2016} + \\sqrt{3}.\n$$\n\n2) Denote $S = \\sqrt{2014} + \\sqrt{1} + \\sqrt{2015} + \\sqrt{2} + \\sqrt{2016} + \\sqrt{3}$. For $x > 1$ we have\n$$\n\\sqrt{2014} + \\sqrt{x} + \\sqrt{2015} + \\sqrt{x+1} + \\sqrt{2016} + \\sqrt{x+2} > \n\\sqrt{2014} + \\sqrt{1} + \\sqrt{2015} + \\sqrt{2} + \\sqrt{2016} + \\sqrt{3} = S.\n$$\nSo the left-hand side is greater than $S$, and in the same way we analyze the right-hand side:\n$$\n\\sqrt{2015-x} + \\sqrt{1} + \\sqrt{2016-x} + \\sqrt{2} + \\sqrt{2017-x} + \\sqrt{3} < \n\\sqrt{2014} + \\sqrt{1} + \\sqrt{2015} + \\sqrt{2} + \\sqrt{2016} + \\sqrt{3} = S.\n$$\nSo in this interval there are no roots. The same holds for $x < 1$."
+ },
+ {
+  "id": "A-040",
+  "title": "Playground Attendance Equation",
+  "difficulty": 2,
+  "topics": [
+   "方程与设元",
+   "根与系数"
+  ],
+  "problem": "Yesterday in the playground the ratio of boys to girls was $3 : 2$. Today, the number of boys is the square of the number of girls and there are $6$ boys and $7$ girls less than yesterday. How many children were there in the playground yesterday?\n(A) 12\n(B) 13\n(C) 15\n(D) 25\n(E) 30",
+  "answer": "D",
+  "solution": "Yesterday there were $3t$ boys and $2t$ girls in the playground. Today, there are $3t-6$ boys and $2t-7$ girls. From $3t-6 = (2t-7)^2$ we get $4t^2-31t+55 = 0$, so $t_{1,2} = \\frac{31\\pm\\sqrt{81}}{8}$. The only possible solution is $t = 5$, since $t$ is an integer. Yesterday there were $3t = 15$ boys and $2t = 10$ girls in the playground, or $25$ children altogether."
+ },
+ {
+  "id": "A-041",
+  "title": "Deleted-Digit Difference",
+  "difficulty": 2,
+  "topics": [
+   "方程与设元"
+  ],
+  "problem": "Andriy wrote a 4-digit number. Olesya crossed out the last digit and it turned out that the difference between the initial number and the obtained number equals $2018$. Which number did Andriy write? Provide all possible answers.",
+  "answer": "2242",
+  "solution": "Let $abcd$ denote the number Andriy wrote, then $\\overline{abcd} - \\overline{abc} = 2018$. Now we only need to pick corresponding digits. Obviously, $a = 2$ or $a = 3$.\n\nWith $a = 3$, $\\overline{3bcd} - \\overline{3bc} > 3000 - 399 > 2018$, hence, $a = 2$ and $\\overline{2bcd} - \\overline{2bc} = 2018$. Analogously, $b = 2$ or $b = 3$.\n\nWith $b = 3$, $\\overline{33cd} - \\overline{33c} > 3300 - 339 > 2018$, therefore, $b = 2$ and $\\overline{22cd} - \\overline{22c} = 2018$. Analogously, $c = 3$ or $c = 4$.\n\nWhen $c = 4$, we get $\\overline{224d} - \\overline{224} > 2240 - 224 = 2016$, therefore, the first solution would be in the form: $2242 - 224 = 2018$.\n\nWhen $c = 3$, we get $\\overline{223d} - \\overline{223} < 2239 - 223 = 2016$, which means previously found solution is unique possible."
+ },
+ {
+  "id": "A-042",
+  "title": "Integer Sum and Product",
+  "difficulty": 2,
+  "topics": [
+   "方程与设元",
+   "根与系数"
+  ],
+  "problem": "Problem:\n\nThe sum of the product and the sum of two integers is $95$. The difference between the product and the sum of these integers is $59$. Find the integers.",
+  "answer": "7 and 11",
+  "solution": "Solution:\n\nLet the two integers be $x$ and $y$.\n\nLet $S = x + y$ (sum), $P = x y$ (product).\n\nWe are given:\n\n$P + S = 95$  \\quad (1)\n\n$P - S = 59$  \\quad (2)\n\nAdd (1) and (2):\n\n$P + S + P - S = 95 + 59$\n\n$2P = 154$\n\n$P = 77$\n\nNow substitute $P = 77$ into (1):\n\n$77 + S = 95$\n\n$S = 18$\n\nSo $x + y = 18$, $x y = 77$.\n\nThe integers are the roots of the equation:\n\n$t^2 - (x + y)t + x y = 0$\n\n$t^2 - 18 t + 77 = 0$\n\nSolve for $t$:\n\n$t = \\frac{18 \\pm \\sqrt{18^2 - 4 \\times 77}}{2}$\n\n$= \\frac{18 \\pm \\sqrt{324 - 308}}{2}$\n\n$= \\frac{18 \\pm \\sqrt{16}}{2}$\n\n$= \\frac{18 \\pm 4}{2}$\n\nSo $t = \\frac{18 + 4}{2} = 11$ or $t = \\frac{18 - 4}{2} = 7$\n\nTherefore, the integers are $7$ and $11$."
+ },
+ {
+  "id": "A-043",
+  "title": "Shifted Sum-of-Squares Equation",
+  "difficulty": 2,
+  "topics": [
+   "方程与设元"
+  ],
+  "problem": "Problem:\n\nFind the real solution(s) to the equation $(x+y)^2 = (x+1)(y-1)$.",
+  "answer": "(-1, 1)",
+  "solution": "Solution:\n\nAnswer: $(-1,1)$\n\nSet $p = x + 1$ and $q = y - 1$, then we get $(p + q)^2 = p q$, which simplifies to $p^2 + p q + q^2 = 0$. Then we have $\\left(p + \\frac{q}{2}\\right)^2 + \\frac{3 q^2}{4} = 0$, and so $p = q = 0$. Thus $(x, y) = (-1, 1)$."
+ },
+ {
+  "id": "A-044",
+  "title": "Three-Speed Shuttle Meetings",
+  "difficulty": 3,
+  "topics": [
+   "方程与设元"
+  ],
+  "problem": "Pedestrian, Cyclist and Motorcyclist start at 12.00 from town $A$ to town $B$ simultaneously. When each of them arrives at $B$ he whip rounds and moves to $A$, when he arrives at $A$ he again whip rounds and moves to $B$, and so on. After the start of the movement the first meeting is the meeting of Cyclist and Motorcyclist at some point $C$. By this time Pedestrian passes $1/6$ part of the distance between $A$ and $B$, and after 6 minute he meets Motorcyclist. The first meeting of Cyclist and Pedestrian is also held at $C$.\nWhen do Pedestrian, Cyclist and Motorcyclist meet each other at the same point for the first time?",
+  "answer": "13.30",
+  "solution": "Answer: 13.30.\nLet the distance between $A$ and $B$ be equal to $S$ (km), the speeds of Pedestrian, Cyclist and Motorcyclist be equal to $a$, $b$ and $c$ (km/h), respectively. By condition (the first meeting is the meeting of Cyclist and Motorcyclist), it follows that $a < b < c$. Let Pedestrian arrive at point $D$ at that moment when Cyclist and Motorcyclist meet at point $C$. By condition, $AD = \\frac{S}{6}$. Then $\\frac{AD}{a} = t_1 = \\frac{S}{6a}$. Since $AC + (AB + BC) = 2S$ we have $t_1 = \\frac{2S}{b+c}$. So, $\\frac{S}{6a} = \\frac{2S}{b+c}$, hence\n$$\nb+c=12a. \\tag{1}\n$$\nFrom $t_1 b = \\frac{Sb}{6a}$ it follows that $AC = \\frac{Sb}{6a}$, so $CD = AC - AD = \\frac{Sb}{6a} - \\frac{S}{6} = \\frac{S(b-a)}{6a}$. Therefore,\n$$\n\\frac{S(b-a)}{6a} = \\frac{(a+c)}{10}. \\tag{2}\n$$\nBy condition, to arrive at $C$ (the point of meeting with Cyclist) Pedestrian need the time $t_2 = \\frac{AC}{a} = \\frac{Sb}{6a^2}$. On the other hand, $t_2 = \\frac{2S}{a+b}$, so $b(a+b) = 12a^2 \\Leftrightarrow b^2 + ab - 12a^2 = 0 \\Leftrightarrow (b+4a)(b-3a) = 0$. Since $b+4a > 0$ ($a$ and $b$ are positive), we have $b-3a = 0$, i.e. $b = 3a$. Now from (1) it follows $c = 9a$, and (2) gives $S = 3a$. Therefore, $AC = \\frac{Sb}{6a} = \\frac{3a \\cdot 3a}{6a} = 1.5a$. It means that Pedestrian and Cyclist meet at point $C$ in $t_2$ hours after the start, $t_2 = \\frac{1.5a}{a} = 1.5$. Moreover, for Motorcyclist we see $1.5 \\cdot c = 13.5 \\cdot a = 4 \\cdot 3a + 1.5 \\cdot a = 4S + 1.5a = AB + BA + AB + BA + AC$, which means that after 1.5 hours after the start he arrive at point $C$. Therefore, Pedestrian, Cyclist and Motorcyclist meet at point $C$ at 13.30."
+ }
+]

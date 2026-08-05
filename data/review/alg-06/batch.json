@@ -1,0 +1,179 @@
+[
+ {
+  "mathnet_id": "0e4j",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "方程与设元",
+   "根与系数"
+  ],
+  "contest": "National Math Olympiad",
+  "problem": "Yesterday in the playground the ratio of boys to girls was $3 : 2$. Today, the number of boys is the square of the number of girls and there are $6$ boys and $7$ girls less than yesterday. How many children were there in the playground yesterday?\n(A) 12\n(B) 13\n(C) 15\n(D) 25\n(E) 30",
+  "solution_head": "Yesterday there were $3t$ boys and $2t$ girls in the playground. Today, there are $3t-6$ boys and $2t-7$ girls. From $3t-6 = (2t-7)^2$ we get $4t^2-31t+55 = 0$, so $t_{1,2} = \\frac{31\\pm\\sqrt{81}}{8}$. The only possible solution is $t = 5$, since $t$ is an integer. Yesterday there were $3t = 15$ boys and $2t = 10$ girls in the playground, or $25$ children altogether."
+ },
+ {
+  "mathnet_id": "09mv",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "方程与设元"
+  ],
+  "contest": "Mongolian Mathematical Olympiad",
+  "problem": "The water in the reservoir evaporates constantly, and water is added through 3 taps. If there were no evaporation, these 3 taps could fill the empty reservoir in 2 weeks. Considering evaporation, it takes six weeks to fill the empty reservoir using only taps 1 and 2. If tap 3 is turned on alone, $\\frac{1}{3}$ of the total water of the reservoir evaporates in five weeks. How long will it take all the water of a full reservoir to evaporate if all the taps are turned off?",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0h8p",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "方程与设元"
+  ],
+  "contest": "58th Ukrainian National Mathematical Olympiad",
+  "problem": "Andriy wrote a 4-digit number. Olesya crossed out the last digit and it turned out that the difference between the initial number and the obtained number equals $2018$. Which number did Andriy write? Provide all possible answers.",
+  "solution_head": "Let $abcd$ denote the number Andriy wrote, then $\\overline{abcd} - \\overline{abc} = 2018$. Now we only need to pick corresponding digits. Obviously, $a = 2$ or $a = 3$.\n\nWith $a = 3$, $\\overline{3bcd} - \\overline{3bc} > 3000 - 399 > 2018$, hence, $a = 2$ and $\\overline{2bcd} - \\overline{2bc} = 2018$. Analogously, $b = 2$ or $b = 3$.\n\nWith $b = 3$, $\\overline{33cd} - \\overline{33c} > 3300 - 339 > 2018$, therefore, $b = 2$ and $\\overline{22cd} - \\overline{22c} = 2018$. Analogously, $c = 3$ or $c = 4$.\n\nWhen $c = 4$, we get $\\overline{224d} - \\overline{224} > 2240 - 224 = 2016$, therefore, the first solution would be in the form: $2242 - 224 = 2018$.\n\nWhen $c = 3$, we get $\\overline{223d} - \\overline{223} < 2239 - 223 = 2016$, which means previously found solution is unique possible."
+ },
+ {
+  "mathnet_id": "0aqn",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "方程与设元",
+   "根与系数"
+  ],
+  "contest": "12th Philippine Mathematical Olympiad - Area Stage",
+  "problem": "Problem:\n\nThe sum of the product and the sum of two integers is $95$. The difference between the product and the sum of these integers is $59$. Find the integers.",
+  "solution_head": "Solution:\n\nLet the two integers be $x$ and $y$.\n\nLet $S = x + y$ (sum), $P = x y$ (product).\n\nWe are given:\n\n$P + S = 95$  \\quad (1)\n\n$P - S = 59$  \\quad (2)\n\nAdd (1) and (2):\n\n$P + S + P - S = 95 + 59$\n\n$2P = 154$\n\n$P = 77$\n\nNow substitute $P = 77$ into (1):\n\n$77 + S = 95$\n\n$S = 18$\n\nSo $x + y = 18$, $x y = 77$.\n\nThe integers are the roots of the equation:\n\n$t^2 - (x + y)t + x y = 0$\n\n$t^2 - 18 t + 77 = 0$\n\nSolve for $t$:\n\n$t = \\frac{18 \\pm \\sqrt{18^2 - 4 \\times 77}}{2}$\n\n$= \\frac{18 \\pm \\sqrt{324 - 308}}{2}$\n\n$= \\frac{18 \\pm \\sqrt{16}}{2}$\n\n$= \\frac{18 \\pm 4}{2}$\n\nSo $t = \\frac{18 + 4}{2} = 11$ or $t = \\frac{18 - 4}{2} = 7$\n\nTherefore, the integers are $7$ and $11$."
+ },
+ {
+  "mathnet_id": "02qk",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "数列与递推",
+   "方程与设元"
+  ],
+  "contest": "Nível 2",
+  "problem": "Problem:\n\nJuliana quer dar a cada uma das 26 letras $A, B, C, D, \\ldots, W, X, Y, Z$ do alfabeto um valor numérico diferente de zero, de tal modo que $A \\times C = B$, $B \\times D = C$, $C \\times E = D$, e assim por diante, até $X \\times Z = Y$.\n\na) Se Juliana der a $A$ e $B$ os valores 5 e 7, respectivamente, quais serão os valores de $C, D$ e $E$?\n\nb) Mostre que $G = A$, quaisquer que sejam os valores que Juliana der para $A$ e $B$.\n\nc) Se Juliana der valores para $A$ e $B$ tais que $A \\times B = 2010$, qual será o valor do produto $A \\times B \\times C \\times D \\times \\cdots \\times W \\times X \\times Y \\times Z$?",
+  "solution_head": "Solution:\n\na) Substituindo $A = 5$ e $B = 7$ em $A \\times C = B$, temos $5 \\times C = 7$ e segue que $C = \\frac{7}{5}$. Podemos agora achar $D$ substituindo os valores de $B$ e $D$ em $B \\times D = C$; obtemos $7 \\times D = \\frac{7}{5}$ e então $D = \\frac{1}{5}$. Finalmente, de $C \\times E = D$ temos $\\frac{7}{5} \\times E = \\frac{1}{5}$ e vemos que $E = \\frac{1}{7}$.\n\nb) Multiplicando as expressões $A \\times C = B$ e $B \\times D = C$ obtemos $A \\times B \\times C \\times D = B \\times C$; como $B$ e $C$ são diferentes de 0, concluímos que $A \\times D = 1$, ou seja, $D = \\frac{1}{A}$. Do mesmo modo, multiplicando as expressões $B \\times D = C$ e $C \\times E = D$ obtemos $B \\times E = 1$, ou seja, $E = \\frac{1}{B}$. Repetindo esse raciocínio, vemos que cada letra a partir do $D$ é o inverso da letra que aparece três posições atrás dela; em particular, $G = \\frac{1}{D} = \\frac{1}{\\frac{1}{A}} = A$.\n\nc) O item anterior nos mostra que $C \\times D \\times E \\times F \\times G \\times H = C \\times D \\times E \\times \\frac{1}{C} \\times \\frac{1}{D} \\times \\frac{1}{E} = 1$; o mesmo raciocínio mostra "
+ },
+ {
+  "mathnet_id": "0ehi",
+  "est": 2,
+  "conf": "mid",
+  "category": "algebra",
+  "topics": [
+   "多项式",
+   "素数与算术基本定理",
+   "方程与设元"
+  ],
+  "contest": "Državno tekmovanje v znanju matematike za dijake srednjih tehniških in strokovnih šol",
+  "problem": "Problem:\n\nRačunsko določi vse možne pare naravnih števil $a$ in $b$, $a > b$, tako da bo razlika kvadratov teh dveh števil enaka $60$.",
+  "solution_head": "Solution:\n\nZapis $a^2 - b^2 = 60$\n\nRazstavljanje razlike kvadratov:\n$$a^2 - b^2 = (a - b)(a + b) = 60$$\n\nZapis vseh možnih razcepov števila $60$ na produkt dveh naravnih števil:\n$$1 \\cdot 60,\\ 2 \\cdot 30,\\ 3 \\cdot 20,\\ 4 \\cdot 15,\\ 5 \\cdot 12,\\ 6 \\cdot 10$$\n\nZapis vsaj enega sistema enačb:\n$$\n\\begin{cases}\n  a - b = m \\\\\n  a + b = n\n\\end{cases}\n$$\nkjer je $m \\cdot n = 60$ in $n > m > 0$.\n\nReševanje sistema enačb:\n$$\n\\begin{cases}\n  a = \\frac{m + n}{2} \\\\\n  b = \\frac{n - m}{2}\n\\end{cases}\n$$\n\nUgotovitev, da za razcepe $1 \\cdot 60$, $3 \\cdot 20$, $4 \\cdot 15$, $5 \\cdot 12$ rešitve niso naravna števila (ker vsaj eden izmed $a$ ali $b$ ni naravno število).\n\nRešitev $a = 16$ in $b = 14$ za razcep $60 = 2 \\cdot 30$:\n$$\n\\begin{cases}\n  a - b = 2 \\\\\n  a + b = 30\n\\end{cases}\n\\implies\n\\begin{cases}\n  a = 16 \\\\\n  b = 14\n\\end{cases}\n$$\n\nRešitev $a = 8$ in $b = 2$ za razcep $60 = 6 \\cdot 10$:\n$$\n\\begin{cases}\n  a - b = 6 \\\\\n  a + b = 10\n\\end{cases}\n\\implies\n\\begin{cases}\n  a = 8 \\\\\n  b = 2\n\\end{cases}\n$$"
+ },
+ {
+  "mathnet_id": "05vx",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "不等式",
+   "方程与设元"
+  ],
+  "contest": "PRÉPARATION OLYMPIQUE FRANÇAISE DE MATHÉMATIQUES",
+  "problem": "Problem:\n\nSoient $x, y, z$ des réels strictement positifs tels que\n$$\nx+\\frac{y}{z}=y+\\frac{z}{x}=z+\\frac{x}{y}=2\n$$\nDéterminer toutes les valeurs possibles que peut prendre le nombre $x+y+z$.",
+  "solution_head": "Solution:\n\nDans un tel problème, il faut chercher à examiner chaque équation séparément mais aussi à les mettre en relation. En pratique, cela consiste à regarder l'équation obtenue lorsque l'on effectue la somme ou le produit de deux ou plusieurs équations. Une autre idée est d'appliquer des inégalités connues d'un côté ou de l'autre de l'équation. En effet, souvent les égalités présentes dans les problèmes ne sont possibles que lorsque les variables vérifient le cas d'égalité d'une inégalité bien connue.\n\nCommençons par un examen séparé. On considère la première équation $x+\\frac{y}{z}=2$. D'après l'inégalité des moyennes, on a\n$$\n2=x+\\frac{y}{z} \\geqslant 2 \\sqrt{x \\cdot \\frac{y}{z}}\n$$\nsoit $\\sqrt{\\frac{x y}{z}} \\leqslant 1$. De même, la deuxième équation $y+\\frac{z}{x}=2$ donne $\\sqrt{\\frac{y z}{x}} \\leqslant 1$. En multipliant ces deux inégalités, on obtient\n$$\n1 \\geqslant \\sqrt{\\frac{x y}{z}} \\cdot \\sqrt{\\frac{y z}{x}}=y\n$$\nAinsi $y \\leqslant 1$, et de même on trouve que $x \\leqslant 1$ et $z \\leqslant 1$. On cherche désormais à appliquer ces estimations ou à prouver des estim"
+ },
+ {
+  "mathnet_id": "04p5",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "方程与设元",
+   "根与系数"
+  ],
+  "contest": "Croatian Mathematical Society Competitions",
+  "problem": "Find all pairs $(x, y)$ of real numbers such that\n$$\nxy^3 = -135, \\quad (x+y)y = -6. \\quad (Matko Ljulj)\n$$",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "02xo",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "方程与设元"
+  ],
+  "contest": "Brazilian Mathematical Olympiad",
+  "problem": "Problem:\n\nBronquinha consegue cortar a grama de seu quintal em 3 horas, mas se ele tomar suco de frutas Gummy, ele corta em 2 horas. Em determinado dia, Bronquinha começou a cortar a grama às 10 horas e, em certo momento, tomou o suco de frutas Gummy, terminando de cortar a grama às 12 horas e 30 minutos. Que horas Bronquinha tomou o suco de frutas Gummy?",
+  "solution_head": "Solution:\n\nSeja $A$ a área de grama a ser cortada. Assim, sem tomar o suco, a velocidade com a qual Bronquinha corta a grama é $\\frac{A}{3}$, enquanto que tomando o suco a velocidade é $\\frac{A}{2}$. Seja $t$ o tempo que Bronquinha corta a grama sem tomar o suco, na situação proposta, temos:\n$$\n\\begin{aligned}\n\\frac{A}{3} \\cdot t + \\frac{A}{2} \\cdot (2,5 - t) & = A \\\\\n\\frac{t}{3} + \\frac{2,5 - t}{2} & = 1 \\\\\n2t + 7,5 - 3t & = 6 \\\\\nt & = 1,5\n\\end{aligned}\n$$\nPortanto, se Bronquinha começou a cortar a grama às $10\\ h$, ele tomou o suco às 11 horas e 30 minutos."
+ },
+ {
+  "mathnet_id": "0fnu",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "根与系数",
+   "方程与设元"
+  ],
+  "contest": "L Olimpiada Matemática Española",
+  "problem": "Dados los números $r$, $q$ y $n$, tales que\n$$\n\\frac{1}{r+qn} + \\frac{1}{q+rn} = \\frac{1}{r+q}\n$$\nprobar que\n$$\n\\sqrt{\\frac{n-3}{n+1}}\n$$\nes un número racional.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "02hx",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "方程与设元"
+  ],
+  "contest": "Brazilian Mathematical Olympiad",
+  "problem": "Problem:\n\nO quadrado abaixo é chamado quadrado mágico, porque a soma dos números de cada linha, de cada coluna e de cada diagonal é sempre a mesma. Neste caso essa soma é $15$.\n\n| 4 | 9 | 2 |\n| :--- | :--- | :--- |\n| 3 | 5 | 7 |\n| 8 | 1 | 6 |\n\nComplete os cinco números que faltam no quadrado abaixo para que ele seja um quadrado mágico.\n\n| -12 |   | -4 |\n| :--- | :--- | :--- |\n|   | 0 |   |\n| 4 |   |   |",
+  "solution_head": "Solution:\n\nComo a soma dos números de uma diagonal é $4+0+(-4)=0$, este deve ser o valor da soma dos números de cada linha, coluna e diagonal.\n\nAssim, obtemos de imediato os números que faltam nas casas em cinza no primeiro tabuleiro: $16$, $8$ e $12$, pois $(-12)+16+(-4)=0$ (na primeira linha), $(-12)+8+4=0$ (na primeira coluna) e $(-12)+0+12=0$ (na diagonal).\n\n| -12 | 16 | -4 |\n| :---: | :---: | :---: |\n| 8 | 0 | -8 |\n| 4 | -16 | 12 |\n\nAgora, o número que falta na segunda linha do tabuleiro é $-8$, porque $8+0+(-8)=0$. Para a terceira linha, obtemos $-16$, pois $4+(-16)+12=0$."
+ },
+ {
+  "mathnet_id": "0is1",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "方程与设元"
+  ],
+  "contest": "Harvard-MIT Mathematics Tournament",
+  "problem": "Problem:\n\nFind the real solution(s) to the equation $(x+y)^2 = (x+1)(y-1)$.",
+  "solution_head": "Solution:\n\nAnswer: $(-1,1)$\n\nSet $p = x + 1$ and $q = y - 1$, then we get $(p + q)^2 = p q$, which simplifies to $p^2 + p q + q^2 = 0$. Then we have $\\left(p + \\frac{q}{2}\\right)^2 + \\frac{3 q^2}{4} = 0$, and so $p = q = 0$. Thus $(x, y) = (-1, 1)$."
+ },
+ {
+  "mathnet_id": "01n2",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "方程与设元"
+  ],
+  "contest": "Belorusija 2012",
+  "problem": "Pedestrian, Cyclist and Motorcyclist start at 12.00 from town $A$ to town $B$ simultaneously. When each of them arrives at $B$ he whip rounds and moves to $A$, when he arrives at $A$ he again whip rounds and moves to $B$, and so on. After the start of the movement the first meeting is the meeting of Cyclist and Motorcyclist at some point $C$. By this time Pedestrian passes $1/6$ part of the distance between $A$ and $B$, and after 6 minute he meets Motorcyclist. The first meeting of Cyclist and Pedestrian is also held at $C$.\nWhen do Pedestrian, Cyclist and Motorcyclist meet each other at the same point for the first time?",
+  "solution_head": "Answer: 13.30.\nLet the distance between $A$ and $B$ be equal to $S$ (km), the speeds of Pedestrian, Cyclist and Motorcyclist be equal to $a$, $b$ and $c$ (km/h), respectively. By condition (the first meeting is the meeting of Cyclist and Motorcyclist), it follows that $a < b < c$. Let Pedestrian arrive at point $D$ at that moment when Cyclist and Motorcyclist meet at point $C$. By condition, $AD = \\frac{S}{6}$. Then $\\frac{AD}{a} = t_1 = \\frac{S}{6a}$. Since $AC + (AB + BC) = 2S$ we have $t_1 = \\frac{2S}{b+c}$. So, $\\frac{S}{6a} = \\frac{2S}{b+c}$, hence\n$$\nb+c=12a. \\tag{1}\n$$\nFrom $t_1 b = \\frac{Sb}{6a}$ it follows that $AC = \\frac{Sb}{6a}$, so $CD = AC - AD = \\frac{Sb}{6a} - \\frac{S}{6} = \\frac{S(b-a)}{6a}$. Therefore,\n$$\n\\frac{S(b-a)}{6a} = \\frac{(a+c)}{10}. \\tag{2}\n$$\nBy condition, to arrive at $C$ (the point of meeting with Cyclist) Pedestrian need the time $t_2 = \\frac{AC}{a} = \\frac{Sb}{6a^2}$. On the other hand, $t_2 = \\frac{2S}{a+b}$, so $b(a+b) = 12a^2 \\Leftrightarrow b^2 + ab - 12a^2 = 0 \\Leftrightarrow (b+4a)(b-3a) = 0$. Since $b+4a > 0$ ($a$ and $b$ are positive), we have"
+ },
+ {
+  "mathnet_id": "0e07",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "方程与设元",
+   "根与系数"
+  ],
+  "contest": "National Math Olympiad",
+  "problem": "Find all real numbers $x$, $y$ and $z$ which are solutions of the system of equations\n$$\nx + y - 2z = 0, \\quad xy - z^2 = 0, \\quad y^2 + 5z + 6 = 0.\n$$",
+  "solution_head": "From the first equation we get $x = -2z - y$. Inserting this into the second equation we get $(-2z - y)y - z^2 = 0$ or, equivalently, $-(z + y)^2 = 0$. This implies that $z = -y$. Finally, we use this together with the third equation to obtain $y^2 - 5y + 6 = 0$ or $(y - 2)(y - 3) = 0$. Hence, $y = 2$ or $y = 3$.\nThere are two solutions: $x = 2$, $y = 2$, $z = -2$ and $x = 3$, $y = 3$, $z = -3$."
+ }
+]
