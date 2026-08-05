@@ -4,7 +4,7 @@
 用法：
   uv run python scripts/bank.py web        # 浏览器训练台（学生推荐入口，scripts/web_app.py）
   uv run python scripts/bank.py lint
-  uv run python scripts/bank.py doclint    # 全仓 md：死链 / 禁词 / taxonomy 树一致性
+  uv run python scripts/bank.py doclint    # 全仓 md：死链 / 禁词 / taxonomy 树 / 训练契约一致性
   uv run python scripts/bank.py query [--difficulty 3] [--topic 韦达] [--contest IMO] [--category algebra] [--unverified]
   uv run python scripts/bank.py stats
   uv run python scripts/bank.py coach --target IMO --save     # 周计划 → data/plan.json
@@ -144,6 +144,8 @@ def lint(problems):
         if nums != expect:
             gaps = sorted(set(expect) - set(nums))
             errors.append(f'{cat}: 题号不连续，缺 {gaps}')
+    # 唯一硬门槛也执行训练契约检查；完整文档一致性仍由 doclint 负责。
+    errors.extend(_training_contract_errors())
     if errors:
         print('\n'.join(errors))
         print(f'\nLINT FAILED: {len(errors)} 个问题')
@@ -526,6 +528,8 @@ def gen_map(problems):
 DOCLINT_FORBIDDEN = ['origin/main', 'scripts/symphony-start.sh', 'docs/sources/']
 TAXONOMY_BOARDS = {'algebra': 'algebra.md', 'combinatorics': 'combinatorics.md',
                    'geometry': 'geometry.md', 'number-theory': 'number-theory.md'}
+TRAINING_CONTRACT_DOCS = ('docs/学生手册.md', 'docs/教练手册.md')
+TRAINING_CONTRACT_SECTIONS = ('intervals', 'time-limits', 'graduate-streak')
 
 
 def _walk_md():
@@ -534,6 +538,87 @@ def _walk_md():
         for fn in sorted(filenames):
             if fn.endswith('.md'):
                 yield os.path.join(dirpath, fn)
+
+
+def _marked_contract_block(text, rel, section, errors):
+    """提取手册中唯一的训练契约标记块；缺失/重复/未闭合均显式报错。"""
+    start = f'<!-- training-contract:{section}:start -->'
+    end = f'<!-- training-contract:{section}:end -->'
+    if text.count(start) != 1 or text.count(end) != 1:
+        errors.append(f'{rel}: 训练契约标记 {section} 必须且只能出现一对')
+        return None
+    start_at = text.index(start) + len(start)
+    end_at = text.index(end)
+    if end_at < start_at:
+        errors.append(f'{rel}: 训练契约标记 {section} 顺序错误')
+        return None
+    return text[start_at:end_at]
+
+
+def _parse_interval_contract(block):
+    """读取标记块内 Markdown 表格的首列结果与末列天数，允许中间保留读者说明列。"""
+    values = {}
+    for line in block.splitlines():
+        cells = [cell.strip() for cell in line.strip().strip('|').split('|')]
+        if len(cells) < 2:
+            continue
+        key_match = re.fullmatch(r'`([^`]+)`', cells[0])
+        value_match = re.fullmatch(r'(\d+)\s*天', cells[-1])
+        if key_match and value_match:
+            values[key_match.group(1)] = int(value_match.group(1))
+    return values
+
+
+def _parse_graduate_contract(block):
+    matches = re.findall(r'连续\s*(\d+)\s*次\s*`independent_ok`', block)
+    return {'independent_ok': int(matches[-1])} if matches else {}
+
+
+def _training_contract_errors():
+    """两手册的刻意数值抄录必须与 spar_session 契约常量逐项一致。"""
+    errors = []
+    parsers = {
+        'intervals': _parse_interval_contract,
+        'time-limits': lambda block: {
+            int(m.group('key')): int(m.group('value'))
+            for m in re.finditer(r'★(?P<key>[1-5])\s*≤\s*(?P<value>\d+)\s*(?:min)?', block)
+        },
+        'graduate-streak': _parse_graduate_contract,
+    }
+    expected = {
+        'intervals': sp.INTERVALS,
+        'time-limits': sp.TIME_LIMIT,
+        'graduate-streak': {'independent_ok': sp.GRADUATE_STREAK},
+    }
+    labels = {
+        'intervals': '复习间隔',
+        'time-limits': '攻坚限时',
+        'graduate-streak': '毕业连击数',
+    }
+    units = {'intervals': '天', 'time-limits': '分钟', 'graduate-streak': '次'}
+
+    for rel in TRAINING_CONTRACT_DOCS:
+        path = os.path.join(ROOT, *rel.split('/'))
+        try:
+            text = open(path, encoding='utf-8').read()
+        except OSError:
+            errors.append(f'{rel}: 训练契约手册缺失')
+            continue
+        for section in TRAINING_CONTRACT_SECTIONS:
+            block = _marked_contract_block(text, rel, section, errors)
+            if block is None:
+                continue
+            actual = parsers[section](block)
+            wanted = expected[section]
+            for key in wanted.keys() - actual.keys():
+                errors.append(f'{rel}: {labels[section]}缺少「{key}」')
+            for key in actual.keys() - wanted.keys():
+                errors.append(f'{rel}: {labels[section]}多出未知项「{key}」')
+            for key in wanted.keys() & actual.keys():
+                if actual[key] != wanted[key]:
+                    errors.append(f'{rel}: {labels[section]}「{key}」应为 {wanted[key]}{units[section]}，'
+                                  f'手册写为 {actual[key]}{units[section]}')
+    return errors
 
 
 def doclint():
@@ -611,11 +696,13 @@ def doclint():
         cyc = sorted(_kahn_leftover(fwd) & _kahn_leftover([(b, a) for a, b in fwd]))
         if cyc:
             errors.append('taxonomy/prereq.yml: 依赖图有环，环上节点：' + '、'.join(cyc))
+    # e) 两手册完整抄录的训练契约数值必须与 spar_session 唯一正本一致
+    errors.extend(_training_contract_errors())
     if errors:
         print('\n'.join(errors))
         print(f'\nDOCLINT FAILED: {len(errors)} 个问题')
         return 1
-    print(f'DOCLINT OK: {n_files} 个 md 文件（死链/禁词/树一致性/依赖图）全部通过')
+    print(f'DOCLINT OK: {n_files} 个 md 文件（死链/禁词/树一致性/依赖图/训练契约）全部通过')
     return 0
 
 
@@ -797,7 +884,7 @@ def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest='cmd', required=True)
     sub.add_parser('lint')
-    sub.add_parser('doclint', help='全仓 md 文档校验：死链 / 禁词 / taxonomy 树一致性 / 前置依赖图')
+    sub.add_parser('doclint', help='全仓 md 文档校验：死链 / 禁词 / taxonomy 树 / 前置依赖图 / 训练契约')
     sub.add_parser('linkcheck', help='联网检查文档外链（不属于 lint；CI 按月跑）')
     q = sub.add_parser('query')
     q.add_argument('--difficulty', type=int)

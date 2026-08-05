@@ -184,7 +184,7 @@ source_url: https://huggingface.co/datasets/ShadenA/MathNet
 | 赛名→难度底档映射 | `taxonomy/contest_tiers.yml` | `mathnet_ingest.py` 估级管线 |
 | 知识点正名与别名 | `taxonomy/registry.yml`（检索别名 `aliases.yml`） | `bank.py lint` 告警、map/query |
 | 知识点前置依赖图（教学建议边） | `taxonomy/prereq.yml`（语义见其头注） | `bank.py doclint`（端点/DAG 校验）、`bank.py map`（指示图前置 chips）、`student_profile.gap_queue`（补齐队列按上游优先） |
-| 攻坚限时/复习间隔/毕业条件 | `spar_session.py` 契约常量（`TIME_LIMIT`/`INTERVALS`/`GRADUATE_STREAK`） | docs/ 两手册、`bank.py` coach/review、`web_app.py`（数值由服务端下发，前端不复制） |
+| 攻坚限时/复习间隔/毕业条件 | `spar_session.py` 契约常量（`TIME_LIMIT`/`INTERVALS`/`GRADUATE_STREAK`） | docs/ 两手册为方便两类读者而完整抄录，属刻意例外，由 `bank.py doclint` 数值校验兜底；`bank.py` coach/review、`web_app.py`（数值由服务端下发，前端不复制） |
 | 机器核验凭证（machine_check_ref 与台账保真） | `scripts/checks/run_checks.py` 头注 | `bank.py lint`（凭证覆盖校验）、CI「机器核验」步骤（重跑保真）、SPEC §2（字段语义指针）、`data/verify/` 台账（必须提交） |
 | 入库铁律 v2 | SPEC §5 | AGENTS.md（路由指针） |
 | 版权边界 | SPEC §6 | AGENTS.md（路由指针） |
