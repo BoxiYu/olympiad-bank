@@ -1,0 +1,174 @@
+[
+ {
+  "mathnet_id": "0jn7",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "代数变换技巧"
+  ],
+  "contest": "Berkeley Math Circle: Monthly Contest 5",
+  "problem": "Problem:\n\nLet $A$, $B$, $C$ be points in a line on this order, with $AB = BC$. A car travels from $A$ to $B$ at $40$ kilometers per hour and then from $B$ to $C$ at $60$ kilometers per hour, without stopping in between. What is the overall speed of the trip from $A$ to $C$?",
+  "solution_head": "Solution:\n\nLet $d = AB = BC$. Then the total time taken is $\\frac{d}{40} + \\frac{d}{60}$, and the total distance is $2d$. Hence the overall speed is\n$$\n\\frac{2d}{\\frac{d}{40} + \\frac{d}{60}} = \\frac{2}{\\frac{1}{40} + \\frac{1}{60}} = 48\n$$"
+ },
+ {
+  "mathnet_id": "02t8",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "代数变换技巧"
+  ],
+  "contest": "Brazilian Mathematical Olympiad",
+  "problem": "Problem:\n\nQuantos dígitos possui o número $3^{100}$? Bom, podemos dar uma resposta aproximada para esta pergunta, sem usar a calculadora, simplesmente comparando-o com potências de $10$. Veja que $3^{2}<10$ nos permite concluir que $(3^{2})^{50}=3^{100}<10^{50}$. Então, $3^{100}$ tem no máximo $50$ dígitos pois, $10^{50}$ é o primeiro número com $51$ dígitos. O número $3^{100}$ tem de fato $48$ dígitos! Agora é a sua vez. Seja $N$ a quantidade de dígitos do número $2^{100}$, determine um inteiro positivo $k$ tal que $k \\leq N \\leq k+5$.",
+  "solution_head": "Solution:\n\nVeja que $2^{3}=8$ é menor que $10$, então\n$$\n2^{100}<2^{102}=(2^{3})^{34}<10^{34}\n$$\nComo $10^{34}$ é o primeiro número com $35$ dígitos, $2^{100}$ possui no máximo $34$ dígitos. Além disso, veja que $2^{7}=128$ é maior que $100$. Daí\n$$\n2^{100}>2^{98}=(2^{7})^{14}>(10^{2})^{14}=10^{28}\n$$\nComo $10^{28}$ é o menor número com $29$ dígitos, $2^{100}$ possui pelo menos $29$ dígitos. Fica então demonstrado que $k=29$ satisfaz a condição dado que $29 \\leq N \\leq 34$."
+ },
+ {
+  "mathnet_id": "08pv",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "素数与算术基本定理",
+   "多项式",
+   "代数变换技巧"
+  ],
+  "contest": "Junior Balkan Mathematical Olympiad",
+  "problem": "Problem:\nShow that there exist infinitely many positive integers $n$ such that\n$$\n\\frac{4^{n}+2^{n}+1}{n^{2}+n+1}\n$$\nis an integer.",
+  "solution_head": "Solution:\nLet $f(n) = n^{2} + n + 1$. Note that\n$$\nf\\left(n^{2}\\right) = n^{4} + n^{2} + 1 = \\left(n^{2} + n + 1\\right)\\left(n^{2} - n + 1\\right)\n$$\nThis means that $f(n) \\mid f\\left(n^{2}\\right)$ for every positive integer $n$. By induction on $k$, one can easily see that $f(n) \\mid f\\left(n^{2^{k}}\\right)$ for every positive integers $n$ and $k$. Note that the required condition is equivalent to $f(n) \\mid f\\left(2^{n}\\right)$. From the discussion above, if there exists a positive integer $n$ so that $2^{n}$ can be written as $n^{2^{k}}$, for some positive integer $k$, then $f(n) \\mid f\\left(2^{n}\\right)$. If we choose $n = 2^{2^{m}}$ and $k = 2^{m} - m$ for some positive integer $m$, then $2^{n} = n^{2^{k}}$ and since there are infinitely many positive integers of the form $n = 2^{2^{m}}$, we have the desired result."
+ },
+ {
+  "mathnet_id": "02a4",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "代数变换技巧"
+  ],
+  "contest": "Nível 3",
+  "problem": "Problem:\n\nDois motoristas viajam da cidade $A$ até a cidade $B$ e, imediatamente, regressam à cidade $A$. O primeiro motorista viaja com velocidade constante de $80~\\mathrm{km}/\\mathrm{h}$, tanto na ida quanto na volta. O segundo motorista viaja até a cidade $B$ com velocidade constante de $90~\\mathrm{km}/\\mathrm{h}$ e retorna com velocidade constante de $70~\\mathrm{km}/\\mathrm{h}$. Qual desses motoristas gasta menos tempo no percurso de ida e volta?",
+  "solution_head": "Solution:\n\nSeja $d$ a distância entre as cidades $A$ e $B$, e lembre que tempo $=$ distância $/$ velocidade.\n\n- O primeiro motorista viaja a distância de $2d$ com velocidade constante igual a $80~\\mathrm{km}/\\mathrm{h}$. Logo, o tempo total gasto por ele é:\n$$\nt = \\frac{2d}{80} = \\frac{d}{40}\n$$\n\n- O segundo motorista percorre a distância $d$, na ida, com velocidade igual a $90~\\mathrm{km}/\\mathrm{h}$ e, na volta, a mesma distância com velocidade de $70~\\mathrm{km}/\\mathrm{h}$. Logo o tempo gasto na ida e volta é:\n$$\nt' = \\frac{d}{70} + \\frac{d}{90} = \\frac{16d}{630} = \\frac{8d}{315}\n$$\n\nComo\n$$\n\\frac{d}{40} = \\frac{8d}{320} < \\frac{8d}{315}\n$$\n\nconclui-se que o motorista que viaja com velocidade constante de $80~\\mathrm{km}/\\mathrm{h}$ é o que gasta menos tempo no percurso de ida e volta."
+ },
+ {
+  "mathnet_id": "02eq",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "代数变换技巧"
+  ],
+  "contest": "XII OBM",
+  "problem": "Given that $f(x) = \\frac{ax+b}{cx+d}$, $f(0) \\neq 0$, $f(f(0)) \\neq 0$. Let $F(x) = \\underbrace{f(\\dots(f(x)\\dots))}_{n \\text{ times}}$. If $F(0) = 0$, show that $F(x) = x$ for all $x$ where the expression is defined.",
+  "solution_head": "Put $f^k(x) = \\underbrace{f(\\dots(f(x))\\dots)}_{k \\text{ times}}$. Then we have $f^k(x) = \\frac{a_k x + b_k}{c_k x + d_k}$. From\n$f^{k+1}(x) = f(f^k(x))$ we get:\n$$\n\\begin{align*} \na_{k+1} &= a a_k + b c_k \\\nb_{k+1} &= a b_k + b d_k \\\nc_{k+1} &= c a_k + d c_k \\\nd_{k+1} &= c b_k + d d_k \n\\end{align*}\n$$\nBut we also have $f^{k+1}(x) = f^k(f(x))$, so\n$$\n\\begin{align*} \na_{k+1} &= a a_k + c b_k \\\nb_{k+1} &= b a_k + d b_k \\\nc_{k+1} &= a c_k + c d_k \\\nd_{k+1} &= b c_k + d d_k \n\\end{align*}\n$$\nComparing, we get $b c_k = c b_k$ and $(a-d) b_k = b(a_k - d_k)$.\nIf $f^n(0) = 0$, then $b_n = 0$, so $b c_n = 0$. We are given that $f(0) \\neq 0$, so $b \\neq 0$. Hence $c_n = 0$. Also $b(a_n - d_n) = 0$ and hence $a_n = d_n$. Hence $f^n(x) = x$."
+ },
+ {
+  "mathnet_id": "044x",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "代数变换技巧"
+  ],
+  "contest": "China Mathematical Competition",
+  "problem": "Given function $f(x) = |2 - \\log_3 x|$, positive real numbers $a, b, c$ satisfy $a < b < c$ and $f(a) = 2f(b) = 2f(c)$. Find the value of $\\frac{ac}{b}$.",
+  "solution_head": "Note that $f(x) = |\\log_3(\\frac{x}{9})|$ is monotonically decreasing on $(0, 9]$ and monotonically increasing on $[9, +\\infty)$.\nBy the conditions satisfied by $a, b, c$, we know that $0 < a < b < 9 < c$ and\n$$\n\\log_3\\left(\\frac{9}{a}\\right) = 2\\log_3\\left(\\frac{9}{b}\\right) = 2\\log_3\\left(\\frac{c}{9}\\right).\n$$\nTherefore,\n$$\n\\begin{aligned}\n\\log_3\\left(\\frac{ac}{b}\\right) &= \\log_3\\left(9 \\cdot \\frac{a}{9} \\cdot \\frac{9}{b} \\cdot \\frac{c}{9}\\right) \\\\\n&= 2 - \\log_3\\left(\\frac{9}{a}\\right) + \\log_3\\left(\\frac{9}{b}\\right) + \\log_3\\left(\\frac{c}{9}\\right) \\\\\n&= 2,\n\\end{aligned}\n$$\nnamely, $\\frac{ac}{b} = 3^2 = 9$."
+ },
+ {
+  "mathnet_id": "02od",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "代数变换技巧"
+  ],
+  "contest": "Brazilian Mathematical Olympiad",
+  "problem": "Problem:\n\nA calculadora do Dodó tem uma tecla especial com o símbolo $\\mathrm{R}$. Se o visor mostra um número $x$ diferente de $2$, ao apertar $\\mathrm{R}$ aparece o valor de $\\frac{2x-3}{x-2}$.\n\na. Se o Dodó colocar $4$ no visor e apertar $\\mathrm{R}$, qual número vai aparecer?\n\nb. Dodó colocou um número no visor e, ao apertar $\\mathrm{R}$, apareceu o mesmo número. Quais são os números que ele pode ter colocado no visor?\n\nc. Dodó percebeu que, colocando o $4$ no visor e apertando $\\mathrm{R}$ duas vezes, aparece de novo o $4$; da mesma forma, colocando o $5$ e apertando $\\mathrm{R}$ duas vezes, aparece de novo o $5$. O mesmo vai acontecer para qualquer número diferente de $2$? Explique.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0j6u",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "代数变换技巧"
+  ],
+  "contest": "Harvard-MIT November Tournament",
+  "problem": "Problem:\n\nLet $x$ be a real number such that $2^{x} = 3$. Determine the value of $4^{3x+2}$.",
+  "solution_head": "Solution:\n\nWe have\n$$\n4^{3x+2} = 4^{3x} \\cdot 4^{2} = \\left(2^{2}\\right)^{3x} \\cdot 16 = 2^{6x} \\cdot 16 = \\left(2^{x}\\right)^{6} \\cdot 16 = 3^{6} \\cdot 16 = 11664\n$$"
+ },
+ {
+  "mathnet_id": "0dwl",
+  "est": 2,
+  "conf": "mid",
+  "category": "algebra",
+  "topics": [
+   "代数变换技巧"
+  ],
+  "contest": "4. državno tekmovanje v znanju matematike za dijake srednjih tehniških in strokovnih šol",
+  "problem": "Problem:\n\nReši enačbo:\n$$\n\\log \\left(\\frac{1}{x}\\right) \\cdot \\log \\left(\\frac{4}{x}\\right) = \\frac{3}{4} \\cdot (\\log 4)^2\n$$",
+  "solution_head": "Solution:\n\nNajprej uporabimo pravilo za logaritmiranje količnika:\n$$(\\log 1 - \\log x) \\cdot (\\log 4 - \\log x) = \\frac{3}{4}(\\log 4)^2.$$\nKer je $\\log 1 = 0$, dobimo:\n$$(-\\log x) \\cdot (\\log 4 - \\log x) = \\frac{3}{4}(\\log 4)^2.$$\nRazpremo oklepaj:\n$$-\\log x \\cdot \\log 4 + (\\log x)^2 = \\frac{3}{4}(\\log 4)^2.$$\nPreuredimo enačbo:\n$$(\\log x)^2 - \\log x \\cdot \\log 4 - \\frac{3}{4}(\\log 4)^2 = 0.$$\nTo je kvadratna enačba oblike $a^2 - ab - c = 0$ za $a = \\log x$.\n\nIzračunamo diskriminanto:\n$$D = (\\log 4)^2 - 4 \\cdot 1 \\cdot \\left(-\\frac{3}{4}(\\log 4)^2\\right) = (\\log 4)^2 + 3(\\log 4)^2 = 4(\\log 4)^2.$$\n\nRešitvi kvadratne enačbe sta:\n$$\\log x_{1,2} = \\frac{\\log 4 \\pm 2\\log 4}{2} = \\frac{1}{2}\\log 4 \\pm \\log 4.$$\nTorej:\n$$\\log x_1 = \\frac{1}{2}\\log 4 + \\log 4 = \\frac{3}{2}\\log 4 = \\log 8,$$\n$$\\log x_2 = \\frac{1}{2}\\log 4 - \\log 4 = -\\frac{1}{2}\\log 4 = \\log \\frac{1}{2}.$$\n\nIz teh rešitev dobimo:\n$$x_1 = 8,$$\n$$x_2 = \\frac{1}{2}.$$"
+ },
+ {
+  "mathnet_id": "0c96",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "数列与递推",
+   "代数变换技巧",
+   "素数与算术基本定理"
+  ],
+  "contest": "Romanian Mathematical Olympiad",
+  "problem": "Consider a real number $a \\ge 1$. The sequence $(x_n)_{n \\ge 1}$ is given by $x_1 = a$ and $x_{n+1} = 1 + \\log_2 x_n$, for any $n \\in \\mathbb{N}^*$. Determine values of $a$ such that all terms of the sequence are rational numbers.",
+  "solution_head": "For $a = 1$ or $a = 2$ we get the constant sequence $1$ or $2$ respectively.\nWe shall prove that these are the only values satisfying the problem.\nTo see this, let $x_n = \\frac{k}{l}$ and $x_{n+1} = \\frac{p}{q}$, with $k, l$ coprime positive integers, $p, q$ coprime positive integers with $q \\ge 2$. Then\n$$\n\\frac{k}{l} = x_n = 2^{x_{n+1}-1} = \\sqrt[q]{2^{p-q}},\n$$\nimplying $l^q 2^p = k^q 2^q$.\nThe last equality cannot be true, as the left hand side number has $2$ as factor at an exponent which is not divisible by $q$ ($p$ and $q$ are coprime), and the right hand side has the factor $2$ at an exponent divisible by $q$. So $q = 1$, thus $l = 1$, so, if all terms of the sequence would be rationals, they should be natural numbers.\nAs $2^n > n + 1$, for $n \\ge 2, n \\in \\mathbb{N}$, we get $1 + \\log_2 x < x$, for $x \\in \\mathbb{N}, x \\ge 3$. As a conclusion, if all terms are positive integers and $x > 2$, an inductive argument shows that the sequence is decreasing, a contradiction. That is $a = x_1 \\in \\{1, 2\\}$."
+ },
+ {
+  "mathnet_id": "0kp0",
+  "est": 2,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "代数变换技巧"
+  ],
+  "contest": "HMMT November 2022",
+  "problem": "Problem:\n\nReal numbers $x$ and $y$ satisfy the following equations:\n$$\n\\begin{aligned}\nx & = \\log_{10}\\left(10^{y-1}+1\\right)-1 \\\\\ny & = \\log_{10}\\left(10^{x}+1\\right)-1\n\\end{aligned}\n$$\nCompute $10^{x-y}$.",
+  "solution_head": "Solution:\n\nTaking 10 to the power of both sides in each equation, these equations become:\n$$\n\\begin{aligned}\n& 10^{x} = \\left(10^{y-1} + 1\\right) \\cdot 10^{-1} \\\\\n& 10^{y} = \\left(10^{x} + 1\\right) \\cdot 10^{-1}\n\\end{aligned}\n$$\nLet $a = 10^{x}$ and $b = 10^{y}$. Our equations become:\n$$\n\\begin{aligned}\n10a & = b/10 + 1 \\\\\n10b & = a + 1\n\\end{aligned}\n$$\nand we are asked to compute $a / b$. Subtracting the equations gives\n$$\n10a - 10b = b/10 - a \\Longrightarrow 11a = 101b/10\n$$\ngiving an answer of $\\frac{101}{110}$."
+ },
+ {
+  "mathnet_id": "0e9k",
+  "est": 2,
+  "conf": "mid",
+  "category": "algebra",
+  "topics": [
+   "代数变换技巧"
+  ],
+  "contest": "14. tekmovanje v znanju matematike za dijake srednjih tehniških in strokovnih šol, Državno tekmovanje",
+  "problem": "Problem:\n\nNaj bo $x > 0$. Reši enačbo $\\left(\\frac{2}{5}\\right)^{\\log^2 x + 1} = \\left(\\frac{25}{4}\\right)^{2 - \\log x^3}$.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0iez",
+  "est": 3,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "代数变换技巧"
+  ],
+  "contest": "Harvard-MIT Mathematics Tournament",
+  "problem": "Problem:\nHow many real numbers $x$ are solutions to the following equation?\n$$\n2003^{x} + 2004^{x} = 2005^{x}\n$$",
+  "solution_head": "Solution:\nRewrite the equation as $(2003 / 2005)^{x} + (2004 / 2005)^{x} = 1$. The left side is strictly decreasing in $x$, so there cannot be more than one solution. On the other hand, the left side equals $2 > 1$ when $x = 0$ and goes to $0$ when $x$ is very large, so it must equal $1$ somewhere in between. Therefore there is one solution."
+ },
+ {
+  "mathnet_id": "0h67",
+  "est": 3,
+  "conf": "mid",
+  "category": "algebra",
+  "topics": [
+   "代数变换技巧"
+  ],
+  "contest": "55rd Ukrainian National Mathematical Olympiad - Fourth Round",
+  "problem": "Solve the equation:\n$$\n\\frac{1}{\\sqrt{2014}-\\sqrt{x}} + \\frac{1}{\\sqrt{2015}-\\sqrt{x+1}} + \\frac{1}{\\sqrt{2016}-\\sqrt{x+2}} = \n\\frac{1}{\\sqrt{2015-x}-\\sqrt{1}} + \\frac{1}{\\sqrt{2016-x}-\\sqrt{2}} + \\frac{1}{\\sqrt{2017-x}-\\sqrt{3}}\n$$",
+  "solution_head": "Multiply both numerator and denominator by the conjugate:\n$$\n\\frac{\\sqrt{2014+\\sqrt{x}}}{2014-x} + \\frac{\\sqrt{2015+\\sqrt{x+1}}}{2015-(x+1)} + \\frac{\\sqrt{2016+\\sqrt{x+2}}}{2016-(x+2)} = \\frac{\\sqrt{2015-x+\\sqrt{1}}}{(2015-x)-1} + \\frac{\\sqrt{2016-x+\\sqrt{2}}}{(2016-x)-2} + \\frac{\\sqrt{2017-x+\\sqrt{3}}}{(2017-x)-3}\n$$\nAfter multiplying by the common denominator we have:\n$$\n\\sqrt{2014+\\sqrt{x}} + \\sqrt{2015+\\sqrt{x+1}} + \\sqrt{2016+\\sqrt{x+2}} = \n\\sqrt{2015-x} + \\sqrt{1} + \\sqrt{2016-x} + \\sqrt{2} + \\sqrt{2017-x} + \\sqrt{3},\n$$\n\n1) $x=1$ is the solution of the equation:\n$$\n\\sqrt{2014} + \\sqrt{1} + \\sqrt{2015} + \\sqrt{2} + \\sqrt{2016} + \\sqrt{3} = \\sqrt{2014} + \\sqrt{1} + \\sqrt{2015} + \\sqrt{2} + \\sqrt{2016} + \\sqrt{3}.\n$$\n\n2) Denote $S = \\sqrt{2014} + \\sqrt{1} + \\sqrt{2015} + \\sqrt{2} + \\sqrt{2016} + \\sqrt{3}$. For $x > 1$ we have\n$$\n\\sqrt{2014} + \\sqrt{x} + \\sqrt{2015} + \\sqrt{x+1} + \\sqrt{2016} + \\sqrt{x+2} > \n\\sqrt{2014} + \\sqrt{1} + \\sqrt{2015} + \\sqrt{2} + \\sqrt{2016} + \\sqrt{3} = S.\n$$\nSo the left-hand side is greater than $S$, and in the same way we analyze the right-hand side:"
+ }
+]
