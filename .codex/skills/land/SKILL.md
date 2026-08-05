@@ -18,7 +18,7 @@ description:
 
 - `gh` CLI 已认证。
 - 你在 PR 分支上，工作区干净。
-- issue 带 `symphony:merging` 标签（人类已批准合入）。
+- Linear 工单处于 `Merging` 状态（人类已批准合入）。
 
 ## 步骤
 
@@ -33,7 +33,7 @@ description:
 8. CI 红了：拉日志定位（`gh pr checks`、`gh run view <run-id> --log`），
    本地修复，`commit` + `push`，重新进入监视循环。
 9. 全绿且意见处理完：squash 合并，用 PR 标题/描述作为合并主题与正文。
-10. 合并后：关闭对应 issue，清掉状态标签，在工作台补一行合入记录（附 merge commit sha）。
+10. 合并后：把 Linear 工单切到 `Done`，在工作台补一行合入记录（附 merge commit sha）。
 
 ## 命令
 
@@ -100,7 +100,7 @@ gh pr merge --squash --subject "$pr_title" --body "$pr_body"
   `WORKFLOW.md`、`.codex/skills/`、`scripts/lint.sh`），合并前必须有教练（人类）
   的明确确认记录，CI 绿不构成合入依据。
 - 合并前 PR 标题与描述必须覆盖整条分支的全部范围，而不只是最后一次修复。
-- 评审要求扩大范围时，决定「现在做」还是「另开 issue」，
+- 评审要求扩大范围时，决定「现在做」还是「另开工单」，
   并在根级 `[codex]` 更新里说明理由。
 - 不要为了让 CI 变绿而放宽 lint 的校验规则或删改 `scripts/bank.py` 的校验逻辑。
   lint 报错说明数据有问题，要修数据，不是修尺子。
