@@ -24,6 +24,7 @@ import student_profile as stp  # 学生档案 + 能力图（证据折算/状态�
 CATEGORIES = ['algebra', 'number-theory', 'combinatorics', 'geometry']
 PREFIX = {'algebra': 'A', 'number-theory': 'N', 'combinatorics': 'C', 'geometry': 'G'}
 REQUIRED = ['id', 'title', 'category', 'source_ref', 'difficulty', 'topics', 'verification', 'source_url']
+ALLOWED = REQUIRED + ['contest', 'year', 'difficulty_note', 'mathnet_id', 'review_ref', 'machine_check_ref']
 SECTIONS = ['## 题面', '## 答案', '## 解法要点']
 MIN_DIFFICULTY = 2  # 学段下界：本库只收初中+高中，★1 为小学/低龄档不入库（语义正本 SPEC §4）
 
@@ -84,6 +85,9 @@ def lint(problems):
         if fm is None:
             errors.append(f'{rel}: frontmatter 缺失或无法解析')
             continue
+        unknown = sorted(set(fm) - set(ALLOWED))
+        if unknown:
+            errors.append(f'{rel}: frontmatter 含未知字段 {", ".join(unknown)}')
         for k in REQUIRED:
             if k not in fm or fm[k] in (None, '', []):
                 errors.append(f'{rel}: 缺少必填字段 {k}')

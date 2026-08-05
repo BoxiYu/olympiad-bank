@@ -215,6 +215,13 @@ class TestVerdictIds:
 # ---------------- 3. 其余 lint 规则 ----------------
 
 class TestLintRules:
+    def test_unknown_frontmatter_field_is_rejected(self, repo, capsys):
+        """防回归：字段全集以 SPEC §2 为准，清退字段或拼错字段都不能静默入库。"""
+        make_problem(repo, deprecated_field='stale')
+        rc, out = run_lint(capsys)
+        assert rc == 1
+        assert 'problems/algebra/A-001.md: frontmatter 含未知字段 deprecated_field' in out
+
     def test_missing_required_field(self, repo, capsys):
         """防回归：必填字段缺失或为空值（None/''/[]）都要报 —— 空 topics 曾能混过去。"""
         make_problem(repo, title=_DROP, topics=[])
