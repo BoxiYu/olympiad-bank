@@ -16,11 +16,11 @@ min(候选池 difficulty_est, 评审 difficulty_codex)，依据写入 difficulty
 """
 import argparse, json, os, re, sys
 
+from bank_constants import CATEGORIES
 from bank import MIN_DIFFICULTY  # 学段下界唯一常量正本，勿在此另设阈值
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 POOL = os.path.join(ROOT, 'candidates', 'mathnet.jsonl')
-CATEGORIES = ['algebra', 'number-theory', 'combinatorics', 'geometry']
 PREFIX = {'algebra': 'A', 'number-theory': 'N', 'combinatorics': 'C', 'geometry': 'G'}
 SOURCE_URL = 'https://huggingface.co/datasets/ShadenA/MathNet'
 

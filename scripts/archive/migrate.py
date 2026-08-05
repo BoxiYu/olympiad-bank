@@ -3,7 +3,7 @@
 import re, os, sys, yaml
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CATEGORIES = {
+LEGACY_CATEGORIES = {
     'A': ('algebra', '代数', 'src/代数板块.md'),
     'N': ('number-theory', '数论', 'src/数论板块.md'),
     'C': ('combinatorics', '组合', 'src/组合板块.md'),
@@ -71,7 +71,7 @@ def parse_entries(text):
 
 def main():
     count = 0
-    for prefix, (slug, zh, srcfile) in CATEGORIES.items():
+    for prefix, (slug, zh, srcfile) in LEGACY_CATEGORIES.items():
         text = open(os.path.join(ROOT, srcfile), encoding='utf-8').read()
         # 知识点树 -> taxonomy/
         tree = text.split('## 一、知识点树', 1)[1].split('## 二、题目条目', 1)[0].strip().rstrip('-').strip()

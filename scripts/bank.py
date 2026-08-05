@@ -19,9 +19,9 @@ import argparse, os, re, sys, yaml
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
+from bank_constants import CATEGORIES
 import spar_session as sp  # 会话流程 + v2 日志契约（间隔/毕业/归一化），三方共用
 import student_profile as stp  # 学生档案 + 能力图（证据折算/状态阈值的正本在该模块 docstring）
-CATEGORIES = ['algebra', 'number-theory', 'combinatorics', 'geometry']
 PREFIX = {'algebra': 'A', 'number-theory': 'N', 'combinatorics': 'C', 'geometry': 'G'}
 REQUIRED = ['id', 'title', 'category', 'source_ref', 'difficulty', 'topics', 'verification', 'source_url']
 SECTIONS = ['## 题面', '## 答案', '## 解法要点']
