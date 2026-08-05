@@ -435,6 +435,24 @@ class TestDoclint:
         rc, out = run_doclint(capsys)
         assert rc == 0, out
 
+    def test_math_bracket_adjacency_not_dead_link(self, repo, capsys):
+        """防回归：LaTeX 里 [..](..) 相邻（如 c[(x+r)-(x+r-d-1)](x+r-1)）是数学记号，
+        不得报死链——题面/答案逐字照录不可改，尺子必须避开数学环境。"""
+        _write(os.path.join(repo, 'docs', 'sol.md'),
+               '推导：\n$$\n\\frac{c[(x+r)-(x+r-d-1)](x+r-1)}{d+1}\n$$\n'
+               '行内 $c[(a)-(b)](x-1)$ 同理。\n')
+        rc, out = run_doclint(capsys)
+        assert rc == 0, out
+
+    def test_dead_link_outside_math_still_caught(self, repo, capsys):
+        """防回归：挖数学环境不得放走公式之外的真死链，同文件混排时仍要抓到。"""
+        _write(os.path.join(repo, 'docs', 'mix.md'),
+               '$$c[(a)-(b)](x-1)$$\n\n[缺的](missing.md)\n')
+        rc, out = run_doclint(capsys)
+        assert rc == 1
+        assert 'docs/mix.md: 死链 missing.md' in out
+        assert out.count('死链') == 1
+
     def test_forbidden_word_caught_outside_archive(self, repo, capsys):
         """防回归：DOCLINT_FORBIDDEN 里的废弃指针出现在正文要报（含行号），docs/archive/ 存档豁免。"""
         assert 'origin/main' in bank.DOCLINT_FORBIDDEN
