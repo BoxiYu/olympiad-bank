@@ -33,6 +33,9 @@ uv run --group mathnet python scripts/mathnet_ingest.py              # 全量重
 uv run --group mathnet python scripts/mathnet_ingest.py --selfcheck  # 只校验两张映射表自洽
 ```
 
+候选池有构建时点，映射与召回规则变更后的重建纪律、排查实例见
+`.claude/skills/ingest/SKILL.md`「实测坑」第 5 条；这里不重复执行细节。
+
 筛选浏览走 `bank.py candidates`（默认排除带图题、置信度 ≥mid）：
 
 ```bash
@@ -70,6 +73,27 @@ uv run --group mathnet python scripts/mathnet_review.py batch \
 
 产物：`data/review/<batch>/batch.json`（题面+官方解摘录+规则层估级）与 `task.md`（评审提示词）。
 批次目录名建议 `<板块缩写>-<序号>`（如 `geo-01`、`nt-02`），一经 dispatch 不再改名——它会被 review_ref 永久引用。
+
+### 排批量校准（实测正本）
+
+`candidates --gaps` 的「候选 ★≤3」是待评审供给，不是可入库量。2026-08-05/06 三轮已落盘批次的
+送审→入库结果如下：
+
+| 板块 | 批次 | 送审 | 入库 | 转化率 |
+| --- | --- | ---: | ---: | ---: |
+| 几何 | `data/review/geo-12`、`data/review/geo-13` | 24 | 9 | 38% |
+| 代数 | `data/review/alg-05`、`data/review/alg-06` | 28 | 13 | 46% |
+| 组合 | `data/review/comb-09` | 14 | 8 | 57% |
+
+主要损耗来自题面或官方解为空、题面非英文、评审判 `skip`；排批时按约 **40%–55%** 估算最终入库量，
+并为目标题数准备相应冗余。转化率只是容量估算，不是放宽准入线的理由。
+
+### 低星段估级偏差（实测正本）
+
+规则层在低星段会系统性高估：`--difficulty 2-3` 仍会混入实际 ★1。仅已落盘的
+`data/review/alg-05`、`data/review/alg-06`、`data/review/comb-09` 就有 10 题被 Codex 判为 ★1 后拒收，
+包括单步公式代入、一次直接计数、直接套用指示变量线性期望等。`difficulty_est` 只适合粗筛，
+不能替代 SPEC §4 的独立定级；这正是跨模型逐题评审的价值。不要为提高转化率而放宽评审或 ★2 准入线。
 
 ## 3｜dispatch：派给本地 Codex
 

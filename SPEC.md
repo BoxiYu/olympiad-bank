@@ -182,6 +182,9 @@ source_url: https://huggingface.co/datasets/ShadenA/MathNet
 | 难度星级语义与锚点 | SPEC §4 | `taxonomy/contest_tiers.yml` 头注、`mathnet_review.py` 评审提示 |
 | 学段范围（初中+高中，★1 不入库） | SPEC §4（语义）+ `bank.py` `MIN_DIFFICULTY`（阈值）+ `bank.py apply_grade_floor`（过滤器） | 硬闸：`mathnet_import.py below_floor`（写盘前准入）、`mathnet_review.py batch`、`candidates --gaps`、`bank.py lint`（最终门槛）；`bank.py candidates` 只作默认值（浏览工具允许显式看低档）；`docs/入库SOP-MathNet.md`、`contest_tiers.yml` 头注为引用 |
 | 赛名→难度底档映射 | `taxonomy/contest_tiers.yml` | `mathnet_ingest.py` 估级管线 |
+| 候选池时效与 map 变更后的重建纪律 | `.claude/skills/ingest/SKILL.md`「实测坑」第 5 条 | `docs/入库SOP-MathNet.md` §1、`CLAUDE.md`「gitignore 与重建」 |
+| 送审→入库转化率的排批校准 | `docs/入库SOP-MathNet.md` §2「排批量校准」 | `.claude/skills/ingest/SKILL.md`「实测坑」第 6 条 |
+| 规则估级在低星段的系统性偏差 | `docs/入库SOP-MathNet.md` §2「低星段估级偏差」 | `.claude/skills/ingest/SKILL.md`「实测坑」第 7 条 |
 | 知识点正名与别名 | `taxonomy/registry.yml`（含检索别名） | `bank.py lint` 告警、map/query |
 | 知识点前置依赖图（教学建议边） | `taxonomy/prereq.yml`（语义见其头注） | `bank.py doclint`（端点/DAG 校验）、`bank.py map`（指示图前置 chips）、`student_profile.gap_queue`（补齐队列按上游优先） |
 | 攻坚限时/提示冷却/复习间隔/毕业条件 | `spar_session.py` 契约常量（`TIME_LIMIT`/`HINT_COOLDOWN_MIN`/`INTERVALS`/`GRADUATE_STREAK`） | docs/ 两手册为方便两类读者而完整抄录，属刻意例外，由 `bank.py doclint` 数值校验兜底；`bank.py` coach/review、`web_app.py`（数值由服务端下发，前端不复制） |
