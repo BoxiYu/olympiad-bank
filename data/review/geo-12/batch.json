@@ -1,0 +1,167 @@
+[
+ {
+  "mathnet_id": "01lv",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形与四边形基本性质",
+   "三角形五心与经典引理",
+   "勾股定理与直角三角形"
+  ],
+  "contest": "61st Belarusian Mathematical Olympiad",
+  "problem": "The lengths of the medians from the vertices of the acute angles of the right-angled triangle are equal to $19$ and $22$.\nFind the length of the hypotenuse of the triangle.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0hzk",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "不等式",
+   "解析几何与向量复数法",
+   "勾股定理与直角三角形"
+  ],
+  "contest": "Harvard-MIT Math Tournament",
+  "problem": "Problem:\n\nIf a right triangle is drawn in a semicircle of radius $1/2$ with one leg (not the hypotenuse) along the diameter, what is the triangle's maximum possible area?",
+  "solution_head": "Solution:\n\nIt is easy to see that we will want one vertex of the triangle to be where the diameter meets the semicircle, so the diameter is divided into segments of length $x$ and $1 - x$, where $x$ is the length of the leg on the diameter. The other leg of the triangle will be the geometric mean of these two numbers, $\\sqrt{x(1 - x)}$. Therefore the area of the triangle is $\\frac{x \\sqrt{x(1 - x)}}{2}$, so it will be maximized when $\\frac{d}{dx}\\left(x^{3} - x^{4}\\right) = 3x^{2} - 4x^{3} = 0$, or $x = 3/4$. Therefore the maximum area is $\\frac{3 \\sqrt{3}}{32}$."
+ },
+ {
+  "mathnet_id": "0ang",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形与四边形基本性质",
+   "勾股定理与直角三角形"
+  ],
+  "contest": "Area Stage",
+  "problem": "Problem:\n\nThe length of a leg of a right triangle is $5$ while the length of the altitude to its hypotenuse is $4$. Find the length of the other leg.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "08lk",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形与四边形基本性质",
+   "代数变换技巧",
+   "勾股定理与直角三角形"
+  ],
+  "contest": "2008 Shortlist JBMO",
+  "problem": "Problem:\nIs it possible to cover a given square with a few congruent right-angled triangles with acute angle equal to $30^{\\circ}$? (The triangles may not overlap and may not exceed the margins of the square.)",
+  "solution_head": "Solution:\nWe will prove that desired covering is impossible.\nLet us assume the opposite, i.e., a square with side length $a$ can be tiled with $k$ congruent right-angled triangles, whose sides are of lengths $b$, $b \\sqrt{3}$, and $2b$.\n\nThen the area of such a triangle is $\\frac{b^{2} \\sqrt{3}}{2}$.\nAnd the area of the square is\n$$\nS_{sq} = k b^{2} \\frac{\\sqrt{3}}{2}\n$$\nFurthermore, the length of the side of the square, $a$, is obtained by the contribution of an integer number of lengths $b$, $2b$, and $b \\sqrt{3}$, hence\n$$\na = m b \\sqrt{3} + n b\n$$\nwhere $m, n \\in \\mathbb{N} \\cup \\{0\\}$, and at least one of the numbers $m$ and $n$ is different from zero. So the area of the square is\n$$\nS_{sq} = a^{2} = (m b \\sqrt{3} + n b)^{2} = b^{2} \\left(3 m^{2} + n^{2} + 2 \\sqrt{3} m n\\right)\n$$\nNow because of (1) and (2) it follows $3 m^{2} + n^{2} + 2 \\sqrt{3} m n = k \\frac{\\sqrt{3}}{2}$, i.e.\n$$\n6 m^{2} + 2 n^{2} = (k - 4 m n) \\sqrt{3}\n$$\nBecause $3 m^{2} + n^{2} \\neq 0$ and from the equality (3) it follows $4 m n \\neq k$. Using once more (3), we get\n$$\n\\sqrt{3} = \\frac{6 m^{2} + 2 n^{2}}{k"
+ },
+ {
+  "mathnet_id": "03qp",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "面积法与三角法",
+   "圆与四点共圆",
+   "勾股定理与直角三角形"
+  ],
+  "contest": "China Girls' Mathematical Olympiad",
+  "problem": "Let $ABC$ be an obtuse triangle inscribed in a circle of radius $1$. Prove that triangle $ABC$ can be covered by an isosceles right-angled triangle with hypotenuse $\\sqrt{2} + 1$. (posed by Leng Gangsong)",
+  "solution_head": "Without loss of generality, we may assume that $\\angle C > 90^\\circ$. Since $\\angle A + \\angle B < 90^\\circ$, we may assume without loss of generality that $\\angle A < 45^\\circ$.\n\nWe can then construct a semicircle $\\omega$ with $AB$ as its diameter such that point $C$ lies inside $\\omega$. Let $O$ be the center of $\\omega$. Then $AO = BO$. Construct rays $AT$ and $OE$ such that $\\angle BAT = \\angle BOE = 45^\\circ$ with $E$ lying on $\\omega$. Let $l$ be the line tangent to $\\omega$ at $E$, and let $l$ meet rays $AT$ and $AB$ at $F$ and $D$ respectively. It is not difficult to see that triangle $AFD$ is an isosceles right-angled triangle, with $\\angle F = 90^\\circ$, that covers triangle $ABC$.\n\nIt suffices to show that $AD < \\sqrt{2} + 1$. Note that\n$$\nAD = AO + OD = AO + \\sqrt{2} OE = (\\sqrt{2} + 1) AO.\n$$\nApplying the sine rule to triangle $ABC$ gives $AB = 2 \\sin C < 2$, or $AO < 1$. It follows that $AD < \\sqrt{2} + 1$, as desired."
+ },
+ {
+  "mathnet_id": "0dc5",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "勾股定理与直角三角形"
+  ],
+  "contest": "SAUDI ARABIAN MATHEMATICAL COMPETITIONS",
+  "problem": "Let $AD$ be the altitude of the right angled triangle $ABC$ with $\\angle A = 90^{\\circ}$. Let $DE$ be the altitude of the triangle $ADB$ and $DZ$ be the altitude of the triangle $ADC$ respectively. Let $N$ be chosen on the line $AB$ such that $CN$ is parallel to $EZ$. Let $A'$ be the symmetric of $A$ with respect to the line $EZ$ and $I, K$ the projections of $A'$ onto $AB$ and $AC$ respectively. Prove that $\\angle NA'T = \\angle ADT$, where $T$ is the intersection point of $IK$ and $DE$.",
+  "solution_head": "Suppose that the line $AA'$ intersects the lines $EZ$, $BC$ and $CN$ at the points $L$, $M$, $F$ respectively. The line $IK$ being diagonal of the rectangle $KA'IA$ passes through $L$, which by construction of $A'$ is the middle of the other diagonal $AA'$. The triangles $ZAL$ and $ALE$ are similar, so $\\angle ZAL = \\angle AEZ$. By the similarity of the triangles $ABC$ and $DAB$ we get $\\angle ACB = \\angle BAD$. We have also that $\\angle AEZ = \\angle BAD$, therefore\n$$\n\\angle ZAL = \\angle CAM = \\angle ACB = \\angle ACM\n$$\nSince $AF \\perp CN$, we have that the right angled triangles $AFC$ and $CDA$ are equal. Thus the altitudes from the vertices $F$ and $D$ of triangles $AFC$ and $CDA$ are respectively equal. It follows that $FD \\parallel AC$ and since $DE \\parallel AC$ we get that the points $E, D, F$ are collinear. In triangle $LFT$ we have\n$$\nA'I \\parallel FT \\text{ and } \\angle LA'I = \\angle LIA',\n$$\nso $\\angle LFT = \\angle LTF$. Therefore the points $F, A', I, T$ belong to the same circle. Also $\\angle A'IN = \\angle A'FN = 90^{\\circ}$ so the quadrilateral $IA'FN$ is cyclic. Thus t"
+ },
+ {
+  "mathnet_id": "04me",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "解析几何与向量复数法",
+   "三角形与四边形基本性质",
+   "勾股定理与直角三角形"
+  ],
+  "contest": "Croatia_2018",
+  "problem": "Let $ABC$ be a right-angled triangle with the right angle at $C$, having sides of length $|AB| = 26$ and $|BC| = 24$. A semicircle with diameter on $\\overline{BC}$ containing point $C$ is inscribed in the triangle. The semicircle touches the side $\\overline{AB}$. What is the radius of the semicircle? (Nikola Adžaga)",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "04dz",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形与四边形基本性质",
+   "勾股定理与直角三角形"
+  ],
+  "contest": "Mathematica competitions in Croatia",
+  "problem": "Let $ABC$ be a right triangle with height $\\overline{CN}$. If $|AC| = |BN| = 1$, determine the length of the hypotenuse $\\overline{AB}$.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "04n4",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "解析几何与向量复数法",
+   "勾股定理与直角三角形"
+  ],
+  "contest": "Croatia_2018",
+  "problem": "Let $ABC$ be a right-angled triangle with the right angle at $C$, such that $|AC| = 2$ and $|BC| = 1$. A square is situated inside the triangle so that two of its vertices are on the side $AC$, the third one is on the side $AB$, and the fourth is on the circle of radius $1$ centred at $B$. Determine the length of the side of the square.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0jo4",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形与四边形基本性质",
+   "根与系数",
+   "勾股定理与直角三角形"
+  ],
+  "contest": "HMMT November 2015",
+  "problem": "Problem:\n\nThe three sides of a right triangle form a geometric sequence. Determine the ratio of the length of the hypotenuse to the length of the shorter leg.",
+  "solution_head": "Solution:\n\nAnswer: $\\frac{1+\\sqrt{5}}{2}$\n\nLet the shorter leg have length $\\ell$, and the common ratio of the geometric sequence be $r>1$. Then the length of the other leg is $\\ell r$, and the length of the hypotenuse is $\\ell r^{2}$. Hence,\n$$\n\\begin{gathered}\n\\ell^{2}+(\\ell r)^{2}=\\left(\\ell r^{2}\\right)^{2} \\\\\n\\Longrightarrow \\ell^{2}\\left(r^{2}+1\\right)=\\ell^{2} r^{4} \\\\\n\\Longrightarrow r^{2}+1=r^{4}\n\\end{gathered}\n$$\nHence, $r^{4}-r^{2}-1=0$, and therefore $r^{2}=\\frac{1 \\pm \\sqrt{5}}{2}$. As $r>1$, we have $r^{2}=\\frac{1+\\sqrt{5}}{2}$, completing the problem as the ratio of the hypotenuse to the shorter side is $\\frac{\\ell r^{2}}{\\ell}=r^{2}$."
+ },
+ {
+  "mathnet_id": "00kh",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "勾股定理与直角三角形"
+  ],
+  "contest": "Austria 2014",
+  "problem": "We are given a right-angled triangle $MNP$ with right angle in $P$. Let $k_M$ be the circle with center $M$ and radius $MP$, and let $k_N$ be the circle with center $N$ and radius $NP$.\nLet $A$ and $B$ be the common points of $k_M$ and the line $MN$, and let $C$ and $D$ be the common points of $k_N$ and the line $MN$, with $C$ between $A$ and $B$.\nProve that the line $PC$ bisects the angle $APB$.",
+  "solution_head": "Let $\\alpha = \\angle NMP$ and $\\beta = \\angle MNP$. Because the sum of angles in $MNP$ is $180^\\circ$, we obtain $\\alpha + \\beta = 90^\\circ$. Since $BP$ is a chord of the circle through $P$ and with mid-point $M$, we have\n$$\n\\angle BAP = \\frac{1}{2} \\angle BMP = \\frac{1}{2} \\alpha.\n$$\nSimilarly, for the chord $CP$ in the circle $k_N$, we obtain\n$$\n\\angle CDP = \\frac{1}{2} \\angle CNP = \\frac{1}{2} \\beta.\n$$\n\nSince $NP$ and $MP$ are perpendicular, $NP$ is a tangent of the circle $k_M$ and $MP$ is a tangent of the circle $k_N$. Considering the chord $BP$ in the circle $k_M$, we therefore have\n$$\n\\angle BPN = \\angle BAP = \\frac{1}{2}\\alpha\n$$\nand with the chord $CP$ in $k_N$ we have\n$$\n\\angle MPC = \\angle CDP = \\frac{1}{2}\\beta\n$$\nIt therefore follows that\n$$\n\\angle CPB = \\angle MPN - \\angle BPN - \\angle MPC = 90^\\circ - \\frac{1}{2}\\alpha - \\frac{1}{2}\\beta = 45^\\circ,\n$$\nand since $\\angle APB = 90^\\circ$ we also have\n$$\n\\angle APC = \\angle APB - \\angle CPB = 45^\\circ\n$$\nIt therefore follows that $PC$ bisects the angle $APB$ as claimed. $\\square$"
+ },
+ {
+  "mathnet_id": "0193",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "面积法与三角法",
+   "不等式",
+   "勾股定理与直角三角形"
+  ],
+  "contest": "Baltic Way 2011 Problem Shortlist",
+  "problem": "Consider a right angled triangle $ABC$ with sides of length $3$, $4$, and $5$. Determine the greatest possible radius of a circle that is tangent to two among the lines $BC$, $CA$, and $AB$ and that in addition passes through at least one of the points $A$, $B$, and $C$.",
+  "solution_head": "Consider a general triangle $ABC$. Suppose we have a circle that touches the lines $AB$ and $AC$. Since it cannot also pass through the point $A$, we may suppose it passes through the point $C$. The centre of the circle will then lie either on the internal, or the external, bisector of the angle at $A$.\n\nAssume the centre of the circle lies on the internal bisector. Then its radius is\n$$\nr = b \\tan \\frac{A}{2} = 2R \\sin B \\tan \\frac{A}{2},\n$$\nwhere $R$ denotes the circumradius. The maximal radius is obtained when $A \\ge B \\ge C$ (the expression $\\frac{\\sin x}{\\tan \\frac{x}{2}} = 2 \\cos^2 \\frac{x}{2}$ is strictly decreasing for $0 \\le x \\le 180^\\circ$).\n\nAssume now the centre of the circle lies on the external bisector. Then its radius is\n$$\ns = b \\tan \\frac{B+C}{2} = \\frac{2R \\sin B}{\\tan \\frac{A}{2}}.\n$$\nThe maximal radius is obtained when $B \\ge C \\ge A$.\n\nFor the triangle at hand, $r$ is maximized by $b = 4$ and $A = 90^\\circ$, which gives $r = 4$, and $s$ by $b = 5$ and $A$ the angle opposite the side of length $3$. Then $\\tan A = \\frac{3}{4}$, $\\tan \\frac{A}{2} = \\frac{1}{3}$, w"
+ }
+]

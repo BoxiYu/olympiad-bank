@@ -1,0 +1,171 @@
+[
+ {
+  "mathnet_id": "0djg",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "相似位似与全等",
+   "三角形五心与经典引理"
+  ],
+  "contest": "SAUDI ARABIAN IMO Booklet 2023",
+  "problem": "Let $ABCD$ be a cyclic quadrilateral. Take $F \\in AB$, $E \\in CD$ such that $(FCD)$ is tangent to $AB$ and $(EAB)$ is tangent to $CD$. Denote $G = AE \\cap DF$, $H = BE \\cap CF$. Prove that $EF$ is the perpendicular bisector of $GH$.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0jv8",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "相似位似与全等",
+   "面积法与三角法"
+  ],
+  "contest": "Berkeley Math Circle: Monthly Contest 2",
+  "problem": "Problem:\n\nLet $ABCDE$ be a convex pentagon with $CD = DE$ and $\\angle BCD = \\angle DEA = 90^{\\circ}$. Point $F$ lies on $AB$ such that $\\frac{AF}{AE} = \\frac{BF}{BC}$. Prove that $\\angle FCE = \\angle ADE$ and $\\angle FEC = \\angle BDC$.",
+  "solution_head": "Solution:\n\nLet $\\omega$ denote the circumcircle of $\\triangle CDE$ and let $D_{1}$ be the point opposite to $D$. Let $DA$ meet $\\omega$ at $A_{1}$ and let $F' = A_{1}C \\cap AB$. If we let $\\alpha = \\angle DA_{1}C = \\angle DD_{1}C = \\angle ED_{1}D$ then\n$$\n\\frac{AF'}{AE} = \\frac{AF' \\cdot AD_{1}}{AA_{1} \\cdot AD} = \\frac{\\sin \\alpha \\cdot \\sin \\angle D_{1}DA}{\\sin \\angle A_{1}F'A \\cdot \\sin \\alpha} = \\frac{\\sin \\angle D_{1}CA}{\\sin \\angle CF'B} = \\frac{F'B}{BC}\n$$\nHence $F = F'$. Now $\\angle F'CE = \\angle A_{1}CE = \\angle A_{1}DE = \\angle ADE$."
+ },
+ {
+  "mathnet_id": "01i2",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "根轴与幂",
+   "相似位似与全等"
+  ],
+  "contest": "Baltic Way 2021 Shortlist",
+  "problem": "Let points $A$ and $B$ lie on circle $\\omega$ with center $O$. Assume that $O$ does not lie on line $AB$. Let point $C$ lie on segment $AB$ and denote by $M$ and $N$ the midpoints of segments $AC$ and $CB$, respectively. The circumcircle of $AON$ intersects $\\omega$ at $A$ and $K$ and the circumcircle of $BOM$ intersects $\\omega$ at $B$ and $L$. Moreover, circumcircles of $AON$ and $BOM$ intersect each other at $O$ and $X$. Prove that the quadrilateral $CKXL$ is cyclic.",
+  "solution_head": "**Solution.** Let $K'$ and $H'$ be the projections of $P'$ onto $AB$ and $AC$ respectively, as in figure 14. Now, $HPP'H'$ is a right angled trapezium, and $M$ is the midpoint of $PP'$. If $M'$ is the midpoint of $HH'$, then $M'M||HP$, so $M'M \\perp HH'$. Therefore, $MH = MH'$. Similarly, $MK = MK'$, and so as $MK = MH, K', K, H, H'$ lie on a circle with centre $M$.\nAs $KHH'K'$ is cyclic, we have $\\angle H'K'A = \\angle KHA$. By considering right angles, we see that $AH'P'K'$ and $AHPK$ are cyclic.\nWe get\n$$\n\\begin{align*} \n\\angle PAB &= \\angle PAK \\\\ \n&= \\angle PHK \\\\ \n&= 90^\\circ - \\angle KHA \\\\ \n&= 90^\\circ - \\angle H'K'A \\\\ \n&= \\angle P'K'H' \\\\ \n&= \\angle P'AH' \\\\ \n&= \\angle P'AC \n\\end{align*}\n$$\nas required."
+ },
+ {
+  "mathnet_id": "01xw",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "相似位似与全等",
+   "解析几何与向量复数法"
+  ],
+  "contest": "69th Belarusian Mathematical Olympiad",
+  "problem": "The circles $\\omega_1$ and $\\omega_2$ centered at $O_1$ and $O_2$, respectively, intersect at the point $X$. The line $XO_1$ intersects $\\omega_1$ at the points $X$ and $A$. The line $XO_2$ intersects $\\omega_2$ at the points $X$ and $B$. Let $M$ be the midpoint of the segment $AB$. The ray $MO_1$ intersects $\\omega_1$ at the point $D$, and the ray $MO_2$ intersects $\\omega_2$ at the point $C$.\n\na) Prove that the triangle $MDC$ is isosceles.\n\nb) Prove that the line $DC$ passes through $X$.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0gyq",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "相似位似与全等",
+   "圆与四点共圆"
+  ],
+  "contest": "The Problems of Ukrainian Authors",
+  "problem": "Given acute-angled triangle $ABC$. $O$ is the circumcenter, $H$ is the orthocenter and $AH_A$, $BH_B$, $CH_C$ are the altitudes of $\\triangle ABC$. Denote by $A_1$, $B_1$, $C_1$ the circumcenters of triangles $BOC$, $COA$ and $AOB$ respectively. Prove that the lines $A_1H_A$, $B_1H_B$, $C_1H_C$ meet at a point, which lies on the Euler line of $\\triangle ABC$. (Euler line of $\\triangle ABC$ is the line passing through the circumcenter and centroid of a triangle).",
+  "solution_head": "It is easy to see that point $O$ is the incenter of $\\triangle A_1B_1C_1$, since $OC$ is perpendicular to the tangent of the circumcircle of $\\triangle ABC$ at the point $C$ and is parallel to $H_AH_B$.\n\nTherefore $OC \\perp H_A H_B \\Rightarrow A_1 B_1 \\parallel H_A H_B$. And so $\\Delta A_1 B_1 C_1 \\sim \\Delta H_A H_B H_C$ (Fig.29).\n\nHence $A_1 H_A \\cap B_1 H_B \\cap C_1 H_C = X$, where point $X$ is the homothety center of these triangles. Since $O$ is the incenter of $\\Delta A_1 B_1 C_1$, and $H$ is the incenter of $\\Delta H_A H_B H_C$, then $X \\in OH$."
+ },
+ {
+  "mathnet_id": "0djv",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "圆与四点共圆",
+   "相似位似与全等"
+  ],
+  "contest": "SAUDI ARABIAN IMO Booklet 2023",
+  "problem": "Let $ABC$ be an acute triangle with $AB < AC$. Let $I$ be its incenter and $\\Gamma$ be its circumcircle. Let $M$ be the midpoint of $BC$, $K$ the midpoint of arc $BC$ not containing $A$, $L$ the midpoint of arc $BC$ containing $A$ and $J$ the reflection of $I$ with respect to the line $KL$. The line $LJ$ cuts $\\Gamma$ again at $T$. The line $TM$ cuts $\\Gamma$ again at $S$. Prove that the points $S$, $I$, $M$ and $K$ are concyclic.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "09k0",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "相似位似与全等"
+  ],
+  "contest": "Mongolian Mathematical Olympiad",
+  "problem": "Let $ABC$ be an acute triangle with $AB > AC$. Consider point $N$ inside the triangle such that $\\angle ANB = 180^\\circ - \\angle BAC$, $\\angle NBA = 180^\\circ - 2\\angle ACB$. The angle bisector of $\\angle NBA$ intersects the angle bisector of $\\angle NAC$ at point $P$. The line passing through $N$ and parallel to line $AN$ intersects line $NB$ at point $D$. Prove that $\\angle DPN = 2\\angle ABC$.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0b58",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "变换几何",
+   "相似位似与全等"
+  ],
+  "contest": "53. Bulgarian Mathematical Olympiad",
+  "problem": "Problem:\nFie $I$ centrul cercului înscris în triunghiul $ABC$ şi $A_{1}$, $B_{1}$ şi $C_{1}$ puncte arbitrare pe segmentele $(AI)$, $(BI)$, respectiv $(CI)$. Mediatoarele segmentelor $AA_{1}$, $BB_{1}$ şi $CC_{1}$ se intersectează în $A_{2}$, $B_{2}$ şi respectiv $C_{2}$. Arătați că centrul cercului circumscris triunghiului $A_{2}B_{2}C_{2}$ coincide cu centrul cercului circumscris triunghiului $ABC$ dacă şi numai dacă $I$ este ortocentrul triunghiului $A_{1}B_{1}C_{1}$.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "09jr",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形与四边形基本性质",
+   "解析几何与向量复数法",
+   "相似位似与全等"
+  ],
+  "contest": "Mongolian Mathematical Olympiad",
+  "problem": "Let $M$ be the midpoint of the side $CD$ of the trapezoid $ABCD$. Let segment $BM$ intersect diagonal $AC$ at point $E$. On the segment $AE$, a point $L$ (distinct from $C$) is chosen such that $EC = EL$. Line $BL$ intersects the base $AD$ at point $K$. Prove that $AK = KD$.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "03ay",
+  "est": 3,
+  "conf": "mid",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "相似位似与全等"
+  ],
+  "contest": "Selection test for 27. Balkan Mathematical Olympiad",
+  "problem": "Given a $\\triangle ABC$ with $\\angle ACB = 90^\\circ$ and altitude $CH$ ($H \\in AB$). A circle $k$ touches the segments $BH$ and $CH$, and the circumcircle of $\\triangle ABC$. If $D = k \\cap BH$, prove that $CD$ bisects $\\angle BCH$.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "07b4",
+  "est": 3,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "反演变换",
+   "相似位似与全等",
+   "圆与四点共圆",
+   "三角形五心与经典引理"
+  ],
+  "contest": "Iranian Mathematical Olympiad",
+  "problem": "Suppose that $I$ is the incenter of triangle $ABC$. The perpendicular to line $AI$ from point $I$ intersects sides $AC$ and $AB$ in points $B'$ and $C'$, respectively. Points $B_1$ and $C_1$ are placed on half-lines $BC$ and $CB$, respectively, in such a way that $AB = BB_1$ and $AC = CC_1$. If $T$ is the second intersection point of the circumcircles of triangles $AB_1C'$ and $AC_1B'$, prove that the circumcenter of triangle $ATI$ lies on the line $BC$.",
+  "solution_head": "Throughout the solution, let $\\omega$ and $\\omega_a$ be the circumcircle of triangle $ABC$ and the excircle of $ABC$ tangent to side $BC$, respectively. Furthermore, $O$ and $I_a$ are the centers of $\\omega$ and $\\omega_a$, respectively.\nUnder an inversion with center $A$ and power $AB \\times AC$, and then a reflection with respect to the bisector of $\\angle BAC$, $B'$ is sent to some point of line $AB$, and $C'$ to some point of line $AC$. Denote by $B''$ and $C''$ these two points, respectively. Note that\n$$\nAB' \\cdot AC'' = AC' \\cdot AB'' = AB \\cdot AC = AI \\cdot AI_a.\n$$\nTherefore, the quadrilaterals $II_aB''C'$ and $II_aC''B'$ are cyclic. Since $\\angle I_aIB' = 90^\\circ$, we get $I_aC'' \\perp AC$ and hence $C''$ is the tangency point of $\\omega_a$ and $AC$. Similarly, $B''$ is the tangency point of $\\omega_a$ and $AB$.\nNow, we are going to find the image of $B_1$ and $C_1$ under the transformation mentioned above. Denote by $M$ and $N$ the midpoints of arcs $ACB$ and $ABC$ of circle $\\omega$, respectively. Then $\\angle BAC_1 = \\angle CAM$. We know that under the transformation, "
+ },
+ {
+  "mathnet_id": "0dem",
+  "est": 2,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "根轴与幂",
+   "反演变换",
+   "相似位似与全等",
+   "射影几何与调和点列"
+  ],
+  "contest": "Saudi Arabian Mathematical Competitions",
+  "problem": "Let $ABC$ be a non-isosceles triangle with incenter $I$, circumcenter $O$ and a point $D$ on segment $BC$ such that $(BID)$ cuts segment $AB$ at $E \\neq B$ and $(CID)$ cuts segment $AC$ at $F \\neq C$. Circle $(DEF)$ cuts segments $AB$, $AC$ again at $M$, $N$. Let $P = IB \\cap DE$ and $Q = IC \\cap DF$. Prove that $EN$, $FM$, $PQ$ are parallel and the median of vertex $I$ in triangle $IPQ$ bisects the arc $BAC$ of $(O)$.",
+  "solution_head": ""
+ }
+]
