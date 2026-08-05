@@ -40,6 +40,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 并检查其中确实包含该题的 `mathnet_id`。凭证不入库 = 题不可信 = lint 红。
 `data/hints/`、`data/plan.json` 同理入库。
 
+`data/attempts.jsonl`（训练日志）也必须提交：它是学生能力图与复习调度的唯一数据来源，
+且只存在于本机——不入库就随时可能丢掉全部训练史。别和 `data/sessions/`（gitignore 的
+运行态）搞混：前者是长期资产，后者是进行中的会话。
+
 ## 契约正本在代码里，不在 SPEC
 
 - `verification` 合法枚举 → `scripts/spar_session.py` 的 `VALID_VERIFICATION`

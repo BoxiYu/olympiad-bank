@@ -1,0 +1,1 @@
+{"id": "A-001", "result": "fail", "date": "2026-08-04", "session": "20260804-A-001-1", "mode": "fresh", "started_at": "2026-08-04T09:52:44+01:00", "ended_at": "2026-08-04T10:58:04+01:00", "time_min": 65, "hints": [{"level": 1, "at": "2026-08-04T10:02:20+01:00", "early": true}], "revealed_at": "2026-08-04T10:02:11+01:00", "stuck": "识别结构", "note": "", "student": "self"}
