@@ -45,7 +45,8 @@ description:
      这一节留空的 PR 不允许交人工评审。
    - 分支更新时刷新描述，使其覆盖**整条分支的全部范围**，而不只是最新几个提交；
      不要沿用过时的旧描述。
-7. 给 PR 打上 `symphony` 标签，并在描述里关联 issue（`Closes #<n>`）。
+7. 在 PR 描述里写上 Linear 工单链接（工单板是 Linear，不是 GitHub issue）。
+   分支名带工单标识（`symphony/<标识小写>-...`）时，Linear 会自动把 PR 关联回工单。
 8. 回复 `gh pr view` 给出的 PR URL。
 
 ## 命令
@@ -79,7 +80,6 @@ else
   gh pr edit --title "$pr_title" --body-file /tmp/pr_body.md
 fi
 
-gh pr edit --add-label symphony
 gh pr view --json url -q .url
 ```
 
