@@ -135,8 +135,6 @@ def lint(problems):
         for s in SECTIONS:
             if s not in p['body']:
                 errors.append(f'{rel}: 缺少小节 {s}')
-        if fm.get('original_lang') == 'en' and '## 原文' not in p['body']:
-            errors.append(f'{rel}: original_lang=en 但缺少「## 原文（English）」小节')
         seen.setdefault(p['cat'], []).append(pid)
     for cat, ids in seen.items():
         nums = sorted(int(i.split('-')[1]) for i in ids)

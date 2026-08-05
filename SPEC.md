@@ -62,8 +62,8 @@ source_url: https://huggingface.co/datasets/ShadenA/MathNet
   仅数值/闭式答案题适用（证明题不进本机制）；是 review_ref 之外的**补充凭证**，不改变
   verification 档位、不是入库门槛。挂了此字段的题，lint 校验台账存在、含本题且 status=pass；
   凭证保真由 CI 重跑核验脚本保证——机制正本在 `scripts/checks/run_checks.py` 头注。
-- legacy 专用字段（`original_lang` / `system` / `verification_note` / `compliance`）：仅存于旧题，
-  兼容期内 lint 继续按旧语义校验，新题一律不写。
+- legacy 专用字段已随旧题整体清退；新题字段全集以上述模板及可选的
+  `machine_check_ref` 为准。历史字段定义可从 `legacy-bank-v1.9` tag 回溯。
 
 ## 3. 正文各节语义
 
