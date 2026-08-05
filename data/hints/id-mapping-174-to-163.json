@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "source_epoch": {
+    "problem_count": 174,
+    "id_field": "old_id"
+  },
+  "target_epoch": {
+    "problem_count": 163,
+    "id_field": "new_id"
+  },
+  "verified_on": "2026-08-05",
+  "method": "Each of the three hint strings was searched verbatim across all 163 current problem Markdown files.",
+  "entries": [
+    {
+      "round": "round-02",
+      "old_id": "A-008",
+      "status": "retired",
+      "new_id": null,
+      "repository_match_count_by_level": [0, 0, 0]
+    },
+    {
+      "round": "round-02",
+      "old_id": "A-014",
+      "status": "retired",
+      "new_id": null,
+      "repository_match_count_by_level": [0, 0, 0]
+    },
+    {
+      "round": "round-03",
+      "old_id": "N-008",
+      "status": "retired",
+      "new_id": null,
+      "repository_match_count_by_level": [0, 0, 0]
+    },
+    {
+      "round": "round-03",
+      "old_id": "N-009",
+      "status": "retired",
+      "new_id": null,
+      "repository_match_count_by_level": [0, 0, 0]
+    },
+    {
+      "round": "round-03",
+      "old_id": "N-012",
+      "status": "retired",
+      "new_id": null,
+      "repository_match_count_by_level": [0, 0, 0]
+    },
+    {
+      "round": "round-04",
+      "old_id": "C-007",
+      "status": "retired",
+      "new_id": null,
+      "repository_match_count_by_level": [0, 0, 0]
+    },
+    {
+      "round": "round-04",
+      "old_id": "C-009",
+      "status": "retired",
+      "new_id": null,
+      "repository_match_count_by_level": [0, 0, 0]
+    },
+    {
+      "round": "round-08",
+      "old_id": "C-024",
+      "status": "retired",
+      "new_id": null,
+      "repository_match_count_by_level": [0, 0, 0]
+    },
+    {
+      "round": "round-09",
+      "old_id": "G-030",
+      "status": "retired",
+      "new_id": null,
+      "repository_match_count_by_level": [0, 0, 0]
+    },
+    {
+      "round": "round-09",
+      "old_id": "G-035",
+      "status": "retired",
+      "new_id": null,
+      "repository_match_count_by_level": [0, 0, 0]
+    },
+    {
+      "round": "round-10",
+      "old_id": "A-032",
+      "status": "active",
+      "new_id": "A-005",
+      "exact_match_levels": [1, 2, 3]
+    },
+    {
+      "round": "round-10",
+      "old_id": "A-033",
+      "status": "active",
+      "new_id": "A-008",
+      "exact_match_levels": [1, 2, 3]
+    },
+    {
+      "round": "round-10",
+      "old_id": "A-034",
+      "status": "active",
+      "new_id": "A-014",
+      "exact_match_levels": [1, 2, 3]
+    },
+    {
+      "round": "round-10",
+      "old_id": "N-040",
+      "status": "active",
+      "new_id": "N-008",
+      "exact_match_levels": [1, 2, 3]
+    },
+    {
+      "round": "round-10",
+      "old_id": "N-041",
+      "status": "active",
+      "new_id": "N-009",
+      "exact_match_levels": [1, 2, 3]
+    },
+    {
+      "round": "round-10",
+      "old_id": "N-042",
+      "status": "active",
+      "new_id": "N-012",
+      "exact_match_levels": [1, 2, 3]
+    },
+    {
+      "round": "round-11",
+      "old_id": "C-041",
+      "status": "active",
+      "new_id": "C-007",
+      "exact_match_levels": [1, 2, 3]
+    },
+    {
+      "round": "round-11",
+      "old_id": "C-042",
+      "status": "active",
+      "new_id": "C-009",
+      "exact_match_levels": [1, 2, 3]
+    },
+    {
+      "round": "round-11",
+      "old_id": "C-043",
+      "status": "active",
+      "new_id": "C-024",
+      "exact_match_levels": [1, 2, 3]
+    },
+    {
+      "round": "round-11",
+      "old_id": "G-054",
+      "status": "active",
+      "new_id": "G-030",
+      "exact_match_levels": [1, 2, 3]
+    },
+    {
+      "round": "round-11",
+      "old_id": "G-055",
+      "status": "active",
+      "new_id": "G-035",
+      "exact_match_levels": [1, 2, 3]
+    }
+  ]
+}
