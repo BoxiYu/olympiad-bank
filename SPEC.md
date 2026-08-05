@@ -93,7 +93,7 @@ source_url: https://huggingface.co/datasets/ShadenA/MathNet
 
 - 可选节：`## 提示阶梯`（spar hint 的提示源，按 `1.` `2.` 编号分级）；`## 核验`（legacy 核验记录）。
 - `## 原文（English）` 是 legacy 专属小节（旧范式中英对照的产物）：**新题不再设此节**——
-  题面本身就是英文原文。兼容期内该节仍在允许名单与题卡名单中，legacy 清退后由代码白名单收回。
+  题面本身就是英文原文。该节已随 legacy 题清退从允许名单与题卡名单中收回。
 
 ## 4. 难度分级（★1–★5）
 
@@ -182,13 +182,14 @@ source_url: https://huggingface.co/datasets/ShadenA/MathNet
 | 难度星级语义与锚点 | SPEC §4 | `taxonomy/contest_tiers.yml` 头注、`mathnet_review.py` 评审提示 |
 | 学段范围（初中+高中，★1 不入库） | SPEC §4（语义）+ `bank.py` `MIN_DIFFICULTY`（阈值）+ `bank.py apply_grade_floor`（过滤器） | 硬闸：`mathnet_import.py below_floor`（写盘前准入）、`mathnet_review.py batch`、`candidates --gaps`、`bank.py lint`（最终门槛）；`bank.py candidates` 只作默认值（浏览工具允许显式看低档）；`docs/入库SOP-MathNet.md`、`contest_tiers.yml` 头注为引用 |
 | 赛名→难度底档映射 | `taxonomy/contest_tiers.yml` | `mathnet_ingest.py` 估级管线 |
-| 知识点正名与别名 | `taxonomy/registry.yml`（检索别名 `aliases.yml`） | `bank.py lint` 告警、map/query |
+| 知识点正名与别名 | `taxonomy/registry.yml`（含检索别名） | `bank.py lint` 告警、map/query |
 | 知识点前置依赖图（教学建议边） | `taxonomy/prereq.yml`（语义见其头注） | `bank.py doclint`（端点/DAG 校验）、`bank.py map`（指示图前置 chips）、`student_profile.gap_queue`（补齐队列按上游优先） |
 | 攻坚限时/复习间隔/毕业条件 | `spar_session.py` 契约常量（`TIME_LIMIT`/`INTERVALS`/`GRADUATE_STREAK`） | docs/ 两手册、`bank.py` coach/review、`web_app.py`（数值由服务端下发，前端不复制） |
 | 机器核验凭证（machine_check_ref 与台账保真） | `scripts/checks/run_checks.py` 头注 | `bank.py lint`（凭证覆盖校验）、CI「机器核验」步骤（重跑保真）、SPEC §2（字段语义指针）、`data/verify/` 台账（必须提交） |
 | 入库铁律 v2 | SPEC §5 | AGENTS.md（路由指针） |
 | 版权边界 | SPEC §6 | AGENTS.md（路由指针） |
 | lint 执行命令 | `scripts/lint.sh` | CI workflow、AGENTS.md |
+| doclint 禁词表 | `scripts/bank.py` `DOCLINT_FORBIDDEN` | `scripts/bank.py` `doclint` 执行 |
 | 外链纪律（死链处置与归档） | `docs/入库SOP-MathNet.md` 凭证纪律节 | `bank.py linkcheck`（执行）、`.github/workflows/linkcheck.yml`（月度 CI） |
 | 训练日志 v2 数据契约 | `spar_session.py` 模块 docstring | `tests/test_learning_loop.py` 锁定 |
 | 学生档案数据契约 / 能力图折算与阈值 | `student_profile.py` 模块 docstring（契约常量） | docs/教练手册.md（用法）；`tests/test_student_profile.py` 锁定 |
