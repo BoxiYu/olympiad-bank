@@ -122,6 +122,10 @@ def write_training_contract_docs(root):
 限时独立攻坚：{limits}。
 <!-- training-contract:time-limits:end -->
 
+<!-- training-contract:hint-cooldown:start -->
+每解一级提示，再独立奋战 {sp.HINT_COOLDOWN_MIN} 分钟。
+<!-- training-contract:hint-cooldown:end -->
+
 <!-- training-contract:graduate-streak:start -->
 连续 {sp.GRADUATE_STREAK} 次 `independent_ok` 即毕业。
 <!-- training-contract:graduate-streak:end -->
@@ -387,7 +391,7 @@ class TestDoclint:
         assert 'DOCLINT OK' in out
 
     def test_training_contract_matches_source_passes(self, repo, capsys):
-        """两手册三组标记值与 spar_session 正本一致时不得误报。"""
+        """两手册四组标记值与 spar_session 正本一致时不得误报。"""
         rc, out = run_doclint(capsys)
         assert rc == 0, out
         assert '训练契约' in out
@@ -400,6 +404,17 @@ class TestDoclint:
         rc, out = run_doclint(capsys)
         assert rc == 1
         expected = f'攻坚限时「3」应为 {documented + 1}分钟，手册写为 {documented}分钟'
+        assert f'docs/学生手册.md: {expected}' in out
+        assert f'docs/教练手册.md: {expected}' in out
+        assert 'DOCLINT FAILED: 2 个问题' in out
+
+    def test_hint_cooldown_source_drift_caught(self, repo, capsys, monkeypatch):
+        """提示冷却代码正本单独改动时，两份手册均须点名期望值与抄录值。"""
+        documented = sp.HINT_COOLDOWN_MIN
+        monkeypatch.setattr(sp, 'HINT_COOLDOWN_MIN', documented + 1)
+        rc, out = run_doclint(capsys)
+        assert rc == 1
+        expected = f'提示冷却「每级」应为 {documented + 1}分钟，手册写为 {documented}分钟'
         assert f'docs/学生手册.md: {expected}' in out
         assert f'docs/教练手册.md: {expected}' in out
         assert 'DOCLINT FAILED: 2 个问题' in out

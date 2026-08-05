@@ -529,7 +529,7 @@ DOCLINT_FORBIDDEN = ['origin/main', 'scripts/symphony-start.sh', 'docs/sources/'
 TAXONOMY_BOARDS = {'algebra': 'algebra.md', 'combinatorics': 'combinatorics.md',
                    'geometry': 'geometry.md', 'number-theory': 'number-theory.md'}
 TRAINING_CONTRACT_DOCS = ('docs/学生手册.md', 'docs/教练手册.md')
-TRAINING_CONTRACT_SECTIONS = ('intervals', 'time-limits', 'graduate-streak')
+TRAINING_CONTRACT_SECTIONS = ('intervals', 'time-limits', 'hint-cooldown', 'graduate-streak')
 
 
 def _walk_md():
@@ -574,6 +574,11 @@ def _parse_graduate_contract(block):
     return {'independent_ok': int(matches[-1])} if matches else {}
 
 
+def _parse_hint_cooldown_contract(block):
+    matches = re.findall(r'再独立奋战\s*(\d+)\s*分钟', block)
+    return {'每级': int(matches[-1])} if matches else {}
+
+
 def _training_contract_errors():
     """两手册的刻意数值抄录必须与 spar_session 契约常量逐项一致。"""
     errors = []
@@ -583,19 +588,23 @@ def _training_contract_errors():
             int(m.group('key')): int(m.group('value'))
             for m in re.finditer(r'★(?P<key>[1-5])\s*≤\s*(?P<value>\d+)\s*(?:min)?', block)
         },
+        'hint-cooldown': _parse_hint_cooldown_contract,
         'graduate-streak': _parse_graduate_contract,
     }
     expected = {
         'intervals': sp.INTERVALS,
         'time-limits': sp.TIME_LIMIT,
+        'hint-cooldown': {'每级': sp.HINT_COOLDOWN_MIN},
         'graduate-streak': {'independent_ok': sp.GRADUATE_STREAK},
     }
     labels = {
         'intervals': '复习间隔',
         'time-limits': '攻坚限时',
+        'hint-cooldown': '提示冷却',
         'graduate-streak': '毕业连击数',
     }
-    units = {'intervals': '天', 'time-limits': '分钟', 'graduate-streak': '次'}
+    units = {'intervals': '天', 'time-limits': '分钟',
+             'hint-cooldown': '分钟', 'graduate-streak': '次'}
 
     for rel in TRAINING_CONTRACT_DOCS:
         path = os.path.join(ROOT, *rel.split('/'))
