@@ -98,6 +98,41 @@ def write_prereq(root, pre=PREREQ):
            yaml.safe_dump({'prereq': pre}, allow_unicode=True, sort_keys=False))
 
 
+def write_training_contract_docs(root):
+    """两手册的最小契约片段；显式标记让 doclint 不会误扫其它数字。"""
+    limits = '，'.join(f'★{difficulty}≤{minutes}min'
+                      for difficulty, minutes in sp.TIME_LIMIT.items())
+    for rel in bank.TRAINING_CONTRACT_DOCS:
+        if rel == 'docs/学生手册.md':
+            interval_head = '| 最近结果 | 判定标准 | 间隔 |\n| --- | --- | --- |'
+            intervals = '\n'.join(
+                f'| `{result}` | 测试说明 | {days} 天 |' for result, days in sp.INTERVALS.items())
+        else:
+            interval_head = '| 最近结果 | 间隔 |\n| --- | --- |'
+            intervals = '\n'.join(
+                f'| `{result}` | {days} 天 |' for result, days in sp.INTERVALS.items())
+        text = f'''# 手册
+
+<!-- training-contract:intervals:start -->
+{interval_head}
+{intervals}
+<!-- training-contract:intervals:end -->
+
+<!-- training-contract:time-limits:start -->
+限时独立攻坚：{limits}。
+<!-- training-contract:time-limits:end -->
+
+<!-- training-contract:hint-cooldown:start -->
+每解一级提示，再独立奋战 {sp.HINT_COOLDOWN_MIN} 分钟。
+<!-- training-contract:hint-cooldown:end -->
+
+<!-- training-contract:graduate-streak:start -->
+连续 {sp.GRADUATE_STREAK} 次 `independent_ok` 即毕业。
+<!-- training-contract:graduate-streak:end -->
+'''
+        _write(os.path.join(root, *rel.split('/')), text)
+
+
 @pytest.fixture()
 def repo(tmp_path, monkeypatch):
     """一个 lint/doclint 基线全绿的空仓库：四个题目目录 + registry + 四张 taxonomy 板块表。"""
@@ -107,6 +142,7 @@ def repo(tmp_path, monkeypatch):
     write_registry(root)
     write_boards(root)
     write_prereq(root)
+    write_training_contract_docs(root)
     monkeypatch.setattr(bank, 'ROOT', root)
     bank._VERDICT_CACHE.clear()   # 模块级缓存按 ref 相对路径存，换 ROOT 必须清，否则串味
     bank._MACHINE_CACHE.clear()
@@ -353,6 +389,35 @@ class TestDoclint:
         rc, out = run_doclint(capsys)
         assert rc == 0
         assert 'DOCLINT OK' in out
+
+    def test_training_contract_matches_source_passes(self, repo, capsys):
+        """两手册四组标记值与 spar_session 正本一致时不得误报。"""
+        rc, out = run_doclint(capsys)
+        assert rc == 0, out
+        assert '训练契约' in out
+
+    def test_training_contract_source_drift_caught(self, repo, capsys, monkeypatch):
+        """代码正本单独改动时，两份手册均须点名字段、期望值与抄录值。"""
+        documented = sp.TIME_LIMIT[3]
+        changed = {**sp.TIME_LIMIT, 3: documented + 1}
+        monkeypatch.setattr(sp, 'TIME_LIMIT', changed)
+        rc, out = run_doclint(capsys)
+        assert rc == 1
+        expected = f'攻坚限时「3」应为 {documented + 1}分钟，手册写为 {documented}分钟'
+        assert f'docs/学生手册.md: {expected}' in out
+        assert f'docs/教练手册.md: {expected}' in out
+        assert 'DOCLINT FAILED: 2 个问题' in out
+
+    def test_hint_cooldown_source_drift_caught(self, repo, capsys, monkeypatch):
+        """提示冷却代码正本单独改动时，两份手册均须点名期望值与抄录值。"""
+        documented = sp.HINT_COOLDOWN_MIN
+        monkeypatch.setattr(sp, 'HINT_COOLDOWN_MIN', documented + 1)
+        rc, out = run_doclint(capsys)
+        assert rc == 1
+        expected = f'提示冷却「每级」应为 {documented + 1}分钟，手册写为 {documented}分钟'
+        assert f'docs/学生手册.md: {expected}' in out
+        assert f'docs/教练手册.md: {expected}' in out
+        assert 'DOCLINT FAILED: 2 个问题' in out
 
     def test_dead_relative_link_caught(self, repo, capsys):
         """防回归：指向不存在相对路径的链接必须被抓；外链/锚点/存在的相对链接不得误报。"""
