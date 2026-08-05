@@ -155,7 +155,7 @@ class TestCardNoLeak:
         with pytest.raises(ValueError, match='白名单'):
             sp.split_sections(BODY.replace('## 提示阶梯', '## 出题人吐槽'), 'T-001')
 
-    def test_legacy_original_lang_section_rejected(self):
+    def test_legacy_english_section_rejected(self):
         # legacy「原文（English）」节已随旧库清退从白名单收回（SPEC §3）
         legacy = BODY.replace('## 答案', '## 原文（English）\n\nGiven.\n\n## 答案')
         with pytest.raises(ValueError, match='白名单'):

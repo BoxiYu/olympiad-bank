@@ -251,6 +251,13 @@ class TestVerdictIds:
 # ---------------- 3. 其余 lint 规则 ----------------
 
 class TestLintRules:
+    def test_unknown_frontmatter_field_is_rejected(self, repo, capsys):
+        """防回归：字段全集以 SPEC §2 为准，清退字段或拼错字段都不能静默入库。"""
+        make_problem(repo, deprecated_field='stale')
+        rc, out = run_lint(capsys)
+        assert rc == 1
+        assert 'problems/algebra/A-001.md: frontmatter 含未知字段 deprecated_field' in out
+
     def test_missing_required_field(self, repo, capsys):
         """防回归：必填字段缺失或为空值（None/''/[]）都要报 —— 空 topics 曾能混过去。"""
         make_problem(repo, title=_DROP, topics=[])
@@ -305,13 +312,6 @@ class TestLintRules:
         assert rc == 1
         assert 'problems/algebra/A-001.md: 缺少小节 ## 答案' in out
         assert '缺少小节 ## 题面' not in out
-
-    def test_english_original_requires_source_section(self, repo, capsys):
-        """防回归：original_lang=en 必须附「## 原文（English）」，否则译文无法回溯原题。"""
-        make_problem(repo, original_lang='en')
-        rc, out = run_lint(capsys)
-        assert rc == 1
-        assert 'original_lang=en 但缺少「## 原文（English）」小节' in out
 
     def test_numbering_must_be_gapless(self, repo, capsys):
         """防回归：题号必须从 001 连号无空洞 —— 造 A-001+A-003，断言点名缺 [2]。"""
