@@ -195,15 +195,11 @@ def query(problems, args):
 
 def stats(problems):
     diff = {}
-    sys_dist = {}
     for p in problems:
         fm = p['fm'] or {}
         d, c = fm.get('difficulty'), p['cat']
         diff.setdefault(d, {}).setdefault(c, 0)
         diff[d][c] += 1
-        s = fm.get('system') or '未归类'
-        sys_dist.setdefault(s, {}).setdefault(c, 0)
-        sys_dist[s][c] += 1
     header = f"{'':<12}" + ''.join(f'{c[:8]:>10}' for c in CATEGORIES) + f"{'合计':>8}"
     print('难度分布'); print(header)
     for d in sorted(diff):
@@ -211,9 +207,6 @@ def stats(problems):
         total = sum(row.values())
         print(f"{'★' * d:<12}" + ''.join(f'{row.get(c, 0):>10}' for c in CATEGORIES) + f'{total:>8}')
     print(f"{'合计':<12}" + ''.join(f"{sum(diff[d].get(c, 0) for d in diff):>10}" for c in CATEGORIES) + f'{len(problems):>8}')
-    print('\n体系分布'); print(header)
-    for s, row in sorted(sys_dist.items()):
-        print(f'{s:<12}' + ''.join(f'{row.get(c, 0):>10}' for c in CATEGORIES) + f'{sum(row.values()):>8}')
 
 
 # 目标赛事 → 星级配比（权重，按比例取题）。锚点见 docs/archive/赛事地图与官方题源.md
@@ -230,6 +223,12 @@ PLAN_PROFILES = {
 }
 
 
+def _plan_quota(profile, n):
+    """按赛事权重计算各星级需求；与实际抽题使用同一份配额。"""
+    total_w = sum(profile.values())
+    return {d: max(1, round(n * w / total_w)) for d, w in profile.items()}
+
+
 def plan(problems, args):
     import random
     profile = PLAN_PROFILES.get(args.target)
@@ -238,11 +237,13 @@ def plan(problems, args):
         sys.exit(2)
     rng = random.Random(args.seed)
     n = args.n
-    total_w = sum(profile.values())
+    category = getattr(args, 'category', None)
     # 每星级配额（至少凑满 n 题）
-    quota = {d: max(1, round(n * w / total_w)) for d, w in profile.items()}
+    quota = _plan_quota(profile, n)
     pool = {}
     for p in problems:
+        if category and p['cat'] != category:
+            continue
         fm = p['fm'] or {}
         d = fm.get('difficulty')
         if d in quota:
@@ -266,7 +267,14 @@ def plan(problems, args):
             if i > 10 * len(cands) + 10:
                 break
         picked += sel
-    print(f'目标：{args.target}　共 {len(picked)} 题（seed={args.seed}，换一套用 --seed）\n')
+    scope = f'　板块：{category}' if category else ''
+    print(f'目标：{args.target}{scope}　共 {len(picked)} 题（seed={args.seed}，换一套用 --seed）\n')
+    shortfalls = [(d, k, len(pool.get(d, []))) for d, k in sorted(quota.items())
+                  if len(pool.get(d, [])) < k]
+    for d, needed, available in shortfalls:
+        print(f'⚠ 库存缺口：{"★" * d} 需要 {needed} 道，库存 {available} 道，缺 {needed - available} 道')
+    if shortfalls:
+        print()
     for fm in sorted(picked, key=lambda f: (f['difficulty'], f['id'])):
         star = '★' * fm['difficulty']
         print(f"{fm['id']}  {star:<5}  {fm.get('contest') or '?':<8} {fm['title']}  [{' / '.join(fm['topics'])}]"
@@ -808,6 +816,7 @@ def main():
     sub.add_parser('stats')
     pl = sub.add_parser('plan')
     pl.add_argument('--target', required=True)
+    pl.add_argument('--category', choices=CATEGORIES)
     pl.add_argument('--n', type=int, default=12)
     pl.add_argument('--seed', type=int, default=1)
     co = sub.add_parser('coach')
