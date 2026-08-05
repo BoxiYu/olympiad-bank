@@ -21,6 +21,7 @@ OUT_PATH = os.path.join(ROOT, 'candidates', 'mathnet.jsonl')
 TIE_ORDER = ['number-theory', 'geometry', 'combinatorics', 'algebra']
 # problem_type 封顶（就低不就高：只降不升）
 PTYPE_CAP = {'MCQ': 2, 'final answer only': 3}
+KEYWORD_SEARCH_IN = {'problem', 'solutions', 'both'}
 
 
 def load_yaml(path):
@@ -182,6 +183,25 @@ def load_tables():
     return mp, tr
 
 
+def compile_keyword_rules(rules):
+    """编译关键词规则；search_in 缺省 problem，保持旧版题面召回口径。"""
+    return [(re.compile(r['pattern']), r['category'], r['node'], r.get('search_in', 'problem'))
+            for r in rules]
+
+
+def keyword_rule_matches(rule, row):
+    """在合成/数据集行的指定侧匹配关键词；解答允许列表、字符串或空值。"""
+    rx, _category, _node, search_in = rule
+    if search_in in ('problem', 'both') and rx.search(row.get('problem_markdown') or ''):
+        return True
+    if search_in not in ('solutions', 'both'):
+        return False
+    solutions = row.get('solutions_markdown') or []
+    if isinstance(solutions, str):
+        solutions = [solutions]
+    return any(isinstance(solution, str) and rx.search(solution) for solution in solutions)
+
+
 def selfcheck(mp, tr):
     """表自洽校验（不读数据集）：节点合法、路径无交叠、tier 取值合法。CI 可跑。"""
     import yaml
@@ -200,6 +220,10 @@ def selfcheck(mp, tr):
     for p, d in (mp.get('board_only') or {}).items():
         if d['category'] not in reg:
             errs.append(f'board_only 非法板块 {p}')
+    for i, rule in enumerate(mp.get('keyword_rules') or [], 1):
+        search_in = rule.get('search_in', 'problem')
+        if search_in not in KEYWORD_SEARCH_IN:
+            errs.append(f'keyword_rules[{i}] 非法 search_in: {search_in!r}')
     for name, d in (tr.get('tiers') or {}).items():
         b = d.get('base')   # bool 是 int 子类：base: yes 会读成 True，不排除就当 ★1 混过校验
         if isinstance(b, bool) or not (isinstance(b, int) and 1 <= b <= 5):
@@ -218,7 +242,7 @@ def build(mp, tr):
                                'competition', 'topics_flat', 'language', 'problem_type', 'final_answer')}
 
     norm = make_path_normalizer(mp.get('normalize') or [])
-    kw_rules = [(re.compile(r['pattern']), r['category'], r['node']) for r in (mp.get('keyword_rules') or [])]
+    kw_rules = compile_keyword_rules(mp.get('keyword_rules') or [])
     sec_map, sec_board, sec_ign = mp.get('map') or {}, mp.get('board_only') or {}, mp.get('ignore') or {}
     tiers = tr.get('tiers') or {}
     tier_keys_by_len = sorted([k for k in tiers if not k.startswith("_")], key=len, reverse=True)
@@ -250,8 +274,13 @@ def build(mp, tr):
             if weak_only:
                 topics = list(dict.fromkeys(weak_topics))
             # 全文关键词召回（仅限已投该板块票的行，控误报）
-            for rx, kcat, knode in kw_rules:
-                if kcat in votes and knode not in topics and rx.search(cols['problem_markdown'][i] or ''):
+            keyword_row = {
+                'problem_markdown': cols['problem_markdown'][i],
+                'solutions_markdown': cols['solutions_markdown'][i],
+            }
+            for rule in kw_rules:
+                _rx, kcat, knode, _search_in = rule
+                if kcat in votes and knode not in topics and keyword_rule_matches(rule, keyword_row):
                     topics.append(knode)
                     weak_only = False
             if votes:

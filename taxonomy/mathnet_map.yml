@@ -7,18 +7,21 @@
 # 生成：2026-08-03，AI 分板块起草+对抗审核；175 条路径完备覆盖 ShadenA/MathNet v0 全库（27,817 行）。
 # 维护：数据集升级出现新路径时 → 补表（map/ignore 三选一）后再跑管线；节点名以 registry.yml 为唯一真理源。
 version: 1
-# keyword_rules：MathNet 标签树盖不住的节点走全文正则召回（仅当该行已投对应板块票时附加，控误报）
+# keyword_rules：MathNet 标签树盖不住的节点走全文正则召回（仅当该行已投对应板块票时附加，控误报）。
+# search_in 可选 problem / solutions / both，缺省 problem（保持既有规则的题面召回口径不变）。
 keyword_rules:
 - pattern: (?i)\bramsey\b|van der waerden|schur'?s theorem
   category: combinatorics
   node: Ramsey 型问题
+  search_in: both
   note: 标签树无 Ramsey 叶子（最近仅 van der Waerden 3 行且挂在被 ignore 的代数数论下）。
     收紧记：初版含裸 monochromatic，Codex 试点复核 6 题仅 1 题真属 Ramsey——普通染色题已由
-    「染色与不变量」覆盖，故只保留拉姆齐理论的专名信号。
+    「染色与不变量」覆盖，故只保留拉姆齐理论的专名信号；专名可能出现在题面或解法，双侧召回。
 - pattern: (?i)lifting the exponent|\bLTE\b|p-adic|v_\{?p\}?\(|\\nu_p
   category: number-theory
   node: p-adic 赋值与 LTE
-  note: 标签树无对应叶子，靠 LTE/p 进赋值记号召回
+  search_in: both
+  note: 标签树无对应叶子，靠 LTE/p 进赋值记号召回；p-adic 对象可见于题面，LTE 技法多见于解法，双侧召回。
 # 以下四条为 2026-08-04 补：这些节点标签树同样无叶子，导致 --gaps 显示「库内 0、候选 0」，
 # 而库内其实已有实质考该点的题（靠读题 retag 补挂，流程见 docs/教练手册.md 第 5 节）。
 # 收紧原则同 Ramsey 条：只保留能指向「该技法是主线」的信号词，宁可漏召不可误召——
@@ -30,7 +33,8 @@ keyword_rules:
 - pattern: (?i)minimal counterexample|extremal (?:principle|configuration|element)|(?:choose|consider|take) the (?:largest|smallest|longest|maximal|minimal)
   category: combinatorics
   node: 极端原理
-  note: 标签树无极端原理叶子；裸 largest/smallest 是通用词，只收「取极端对象」的完整动作短语。
+  search_in: solutions
+  note: 标签树无极端原理叶子；裸 largest/smallest 是通用词，只收解法中「取极端对象」的完整动作短语。
 - pattern: (?i)Pythagorean (?:theorem|triple)|right[- ]angled triangle|hypotenuse
   category: geometry
   node: 勾股定理与直角三角形
