@@ -2,6 +2,7 @@
 name = "olympiad-bank"
 version = "0.1.0"
 description = "奥数题库：竞赛数学题库与训练工作流"
+license = "AGPL-3.0-or-later"
 requires-python = ">=3.11"
 dependencies = [
     "pyyaml>=6",

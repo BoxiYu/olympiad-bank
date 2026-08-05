@@ -3,7 +3,7 @@
 > 归档日期：2026-08-03
 > 原用途：官方赛题 PDF 弹药库使用说明（PDF 落盘 + 浏览器文本抽取双通道）。
 > 死因/取代者：题库供给全换 MathNet（决策①），官方 PDF 不再是入库弹药；目录随迁至 docs/archive/sources/。
-> 勘误注：`scripts/browser_pdf_extract.js` 未随迁，仍在 scripts/；文中「本目录」均指 docs/archive/sources/。
+> 勘误注：`scripts/browser_pdf_extract.js` 已随迁至 `scripts/archive/browser_pdf_extract.js`；文中「本目录」均指 docs/archive/sources/。
 
 把官方赛题 PDF 放到本目录（如 `IMO2024SL.pdf`），会话内即可全文精读入库/终审。
 
@@ -11,7 +11,7 @@
 
 **不依赖 PDF 落盘**：经 Claude in Chrome 扩展在浏览器内抽取官方 PDF 全文
 （同源 fetch + DecompressionStream 解压 + Tj/TJ 算子抽取，零外部依赖、CSP 免疫），
-管线与踩坑记录见 `scripts/browser_pdf_extract.js`。ISL 2024 全卷 20.6 万字符
+管线与踩坑记录见 `scripts/archive/browser_pdf_extract.js`。ISL 2024 全卷 20.6 万字符
 （含全部解答区）已按此法抽取，官方答案清单在 `isl2024_answers_harvest.md`。
 后续年份逐年重跑同一管线即可。
 

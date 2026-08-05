@@ -227,7 +227,7 @@ def find_open_session():
         if not os.path.isfile(mp):
             continue
         try:
-            meta = json.load(open(mp, encoding='utf-8'))
+            meta = load_meta(d)
         except ValueError:
             continue
         if meta.get('status') == 'open':

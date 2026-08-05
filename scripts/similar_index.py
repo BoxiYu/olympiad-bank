@@ -37,8 +37,9 @@ import sys
 import time
 import unicodedata
 
+from bank_constants import CATEGORIES
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CATEGORIES = ['algebra', 'number-theory', 'combinatorics', 'geometry']
 CAND_PATH = os.path.join(ROOT, 'candidates', 'mathnet.jsonl')
 INDEX_DIR = os.path.join(ROOT, 'candidates', 'simindex')
 MODEL_NAME = 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'

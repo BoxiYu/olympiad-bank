@@ -32,12 +32,13 @@ import sys
 
 import yaml
 
+from bank_constants import CATEGORIES
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
 import spar_session as sp  # attempts v2 读取契约共用
 
 STUDENTS_ROOT = os.path.join(ROOT, 'data', 'students')
-CATEGORIES = ['algebra', 'number-theory', 'combinatorics', 'geometry']  # 展示序，与 bank.py 一致
 CAT_LABEL = {'algebra': '代数', 'number-theory': '数论', 'combinatorics': '组合', 'geometry': '几何'}
 
 # 证据折算与状态阈值（正本，勿在文档里抄数值）
