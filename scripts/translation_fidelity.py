@@ -17,8 +17,6 @@ from enum import Enum
 from itertools import zip_longest
 from pathlib import Path
 
-from source_lang import detect_source_lang
-
 
 class FindingType(str, Enum):
     """稳定的问题类型；字符串值可直接写入 JSON/CI 台账。"""
@@ -248,9 +246,10 @@ def _has_prose_outside_target_language(section: _Section, target_lang: str) -> b
     已是中文的状态说明写进英文原文（例如证明题的答案占位）；这类文字在中文
     variant 中原样保留是正确的，不能仅因“非空且相同”而告警。
 
-    中文可按 Unicode 文字脚本精确判断。英文与其他拉丁字母语言共享脚本，故
-    复用保守的源语言检测器；证据不足时仍视为需要翻译，避免放过真正的漏译。
-    数学、图片与纯符号内容仍由 ``_has_translatable_prose`` 先行排除。
+    中文可按 Unicode 文字脚本精确判断。英文原文到英文 variant 按契约必须走
+    ``passthrough``；英文 ``translated`` 模式还可能承载西语等同为拉丁脚本的
+    源文，因此继续保守告警，避免把共享文字脚本误当成已是目标语言。数学、
+    图片与纯符号内容仍由 ``_has_translatable_prose`` 先行排除。
     """
     if not _has_translatable_prose(section):
         return False
@@ -261,9 +260,7 @@ def _has_prose_outside_target_language(section: _Section, target_lang: str) -> b
     letters = [ch for ch in body if unicodedata.category(ch).startswith('L')]
     if target_lang == 'zh':
         return any(_HAN_RE.fullmatch(ch) is None for ch in letters)
-
-    language, confidence = detect_source_lang(body, {})
-    return language != target_lang or confidence == 'low'
+    return True
 
 
 def _content_findings(

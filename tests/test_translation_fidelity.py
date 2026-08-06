@@ -202,6 +202,11 @@ def test_real_prose_left_identical_is_still_untranslated():
 
 def test_passthrough_identical_document_has_zero_findings():
     assert verify_translation(SOURCE, SOURCE, mode='passthrough', target_lang='en') == []
+    assert FindingType.UNTRANSLATED in types(
+        translated=SOURCE,
+        mode='translated',
+        target_lang='en',
+    )
 
 
 def test_regression_inequality_reversal_is_rejected():
