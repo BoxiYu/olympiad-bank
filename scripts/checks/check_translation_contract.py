@@ -6,7 +6,7 @@
 ``docs/译文契约-mathnet-full.md`` 提供（CXB-495）；本模块只执行该契约。
 
 CXB-497 的保真校验器合入后，本模块会从约定候选模块中寻找
-``verify_translation(source, translated)`` 并调用；在此之前明确报告该项 skipped，
+``verify_translation(source, translated, target_lang=lang)`` 并调用；在此之前明确报告该项 skipped，
 不在这里复制数学环境/图片引用的实现。
 """
 import argparse
@@ -220,7 +220,11 @@ def _check_one(contract_path, corpus, verifier):
         # 避免 CXB-497 将「译文等于原文」的漏译规则误套到合法 passthrough。
         if verifier is not None and mode == 'translated':
             try:
-                findings = verifier(source.decode('utf-8'), body.decode('utf-8'))
+                findings = verifier(
+                    source.decode('utf-8'),
+                    body.decode('utf-8'),
+                    target_lang=lang,
+                )
             except Exception as exc:
                 errors.append(f'{rel}: 保真校验器异常：index.{lang}.md（{exc!r}）')
             else:

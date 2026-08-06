@@ -3,11 +3,16 @@ import hashlib
 import importlib.util
 import json
 import os
+import sys
 
 import pytest
 
-_CHECKER = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                        'scripts', 'checks', 'check_translation_contract.py')
+_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(_ROOT, 'scripts'))
+
+from translation_fidelity import FindingType, verify_translation  # noqa: E402
+
+_CHECKER = os.path.join(_ROOT, 'scripts', 'checks', 'check_translation_contract.py')
 _spec = importlib.util.spec_from_file_location('check_translation_contract_test', _CHECKER)
 tc = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(tc)
@@ -33,7 +38,15 @@ SOURCE = b'# 0abc\n\n## \xe9\xa2\x98\xe9\x9d\xa2\n\nFind $x$.\n\n![](attached_im
 ZH = b'# 0abc\n\n## \xe9\xa2\x98\xe9\x9d\xa2\n\n\xe6\xb1\x82 $x$\xe3\x80\x82\n\n![](attached_image_1.png)\n'
 
 
-def make_problem(corpus, pid='0abc', source=SOURCE, en=None, zh=ZH, variants=None):
+def make_problem(
+    corpus,
+    pid='0abc',
+    source=SOURCE,
+    en=None,
+    zh=ZH,
+    variants=None,
+    source_lang='en',
+):
     problem = os.path.join(corpus, 'by-topic', 'algebra', 'topic', pid)
     en = source if en is None else en
     _write_bytes(os.path.join(problem, 'index.md'), source)
@@ -48,7 +61,7 @@ def make_problem(corpus, pid='0abc', source=SOURCE, en=None, zh=ZH, variants=Non
     payload = {
         'mathnet_id': pid,
         'source_sha256': _sha(source),
-        'source_lang': 'en',
+        'source_lang': source_lang,
         'source_lang_confidence': 'high',
         'variants': variants,
     }
@@ -175,11 +188,39 @@ def test_cxb_497_hook_is_called_and_findings_fail(tmp_path):
     make_problem(corpus)
     calls = []
 
-    def verify(source, translated):
-        calls.append((source, translated))
+    def verify(source, translated, *, target_lang):
+        calls.append((source, translated, target_lang))
         return [] if source == translated else [{'kind': 'math_mismatch', 'section': '题面'}]
 
     result = tc.check_corpus(str(tmp_path), sample=10, fidelity_verifier=verify)
     assert len(calls) == 1  # passthrough 由逐字相同这个更强条件覆盖，只抽检 translated
     assert result.fidelity == 'enabled'
     assert any('保真校验失败' in error and 'math_mismatch' in error for error in result.errors)
+    assert calls[0][2] == 'zh'
+
+
+def test_english_translated_variant_uses_english_fidelity_rules(tmp_path):
+    corpus = os.path.join(tmp_path, 'mathnet-full')
+    chinese_source = '# 0abc\n\n## 题面\n\n求整数 $x$。\n'.encode()
+    variants = {
+        'en': {'mode': 'translated', 'sha256': _sha(chinese_source)},
+    }
+    make_problem(
+        corpus,
+        source=chinese_source,
+        en=chinese_source,
+        zh=False,
+        variants=variants,
+        source_lang='zh',
+    )
+
+    result = tc.check_corpus(
+        str(tmp_path),
+        sample=10,
+        fidelity_verifier=verify_translation,
+    )
+
+    assert any(
+        'index.en.md' in error and str(FindingType.UNTRANSLATED) in error
+        for error in result.errors
+    )
