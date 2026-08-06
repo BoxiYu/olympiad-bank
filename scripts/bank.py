@@ -693,6 +693,8 @@ TRAINING_CONTRACT_SECTIONS = ('intervals', 'time-limits', 'hint-cooldown', 'grad
 
 
 def _walk_md():
+    # mathnet-full/ 是 mathnet_export.py 的本地导出产物（gitignore，2.7 万题目目录）：
+    # 数据集原文不受本仓文档规范约束，扫进来会把 doclint 从 ~300 文件拖到 2.8 万
     for dirpath, dirnames, filenames in os.walk(ROOT):
         dirnames[:] = sorted(d for d in dirnames
                             if not d.startswith('.') and d not in DOCLINT_EXCLUDED_DIRS)
