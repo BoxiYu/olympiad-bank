@@ -20,6 +20,22 @@ prereq:
   combinatorics/Ramsey 型问题:
     - combinatorics/抽屉原理
     - combinatorics/图论
+  combinatorics/染色与不变量:
+    # 奇偶性与模 n 剩余是最原型的不变量，学染色论证前先会同余分析
+    - number-theory/整除与同余
+    # 染色论证最终归结为按色类计数与双计数比较
+    - combinatorics/计数与容斥
+  combinatorics/算法与过程类问题:
+    # 过程类问题证终止与不可达，靠的正是单调量与势函数这套不变量工具
+    - combinatorics/染色与不变量
+  combinatorics/组合博弈与策略:
+    # 胜负态倒推（P/N 态分析）是递推思想的直接应用
+    - combinatorics/递推与生成结构
+    # 配对与对称必胜策略的本质是维持不变量
+    - combinatorics/染色与不变量
+  combinatorics/组合构造:
+    # 构造须配套计数或估计验证达界，先会算再学造
+    - combinatorics/计数与容斥
   geometry/勾股定理与直角三角形:
     - geometry/三角形与四边形基本性质
   geometry/相似位似与全等:
@@ -46,6 +62,16 @@ prereq:
   geometry/解析几何与向量复数法:
     - geometry/勾股定理与直角三角形
     - algebra/复数与三角
+  geometry/立体几何:
+    # 空间距离与截面计算归结为构造直角三角形
+    - geometry/勾股定理与直角三角形
+    # 旋转体、柱体与球的表面积体积依赖圆与扇形面积
+    - geometry/面积法与三角法
+  geometry/组合几何:
+    # 点线配置与覆盖问题的度量基础是三角形不等式等基本性质
+    - geometry/三角形与四边形基本性质
+    # 分割区域再取两点是覆盖与极值问题的标准起手，靠抽屉原理
+    - combinatorics/抽屉原理
   number-theory/素数与算术基本定理:
     - number-theory/整除与同余
   number-theory/最大公约数与欧几里得算法:
@@ -66,3 +92,18 @@ prereq:
   number-theory/不定方程:
     - number-theory/整除与同余
     - number-theory/最大公约数与欧几里得算法
+    # 韦达跳跃以韦达定理（根与系数关系）为运算核心
+    - algebra/根与系数
+  number-theory/数字与进位制:
+    # 数字和与整除判别法都是模 9、模 11 同余的直接应用
+    - number-theory/整除与同余
+  number-theory/数论函数与阶乘估计:
+    # 数论函数按素因子分解定义，先掌握唯一分解
+    - number-theory/素数与算术基本定理
+    # 筛法本质是容斥原理在整数集上的应用
+    - combinatorics/计数与容斥
+  number-theory/构造与估计:
+    # Bertrand、Wilson 式估计与素因子构造都以素数分布和唯一分解为语言
+    - number-theory/素数与算术基本定理
+    # 极值论证（最小反例、极值构造）沿用组合极端原理的思路
+    - combinatorics/极端原理
