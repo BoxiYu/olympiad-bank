@@ -26,7 +26,7 @@ if SCRIPTS_DIR not in sys.path:
 from source_lang import should_passthrough
 
 DEFAULT_SAMPLE = 100
-VALID_MODES = {'passthrough', 'translated', 'failed'}
+VALID_MODES = {'passthrough', 'translated', 'verified_identical', 'failed'}
 VALID_LANGUAGES = {'en', 'zh'}
 VALID_CONFIDENCE = {'high', 'medium', 'low'}
 SHA256_RE = re.compile(r'[0-9a-f]{64}')
@@ -137,6 +137,12 @@ def _schema_errors(payload, rel):
         elif sha is not None and (not isinstance(sha, str) or not SHA256_RE.fullmatch(sha)):
             errors.append(f'{rel}: translation.json schema 非法：variants.{lang}.sha256 '
                           '必须是 64 位小写 sha256')
+        if mode == 'verified_identical':
+            model = variant.get('model')
+            if not isinstance(model, str) or not model.strip():
+                errors.append(
+                    f'{rel}: translation.json schema 非法：verified_identical 必须记录模型'
+                )
     return errors
 
 
@@ -242,9 +248,11 @@ def _check_one(contract_path, corpus, verifier):
                 errors.append(f'{rel}: variant sha256 对不上：index.{lang}.md')
         if mode == 'passthrough' and body != source:
             errors.append(f'{rel}: passthrough 内容与原文不一致：index.{lang}.md')
+        if mode == 'verified_identical' and body != source:
+            errors.append(f'{rel}: verified_identical 内容与原文不一致：index.{lang}.md')
         # passthrough 已由逐字节相等这个更强的条件覆盖；保真校验器只检查机器译文，
         # 避免 CXB-497 将「译文等于原文」的漏译规则误套到合法 passthrough。
-        if verifier is not None and mode == 'translated':
+        if verifier is not None and mode in {'translated', 'verified_identical'}:
             try:
                 findings = verifier(
                     source.decode('utf-8'),
@@ -278,7 +286,7 @@ def _batch_inputs(contract_path, corpus):
     for lang, variant in payload['variants'].items():
         if lang not in VALID_LANGUAGES or not isinstance(variant, dict):
             continue
-        if variant.get('mode') != 'translated':
+        if variant.get('mode') not in {'translated', 'verified_identical'}:
             continue
         try:
             with open(os.path.join(problem_dir, f'index.{lang}.md'), encoding='utf-8') as handle:

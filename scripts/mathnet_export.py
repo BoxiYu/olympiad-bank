@@ -42,7 +42,7 @@ STARS = {1: '★', 2: '★★', 3: '★★★', 4: '★★★★', 5: '★★★
 UNCLASSIFIED = '_未分类'   # 候选池判定 out_of_scope、无板块的题
 UNSPECIFIED = '_未细分'    # 有板块但候选池没判出知识点的题
 VARIANT_LANGS = ('en', 'zh')
-VARIANT_STATES = ('passthrough', 'translated', 'failed', 'missing')
+VARIANT_STATES = ('passthrough', 'translated', 'verified_identical', 'failed', 'missing')
 
 
 def die(msg):
@@ -308,6 +308,7 @@ def write_readme(out, index_rows, n_topics):
 
     coverage_rows = '\n'.join(
         f"| {code} | {coverage[code]['passthrough']:,} | {coverage[code]['translated']:,} | "
+        f"{coverage[code]['verified_identical']:,} | "
         f"{coverage[code]['failed']:,} | {coverage[code]['missing']:,} |"
         for code in VARIANT_LANGS
     )
@@ -354,8 +355,8 @@ mathnet-full/
 
 ### 三语覆盖率
 
-| 语言 | passthrough | translated | failed | missing |
-| --- | ---: | ---: | ---: | ---: |
+| 语言 | passthrough | translated | verified_identical | failed | missing |
+| --- | ---: | ---: | ---: | ---: | ---: |
 {coverage_rows}
 
 ### 板块

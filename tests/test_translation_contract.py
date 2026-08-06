@@ -10,7 +10,7 @@ import pytest
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_ROOT, 'scripts'))
 
-from translation_fidelity import FindingType, verify_translation  # noqa: E402
+from translation_fidelity import FindingType, verify_directory, verify_translation  # noqa: E402
 
 _CHECKER = os.path.join(_ROOT, 'scripts', 'checks', 'check_translation_contract.py')
 _spec = importlib.util.spec_from_file_location('check_translation_contract_test', _CHECKER)
@@ -190,7 +190,7 @@ def test_passthrough_below_en_high_is_a_contract_error(
 ):
     corpus = os.path.join(tmp_path, 'mathnet-full')
     variants = {lang: {'mode': 'passthrough', 'sha256': _sha(SOURCE)}}
-    problem, contract, payload = make_problem(
+    _problem, contract, payload = make_problem(
         corpus, en=SOURCE, zh=SOURCE, variants=variants
     )
     payload['source_lang'] = source_lang
@@ -237,6 +237,20 @@ def test_failed_variant_does_not_claim_a_file(tmp_path):
     })
     result = tc.check_corpus(str(tmp_path), sample=10)
     assert result.status == 'ok', result.errors
+
+
+def test_verified_identical_requires_model_and_exact_source_bytes(tmp_path):
+    corpus = os.path.join(tmp_path, 'mathnet-full')
+    changed = SOURCE + b'changed\n'
+    variants = {
+        'en': {'mode': 'verified_identical', 'sha256': _sha(changed)},
+    }
+    make_problem(corpus, en=changed, zh=False, variants=variants)
+
+    result = tc.check_corpus(str(tmp_path), sample=10)
+
+    assert any('verified_identical 必须记录模型' in error for error in result.errors)
+    assert any('verified_identical 内容与原文不一致' in error for error in result.errors)
 
 
 def test_sample_limit_is_explicit(tmp_path, capsys):
@@ -336,3 +350,57 @@ def test_english_translated_variant_uses_english_fidelity_rules(tmp_path):
         'index.en.md' in error and str(FindingType.UNTRANSLATED) in error
         for error in result.errors
     )
+
+
+def test_contract_and_directory_audits_agree_on_rejected_und_foreign_echo(tmp_path):
+    corpus = os.path.join(tmp_path, 'mathnet-full')
+    source = '# 0abc\n\n## 题面\n\nΒρείτε τον αριθμό $x$.\n'.encode()
+    variants = {'en': {'mode': 'translated', 'sha256': _sha(source)}}
+    problem, contract, payload = make_problem(
+        corpus,
+        source=source,
+        en=source,
+        zh=False,
+        variants=variants,
+        source_lang='und',
+    )
+    payload['source_lang_confidence'] = 'low'
+    _write_json(contract, payload)
+
+    contract_result = tc.check_corpus(
+        str(tmp_path), sample=10, fidelity_verifier=verify_translation
+    )
+    directory_result = verify_directory(corpus, variant='en')
+
+    assert any('untranslated' in error.lower() for error in contract_result.errors)
+    assert directory_result.finding_counts == {FindingType.UNTRANSLATED.value: 1}
+
+
+def test_contract_and_directory_audits_agree_on_verified_und_english_echo(tmp_path):
+    corpus = os.path.join(tmp_path, 'mathnet-full')
+    source = '# 0abc\n\n## 题面\n\nFind $x$.\n'.encode()
+    variants = {
+        'en': {
+            'mode': 'verified_identical',
+            'model': 'test-model',
+            'sha256': _sha(source),
+        }
+    }
+    _problem, contract, payload = make_problem(
+        corpus,
+        source=source,
+        en=source,
+        zh=False,
+        variants=variants,
+        source_lang='und',
+    )
+    payload['source_lang_confidence'] = 'low'
+    _write_json(contract, payload)
+
+    contract_result = tc.check_corpus(
+        str(tmp_path), sample=10, fidelity_verifier=verify_translation
+    )
+    directory_result = verify_directory(corpus, variant='en')
+
+    assert contract_result.status == 'ok', contract_result.errors
+    assert directory_result.failed == 0

@@ -166,6 +166,14 @@ _PROTECTED_RE = re.compile(
 _IMAGE_RE = re.compile(r'!\[\]\(attached_image_(\d+)\.png\)')
 _PLACEHOLDER_RE = re.compile(r'\{\{MNT_\d{4}\}\}')
 _HAN_RE = re.compile(r'[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]')
+_NON_ENGLISH_SCRIPT_RE = re.compile(
+    r'[\u0400-\u052f'  # Cyrillic
+    r'\u0370-\u03ff\u1f00-\u1fff'  # Greek
+    r'\u0590-\u05ff'  # Hebrew
+    r'\u0600-\u06ff\u0750-\u077f\u08a0-\u08ff'  # Arabic
+    r'\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff'  # CJK
+    r'\uac00-\ud7af]'
+)
 _SYMBOL_WORDS = {
     'bmod', 'cos', 'gcd', 'inf', 'lcm', 'ln', 'log', 'max', 'min', 'mod',
     'pmod', 'sin', 'sqrt', 'sup', 'tan',
@@ -533,6 +541,40 @@ def _same_language_family(source_lang: str | None, target_lang: str) -> bool:
     return family == target_lang
 
 
+def _has_non_english_script_or_latin_diacritic(body: str) -> bool:
+    """Return whether prose contains cheap, decisive non-English evidence.
+
+    This is deliberately a lower-bound guard, not a language detector.  It
+    catches the scripts observed in the ``und`` false-accept corpus plus Latin
+    letters with diacritics.  Plain-ASCII foreign prose remains possible, so
+    absence of this evidence never authorizes an English-identical result.
+    """
+    if _NON_ENGLISH_SCRIPT_RE.search(body):
+        return True
+    return any(
+        ord(char) > 127
+        and unicodedata.category(char).startswith('L')
+        and 'LATIN' in unicodedata.name(char, '')
+        for char in body
+    )
+
+
+def _und_prose_has_positive_english_evidence(body: str) -> bool:
+    """Authorize an underdetected English echo only with positive evidence.
+
+    The conservative detector's ``und`` result means evidence is insufficient,
+    not English.  A model-identical English result is therefore accepted only
+    when the section itself matches a known short-English construction.  Longer
+    prose already reaches ``detect_source_lang(...)[0] == 'en'`` before this
+    fallback.  This intentionally rejects unfamiliar short English wording;
+    false negatives cost a retry, while false positives publish foreign prose
+    as English.
+    """
+    if _has_non_english_script_or_latin_diacritic(body):
+        return False
+    return bool(_SHORT_ENGLISH_PROSE_RE.search(body))
+
+
 def _ascii_fold(value: str) -> str:
     return ''.join(
         char for char in unicodedata.normalize('NFKD', value.casefold())
@@ -567,6 +609,8 @@ def _has_prose_outside_target_language(
     letters = [ch for ch in body if unicodedata.category(ch).startswith('L')]
     if target_lang == 'zh':
         return any(_HAN_RE.fullmatch(ch) is None for ch in letters)
+    if _has_non_english_script_or_latin_diacritic(body):
+        return True
     if _NON_ENGLISH_FRAGMENT_RE.search(_ascii_fold(body)):
         return True
     detected_lang, _confidence = detect_source_lang(body, {})
@@ -574,7 +618,7 @@ def _has_prose_outside_target_language(
         return False
     if detected_lang != 'und':
         return True
-    if _SHORT_ENGLISH_PROSE_RE.search(body):
+    if _und_prose_has_positive_english_evidence(body):
         return False
     if _same_language_family(source_lang, target_lang):
         return False
@@ -612,7 +656,7 @@ def _content_findings(
                 '',
             ))
 
-    if mode == 'translated':
+    if mode in {'translated', 'verified_identical'}:
         for source_section, translated_section in zip(source_sections, translated_sections):
             if source_section.heading != translated_section.heading:
                 continue
@@ -673,10 +717,11 @@ def verify_translation(
     """校验一对 Markdown 字符串，返回全部可定位问题。
 
     ``mode='passthrough'`` 只关闭“正文未翻译”检查；数学、图片、骨架与泄漏检查
-    仍然执行。调用方可直接传入 ``translation.json`` 中对应 variant 的 mode。
-    ``source_lang`` 保留在调用契约中，但不能绕过混合语言文档的逐小节证据检查。
+    仍然执行。``verified_identical`` 与 ``translated`` 使用相同的逐小节语言闸门。
+    调用方可直接传入 ``translation.json`` 中对应 variant 的 mode。``source_lang``
+    不能绕过混合语言文档的逐小节证据检查。
     """
-    if mode not in {'translated', 'passthrough', 'failed'}:
+    if mode not in {'translated', 'verified_identical', 'passthrough', 'failed'}:
         raise ValueError(f'unsupported translation mode: {mode}')
     if target_lang not in {'en', 'zh'}:
         raise ValueError(f'unsupported target language: {target_lang}')
@@ -866,7 +911,7 @@ def verify_directory(
     source_dir: str | Path,
     translated_dir: str | Path | None = None,
     *,
-    mode: str = 'translated',
+    mode: str | None = None,
     pattern: str | None = None,
     variant: str = 'zh',
     only_translated: bool = False,
@@ -877,6 +922,8 @@ def verify_directory(
     ``index.md`` 与 ``index.<variant>.md``。传入 ``translated_dir`` 时按两个
     目录的相对路径配对，方便批次导出与 CI fixture。默认把缺少译文的原文计为
     ``missing_translation``，用于完整性审计；``only_translated`` 只检查已有译文。
+    单目录模式会从同目录 ``translation.json`` 读取 variant mode 与 source_lang，确保
+    与契约检查器使用同一组审计输入；双目录模式没有元数据时默认按 translated 检查。
     """
     if variant not in {'en', 'zh'}:
         raise ValueError(f'unsupported translation variant: {variant}')
@@ -884,6 +931,8 @@ def verify_directory(
     if not source_root.is_dir():
         raise FileNotFoundError(f'source directory does not exist: {source_root}')
     translated_root = Path(translated_dir) if translated_dir is not None else None
+    if mode not in {None, 'translated', 'verified_identical', 'passthrough', 'failed'}:
+        raise ValueError(f'unsupported translation mode: {mode}')
     failed_files = {}
     source_pattern = pattern or ('*.md' if translated_root is not None else 'index.md')
     source_paths = sorted(path for path in source_root.rglob(source_pattern) if path.is_file())
@@ -904,13 +953,35 @@ def verify_directory(
         if translated_path.is_file():
             source_text = source_path.read_text(encoding='utf-8')
             translated_text = translated_path.read_text(encoding='utf-8')
+            pair_mode = mode or 'translated'
+            source_lang = None
+            if translated_root is None:
+                try:
+                    state = json.loads(
+                        (source_path.parent / 'translation.json').read_text(encoding='utf-8')
+                    )
+                except (OSError, json.JSONDecodeError):
+                    state = None
+                if isinstance(state, dict):
+                    candidate_lang = state.get('source_lang')
+                    if isinstance(candidate_lang, str):
+                        source_lang = candidate_lang
+                    variant_meta = (state.get('variants') or {}).get(variant)
+                    candidate_mode = (
+                        variant_meta.get('mode') if isinstance(variant_meta, dict) else None
+                    )
+                    if mode is None and candidate_mode in {
+                        'translated', 'verified_identical', 'passthrough', 'failed'
+                    }:
+                        pair_mode = candidate_mode
             findings = verify_translation(
                 source_text,
                 translated_text,
-                mode=mode,
+                mode=pair_mode,
                 target_lang=variant,
+                source_lang=source_lang,
             )
-            if mode == 'translated':
+            if pair_mode in {'translated', 'verified_identical'}:
                 batch_sources.append(source_text)
                 batch_translated.append(translated_text)
                 batch_keys.append(relative.as_posix())
@@ -965,8 +1036,11 @@ def main(argv: list[str] | None = None) -> int:
                         help='可选译文目录；给出时按相对路径与原文目录配对')
     parser.add_argument('--variant', choices=('en', 'zh'), default='zh',
                         help='单目录模式的目标语言（默认 zh）')
-    parser.add_argument('--mode', choices=('translated', 'passthrough', 'failed'), default='translated',
-                        help='译文模式（由调用方从 translation.json 传入；默认 translated）')
+    parser.add_argument(
+        '--mode',
+        choices=('translated', 'verified_identical', 'passthrough', 'failed'),
+        help='显式覆盖译文模式；单目录默认从 translation.json 读取',
+    )
     parser.add_argument('--glob', help='递归原文匹配模式（双目录默认 *.md；单目录默认 index.md）')
     parser.add_argument('--only-translated', action='store_true',
                         help='只检查已有目标 variant；默认也把缺少译文报告为 missing_translation')

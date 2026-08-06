@@ -66,6 +66,16 @@ def corpus(tmp_path):
             'variants': {'en': 'failed', 'zh': 'missing'},
             'translation_stale': False,
         },
+        {
+            'mathnet_id': '0005',
+            'path': 'by-topic/algebra/方程/0005/index.md',
+            'category': 'algebra',
+            'topics': ['方程与设元'],
+            'difficulty_est': 2,
+            'country': 'Testland',
+            'variants': {'en': 'verified_identical', 'zh': 'missing'},
+            'translation_stale': False,
+        },
     ]
     _write_problem(
         root, rows[0]['path'],
@@ -87,6 +97,11 @@ def corpus(tmp_path):
     _write_problem(
         root, rows[3]['path'],
         '# 0004\n\nFOURTH_ORIG failed translation',
+    )
+    _write_problem(
+        root, rows[4]['path'],
+        '# 0005\n\nFIFTH_ORIG verified identical',
+        '# 0005\n\nFIFTH_ORIG verified identical',
     )
 
     # 同一题第二知识点只挂符号链接；索引还故意重复一行，锁定 mathnet_id 防御性去重。
@@ -143,6 +158,7 @@ def test_metadata_filters_compose(corpus):
     ('lang', 'coverage', 'expected', 'unexpected'),
     [('zh', 'translated', '0001', '0003'),
      ('en', 'passthrough', '0003', '0001'),
+     ('en', 'verified_identical', '0005', '0001'),
      ('en', 'failed', '0004', '0002'),
      ('zh', 'stale', '0002', '0001')],
 )

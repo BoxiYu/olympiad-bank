@@ -202,7 +202,7 @@ def query(problems, args):
 
 MATHNET_REBUILD_CMD = 'uv run --group mathnet python scripts/mathnet_export.py'
 TRANSLATION_EXPORT_CMD = 'uv run python scripts/mathnet_translate.py export --out translations.todo.jsonl'
-MATHNET_VARIANT_STATES = ('passthrough', 'translated', 'failed', 'missing')
+MATHNET_VARIANT_STATES = ('passthrough', 'translated', 'verified_identical', 'failed', 'missing')
 
 
 def _mathnet_variant_path(source_path, lang):

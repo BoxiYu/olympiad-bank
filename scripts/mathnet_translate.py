@@ -33,6 +33,7 @@ from translation_fidelity import verify_batch, verify_translation
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CORPUS = ROOT / "mathnet-full"
 TARGET_LANGS = ("en", "zh")
+CURRENT_VARIANT_MODES = {"passthrough", "translated", "verified_identical"}
 INDEX_TRANSLATION_FIELDS = ("source_lang", "variants", "translation_stale")
 COMPANION_EFFORTS = ("none", "minimal", "low", "medium", "high", "xhigh")
 # 100 题真实批次对照：high 运行 2.5 小时仍无产出；low 虽 4m31s 完成，但
@@ -326,7 +327,7 @@ def translation_projection(source_path: Path, mathnet_id: str) -> dict[str, Any]
             variants[lang] = mode
             continue
         target = source_path.with_name(f"index.{lang}.md")
-        if mode in {"passthrough", "translated"} and target.is_file():
+        if mode in CURRENT_VARIANT_MODES and target.is_file():
             target_sha = sha256_bytes(target.read_bytes())
             variants[lang] = mode if item.get("sha256") == target_sha else "missing"
         else:
@@ -483,7 +484,7 @@ def variant_current(question_dir: Path, state: dict[str, Any] | None, mathnet_id
         return False
     variant = (state.get("variants") or {}).get(lang)
     target = question_dir / f"index.{lang}.md"
-    if not isinstance(variant, dict) or variant.get("mode") not in {"passthrough", "translated"}:
+    if not isinstance(variant, dict) or variant.get("mode") not in CURRENT_VARIANT_MODES:
         return False
     if not target.is_file():
         return False
@@ -695,6 +696,20 @@ def apply_record(root: Path, record: dict[str, Any]) -> None:
         target_bytes, metadata = prepare_variant(
             lang, payload, source_lang, confidence, source_bytes, document
         )
+        if payload.get("mode") == "translated" and target_bytes == source_bytes:
+            findings = verify_translation(
+                source_bytes.decode("utf-8"),
+                target_bytes.decode("utf-8"),
+                mode="verified_identical",
+                target_lang=lang,
+                source_lang=source_lang,
+            )
+            if findings:
+                summary = "; ".join(
+                    f"{finding.type.value}@{finding.section}" for finding in findings[:8]
+                )
+                raise TranslateError(f"模型同文核验失败：{summary}")
+            metadata = dict(metadata, mode="verified_identical")
         prepared[lang] = target_bytes
         metadata_updates[lang] = metadata
 

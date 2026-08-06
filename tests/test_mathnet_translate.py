@@ -18,6 +18,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import mathnet_translate as mt  # noqa: E402
 
 FIXTURE = Path(__file__).parent / "fixtures" / "mathnet_translate"
+IDENTICAL_EN_FIXTURE = (
+    Path(__file__).parent / "fixtures" / "translation_fidelity" / "identical-en"
+)
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BANK = REPO_ROOT / "scripts" / "bank.py"
 NOW = "2026-08-06T12:00:00Z"
@@ -421,7 +424,7 @@ def test_apply_rejects_every_passthrough_below_en_high(
 
 
 @pytest.mark.parametrize("confidence", ["medium", "low"])
-def test_en_non_high_identical_model_result_is_translated_and_written(
+def test_en_non_high_identical_model_result_is_marked_verified_identical(
     corpus: Path, tmp_path: Path, confidence: str
 ):
     row = export(
@@ -437,8 +440,29 @@ def test_en_non_high_identical_model_result_is_translated_and_written(
     question = (corpus / row["path"]).parent
     assert (question / "index.en.md").read_bytes() == (question / "index.md").read_bytes()
     state = json.loads((question / "translation.json").read_text(encoding="utf-8"))
-    assert state["variants"]["en"]["mode"] == "translated"
+    assert state["variants"]["en"]["mode"] == "verified_identical"
+    indexed = {
+        item["mathnet_id"]: item
+        for item in map(json.loads, (corpus / "index.jsonl").read_text(encoding="utf-8").splitlines())
+    }
+    assert indexed["eng1"]["variants"]["en"] == "verified_identical"
     assert apply_path.with_suffix(".jsonl.failures.jsonl").read_text(encoding="utf-8") == ""
+
+
+def test_apply_input_cannot_claim_derived_verified_identical_mode(
+    corpus: Path, tmp_path: Path
+):
+    row = export(
+        corpus, tmp_path / "batch.jsonl", "--only", "eng1",
+        "--source-lang", "en", "--source-lang-confidence", "medium",
+    )[0]
+    payload = identical_translated_variant(row)
+    payload["mode"] = "verified_identical"
+    apply_path = apply_input(tmp_path, row, {"en": payload})
+
+    assert mt.main(["apply", "--root", str(corpus), "--in", str(apply_path)]) == 1
+    failures = read_jsonl(apply_path.with_suffix(".jsonl.failures.jsonl"))
+    assert "mode 必须是 passthrough/translated/failed" in failures[0]["error"]
 
 
 def test_apply_payload_accepts_en_non_high_identical_model_result(
@@ -454,7 +478,56 @@ def test_apply_payload_accepts_en_non_high_identical_model_result(
     question = (corpus / row["path"]).parent
     assert (question / "index.en.md").read_bytes() == (question / "index.md").read_bytes()
     state = json.loads((question / "translation.json").read_text(encoding="utf-8"))
-    assert state["variants"]["en"]["mode"] == "translated"
+    assert state["variants"]["en"]["mode"] == "verified_identical"
+
+
+def install_detected_identical_fixture(
+    corpus: Path, tmp_path: Path, fixture_lang: str
+) -> tuple[Path, dict]:
+    source = next(path for path in corpus.rglob("index.md") if path.parent.name == "eng1")
+    source.write_text(
+        (IDENTICAL_EN_FIXTURE / f"{fixture_lang}.md").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    language_map_path = tmp_path / f"{fixture_lang}-source-map.json"
+    language_map, _hashes = mt.build_source_language_map(
+        corpus, language_map_path, {"eng1"}
+    )
+    assert language_map["eng1"]["source_lang"] == "und"
+    assert language_map["eng1"]["source_lang_confidence"] == "low"
+    row = export(
+        corpus,
+        tmp_path / f"{fixture_lang}-batch.jsonl",
+        "--only", "eng1",
+        "--source-lang-map", str(language_map_path),
+    )[0]
+    return source, row
+
+
+def test_und_identical_english_uses_real_apply_payload_and_is_auditable(
+    corpus: Path, tmp_path: Path
+):
+    source, row = install_detected_identical_fixture(corpus, tmp_path, "en")
+
+    mt.apply_payload(corpus, row, "en", identical_translated_variant(row))
+
+    assert (source.parent / "index.en.md").read_bytes() == source.read_bytes()
+    state = json.loads((source.parent / "translation.json").read_text(encoding="utf-8"))
+    assert state["variants"]["en"]["mode"] == "verified_identical"
+    assert state["variants"]["en"]["model"] == "test-model"
+
+
+@pytest.mark.parametrize("fixture_lang", ["de", "fr", "nl", "ro", "mn", "mk", "el"])
+def test_seven_und_foreign_identical_fixtures_are_rejected_by_apply_payload(
+    corpus: Path, tmp_path: Path, fixture_lang: str
+):
+    source, row = install_detected_identical_fixture(corpus, tmp_path, fixture_lang)
+
+    with pytest.raises(mt.TranslateError, match="untranslated"):
+        mt.apply_payload(corpus, row, "en", identical_translated_variant(row))
+
+    assert not (source.parent / "index.en.md").exists()
+    assert not (source.parent / "translation.json").exists()
 
 
 def test_apply_payload_rejects_mixed_section_despite_matching_file_language(

@@ -101,9 +101,9 @@ def test_refresh_index_projects_translation_state_and_readme(tmp_path):
     assert paths['en-source'].read_text(encoding='utf-8') == originals['en-source']
 
     readme = (out / 'README.md').read_text(encoding='utf-8')
-    assert '| 语言 | passthrough | translated | failed | missing |' in readme
-    assert '| en | 1 | 1 | 1 | 1 |' in readme
-    assert '| zh | 0 | 1 | 0 | 3 |' in readme
+    assert '| 语言 | passthrough | translated | verified_identical | failed | missing |' in readme
+    assert '| en | 1 | 1 | 0 | 1 | 1 |' in readme
+    assert '| zh | 0 | 1 | 0 | 0 | 3 |' in readme
     assert 'index.en.md' in readme
     assert 'index.zh.md' in readme
     assert 'translation.json' in readme
