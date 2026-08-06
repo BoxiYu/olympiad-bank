@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""题库工具：lint / doclint / query / stats / plan / coach / spar / review / similar / web / student / assess / profile
+"""题库工具：lint / doclint / query / mathnet-search / stats / plan / coach / spar / review / similar / web / student / assess / profile
 
 用法：
   uv run python scripts/bank.py web        # 浏览器训练台（学生推荐入口，scripts/web_app.py）
   uv run python scripts/bank.py lint
   uv run python scripts/bank.py doclint    # 全仓 md：死链 / 禁词 / taxonomy 树 / 训练契约一致性
   uv run python scripts/bank.py query [--difficulty 3] [--topic 韦达] [--contest IMO] [--category algebra] [--unverified]
+  uv run python scripts/bank.py mathnet-search "关键词" --lang zh --topic 不等式
   uv run python scripts/bank.py stats
   uv run python scripts/bank.py coach --target IMO --save     # 周计划 → data/plan.json
   uv run python scripts/bank.py spar next                     # 开卡（复习到期 > 周计划）
@@ -195,6 +196,153 @@ def query(problems, args):
         topics = ' / '.join(fm['topics'])
         print(f"{fm['id']}  {star:<5}  {fm.get('contest') or '?':<8} {fm.get('year') or '----'}  {fm['title']}  [{topics}]")
     print(f'\n共 {len(rows)} 题')
+
+
+MATHNET_REBUILD_CMD = 'uv run --group mathnet python scripts/mathnet_export.py'
+TRANSLATION_EXPORT_CMD = 'uv run python scripts/mathnet_translate.py export --out translations.todo.jsonl'
+
+
+def _mathnet_variant_path(source_path, lang):
+    """index.jsonl 的原文路径 → 所选语言正文路径。"""
+    if lang == 'orig':
+        return source_path
+    parent, _ = os.path.split(source_path)
+    return os.path.join(parent, f'index.{lang}.md')
+
+
+def _mathnet_coverage(row, lang):
+    """兼容新索引字符串投影和 translation.json 风格的嵌套 mode。"""
+    if lang == 'orig':
+        return 'passthrough'
+    variants = row.get('variants')
+    value = variants.get(lang, 'missing') if isinstance(variants, dict) else 'missing'
+    if isinstance(value, dict):
+        value = value.get('mode', 'missing')
+    return str(value or 'missing')
+
+
+def _mathnet_row_matches(row, args):
+    if args.category and row.get('category') != args.category:
+        return False
+    if args.difficulty is not None and row.get('difficulty_est') != args.difficulty:
+        return False
+    if args.country and args.country.casefold() not in str(row.get('country') or '').casefold():
+        return False
+    if args.topic:
+        needle = args.topic.casefold()
+        if not any(needle in str(topic).casefold() for topic in (row.get('topics') or [])):
+            return False
+    if args.coverage == 'stale':
+        return bool(row.get('translation_stale', False))
+    if args.coverage and _mathnet_coverage(row, args.lang) != args.coverage:
+        return False
+    return True
+
+
+def _mathnet_snippet(text, keyword, width=120):
+    """命中位置两侧的单行片段；无关键词时取正文开头。"""
+    flat = re.sub(r'\s+', ' ', text).strip()
+    if not flat:
+        return '（正文为空）'
+    pos = flat.casefold().find((keyword or '').casefold()) if keyword else 0
+    if pos < 0:
+        return None
+    start = max(0, pos - width // 3)
+    end = min(len(flat), start + width)
+    snippet = flat[start:end]
+    return ('…' if start else '') + snippet + ('…' if end < len(flat) else '')
+
+
+def mathnet_search(args):
+    """以 index.jsonl 为清单检索全量语料；不递归目录，也不跟随符号链接。"""
+    import json
+
+    corpus_root = os.path.abspath(args.root)
+    default_root = os.path.join(ROOT, 'mathnet-full')
+    display_root = ('mathnet-full' if corpus_root == default_root
+                    else (args.root.rstrip(os.sep) or args.root))
+    index_path = os.path.join(corpus_root, 'index.jsonl')
+    if not os.path.isdir(corpus_root):
+        print(f'全量语料目录不存在：{display_root}/')
+        print(f'请重建：{MATHNET_REBUILD_CMD}')
+        return 0
+    if not os.path.isfile(index_path):
+        print(f'全量索引不存在：{os.path.join(display_root, "index.jsonl")}')
+        print(f'请重建：{MATHNET_REBUILD_CMD}')
+        return 0
+
+    matches = []
+    visited_ids = set()
+    missing_language = 0
+    invalid_rows = 0
+    with open(index_path, encoding='utf-8') as fh:
+        for line in fh:
+            try:
+                row = json.loads(line)
+            except (TypeError, ValueError):
+                invalid_rows += 1
+                continue
+            if not isinstance(row, dict):
+                invalid_rows += 1
+                continue
+            mathnet_id = str(row.get('mathnet_id') or '')
+            rel_source = row.get('path')
+            if not mathnet_id or not isinstance(rel_source, str) or not _mathnet_row_matches(row, args):
+                continue
+            # index.jsonl 契约是一题一行；即使索引损坏出现重复，也绝不读取第二个挂载路径。
+            if mathnet_id in visited_ids:
+                continue
+            visited_ids.add(mathnet_id)
+
+            rel_variant = _mathnet_variant_path(rel_source, args.lang)
+            variant_path = os.path.abspath(os.path.join(corpus_root, rel_variant))
+            try:
+                inside_corpus = os.path.commonpath([corpus_root, variant_path]) == corpus_root
+            except ValueError:
+                inside_corpus = False
+            if not inside_corpus or os.path.realpath(variant_path) != variant_path:
+                invalid_rows += 1
+                continue
+            if not os.path.isfile(variant_path):
+                missing_language += 1
+                # 没有关键词时，coverage=missing 仍可作为待译清单使用。
+                if args.keyword or args.coverage != 'missing':
+                    continue
+                snippet = f'（{args.lang} 版本缺失）'
+            else:
+                try:
+                    with open(variant_path, encoding='utf-8') as variant_fh:
+                        body = variant_fh.read()
+                except OSError:
+                    missing_language += 1
+                    continue
+                snippet = _mathnet_snippet(body, args.keyword)
+                if snippet is None:
+                    continue
+
+            shown_path = os.path.join(display_root, rel_variant)
+            matches.append((mathnet_id, snippet, shown_path))
+
+    shown = matches[:args.limit]
+    for mathnet_id, snippet, path in shown:
+        print(f'{mathnet_id}  {path}')
+        print(f'  {snippet}')
+
+    truncated = len(matches) - len(shown)
+    if truncated:
+        print(f'\n匹配 {len(matches)} 题，显示 {len(shown)} 题；已截断 {truncated} 题（用 --limit 调整）')
+    else:
+        print(f'\n共 {len(matches)} 题')
+    if missing_language:
+        label = {'orig': '原文', 'en': '英文', 'zh': '中文'}[args.lang]
+        print(f'注意：筛选范围内有 {missing_language} 题缺少{label}版本，未作为全文命中。')
+        if args.lang == 'orig':
+            print(f'请重建：{MATHNET_REBUILD_CMD}')
+        else:
+            print(f'请生成：{TRANSLATION_EXPORT_CMD}')
+    if invalid_rows:
+        print(f'注意：index.jsonl 有 {invalid_rows} 行无效或路径越界；请重建：{MATHNET_REBUILD_CMD}')
+    return 0
 
 
 def stats(problems):
@@ -918,6 +1066,16 @@ def main():
     q.add_argument('--contest')
     q.add_argument('--category', choices=CATEGORIES)
     q.add_argument('--unverified', action='store_true')
+    ms = sub.add_parser('mathnet-search', help='按 index.jsonl 去重检索 MathNet 全量三语正文')
+    ms.add_argument('keyword', nargs='?', help='全文关键词（不填时列出符合过滤条件的题）')
+    ms.add_argument('--lang', default='orig', choices=['zh', 'en', 'orig'], help='检索版本（默认 orig 原文）')
+    ms.add_argument('--topic', help='知识点子串')
+    ms.add_argument('--category', choices=CATEGORIES)
+    ms.add_argument('--difficulty', type=int, choices=[1, 2, 3, 4, 5], help='difficulty_est')
+    ms.add_argument('--country', help='国家/地区子串')
+    ms.add_argument('--coverage', choices=['missing', 'translated', 'passthrough', 'stale'])
+    ms.add_argument('--limit', type=int, default=20, help='最多显示多少题（默认 20）')
+    ms.add_argument('--root', default=os.path.join(ROOT, 'mathnet-full'), help=argparse.SUPPRESS)
     sub.add_parser('stats')
     pl = sub.add_parser('plan')
     pl.add_argument('--target', required=True)
@@ -1008,6 +1166,8 @@ def main():
             threading.Timer(0.8, webbrowser.open, args=(url,)).start()
         uvicorn.run(web_application, host=args.host, port=args.port, log_level='warning')
         return
+    if args.cmd == 'mathnet-search':
+        sys.exit(mathnet_search(args))
     problems = load_all()
     if args.cmd == 'lint':
         sys.exit(lint(problems))
