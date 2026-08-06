@@ -1,0 +1,170 @@
+[
+  {
+    "id": "en_plain_1",
+    "body": "Let positive integers a and b satisfy a < b. Prove that there exists an integer divisible by each of them.",
+    "meta": {},
+    "expected": ["en", "high"]
+  },
+  {
+    "id": "en_plain_2",
+    "body": "Determine all real numbers for which the given equation has exactly two distinct solutions.",
+    "meta": {"language": "English"},
+    "expected": ["en", "high"]
+  },
+  {
+    "id": "en_math_noise",
+    "body": "Find all positive integers $n$ such that $$n^2 + 1 = 2^k.$$ Show that each answer has the required property.",
+    "meta": {"language": "eng"},
+    "expected": ["en", "high"]
+  },
+  {
+    "id": "en_full_problem_ignores_chinese_metadata",
+    "body": "---\ntitle: 示例\n---\n\n- 板块：代数\n- 知识点：方程\n\n## 题面\n\nLet a and b be positive numbers. Prove that their sum is greater than their product under the given condition.\n\n## 答案\n\n证明题\n",
+    "meta": {"language": "English"},
+    "expected": ["en", "high"]
+  },
+  {
+    "id": "en_code_and_image_noise",
+    "body": "![中文图注](diagram.png)\n```python\nprint('中文噪声')\n```\nGiven three points on a circle, prove that the lines through their centres are concurrent.",
+    "meta": {"language": "English"},
+    "expected": ["en", "high"]
+  },
+  {
+    "id": "en_multilingual_metadata",
+    "body": "Find all positive integers which satisfy the equation and prove that every listed value works.",
+    "meta": {"language": "Chinese; English"},
+    "expected": ["en", "medium"]
+  },
+  {
+    "id": "es_plain_1",
+    "body": "Sean a y b números enteros positivos tales que su suma es cien. Demostrar que existe un valor con la propiedad indicada.",
+    "meta": {},
+    "expected": ["es", "high"]
+  },
+  {
+    "id": "es_dirty_metadata",
+    "body": "Hallar todos los números enteros positivos para los cuales la ecuación tiene exactamente dos soluciones.",
+    "meta": {"language": "Español"},
+    "expected": ["es", "high"]
+  },
+  {
+    "id": "es_problem_prefix",
+    "body": "Problem: Sea un triángulo con lados enteros y sea uno de sus ángulos recto. Demostrar que para todo caso se cumple la igualdad.",
+    "meta": {"language": "Spanish"},
+    "expected": ["es", "high"]
+  },
+  {
+    "id": "es_meta_body_conflict",
+    "body": "Sean enteros positivos y determine todos los valores para los que existe una solución.",
+    "meta": {"language": "English"},
+    "expected": ["es", "low"]
+  },
+  {
+    "id": "pt_plain_1",
+    "body": "Sejam a e b números inteiros positivos tais que a soma seja cem. Demonstrar que existe uma solução para cada caso.",
+    "meta": {},
+    "expected": ["pt", "high"]
+  },
+  {
+    "id": "pt_plain_2",
+    "body": "Determine todos os números positivos para os quais a equação possui exatamente duas raízes inteiras.",
+    "meta": {"language": "português"},
+    "expected": ["pt", "high"]
+  },
+  {
+    "id": "pt_math_environment",
+    "body": "Considere a expressão \\begin{align}x^2+y^2&=z^2\\end{align}. Mostre que para todos os inteiros positivos existe uma escolha com essa propriedade.",
+    "meta": {"language": "Portuguese"},
+    "expected": ["pt", "high"]
+  },
+  {
+    "id": "fr_plain_1",
+    "body": "Soient a et b des nombres entiers positifs. Montrer qu'il existe un entier avec toutes les propriétés demandées.",
+    "meta": {},
+    "expected": ["fr", "high"]
+  },
+  {
+    "id": "fr_plain_2",
+    "body": "Déterminer tous les nombres entiers pour lesquels cette équation possède exactement deux solutions positives.",
+    "meta": {"language": "French"},
+    "expected": ["fr", "high"]
+  },
+  {
+    "id": "fr_inline_code",
+    "body": "`for x in range(10): print(x)` Trouver tous les nombres positifs tels que leur somme est égale à leur produit.",
+    "meta": {"language": "français"},
+    "expected": ["fr", "high"]
+  },
+  {
+    "id": "sl_plain_1",
+    "body": "Naj bo n pozitivno celo število. Dokaži, da obstaja tako celo število, ki ima zahtevano lastnost.",
+    "meta": {},
+    "expected": ["sl", "high"]
+  },
+  {
+    "id": "sl_plain_2",
+    "body": "Poišči vsa cela števila, za katera je izraz pozitiven, in določi vse možne vrednosti.",
+    "meta": {"language": "Slovenian"},
+    "expected": ["sl", "high"]
+  },
+  {
+    "id": "sl_problem_solution_prefix",
+    "body": "Problem: Naj bodo a, b in c pozitivna cela števila. Določi vse trojice, za katere obstaja rešitev. Solution: Dokaži trditev.",
+    "meta": {"language": "Slovene"},
+    "expected": ["sl", "high"]
+  },
+  {
+    "id": "sl_body_conflicts_english_meta",
+    "body": "Problem: Naj bo n celo število in dokaži, da za vsak pozitiven n obstaja zahtevano število.",
+    "meta": {"language": "English"},
+    "expected": ["sl", "low"]
+  },
+  {
+    "id": "ru_plain_1",
+    "body": "Докажите, что для любых положительных целых чисел существует число с указанным свойством.",
+    "meta": {},
+    "expected": ["ru", "high"]
+  },
+  {
+    "id": "ru_plain_2",
+    "body": "Найдите все натуральные числа, для которых данное уравнение имеет ровно два решения.",
+    "meta": {"language": "Russian"},
+    "expected": ["ru", "high"]
+  },
+  {
+    "id": "ru_conflicts_english_meta",
+    "body": "Докажите, что каждое положительное целое число обладает указанным свойством.",
+    "meta": {"language": "English"},
+    "expected": ["ru", "low"]
+  },
+  {
+    "id": "zh_plain_1",
+    "body": "求所有满足下列方程的正整数，并证明所得的每一个答案都符合条件。",
+    "meta": {},
+    "expected": ["zh", "high"]
+  },
+  {
+    "id": "zh_plain_2",
+    "body": "设三个正整数的和为一百，证明其中必定存在两个数具有所要求的性质。",
+    "meta": {"language": "Chinese"},
+    "expected": ["zh", "high"]
+  },
+  {
+    "id": "zh_multilingual_conflict",
+    "body": "求所有满足条件的正整数，并证明每个答案都是正确的。",
+    "meta": {"language": "Chinese; English"},
+    "expected": ["zh", "low"]
+  },
+  {
+    "id": "und_only_math",
+    "body": "## 题面\n\n$$\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}$$\n\n![plot](x.png)\n\n## 答案\n\n证明题",
+    "meta": {"language": "English"},
+    "expected": ["und", "low"]
+  },
+  {
+    "id": "und_tiny_after_strip",
+    "body": "Problem: $x+y=z$ `return x`",
+    "meta": {"language": "Spanish"},
+    "expected": ["und", "low"]
+  }
+]
