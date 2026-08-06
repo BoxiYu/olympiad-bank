@@ -430,6 +430,21 @@ def test_run_fidelity_failure_is_recorded_without_target_files(
     assert state["variants"]["zh"]["mode"] == "failed"
     ledger = (work / ".translate-failures.jsonl").read_text(encoding="utf-8")
     assert "保真校验失败" in ledger
+    batch_outputs = list(work.glob("batches/*/translations.json"))
+    assert batch_outputs == []
+
+    monkeypatch.setenv("FAKE_MODE", "success")
+    monkeypatch.delenv("FAKE_FAIL_ID")
+    assert mt.main(run_args(
+        corpus, work, companion, "--only", "slv1", "--batch-size", "1", "--concurrency", "2"
+    )) == 0
+    attempts = sorted(
+        int(path.read_text(encoding="utf-8")) for path in work.glob("batches/*/attempts.txt")
+    )
+    assert attempts == [2, 2]
+    assert (question / "index.en.md").is_file()
+    assert (question / "index.zh.md").is_file()
+    assert (work / ".translate-failures.jsonl").read_text(encoding="utf-8") == ""
 
 
 def test_run_strict_stops_before_later_good_batch(corpus: Path, tmp_path: Path, monkeypatch):
@@ -447,6 +462,52 @@ def test_run_strict_stops_before_later_good_batch(corpus: Path, tmp_path: Path, 
     eng_dir = next(path.parent for path in corpus.rglob("index.md") if path.parent.name == "eng1")
     assert (eng_dir / "index.en.md").is_file()  # passthrough happens before dispatch
     assert not (eng_dir / "index.zh.md").exists()
+
+
+@pytest.mark.skipif(os.name != "posix", reason="process-group cleanup uses POSIX signals")
+def test_run_submission_interrupt_cleans_started_child(
+    corpus: Path, tmp_path: Path, monkeypatch
+):
+    companion = fake_companion(tmp_path)
+    work = tmp_path / "run-submit-interrupt"
+    events = tmp_path / "submit-interrupt-events.log"
+    monkeypatch.setenv("FAKE_MODE", "timeout")
+    monkeypatch.setenv("FAKE_FAIL_ID", "slv1")
+    monkeypatch.setenv("FAKE_SLEEP_MS", "5000")
+    monkeypatch.setenv("FAKE_EVENTS", str(events))
+    real_executor = mt.concurrent.futures.ThreadPoolExecutor
+
+    class InterruptingExecutor:
+        def __init__(self, *args, **kwargs):
+            self.delegate = real_executor(*args, **kwargs)
+            self.submissions = 0
+
+        def submit(self, *args, **kwargs):
+            self.submissions += 1
+            if self.submissions == 2:
+                deadline = time.monotonic() + 5
+                while time.monotonic() < deadline:
+                    if events.is_file() and events.read_text(encoding="utf-8").startswith("start "):
+                        break
+                    time.sleep(0.01)
+                raise KeyboardInterrupt
+            return self.delegate.submit(*args, **kwargs)
+
+        def shutdown(self, *args, **kwargs):
+            return self.delegate.shutdown(*args, **kwargs)
+
+    monkeypatch.setattr(mt.concurrent.futures, "ThreadPoolExecutor", InterruptingExecutor)
+    rc = mt.main(run_args(
+        corpus, work, companion,
+        "--only", "slv1", "--batch-size", "1", "--concurrency", "1", "--timeout", "30",
+    ))
+
+    assert rc == 130
+    child_pid = int(events.read_text(encoding="utf-8").split()[1])
+    with pytest.raises(ProcessLookupError):
+        os.kill(child_pid, 0)
+    json.loads((work / ".translate-progress.json").read_text(encoding="utf-8"))
+    assert not list(work.rglob(".*.tmp"))
 
 
 @pytest.mark.skipif(os.name != "posix", reason="process-group cleanup uses POSIX signals")

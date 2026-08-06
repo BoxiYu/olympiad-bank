@@ -1238,28 +1238,6 @@ def run_records(args: argparse.Namespace) -> int:
     stop_event = threading.Event()
     executor = concurrent.futures.ThreadPoolExecutor(max_workers=args.concurrency)
     futures: dict[concurrent.futures.Future[BatchResult], BatchJob] = {}
-    for job in jobs:
-        write_batch_files(job)
-        progress.batches[job.batch_id] = {
-            "status": "running",
-            "target_lang": job.target_lang,
-            "question_ids": [row["mathnet_id"] for row in job.records],
-            "updated_at": utc_now(),
-        }
-        future = executor.submit(
-            dispatch_batch,
-            job,
-            companion,
-            args.timeout,
-            args.retries,
-            args.retry_backoff,
-            args.retry_backoff_max,
-            registry,
-            stop_event,
-        )
-        futures[future] = job
-    progress.save()
-
     previous_sigterm = signal.getsignal(signal.SIGTERM)
 
     def interrupt_on_sigterm(_signum: int, _frame: Any) -> None:
@@ -1268,6 +1246,28 @@ def run_records(args: argparse.Namespace) -> int:
     signal.signal(signal.SIGTERM, interrupt_on_sigterm)
     interrupted = False
     try:
+        for job in jobs:
+            write_batch_files(job)
+            progress.batches[job.batch_id] = {
+                "status": "running",
+                "target_lang": job.target_lang,
+                "question_ids": [row["mathnet_id"] for row in job.records],
+                "updated_at": utc_now(),
+            }
+            future = executor.submit(
+                dispatch_batch,
+                job,
+                companion,
+                args.timeout,
+                args.retries,
+                args.retry_backoff,
+                args.retry_backoff_max,
+                registry,
+                stop_event,
+            )
+            futures[future] = job
+        progress.save()
+
         for future in concurrent.futures.as_completed(futures):
             result = future.result()
             job = result.job
@@ -1315,6 +1315,11 @@ def run_records(args: argparse.Namespace) -> int:
                     finally:
                         finished_targets += 1
                 if batch_failed:
+                    job.output_path.unlink(missing_ok=True)
+                    print(
+                        f"dispatch: {job.batch_id} 的译文未通过 apply/保真门禁，"
+                        "已清除缓存以便下次重新派单"
+                    )
                     failed_batches += 1
 
             finished_batches += 1
