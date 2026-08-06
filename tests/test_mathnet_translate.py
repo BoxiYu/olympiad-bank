@@ -571,13 +571,14 @@ def test_atomic_write_uses_same_directory_replace_and_cleans_failed_temp(tmp_pat
     assert not list(tmp_path.glob(".translation.json.*.tmp"))
 
 
-def test_batch_output_rejects_real_boilerplate_fixture(tmp_path: Path):
+def test_batch_output_rejects_human_reported_boilerplate_excerpts(tmp_path: Path):
     fixture = json.loads(
-        (REPO_ROOT / "tests" / "fixtures" / "translation_fidelity" / "degenerate-batch.json")
+        (REPO_ROOT / "tests" / "fixtures" / "translation_fidelity"
+         / "human-reported-degenerate-excerpts.json")
         .read_text(encoding="utf-8")
-    )
+    )["rows"]
     records = tuple({
-        "mathnet_id": row["mathnet_id"],
+        "mathnet_id": row["fixture_id"],
         "units": [{
             "id": "statement",
             "source": row["source"],
@@ -589,7 +590,7 @@ def test_batch_output_rejects_real_boilerplate_fixture(tmp_path: Path):
     job.output_path.write_text(json.dumps({
         "model": "fake-codex",
         "translations": [{
-            "mathnet_id": row["mathnet_id"],
+            "mathnet_id": row["fixture_id"],
             "units": {"statement": row["translated"]},
         } for row in fixture],
     }, ensure_ascii=False), encoding="utf-8")
@@ -598,11 +599,12 @@ def test_batch_output_rejects_real_boilerplate_fixture(tmp_path: Path):
         mt.validate_batch_output(job)
 
 
-def test_apply_preflight_rejects_only_real_boilerplate_records(tmp_path: Path):
+def test_apply_preflight_rejects_only_human_reported_boilerplate_excerpts(tmp_path: Path):
     fixture = json.loads(
-        (REPO_ROOT / "tests" / "fixtures" / "translation_fidelity" / "degenerate-batch.json")
+        (REPO_ROOT / "tests" / "fixtures" / "translation_fidelity"
+         / "human-reported-degenerate-excerpts.json")
         .read_text(encoding="utf-8")
-    )
+    )["rows"]
     root = tmp_path / "corpus"
     records = []
     for row in fixture:
@@ -611,11 +613,11 @@ def test_apply_preflight_rejects_only_real_boilerplate_records(tmp_path: Path):
             .replace("{{MNT_0001}}", "$x$")
             .replace("{{MNT_0002}}", "$y$")
         )
-        problem_dir = root / row["mathnet_id"]
+        problem_dir = root / row["fixture_id"]
         problem_dir.mkdir(parents=True)
         source_path = problem_dir / "index.md"
         source_path.write_text(
-            f"# {row['mathnet_id']}\n\n## 题面\n{source_statement}\n\n## 最终答案\nD\n",
+            f"# {row['fixture_id']}\n\n## 题面\n{source_statement}\n\n## 最终答案\nD\n",
             encoding="utf-8",
         )
         units = mt.export_units(mt.parse_document(source_path.read_text(encoding="utf-8")))
@@ -624,7 +626,7 @@ def test_apply_preflight_rejects_only_real_boilerplate_records(tmp_path: Path):
             for unit in units
         }
         records.append({
-            "mathnet_id": row["mathnet_id"],
+            "mathnet_id": row["fixture_id"],
             "path": source_path.relative_to(root).as_posix(),
             "source_sha256": digest(source_path),
             "source_lang": "en",

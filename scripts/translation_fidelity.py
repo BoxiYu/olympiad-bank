@@ -82,7 +82,9 @@ class BatchConfig:
 
     默认 ``boilerplate_min_group=3`` 对应最小可行动重复簇：两条短题偶然同句很常见，
     三条不同原文却共用译文已足以复核。相似度 0.9 在剥离数学与标点后容忍少量虚词漂移；
-    译文相似度还须比源文相似度至少高 0.2，避免误伤同模板原文的忠实同模板翻译。
+    译文相似度还须比同一个 peer 的源文相似度至少高 0.2，避免把两个 peer 的
+    相似度极值错配后误伤忠实的同模板翻译。译文相似度相差不超过 0.02 的 peer
+    视为并列，并选择其中源文最接近者作保守比较。
     少于 8 个文字/数字的短答案不参与套话聚类。长度比采用很宽的 0.25--4.0 区间，
     适配英中字符密度差；长度和锚点各权重 1，必须同时出现才达到默认阻断分 2，
     因而长度异常绝不会单独产生 Finding。套话权重 2，可独立阻断。
@@ -93,6 +95,7 @@ class BatchConfig:
     boilerplate_min_group: int = 3
     boilerplate_similarity: float = 0.9
     boilerplate_source_similarity_gap: float = 0.2
+    boilerplate_pair_similarity_tolerance: float = 0.02
     boilerplate_min_chars: int = 8
     length_ratio_min: float = 0.25
     length_ratio_max: float = 4.0
@@ -379,6 +382,8 @@ def _validate_batch_config(config: BatchConfig) -> None:
         raise ValueError('boilerplate_similarity must be in (0, 1]')
     if not 0 <= config.boilerplate_source_similarity_gap <= 1:
         raise ValueError('boilerplate_source_similarity_gap must be in [0, 1]')
+    if not 0 <= config.boilerplate_pair_similarity_tolerance <= 1:
+        raise ValueError('boilerplate_pair_similarity_tolerance must be in [0, 1]')
     if config.boilerplate_min_chars <= 0:
         raise ValueError('boilerplate_min_chars must be positive')
     if not 0 < config.length_ratio_min < config.length_ratio_max:
@@ -785,21 +790,33 @@ def verify_batch(
             candidates = []
             for group_position, position in enumerate(positions):
                 item_index, normalized, _plain = entries[position]
-                target_similarity = (
-                    1.0 if len(positions) > batch_config.fuzzy_comparison_limit else max(
-                        (SequenceMatcher(None, normalized, peer).ratio()
-                         for peer_index, peer in enumerate(group_texts)
-                         if peer_index != group_position),
-                        default=1.0,
-                    )
-                )
                 source_text = group_sources[group_position]
-                source_similarity = min(
-                    (SequenceMatcher(None, source_text, peer).ratio()
-                     for peer_index, peer in enumerate(group_sources)
-                     if peer_index in exemplar_indexes and peer_index != group_position
-                     and source_text and peer),
-                    default=1.0,
+                peer_scores = [
+                    (
+                        1.0 if len(positions) > batch_config.fuzzy_comparison_limit
+                        else SequenceMatcher(None, normalized, group_texts[peer_index]).ratio(),
+                        SequenceMatcher(None, source_text, group_sources[peer_index]).ratio(),
+                    )
+                    for peer_index in exemplar_indexes
+                    # 完全相同的源文不是独立的体裁证据；整簇源文都相同的情形
+                    # 已由 distinct_sources 门槛作为合法重复提前退出。
+                    if (peer_index != group_position and source_text
+                        and group_sources[peer_index]
+                        and group_sources[peer_index] != source_text)
+                ]
+                if not peer_scores:
+                    continue
+                best_target_similarity = max(score[0] for score in peer_scores)
+                comparable_scores = [
+                    score for score in peer_scores
+                    if score[0] >= (
+                        best_target_similarity
+                        - batch_config.boilerplate_pair_similarity_tolerance
+                    )
+                ]
+                target_similarity, source_similarity = max(
+                    comparable_scores,
+                    key=lambda score: (score[1], score[0]),
                 )
                 if (target_similarity - source_similarity
                         < batch_config.boilerplate_source_similarity_gap):
@@ -813,7 +830,7 @@ def verify_batch(
                     heading,
                     target_similarity,
                     f'{len(candidates)} 条译文散文高度重合；译文相似度 {target_similarity:.3f}，'
-                    f'最低源文相似度 {source_similarity:.3f}',
+                    f'匹配 peer 的源文相似度 {source_similarity:.3f}',
                 ))
 
     for key, source, target in zip(item_keys, sources, translated):

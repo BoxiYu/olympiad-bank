@@ -104,20 +104,21 @@ def test_repository_fidelity_module_loads_and_runs(tmp_path, capsys):
     assert '保真校验 skipped' not in out
 
 
-def test_repository_batch_gate_rejects_real_boilerplate_fixture(tmp_path):
+def test_repository_batch_gate_rejects_human_reported_boilerplate_excerpts(tmp_path):
     corpus = os.path.join(tmp_path, 'mathnet-full')
     fixture_path = os.path.join(
-        _ROOT, 'tests', 'fixtures', 'translation_fidelity', 'degenerate-batch.json'
+        _ROOT, 'tests', 'fixtures', 'translation_fidelity',
+        'human-reported-degenerate-excerpts.json'
     )
     with open(fixture_path, encoding='utf-8') as handle:
-        fixture = json.load(handle)
+        fixture = json.load(handle)['rows']
     for row in fixture:
-        heading = f"# {row['mathnet_id']}\n\n## 题面\n\n"
+        heading = f"# {row['fixture_id']}\n\n## 题面\n\n"
         source = (heading + row['source'] + '\n').encode()
         translated = (heading + row['translated'] + '\n').encode()
         make_problem(
             corpus,
-            pid=row['mathnet_id'],
+            pid=row['fixture_id'],
             source=source,
             en=False,
             zh=translated,
