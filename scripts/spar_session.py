@@ -10,7 +10,8 @@
   meta.json、hints/hint-N.md、solution.md
 - data/plan.json：{"week","target","seed","items"}
 - data/similar/edges.jsonl：确认边台账（不存 cluster_id，关系类型由人确认；
-  evidence 为自由文本出处，--confirm 时必填非空，记录「谁在何时凭什么确认」）
+  evidence 为自由文本出处，--confirm 时必填非空——确认主体与判断方式写进文本，
+  如「AI双评审2026-08-06：…」，日期另有 date 字段记录）
 """
 import datetime
 import json
