@@ -311,6 +311,20 @@ def _validate_batch_config(config: BatchConfig) -> None:
         raise ValueError('block_score must be positive and fuzzy_comparison_limit non-negative')
 
 
+def _cluster_find(parent: list[int], index: int) -> int:
+    while parent[index] != index:
+        parent[index] = parent[parent[index]]
+        index = parent[index]
+    return index
+
+
+def _cluster_union(parent: list[int], left: int, right: int) -> None:
+    left_root = _cluster_find(parent, left)
+    right_root = _cluster_find(parent, right)
+    if left_root != right_root:
+        parent[right_root] = left_root
+
+
 def _section_matches(text: str) -> list[re.Match[str]]:
     return list(_H2_RE.finditer(text))
 
@@ -645,23 +659,12 @@ def verify_batch(
     for heading, entries in by_heading.items():
         parent = list(range(len(entries)))
 
-        def find(index: int) -> int:
-            while parent[index] != index:
-                parent[index] = parent[parent[index]]
-                index = parent[index]
-            return index
-
-        def union(left: int, right: int) -> None:
-            left_root, right_root = find(left), find(right)
-            if left_root != right_root:
-                parent[right_root] = left_root
-
         exact: dict[str, list[int]] = {}
         for position, (_index, normalized, _plain) in enumerate(entries):
             exact.setdefault(normalized, []).append(position)
         for positions in exact.values():
             for position in positions[1:]:
-                union(positions[0], position)
+                _cluster_union(parent, positions[0], position)
 
         if len(entries) <= batch_config.fuzzy_comparison_limit:
             for left in range(len(entries)):
@@ -675,11 +678,11 @@ def verify_batch(
                         continue
                     similarity = SequenceMatcher(None, left_text, right_text).ratio()
                     if similarity >= batch_config.boilerplate_similarity:
-                        union(left, right)
+                        _cluster_union(parent, left, right)
 
         groups: dict[int, list[int]] = {}
         for position in range(len(entries)):
-            groups.setdefault(find(position), []).append(position)
+            groups.setdefault(_cluster_find(parent, position), []).append(position)
         for positions in groups.values():
             if len(positions) < batch_config.boilerplate_min_group:
                 continue

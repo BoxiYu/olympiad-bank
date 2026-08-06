@@ -812,14 +812,14 @@ def test_run_retries_bad_batch_and_continues_other_batches(
     work = tmp_path / f"run-{mode}"
     monkeypatch.setenv("FAKE_MODE", mode)
     monkeypatch.setenv("FAKE_FAIL_ID", "bad1")
-    monkeypatch.setenv("FAKE_SLEEP_MS", "250")
+    monkeypatch.setenv("FAKE_SLEEP_MS", "600")
     args = run_args(
         corpus, work, companion,
         "--only", "bad1", "--only", "eng1", "--batch-size", "1",
         "--concurrency", "2", "--retries", "1",
     )
     if mode == "timeout":
-        args[args.index("--timeout") + 1] = "0.15"
+        args[args.index("--timeout") + 1] = "0.3"
 
     assert mt.main(args) == 1
     eng_dir = next(path.parent for path in corpus.rglob("index.md") if path.parent.name == "eng1")
