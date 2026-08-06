@@ -812,14 +812,50 @@ def test_run_retries_bad_batch_and_continues_other_batches(
     work = tmp_path / f"run-{mode}"
     monkeypatch.setenv("FAKE_MODE", mode)
     monkeypatch.setenv("FAKE_FAIL_ID", "bad1")
-    monkeypatch.setenv("FAKE_SLEEP_MS", "600")
     args = run_args(
         corpus, work, companion,
         "--only", "bad1", "--only", "eng1", "--batch-size", "1",
         "--concurrency", "2", "--retries", "1",
     )
     if mode == "timeout":
-        args[args.index("--timeout") + 1] = "0.3"
+        # 超时必须确定性注入：靠小 --timeout 与真实 sleep 赛跑会被机器负载翻盘
+        # （node 启动慢会误杀好批次）。这里按批次 id 精确超时坏批次的每次派单，
+        # 并等 companion 写完 attempts.txt 再抛，保证重试计数 [2, 2] 可靠；
+        # 真实 --timeout 放大到 30s，对好批次永不触发。
+        args[args.index("--timeout") + 1] = "30"
+        monkeypatch.setenv("FAKE_SLEEP_MS", "60000")  # 坏批次挂死等 terminate 杀；杀失败也 60s 自退
+        real_popen = subprocess.Popen
+
+        class TimeoutInjectingPopen(real_popen):
+            def __init__(self, cmd, *popen_args, **popen_kwargs):
+                self._attempts_path = None
+                self._attempts_before = 0
+                if "--cwd" in cmd:
+                    directory = Path(cmd[cmd.index("--cwd") + 1])
+                    batch = json.loads((directory / "batch.json").read_text(encoding="utf-8"))
+                    if batch["records"][0]["mathnet_id"] == "bad1":
+                        self._attempts_path = directory / "attempts.txt"
+                        if self._attempts_path.is_file():
+                            self._attempts_before = int(
+                                self._attempts_path.read_text(encoding="utf-8")
+                            )
+                super().__init__(cmd, *popen_args, **popen_kwargs)
+
+            def communicate(self, input=None, timeout=None):
+                if timeout is None or self._attempts_path is None:
+                    return super().communicate(input=input, timeout=timeout)
+                deadline = time.monotonic() + 10
+                while time.monotonic() < deadline:
+                    counter = (
+                        self._attempts_path.read_text(encoding="utf-8").strip()
+                        if self._attempts_path.is_file() else ""
+                    )
+                    if counter.isdigit() and int(counter) > self._attempts_before:
+                        break
+                    time.sleep(0.005)
+                raise subprocess.TimeoutExpired(self.args, timeout)
+
+        monkeypatch.setattr(mt.subprocess, "Popen", TimeoutInjectingPopen)
 
     assert mt.main(args) == 1
     eng_dir = next(path.parent for path in corpus.rglob("index.md") if path.parent.name == "eng1")
