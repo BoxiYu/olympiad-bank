@@ -1,0 +1,159 @@
+[
+ {
+  "mathnet_id": "0hig",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "数列与递推",
+   "极端原理"
+  ],
+  "contest": "62nd Ukrainian National Mathematical Olympiad",
+  "problem": "$n \\ge 4$ real numbers are placed on the circle. It is known that for any four consecutive numbers $a, b, c, d$ that go around the circle in this specified order, the condition $a + d = b + c$ holds. For which $n$ can we conclude that all the numbers are equal?",
+  "solution_head": "We denote the numbers in the circle by $a_1, a_2, \\ldots, a_n$. Choose the largest among them (or any of them, if there are several such numbers). Without loss of generality, let this number be $a_1$. From the condition of the problem we have that\n$$\na_1 + a_2 = a_n + a_3, \\quad a_1 + a_n = a_2 + a_{n-1} \\Rightarrow 2a_1 = a_3 + a_{n-1}.\n$$\nSince $a_1$ is the largest number, the last equality implies that $a_1 = a_3 = a_{n-1}$: that is, every second number is the largest, if we continue with the same reasoning. If $n$ is odd, then all the numbers will be equal.\n\nFor even numbers $n$ it is enough to consider the following example with not all equal numbers: $1, 0, 1, 0, \\ldots, 1, 0$."
+ },
+ {
+  "mathnet_id": "0emy",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "函数方程",
+   "极端原理"
+  ],
+  "contest": "South-Afrika 2011-2013",
+  "problem": "Each positive integer is coloured red or blue. A function $f$ from the set of positive integers to itself has the following two properties:\n(a) if $x \\le y$, then $f(x) \\le f(y)$; and\n(b) if $x, y$ and $z$ are (not necessarily distinct) positive integers of the same colour and $x + y = z$, then $f(x) + f(y) = f(z)$.\nProve that there exists a positive number $a$ such that $f(x) \\le a x$ for all positive integers $x$.",
+  "solution_head": "For integers $x$ and $y$, by a segment $[x, y]$ we mean the set of all integers $t$ such that $x \\le t \\le y$; the length of this segment is $y - x$.\nIf, for every two positive integers $x$ and $y$ of the same colour we have $\\frac{f(x)}{x} = \\frac{f(y)}{y}$, then one can choose $a = \\max\\left\\{\\frac{f(r)}{r}, \\frac{f(b)}{b}\\right\\}$, where $r$ and $b$ are arbitrary red and blue numbers, respectively. So we can assume that there are two red numbers $x$ and $y$ such that $\\frac{f(x)}{x} \\ne \\frac{f(y)}{y}$.\nSet $m = x y$. Then each segment of length $m$ contains a blue number. Indeed, assume that all the numbers on the segment $[k, k+m]$ are red. Then\n$$\nf(k + m) = f(k + x y) = f(k + x(y - 1)) + f(x) = \\dots = f(k) + y f(x), \\\\\nf(k + m) = f(k + x y) = f(k + (x - 1)y) + f(y) = \\dots = f(k) + x f(y),\n$$\nso $y f(x) = x f(y)$, a contradiction. Now we consider two cases.\n\n**Case 1.** Assume that there exists a segment $[k, k+m]$ of length $m$ consisting of blue numbers. Define $D = \\max\\{f(k), \\dots, f(k+m)\\}$. We claim that $f(z) - f(z-1) \\le D$, whenever $z > k$, and the conclusion follo"
+ },
+ {
+  "mathnet_id": "03dh",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "抽屉原理",
+   "极端原理"
+  ],
+  "contest": "Bulgaria 2022",
+  "problem": "Let $n \\ge 2$ be a natural number. The sets $A_1, \\dots, A_n$ and $B_1, \\dots, B_n$ of natural numbers satisfy the properties:\n\n* $A_i \\cap B_j \\neq \\emptyset$ for all $i, j \\in \\{1, 2, \\dots, n\\}$;\n* $A_i \\cap A_j = \\emptyset$ and $B_i \\cap B_j = \\emptyset$ for all $i \\neq j \\in \\{1, 2, \\dots, n\\}$.\n\nFor each of the sets we arrange its elements in descending order and compute the largest difference between two adjacent elements in the result ordering. Find the smallest possible value of the largest among these differences.",
+  "solution_head": "We will prove that the required smallest possible value is $n$. Let $A_i$-s are the rows and $B_j$-s are the columns of a square table $n \\times n$ in which the value in row $i$ and column $j$ is $(n-1)i + j$. So all differences for the $A_i$-s are equal to $1$ and all differences for the $B_j$-s are equal to $n$.\n\nLet $a$ be the smallest natural number such that the set $\\{1, 2, \\dots, a\\}$ contains some of the considered $2n$ sets, $A_1$ for example. Without loss of generality, we can assume that $a \\in B_1$ or $a \\notin B_j$ for all $j$. Consider the numbers $a+1, a+2, \\dots, a+n-2$ (which are at most $n-2$) and the sets $B_2, B_3, \\dots, B_n$ (which are $n-1$). It follows from Dirichlet's principle that at least one of them, for example $B_2$, does not contain any of these numbers. Since $a \\notin B_2$ (because either $a \\in B_1$ and $B_1 \\cap B_2 = \\emptyset$, or $a \\notin B_j$ for all $j$) $B_2$ contains at least one number $x \\ge a+n-1$ (otherwise the set $\\{1, 2, \\dots, a-1\\}$ contains $B_2$, which is contradiction with the minimality of $a$).\nLet $b_1 > b_2 > \\dots > b_m$ ar"
+ },
+ {
+  "mathnet_id": "0dol",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "数列与递推",
+   "极端原理"
+  ],
+  "contest": "Silk Road Mathematics Competition",
+  "problem": "Let $a_1, a_2, \\dots, a_{2003}$ be a sequence of real numbers. A term $a_k$, $1 \\le k \\le 2003$, is said to be a *leading term*, if at least one of the expressions $a_k, a_k+a_{k+1}, \\dots, a_k+a_{k+1}+\\dots+a_{2003}$ is positive. Prove that the sum of all leading terms is positive provided that the sequence has at least one leading term.",
+  "solution_head": "We solve this problem for any sequence having $n$ terms applying induction with respect to $n$.\n\nThe case $n = 1$ is clear.\n\nSuppose that the statement is true for all sequences of length less than $n$.\n\nNow consider a sequence $a_1, a_2, \\dots, a_n$.\n\n*Case 1. $a_1$ is not a leading term.*\n\nThen the set of all leading terms of the sequence $a_1, a_2, \\dots, a_n$ coincides with the set of all leading terms of the sequence $a_2, a_3, \\dots, a_n$. And by inductive hypothesis we are done.\n\n*Case 2. $a_1$ is a leading term.*\n\nConsider the smallest nonnegative integer $m$, with positive $a_1 + a_2 + \\dots + a_m$. Then the terms $a_2, a_3, \\dots, a_m$ are also leading terms and their sum is positive. The sum of all remaining leading terms also is nonnegative by induction hypothesis."
+ },
+ {
+  "mathnet_id": "0jml",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "染色与不变量",
+   "极端原理"
+  ],
+  "contest": "HMMT 2014",
+  "problem": "Problem:\n\nThe numbers $2^{0}, 2^{1}, \\cdots, 2^{15}, 2^{16}=65536$ are written on a blackboard. You repeatedly take two numbers on the blackboard, subtract one from the other, erase them both, and write the result of the subtraction on the blackboard. What is the largest possible number that can remain on the blackboard when there is only one number left?",
+  "solution_head": "Solution:\n\nAnswer: $131069$\n\nIf we reverse the order of the numbers in the final subtraction we perform, then the final number will be negated. Thus, the possible final numbers come in pairs with opposite signs. Therefore, the largest possible number is the negative of the smallest possible number.\n\nTo get the smallest possible number, clearly we can take the smallest number originally on the board and subtract all of the other numbers from it (you can make this rigorous pretty easily if needed), so the smallest possible number is\n$$\n1 - \\sum_{k=1}^{16} 2^{k} = 1 - 131070 = -131069,\n$$\nand thus the largest possible number is $131069$."
+ },
+ {
+  "mathnet_id": "0ku9",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "图论",
+   "极端原理"
+  ],
+  "contest": "HMMT February",
+  "problem": "Problem:\n\nOne thousand people are in a tennis tournament where each person plays against each other person exactly once, and there are no ties. Prove that it is possible to put all the competitors in a line so that each of the 998 people who are not at an end of the line either defeated both their neighbors or lost to both their neighbors.",
+  "solution_head": "Solution:\n\nTake the natural graph theoretic interpretation, where an edge points towards the loser of each pair, and call such a line an alternating path. Consider the longest alternating path, and suppose it doesn't contain everyone. We will show we can make the path longer, which would be a contradiction.\n\nFirst, assume the path has an odd number of vertices, labeled $v_{1}, \\ldots, v_{n}$. WLOG $v_{1}$ points towards $v_{2}$, $v_{3}$ points towards $v_{2}$, all the way up to $v_{n}$ which points towards $v_{n-1}$ (otherwise, reverse all the edges). Also WLOG $v_{1}$ points towards $v_{n}$ (if not, label the vertices backwards). Let $w$ be a vertex not in the path. Note that if $v_{n}$ points towards $w$, we can make the path longer by adding $w$ to the end. Thus, $w$ must point towards $v_{n}$. But now we can take the path $w, v_{n}, v_{1}, \\ldots, v_{n-1}$, which is longer than before, and so a contradiction.\n\nNow assume the path has an even number of vertices, labeled $v_{1}, \\ldots, v_{n}$, and WLOG $v_{1}$ points towards $v_{2}$ again. Then $v_{n-1}$ will point towards $v_{n}$"
+ },
+ {
+  "mathnet_id": "047x",
+  "est": 3,
+  "conf": "mid",
+  "category": "combinatorics",
+  "topics": [
+   "整除与同余",
+   "染色与不变量",
+   "极端原理"
+  ],
+  "contest": "China-TST-2025A",
+  "problem": "Let $k$, $l$, $n$ be positive integers, and let $a_1, a_2, \\dots, a_k \\in \\{1, 2, \\dots, n\\}$ satisfy the following three conditions:\n(1) $n \\ge 3$, $l \\le n-2$, and $l-k \\le \\frac{n-3}{2}$;\n(2) For each $t \\in \\{1, 2, \\dots, l\\}$, there exists a non-empty subset $I \\subseteq \\{1, 2, \\dots, k\\}$ such that\n$$\n\\sum_{i \\in I} a_i \\equiv t \\pmod{n};\n$$\n(3) For each $t \\in \\{l+1, l+2, \\dots, n\\}$, there does not exist a non-empty subset $I \\subseteq \\{1, 2, \\dots, k\\}$ such that\n$$\n\\sum_{i \\in I} a_i \\equiv t \\pmod{n}.\n$$\nProve that $a_1 + a_2 + \\dots + a_k = l$.",
+  "solution_head": "**Proof:** For a finite multiset $S$ of integers, let $\\sigma(S)$ denote the sum of all elements in $S$ (counting multiplicities), and let $\\Sigma(S) = \\{\\sigma(T) \\mid \\sigma(T) \\neq T \\subseteq S\\}$, where $\\Sigma(S)$ is treated as a set (ignoring multiplicities). Let $\\Sigma_n(S)$ denote the set of congruence classes modulo $n$ of the elements in $\\Sigma(S)$. For $x \\in \\mathbb{Z}$, let $\\bar{x}$ denote the congruence class of $x$ modulo $n$. Under this notation, conditions (2) and (3) can be written as\n$$\n\\Sigma_n(\\{a_1, a_2, \\dots, a_k\\}) = \\{\\bar{1}, \\bar{2}, \\dots, \\bar{\\ell}\\}.\n$$\n**Step 1:** The main idea is to add an element $x$ to a nonempty multiset $S$, obtaining $T = S \\cup \\{x\\}$. Assuming that neither $\\Sigma_n(S)$ nor $\\Sigma_n(T)$ contains $\\bar{0}$, we compare $\\Sigma_n(S)$ and $\\Sigma_n(T)$. In particular, if $\\Sigma_n(T)$ contains exactly one more element than $\\Sigma_n(S)$, we can deduce a very refined structure for $\\Sigma_n(S)$.\nObserve that\n$$\n\\Sigma(T) = \\Sigma(S) \\cup (\\Sigma(S) + x) \\cup \\{x\\},\n$$\nso $\\Sigma_n(S) \\subset \\Sigma_n(T)$. Moreover, $\\overline{"
+ },
+ {
+  "mathnet_id": "0i7q",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "染色与不变量",
+   "极端原理"
+  ],
+  "contest": "Harvard-MIT Mathematics Tournament",
+  "problem": "Problem:\nShow that every consistent 2-configuration of order 4 on a finite set $A$ has a subset that is a consistent 2-configuration of order 2.",
+  "solution_head": "Solution:\nFirst, assume the 2-configuration has just one cell. We claim there exists a sequence $a_{0}, a_{1}, \\ldots, a_{n}$ of elements of $A$ (not necessarily all distinct) such that the list\n$$\n\\{a_{0}, a_{1}\\}, \\{a_{1}, a_{2}\\}, \\ldots, \\{a_{n-1}, a_{n}\\}, \\{a_{n}, a_{0}\\}\n$$\ncontains each element of the 2-configuration exactly once. To see this, consider the longest sequence such that $\\{a_{0}, a_{1}\\}, \\ldots, \\{a_{n-1}, a_{n}\\}, \\{a_{n}, a_{0}\\}$ are all distinct elements of the 2-configuration. (We may take $n=0$ if necessary. Note that the finiteness condition ensures such a maximal sequence exists.) Each element of $A$ occurs an even number of times among these pairs (since each occurrence in the sequence contributes to two pairs). If every element occurs 4 times or 0 times, then the elements occurring in the sequence form a cell, since they cannot occur in any other pairs in the 2-configuration. Hence, they are all of $A$, and our sequence uses all the pairs in the 2-configuration, so the claim follows. Otherwise, there is some element $a_{i}$ occurring exactly twice. Cho"
+ },
+ {
+  "mathnet_id": "01bj",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "组合几何",
+   "极端原理"
+  ],
+  "contest": "Baltic Way",
+  "problem": "Is it possible to subdivide a convex $2014$-gon, by means of diagonals that do not intersect, into triangles, in such a way that each vertex be incident to an odd number of triangles?",
+  "solution_head": "No, it is not possible. First, note that each triangulated polygon can be bicoloured: The triangles may each be assigned either of two colours, black and white, in such a way that the colours alternate (i.e. adjacent triangles have opposite colours). This is easily shown inductively, since a triangulated polygon can be cut into two smaller ones across a diagonal.\n\nIt is clear that a triangulated polygon has an odd number of triangles incident at each vertex if and only if its edges are uniformly coloured in a single colour.\n\nWe now prove that, if $n$ is not divisible by $3$ (which $2014$ clearly isn't), there exists no triangulated $n$-gon having an odd number of triangles incident at each vertex. For, towards a contradiction, consider the smallest such $n$-gon, and, without loss of generality, suppose its edges to be black.\n\nWe first assume there exists a diagonal cutting the $n$-gon into two smaller polygons $P$ and $Q$, neither of which is a triangle. Say the two pieces have $p$ and $q$ vertices, respectively, where $p, q \\ge 4$ and $p+q-2=n$.\n\nSince the two triangles adjacent at "
+ },
+ {
+  "mathnet_id": "0dta",
+  "est": 2,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "抽屉原理",
+   "极端原理"
+  ],
+  "contest": "Singapore Mathematical Olympiad (SMO)",
+  "problem": "Colour a $20000 \\times 20000$ square grid using $2000$ different colours with $1$ colour in each square. Two squares are neighbours if they share a vertex. A path is a sequence of squares so that $2$ successive squares are neighbours. Mark $k$ of the squares. For each unmarked square $x$, there is exactly $1$ marked square $y$ of the same colour so that $x$ and $y$ are connected by a path of squares of the same colour. For any $2$ marked squares of the same colour, any path connecting them must pass through squares of all the colours. Find the maximum value of $k$.",
+  "solution_head": "The maximum value is $k = 20000$. Define a region as a maximal set of same-colour squares such that there is a path of the same colour between any $2$ squares in the region. From the first condition, there is exactly one marked square in a region and so there are $k$ regions. Two regions are neighbours if they have a vertex in common.\n\nNow suppose that $k > 20000$. Form a graph whose vertices are the regions and whose edges join neighbouring regions. Since there are only $2000$ colours, there are $2$ regions $P, Q$ with the same colour. Thus there is a path $P = A_0, A_1, \\dots, A_i = Q$, with $i \\ge 2000$ by the second condition. Consider the longest path in the graph: $B_0, B_1, \\dots, B_j$. Then $j \\ge i \\ge 2000$. Suppose there is a vertex $C$ not in the path but is adjacent to a vertex $B_k$ in the path. Then $k \\ne 0, j$, else there is a longer path. Consider the $2001$ vertices $C, B_p, B_{p+1}, \\dots, B_{p+1999}$ where $p < k < p+1999 \\le j$. Two of them have the same colour but their distance apart is $< 2000$, contradicting the second condition. So $B_0, B_1, \\dots, B_j$ ar"
+ },
+ {
+  "mathnet_id": "0hct",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "图论",
+   "极端原理"
+  ],
+  "contest": "59th Ukrainian National Mathematical Olympiad",
+  "problem": "In the company there are no three people who know each other, but for any group of five there are three who have the common acquaintance (not necessarily from that group). Prove that this company can be split into two groups of pairwise unfamiliar people.\n(ViktorBogdanskyi)",
+  "solution_head": "We are going to show that the acquaintances graph has no odd cycles. For the sake of contradiction, let us take the smallest odd cycle. Clearly, there are no edges connecting vertices of this cycle (as it would divide the cycle into two smaller cycles, at least one of which would be odd). Next, let us enumerate people from $1$ to $2k+1$ along the cycle and use the statement for people with numbers $1$, $2$, $3$, $k+2$, $k+3$ (one can easily check that they are pairwise distinct). Note that\nthere cannot be edges between any three people having the common acquaintance, because it would lead to the existence of a triangle. Hence, if $2k+1=5$, there would be such edges between people $1$, $2$, $3$, $k+2$, $k+3$, so $k>2$.\nThen there must be a common acquaintance for $1$, $3$, and one of $k+2$, $k+3$, w.l.o.g. let $1$, $3$, $k+2$ have the common acquaintance.\nFrom here one can easily construct a smaller odd cycle by using the common acquaintance $X$ of $1$ and $k+2$ ($X$ doesn't belong to the original cycle), namely $1$, $2$, $3$, $\\ldots$, $k+2$, $X$ and $k+2$, $k+3$, $\\ldots$, $2k+1$, $"
+ },
+ {
+  "mathnet_id": "0f4n",
+  "est": 3,
+  "conf": "high",
+  "category": "combinatorics",
+  "topics": [
+   "抽屉原理",
+   "极端原理"
+  ],
+  "contest": "16th ASU",
+  "problem": "Problem:\n\nAn integer is put in each cell of an $n \\times n$ array. The difference between the integers in cells which share a side is $0$ or $1$. Show that some integer occurs at least $n$ times.",
+  "solution_head": "Solution:\n\nLet the integers in the array be $a_{i,j}$ for $1 \\leq i, j \\leq n$. For any two adjacent cells (sharing a side), $|a_{i,j} - a_{k,l}| = 0$ or $1$.\n\nLet $m$ be the minimum integer in the array. Consider the set of cells where the value is $m$. Any cell adjacent to such a cell can have value $m$ or $m+1$.\n\nLet us color the array as follows: color cell $(i,j)$ black if $i + j$ is even, white if $i + j$ is odd. Consider the minimal value $m$ and the set $S$ of all cells with value $m$.\n\nSuppose $|S| < n$. Then, in each row and each column, there is at most one cell with value $m$ (otherwise, two cells with value $m$ in the same row or column would force all cells between them to also have value $m$, by the adjacency condition, contradicting minimality unless the whole row or column is $m$). Thus, $|S| \\leq n$.\n\nSuppose $|S| < n$. Then, there is a row and a column with no cell of value $m$. Consider the path from a cell with value $m$ to a cell in this row or column. Along the path, the value can increase by at most $1$ at each step, so the maximum value in the array is at mos"
+ }
+]
