@@ -5,10 +5,9 @@
 ``translation.json``，并显式报告抽样覆盖与耗时。文件布局与字段语义正本由
 ``docs/译文契约-mathnet-full.md`` 提供（CXB-495）；本模块只执行该契约。
 
-本模块从约定候选模块中寻找
-``verify_translation(source, translated, target_lang=lang, source_lang=source_lang)`` 并调用，
-不在这里复制数学环境/图片引用的实现。只有候选文件确实不存在时才允许 skipped；
-文件存在却无法加载或缺少入口时必须让检查失败。
+本模块从约定候选模块中寻找逐题 ``verify_translation`` 与批级 ``verify_batch`` 并调用，
+不在这里复制数学环境、图片引用或退化检测的实现。只有候选文件确实不存在时才允许
+skipped；文件存在却无法加载或缺少任一入口时必须让检查失败。
 """
 import argparse
 import hashlib
@@ -167,8 +166,15 @@ def _load_fidelity_verifier(root):
             else:
                 sys.modules[spec.name] = previous
             raise FidelityVerifierError(f'{rel} 缺少可调用的 verify_translation')
-        return verifier, rel
-    return None, '未发现保真校验器候选文件'
+        batch_verifier = getattr(module, 'verify_batch', None)
+        if not callable(batch_verifier):
+            if previous is _MISSING_MODULE:
+                sys.modules.pop(spec.name, None)
+            else:
+                sys.modules[spec.name] = previous
+            raise FidelityVerifierError(f'{rel} 缺少可调用的 verify_batch')
+        return verifier, batch_verifier, rel
+    return None, None, '未发现保真校验器候选文件'
 
 
 def _format_finding(finding):
@@ -255,8 +261,65 @@ def _check_one(contract_path, corpus, verifier):
     return errors
 
 
-def check_corpus(root=ROOT, corpus=None, sample=DEFAULT_SAMPLE, fidelity_verifier=None):
-    """返回结构化检查结果；``fidelity_verifier`` 仅供 CXB-497 接口测试/显式注入。"""
+def _batch_inputs(contract_path, corpus):
+    """读取可参与批级检查的 translated variants；逐题错误仍由 ``_check_one`` 汇报。"""
+    try:
+        with open(contract_path, encoding='utf-8') as handle:
+            payload = json.load(handle)
+        if not isinstance(payload, dict) or not isinstance(payload.get('variants'), dict):
+            return []
+        problem_dir = os.path.dirname(contract_path)
+        with open(os.path.join(problem_dir, 'index.md'), encoding='utf-8') as handle:
+            source = handle.read()
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return []
+    rel = _relative(contract_path, corpus)
+    rows = []
+    for lang, variant in payload['variants'].items():
+        if lang not in VALID_LANGUAGES or not isinstance(variant, dict):
+            continue
+        if variant.get('mode') != 'translated':
+            continue
+        try:
+            with open(os.path.join(problem_dir, f'index.{lang}.md'), encoding='utf-8') as handle:
+                translated = handle.read()
+        except (OSError, UnicodeError):
+            continue
+        rows.append((lang, f'{rel}:index.{lang}.md', source, translated))
+    return rows
+
+
+def _check_batch(rows, batch_verifier):
+    errors = []
+    by_lang = {lang: [] for lang in VALID_LANGUAGES}
+    for lang, key, source, translated in rows:
+        by_lang[lang].append((key, source, translated))
+    for lang, items in by_lang.items():
+        if not items:
+            continue
+        keys, sources, translated = zip(*items)
+        try:
+            report = batch_verifier(
+                list(sources), list(translated), keys=list(keys), target_lang=lang
+            )
+            findings_by_key = report.findings
+        except Exception as exc:
+            errors.append(f'批级保真校验器异常：{lang}（{exc!r}）')
+            continue
+        for key, findings in findings_by_key.items():
+            detail = '、'.join(_format_finding(finding) for finding in findings)
+            errors.append(f'{key}: 批级保真校验失败：{detail}')
+    return errors
+
+
+def check_corpus(
+    root=ROOT,
+    corpus=None,
+    sample=DEFAULT_SAMPLE,
+    fidelity_verifier=None,
+    batch_verifier=None,
+):
+    """返回结构化检查结果；verifier 参数仅供接口测试/显式注入。"""
     started = time.perf_counter()
     corpus = corpus or os.path.join(root, 'mathnet-full')
     if not os.path.isdir(corpus):
@@ -269,9 +332,9 @@ def check_corpus(root=ROOT, corpus=None, sample=DEFAULT_SAMPLE, fidelity_verifie
     errors = []
     if fidelity_verifier is None:
         try:
-            fidelity_verifier, fidelity_note = _load_fidelity_verifier(root)
+            fidelity_verifier, batch_verifier, fidelity_note = _load_fidelity_verifier(root)
         except FidelityVerifierError as exc:
-            fidelity_verifier = None
+            fidelity_verifier = batch_verifier = None
             fidelity, fidelity_note = 'failed', str(exc)
             errors.append(f'保真校验器不可用：{exc}')
         else:
@@ -280,6 +343,13 @@ def check_corpus(root=ROOT, corpus=None, sample=DEFAULT_SAMPLE, fidelity_verifie
         fidelity, fidelity_note = 'enabled', '显式注入 verify_translation'
     for path in selected:
         errors.extend(_check_one(path, corpus, fidelity_verifier))
+    if batch_verifier is not None:
+        batch_rows = [
+            row
+            for path in selected
+            for row in _batch_inputs(path, corpus)
+        ]
+        errors.extend(_check_batch(batch_rows, batch_verifier))
     return CheckResult(
         status='failed' if errors else 'ok',
         discovered=len(contracts),
