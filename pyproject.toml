@@ -19,7 +19,7 @@ dependencies = [
 [dependency-groups]
 # 测试与代码检查：uv run --group dev pytest -q ／ uv run --group dev ruff check scripts tests
 # （httpx2 供 web 训练台测试的 TestClient 用）
-dev = ["pytest>=8", "ruff>=0.9", "httpx2>=2.9.1"]
+dev = ["pytest>=8", "ruff>=0.9", "httpx2>=2.9.1", "numpy>=2"]
 # MathNet 候选池构建（scripts/mathnet_ingest.py）：uv run --group mathnet python ...
 mathnet = ["datasets>=3.0", "pillow>=10"]
 # 相似度设施（scripts/similar_index.py）：uv run --group similar python ...
