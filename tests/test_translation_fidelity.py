@@ -163,6 +163,47 @@ def test_length_and_missing_anchor_block_as_separate_findings():
     }
 
 
+def test_chinese_source_hollow_english_translation_is_blocked():
+    source = '证明对于所有满足下列整除条件的正整数，欧拉方法给出的结论在 2024 年情形下成立。'
+    report = verify_batch([source], ['Answer.'], keys=['hollow-en'], target_lang='en')
+
+    assert {finding.type for finding in report.findings['hollow-en']} == {
+        FindingType.LENGTH_RATIO,
+        FindingType.CONTENT_ANCHOR_MISSING,
+    }
+    assert '证明' in report.signals['hollow-en'][1].detail
+
+
+def test_non_english_source_hollow_chinese_translation_is_blocked():
+    source = ('Démontrer que pour tous les entiers positifs satisfaisant les conditions données, '
+              "l'identité d'Euler reste valable en 2024.")
+    report = verify_batch([source], ['答案。'], keys=['hollow-zh'], target_lang='zh')
+
+    assert {finding.type for finding in report.findings['hollow-zh']} == {
+        FindingType.LENGTH_RATIO,
+        FindingType.CONTENT_ANCHOR_MISSING,
+    }
+    assert 'demontrer' in report.signals['hollow-zh'][1].detail
+
+
+@pytest.mark.parametrize(('source', 'translated', 'target_lang'), [
+    (
+        '证明欧拉方法给出的结论在 2024 年情形下成立。',
+        "Prove that Euler's method gives the claimed result in the 2024 case.",
+        'en',
+    ),
+    (
+        "Démontrer que l'identité d'Euler reste valable en 2024.",
+        '证明欧拉恒等式在 2024 年仍然成立。',
+        'zh',
+    ),
+])
+def test_cross_language_content_anchors_accept_normal_translations(
+    source, translated, target_lang
+):
+    assert verify_batch([source], [translated], target_lang=target_lang).findings == {}
+
+
 def test_batch_thresholds_are_configurable():
     report = batch_report(degenerate_fixture(), config=BatchConfig(boilerplate_min_group=4))
     assert report.findings == {}

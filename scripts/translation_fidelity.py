@@ -206,17 +206,79 @@ _MODEL_META_PATTERNS = (
     re.compile(r'\bas an AI\b', re.IGNORECASE),
     re.compile(r'\bI (?:have )?translated\b', re.IGNORECASE),
 )
-_ZH_TASK_ANCHORS = (
-    (re.compile(r'\b(?:prove|show|demonstrate)\b', re.IGNORECASE),
-     re.compile(r'证明|证实|说明|表明')),
-    (re.compile(r'\b(?:find|determine)\b', re.IGNORECASE),
-     re.compile(r'求(?:出|得)?|找出|确定')),
-    (re.compile(r'\b(?:calculate|compute|evaluate)\b', re.IGNORECASE),
-     re.compile(r'计算|求(?:出|得)?')),
-    (re.compile(r'\bsolve\b', re.IGNORECASE), re.compile(r'求解|解(?:出|方程|不等式)')),
-    (re.compile(r'\bconstruct\b', re.IGNORECASE), re.compile(r'构造|作出')),
-    (re.compile(r'\bclassif(?:y|ies)\b', re.IGNORECASE), re.compile(r'分类|归类')),
-    (re.compile(r'\bcount\b', re.IGNORECASE), re.compile(r'计数|数出|多少')),
+_TASK_ANCHORS = (
+    (
+        re.compile(
+            r'\b(?:prove|show|demonstrate|demostrar|demonstrar|demontrer|montrer|prouver|'
+            r'beweisen|zeig(?:e|en)|dimostrare|dokazi)\b|证明|证实|表明|докажите|доказать',
+            re.IGNORECASE,
+        ),
+        {
+            'en': re.compile(r'\b(?:prove|show|demonstrate|establish|verify)\b', re.IGNORECASE),
+            'zh': re.compile(r'证明|证实|说明|表明'),
+        },
+    ),
+    (
+        re.compile(
+            r'\b(?:find|determine|hallar|encontrar|determinar|trouver|determiner|finden|'
+            r'bestimmen|trovare|determinare|poisci|doloci)\b|求出|求得|找出|确定|'
+            r'найдите|определите',
+            re.IGNORECASE,
+        ),
+        {
+            'en': re.compile(r'\b(?:find|determine|identify|obtain)\b', re.IGNORECASE),
+            'zh': re.compile(r'求(?:出|得)?|找出|确定'),
+        },
+    ),
+    (
+        re.compile(
+            r'\b(?:calculate|compute|evaluate|calcular|calculer|berechnen|calcolare|'
+            r'izracunaj)\b|计算|вычислите',
+            re.IGNORECASE,
+        ),
+        {
+            'en': re.compile(r'\b(?:calculate|compute|evaluate)\b', re.IGNORECASE),
+            'zh': re.compile(r'计算|求(?:出|得)?'),
+        },
+    ),
+    (
+        re.compile(
+            r'\b(?:solve|resolver|resoudre|losen|risolvere|resi)\b|求解|解方程|解不等式|'
+            r'решите',
+            re.IGNORECASE,
+        ),
+        {
+            'en': re.compile(r'\bsolve\b', re.IGNORECASE),
+            'zh': re.compile(r'求解|解(?:出|方程|不等式)'),
+        },
+    ),
+    (
+        re.compile(
+            r'\b(?:construct|construir|construire|konstruieren|costruire|konstruiraj)\b|'
+            r'构造|作出|постройте',
+            re.IGNORECASE,
+        ),
+        {
+            'en': re.compile(r'\b(?:construct|draw)\b', re.IGNORECASE),
+            'zh': re.compile(r'构造|作出'),
+        },
+    ),
+    (
+        re.compile(r'\b(?:classif(?:y|ies)|clasificar|classer|klassifizieren)\b|分类|归类',
+                   re.IGNORECASE),
+        {
+            'en': re.compile(r'\b(?:classif(?:y|ies)|categorize)\b', re.IGNORECASE),
+            'zh': re.compile(r'分类|归类'),
+        },
+    ),
+    (
+        re.compile(r'\b(?:count|contar|compter|zahlen|contare|prestej)\b|计数|数出|сколько',
+                   re.IGNORECASE),
+        {
+            'en': re.compile(r'\b(?:count|how many|number of)\b', re.IGNORECASE),
+            'zh': re.compile(r'计数|数出|多少'),
+        },
+    ),
 )
 _ZH_NAME_ANCHORS = {
     'cauchy': re.compile(r'Cauchy|柯西', re.IGNORECASE),
@@ -231,6 +293,20 @@ _ZH_NAME_ANCHORS = {
     'schwarz': re.compile(r'Schwarz|施瓦茨', re.IGNORECASE),
     'vieta': re.compile(r'Vieta|韦达', re.IGNORECASE),
     'wilson': re.compile(r'Wilson|威尔逊', re.IGNORECASE),
+}
+_EN_NAME_ANCHORS = {
+    'cauchy': re.compile(r'\bCauchy\b', re.IGNORECASE),
+    'ceva': re.compile(r'\bCeva\b', re.IGNORECASE),
+    'euler': re.compile(r'\bEuler\b', re.IGNORECASE),
+    'fermat': re.compile(r'\bFermat\b', re.IGNORECASE),
+    'fibonacci': re.compile(r'\bFibonacci\b', re.IGNORECASE),
+    'jensen': re.compile(r'\bJensen\b', re.IGNORECASE),
+    'menelaus': re.compile(r'\bMenelaus\b', re.IGNORECASE),
+    'pascal': re.compile(r'\bPascal\b', re.IGNORECASE),
+    'pythagoras': re.compile(r'\bPythagoras|Pythagorean\b', re.IGNORECASE),
+    'schwarz': re.compile(r'\bSchwarz\b', re.IGNORECASE),
+    'vieta': re.compile(r'\bVieta\b', re.IGNORECASE),
+    'wilson': re.compile(r'\bWilson\b', re.IGNORECASE),
 }
 
 
@@ -270,21 +346,23 @@ def _semantic_sections(value: str) -> list[tuple[str, str, str]]:
 
 def _missing_content_anchors(source: str, translated: str, target_lang: str) -> list[str]:
     """返回保守的缺失内容锚点；没有可靠跨语言映射时不猜。"""
-    if target_lang != 'zh':
-        return []
     missing = []
     source_plain = _plain_prose(source)
     translated_plain = _plain_prose(translated)
-    for source_pattern, target_pattern in _ZH_TASK_ANCHORS:
-        match = source_pattern.search(source_plain)
-        if match and not target_pattern.search(translated_plain):
+    source_folded = _ascii_fold(source_plain)
+    translated_folded = _ascii_fold(translated_plain)
+    for source_pattern, target_patterns in _TASK_ANCHORS:
+        match = source_pattern.search(source_folded)
+        if match and not target_patterns[target_lang].search(translated_folded):
             missing.append(match.group(0).casefold())
     # 只锚定至少两位的十进制数；个位数常是列表编号或被自然改写，误报风险更高。
     for number in sorted(set(re.findall(r'(?<!\w)\d{2,}(?!\w)', source_plain))):
         if number not in translated_plain:
             missing.append(number)
-    for name, target_pattern in _ZH_NAME_ANCHORS.items():
-        if target_pattern.search(source_plain) and not target_pattern.search(translated_plain):
+    target_name_patterns = _ZH_NAME_ANCHORS if target_lang == 'zh' else _EN_NAME_ANCHORS
+    for name, source_pattern in _ZH_NAME_ANCHORS.items():
+        if (source_pattern.search(source_plain)
+                and not target_name_patterns[name].search(translated_plain)):
             missing.append(name)
     # 仅检查明确独立出现的单字母变量，排除英文冠词 a 与代词 I；数学环境中的变量已被剥离。
     variables = set(re.findall(r'(?<![A-Za-z])[b-hj-zB-HJ-Z](?![A-Za-z])', source_plain))
