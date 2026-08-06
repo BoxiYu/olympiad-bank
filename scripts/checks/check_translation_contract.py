@@ -5,7 +5,8 @@
 ``translation.json``，并显式报告抽样覆盖与耗时。文件布局与字段语义正本由
 ``docs/译文契约-mathnet-full.md`` 提供（CXB-495）；本模块只执行该契约。
 
-本模块从约定候选模块中寻找 ``verify_translation(source, translated)`` 并调用，
+本模块从约定候选模块中寻找
+``verify_translation(source, translated, target_lang=lang)`` 并调用，
 不在这里复制数学环境/图片引用的实现。只有候选文件确实不存在时才允许 skipped；
 文件存在却无法加载或缺少入口时必须让检查失败。
 """
@@ -20,6 +21,11 @@ import time
 from dataclasses import dataclass, field
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SCRIPTS_DIR = os.path.join(ROOT, 'scripts')
+if SCRIPTS_DIR not in sys.path:
+    sys.path.insert(0, SCRIPTS_DIR)
+from source_lang import should_passthrough
+
 DEFAULT_SAMPLE = 100
 VALID_MODES = {'passthrough', 'translated', 'failed'}
 VALID_LANGUAGES = {'en', 'zh'}
@@ -204,12 +210,19 @@ def _check_one(contract_path, corpus, verifier):
     variants = payload.get('variants')
     if not isinstance(variants, dict):
         return errors
+    source_lang = payload.get('source_lang')
+    confidence = payload.get('source_lang_confidence')
     for lang, variant in variants.items():
         if lang not in VALID_LANGUAGES or not isinstance(variant, dict):
             continue
         mode = variant.get('mode')
         if mode not in VALID_MODES or mode == 'failed':
             continue
+        if mode == 'passthrough' and not should_passthrough(source_lang, confidence, lang):
+            errors.append(
+                f'{rel}: passthrough 阈值非法：仅 source_lang=en 且 '
+                'source_lang_confidence=high 可 passthrough 为 en'
+            )
         variant_path = os.path.join(problem_dir, f'index.{lang}.md')
         try:
             body = open(variant_path, 'rb').read()
@@ -227,7 +240,11 @@ def _check_one(contract_path, corpus, verifier):
         # 避免 CXB-497 将「译文等于原文」的漏译规则误套到合法 passthrough。
         if verifier is not None and mode == 'translated':
             try:
-                findings = verifier(source.decode('utf-8'), body.decode('utf-8'))
+                findings = verifier(
+                    source.decode('utf-8'),
+                    body.decode('utf-8'),
+                    target_lang=lang,
+                )
             except Exception as exc:
                 errors.append(f'{rel}: 保真校验器异常：index.{lang}.md（{exc!r}）')
             else:
