@@ -8,7 +8,8 @@
 
 输入：HF 本地缓存的 ShadenA/MathNet（all config）+ candidates/mathnet.jsonl + taxonomy/registry.yml
 输出：mathnet-full/（gitignore，可随时重建）——与 candidates/mathnet.jsonl 只存预览不同，这里是全文。
-确定性：同一数据集快照 + 同版本候选池 → 输出逐字节一致。
+确定性：同一数据集快照 + 同版本候选池 + 同一入库/评审快照 → 原文树与索引逐字节一致；
+已落盘的译文产物（index.en/zh.md 与 translation.json）在重导出时按 mathnet_id 原样保留。
 
 与候选池的分工：candidates/mathnet.jsonl 是给管线用的索引（每题一行、只有 200 字预览），
 本脚本是给人用的全文视图。分类不另立一套，直接复用候选池已判定的板块与知识点。
@@ -28,6 +29,8 @@ import sys
 import tempfile
 import unicodedata
 from collections import Counter
+
+from mathnet_ingest import in_bank_snapshot
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 POOL_PATH = os.path.join(ROOT, 'candidates', 'mathnet.jsonl')
@@ -148,18 +151,56 @@ def render(rec, meta_row):
     return '\n'.join(lines)
 
 
+TRANSLATION_ARTIFACTS = ('translation.json',) + tuple(f'index.{lang}.md' for lang in VARIANT_LANGS)
+
+
+def stash_translations(out):
+    """重导出前把译文产物挪进 out 的临时兄弟目录暂存：机器译文是付费产物，不得随原文树
+    一起销毁。原文若有变动靠 translation.json 的 source_sha256 判定失效（契约见
+    docs/译文契约-mathnet-full.md），这里不做预判。返回 (mathnet_id → 暂存子目录, 暂存根目录)。"""
+    stash, stash_root = {}, None
+    for dirpath, dirnames, filenames in os.walk(os.path.join(out, 'by-topic')):
+        dirnames[:] = [d for d in dirnames if not os.path.islink(os.path.join(dirpath, d))]
+        present = [fn for fn in filenames if fn in TRANSLATION_ARTIFACTS]
+        if not present:
+            continue
+        if stash_root is None:   # 与 out 同层同盘，os.replace 不跨文件系统
+            stash_root = tempfile.mkdtemp(prefix=os.path.basename(out) + '.translations-',
+                                          dir=os.path.dirname(out))
+        mid = os.path.basename(dirpath)
+        dest = os.path.join(stash_root, mid)
+        os.makedirs(dest, exist_ok=True)
+        for fn in present:
+            os.replace(os.path.join(dirpath, fn), os.path.join(dest, fn))
+        stash[mid] = dest
+    return stash, stash_root
+
+
+def restore_translations(stash, mid, pdir):
+    """把暂存的译文产物放回该题的新目录（分类挪了窝也跟着走，产物按 mathnet_id 归属）。"""
+    src = stash.pop(mid, None)
+    if src is None:
+        return
+    for fn in os.listdir(src):
+        os.replace(os.path.join(src, fn), os.path.join(pdir, fn))
+    os.rmdir(src)
+
+
 def prepare_out(out):
-    """清空输出目录。只肯删自己产出的目录，避免 --out 指错把别人的东西删了。"""
+    """清空输出目录（译文产物先暂存后回填，不随树销毁）。只肯删自己产出的目录，
+    避免 --out 指错把别人的东西删了。"""
     if not os.path.exists(out):
         os.makedirs(out)
-        return
+        return {}, None
     if not os.path.isdir(out):
         die(f'{out} 不是目录')
     entries = set(os.listdir(out))
     if entries and 'index.jsonl' not in entries:
         die(f'{out} 非空且不像本脚本的产物（没有 index.jsonl），拒绝删除；请换个 --out 或手动清理')
+    stash, stash_root = stash_translations(out)
     shutil.rmtree(out)
     os.makedirs(out)
+    return stash, stash_root
 
 
 def sha256_file(path):
@@ -255,6 +296,8 @@ def write_readme(out, index_rows, n_topics):
         if r['n_images']:
             n_img += r['n_images']
             n_img_prob += 1
+    n_banked = sum(1 for r in index_rows if r.get('in_bank') not in (None, 'reviewed-skip'))
+    n_skip = sum(1 for r in index_rows if r.get('in_bank') == 'reviewed-skip')
 
     def tbl(counter, limit=None):
         return '\n'.join(f'| {k} | {v:,} |' for k, v in counter.most_common(limit))
@@ -286,7 +329,7 @@ def write_readme(out, index_rows, n_topics):
 
 ```
 mathnet-full/
-├── index.jsonl          全量索引，一行一题（分类/难度/来源/答案/路径）
+├── index.jsonl          全量索引，一行一题（分类/原始标签/难度及置信度/来源/答案/入库状态/路径）
 ├── by-topic/            主轴：板块 / 知识点 / <题号>/       ← 真实目录
 │   └── <板块>/<知识点>/<题号>/index.md          原文
 │                                index.en.md       英文版
@@ -355,14 +398,14 @@ mathnet-full/
 
 ## 常用检索
 
-按知识点 + 难度筛选：
+按知识点 + 难度筛选，同时跳过已入库与评审弃用的题（选题的常规起点）：
 
 ```bash
 python3 -c "
 import json
 for line in open('mathnet-full/index.jsonl'):
     r = json.loads(line)
-    if '不等式' in r['topics'] and r['difficulty_est'] == 4:
+    if '不等式' in r['topics'] and r['difficulty_est'] == 4 and not r.get('in_bank'):
         print(r['mathnet_id'], r['contest'], r['path'])
 "
 ```
@@ -389,6 +432,11 @@ grep -rl --include=index.md "functional equation" mathnet-full/by-topic/algebra/
 
 ## 已知口径
 
+- `topics_flat` 是 MathNet 原始英文标签路径，逐字照录；`topics` 才是本仓库的知识点判定。
+- `difficulty_conf` 是候选池难度估级的置信度，档位正本见 `scripts/mathnet_ingest.py`。
+- `in_bank` 是**导出时点快照**：题号（已入库，共 {n_banked:,} 道）＞ `reviewed-skip`
+  （评审明确弃用，共 {n_skip:,} 道）＞ null（未经评审）。精确归属以 `problems/` 的
+  frontmatter 与 `data/review/` 评审凭证为准，别拿快照当正本引用。
 - 配图共 {n_img:,} 张，分布在 {n_img_prob:,} 道题上，其余题目无图。
 - 依赖图形、无法用文字复原的题按铁律不可入库；这里保留原图只是便于判断。
 - `status` 非 `ok` 的题在正文顶部有 ⚠️ 标记，共 {status.get('out_of_scope', 0):,} 道。
@@ -416,11 +464,12 @@ def export(out, with_images):
 
     node_cat = load_node_category()
     meta = load_pool()
+    bank_marks = in_bank_snapshot()   # 导出时点重扫，不沿用候选池建池时的旧快照
     shards = sorted(glob.glob(os.path.join(snapshot_dir(), 'data', 'all', '*.parquet')))
     if not shards:
         die('快照里没有 data/all/*.parquet，缓存可能不完整')
 
-    prepare_out(out)
+    stash, stash_root = prepare_out(out)
     cols = ['id', 'problem_markdown', 'solutions_markdown', 'country', 'competition',
             'topics_flat', 'language', 'problem_type', 'final_answer']
     stat = Counter()
@@ -446,6 +495,7 @@ def export(out, with_images):
             os.makedirs(pdir, exist_ok=True)
             with open(os.path.join(pdir, 'index.md'), 'w', encoding='utf-8') as fh:
                 fh.write(render(rec, meta_row))
+            restore_translations(stash, mid, pdir)
             stat['problems'] += 1
 
             # 配图按原文的位置式引用命名，作为 index.md 的兄弟文件
@@ -477,7 +527,9 @@ def export(out, with_images):
                 'path': os.path.relpath(os.path.join(pdir, 'index.md'), out),
                 'category': meta_row.get('category'),
                 'topics': meta_row.get('topics') or [],
+                'topics_flat': rec.get('topics_flat') or [],
                 'difficulty_est': meta_row.get('difficulty_est'),
+                'difficulty_conf': meta_row.get('difficulty_conf'),
                 'country': meta_row.get('country'),
                 'contest': meta_row.get('contest_raw'),
                 'year': meta_row.get('year'),
@@ -487,11 +539,19 @@ def export(out, with_images):
                 'n_solutions': len(rec.get('solutions_markdown') or []),
                 'final_answer': rec.get('final_answer'),
                 'status': meta_row.get('status'),
+                'in_bank': bank_marks.get(mid),
             }, out))
         print(f'[{si}/{len(shards)}] {os.path.basename(shard)} → 累计 {stat["problems"]} 题', flush=True)
 
     write_index(out, index_rows)
     write_readme(out, index_rows, len({t for r in index_rows for t in r['topics']}))
+
+    if stash_root is not None:
+        if stash:
+            print(f'  ⚠️ {len(stash)} 题的译文产物在本次导出中找不到归属（数据集里已无此题？），'
+                  f'保留在 {stash_root} 未删，请人工处置')
+        else:
+            shutil.rmtree(stash_root)
 
     rel = os.path.relpath(out, ROOT)
     print(f'{rel}/ 已生成：{stat["problems"]} 题、{stat["images"]} 张配图')

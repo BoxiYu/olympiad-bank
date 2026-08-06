@@ -7,15 +7,17 @@
 
 输入：HF 本地缓存的 ShadenA/MathNet（all config）+ taxonomy/mathnet_map.yml + taxonomy/contest_tiers.yml
 输出：candidates/mathnet.jsonl（gitignore，可随时重建）——只含元数据与题面前 80 字预览，不含全文。
-确定性：同一数据集快照 + 同版本两张表 → 输出逐字节一致。
+确定性：同一数据集快照 + 同版本两张表 + 同一入库/评审快照（in_bank_snapshot 的输入）→ 输出逐字节一致。
 """
-import argparse, json, os, re, sys, unicodedata
+import argparse, glob, json, os, re, sys, unicodedata
 from collections import Counter
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAP_PATH = os.path.join(ROOT, 'taxonomy', 'mathnet_map.yml')
 TIER_PATH = os.path.join(ROOT, 'taxonomy', 'contest_tiers.yml')
 OUT_PATH = os.path.join(ROOT, 'candidates', 'mathnet.jsonl')
+PROBLEMS_GLOB = os.path.join(ROOT, 'problems', '*', '*.md')
+VERDICTS_GLOB = os.path.join(ROOT, 'data', 'review', '*', 'verdicts.json')
 
 # 板块平票裁决优先序（特异性从高到低；Algebra 标签常为工具位）
 TIE_ORDER = ['number-theory', 'geometry', 'combinatorics', 'algebra']
@@ -183,6 +185,32 @@ def load_tables():
     return mp, tr
 
 
+_FM_ID = re.compile(r'^id:\s*"?([^"\n]+?)"?\s*$', re.M)
+_FM_MATHNET_ID = re.compile(r'^mathnet_id:\s*"?([^"\n]+?)"?\s*$', re.M)
+
+
+def in_bank_snapshot():
+    """mathnet_id → 入库标记的时点快照：题号（如 "G-035"）＞ 'reviewed-skip'（评审明确弃用）＞ 无记录。
+
+    正本是 problems/ 的 frontmatter 与 data/review/*/verdicts.json 评审凭证，这里只做一次投影；
+    先记评审弃用、再让已入库题号覆盖，保证「已入库」优先。ingest 与 export 共用本函数。
+    """
+    marks = {}
+    for path in sorted(glob.glob(VERDICTS_GLOB)):
+        with open(path, encoding='utf-8') as fh:
+            for v in json.load(fh):
+                if v.get('recommend') == 'skip' and v.get('mathnet_id'):
+                    marks[v['mathnet_id']] = 'reviewed-skip'
+    for path in sorted(glob.glob(PROBLEMS_GLOB)):
+        with open(path, encoding='utf-8') as fh:
+            text = fh.read()
+        fm = text.split('\n---', 1)[0] if text.startswith('---') else ''
+        pid, mid = _FM_ID.search(fm), _FM_MATHNET_ID.search(fm)
+        if pid and mid:
+            marks[mid.group(1)] = pid.group(1)
+    return marks
+
+
 def compile_keyword_rules(rules):
     """编译关键词规则；search_in 缺省 problem，保持旧版题面召回口径。"""
     return [(re.compile(r['pattern']), r['category'], r['node'], r.get('search_in', 'problem'))
@@ -252,6 +280,7 @@ def build(mp, tr):
     default = tr.get('default_unknown') or {'base': 2, 'conf': 'low'}
 
     os.makedirs(os.path.dirname(OUT_PATH), exist_ok=True)
+    bank_marks = in_bank_snapshot()
     stat = Counter()
     unmapped = Counter()
     with open(OUT_PATH, 'w', encoding='utf-8') as f:
@@ -317,7 +346,7 @@ def build(mp, tr):
                 'excluded_reason': reason,
                 'head': re.sub(r'\s+', ' ', cols['problem_markdown'][i] or '')[:200],
                 'dup_group': None,
-                'in_bank': None,
+                'in_bank': bank_marks.get(cols['id'][i]),
             }
             f.write(json.dumps(row, ensure_ascii=False) + '\n')
             stat['total'] += 1
