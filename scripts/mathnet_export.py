@@ -19,11 +19,13 @@
 """
 import argparse
 import glob
+import hashlib
 import json
 import os
 import re
 import shutil
 import sys
+import tempfile
 import unicodedata
 from collections import Counter
 
@@ -36,6 +38,8 @@ REPO_ID = 'ShadenA/MathNet'
 STARS = {1: '★', 2: '★★', 3: '★★★', 4: '★★★★', 5: '★★★★★'}
 UNCLASSIFIED = '_未分类'   # 候选池判定 out_of_scope、无板块的题
 UNSPECIFIED = '_未细分'    # 有板块但候选池没判出知识点的题
+VARIANT_LANGS = ('en', 'zh')
+VARIANT_STATES = ('passthrough', 'translated', 'failed', 'missing')
 
 
 def die(msg):
@@ -158,10 +162,83 @@ def prepare_out(out):
     os.makedirs(out)
 
 
+def sha256_file(path):
+    """流式计算文件摘要，避免全量题面一次性读进内存。"""
+    digest = hashlib.sha256()
+    with open(path, 'rb') as fh:
+        for chunk in iter(lambda: fh.read(1024 * 1024), b''):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def variant_status(row, lang):
+    """兼容读取新旧索引；缺字段或未知值一律按 missing。"""
+    variants = row.get('variants') or {}
+    if not isinstance(variants, dict):
+        return 'missing'
+    status = variants.get(lang, 'missing')
+    return status if status in VARIANT_STATES else 'missing'
+
+
+def translation_projection(source_path):
+    """把同目录 translation.json 投影成索引字段；无译文元数据时安全降级。"""
+    fallback = {
+        'source_lang': 'und',
+        'variants': {lang: 'missing' for lang in VARIANT_LANGS},
+        'translation_stale': False,
+    }
+    meta_path = os.path.join(os.path.dirname(source_path), 'translation.json')
+    try:
+        with open(meta_path, encoding='utf-8') as fh:
+            meta = json.load(fh)
+    except (FileNotFoundError, OSError, json.JSONDecodeError, TypeError):
+        return fallback
+    if not isinstance(meta, dict):
+        return fallback
+
+    source_lang = meta.get('source_lang')
+    if isinstance(source_lang, str):
+        source_lang = source_lang.strip().lower()
+    if not isinstance(source_lang, str) or not re.fullmatch(r'[a-z]{2}|und', source_lang):
+        source_lang = 'und'
+    variants_meta = meta.get('variants') or {}
+    if not isinstance(variants_meta, dict):
+        variants_meta = {}
+    variants = {}
+    for lang in VARIANT_LANGS:
+        item = variants_meta.get(lang)
+        mode = item.get('mode') if isinstance(item, dict) else item
+        variants[lang] = mode if mode in VARIANT_STATES else 'missing'
+
+    return {
+        'source_lang': source_lang,
+        'variants': variants,
+        'translation_stale': meta.get('source_sha256') != sha256_file(source_path),
+    }
+
+
+def project_index_row(row, out):
+    """返回带三语字段的新行，不修改调用方传入的旧索引行。"""
+    projected = dict(row)
+    projected.update(translation_projection(os.path.join(out, row['path'])))
+    return projected
+
+
+def write_index(out, index_rows):
+    """原子改写索引，刷新中断时保留上一版可读文件。"""
+    index_path = os.path.join(out, 'index.jsonl')
+    with tempfile.NamedTemporaryFile('w', encoding='utf-8', dir=out, delete=False) as fh:
+        tmp_path = fh.name
+        for row in index_rows:
+            fh.write(json.dumps(row, ensure_ascii=False) + '\n')
+    os.replace(tmp_path, index_path)
+
+
 def write_readme(out, index_rows, n_topics):
     """统计口径全部现算自 index_rows，不手抄数字。"""
     cat, topics, diff = Counter(), Counter(), Counter()
     ctry, lang, ptype, status = Counter(), Counter(), Counter(), Counter()
+    coverage = {code: Counter() for code in VARIANT_LANGS}
     n_img = n_img_prob = 0
     for r in index_rows:
         cat[r['category'] or '（未分类）'] += 1
@@ -172,6 +249,9 @@ def write_readme(out, index_rows, n_topics):
         lang[r['language'] or '（未标注）'] += 1
         ptype[r['problem_type'] or '（未标注）'] += 1
         status[r['status']] += 1
+        for code in VARIANT_LANGS:
+            coverage_state = variant_status(r, code)
+            coverage[code]['missing' if coverage_state == 'failed' else coverage_state] += 1
         if r['n_images']:
             n_img += r['n_images']
             n_img_prob += 1
@@ -182,6 +262,12 @@ def write_readme(out, index_rows, n_topics):
     diff_rows = '\n'.join(
         f"| {('★' * k + f'（{k}）') if isinstance(k, int) and k else '（未估）'} | {v:,} |"
         for k, v in sorted(diff.items(), key=lambda x: (x[0] is None, x[0])))
+
+    coverage_rows = '\n'.join(
+        f"| {code} | {coverage[code]['passthrough']:,} | {coverage[code]['translated']:,} | "
+        f"{coverage[code]['missing']:,} |"
+        for code in VARIANT_LANGS
+    )
 
     md = f"""# MathNet 全量导出
 
@@ -194,6 +280,7 @@ def write_readme(out, index_rows, n_topics):
 - 题面、解法、最终答案**逐字照录** MathNet 原文，未做任何改写、补全或符号复原。
 - 分类不另立一套：板块与知识点取自 `candidates/mathnet.jsonl`，
   知识点的板块归属查 `taxonomy/registry.yml`。
+- 译文落盘后运行 `uv run python scripts/mathnet_export.py --refresh-index`，即可只刷新索引与本说明。
 
 ## 目录结构
 
@@ -201,10 +288,16 @@ def write_readme(out, index_rows, n_topics):
 mathnet-full/
 ├── index.jsonl          全量索引，一行一题（分类/难度/来源/答案/路径）
 ├── by-topic/            主轴：板块 / 知识点 / <题号>/       ← 真实目录
-│   └── <板块>/<知识点>/<题号>/index.md
+│   └── <板块>/<知识点>/<题号>/index.md          原文
+│                                index.en.md       英文版
+│                                index.zh.md       中文版
+│                                translation.json  译文元数据
 │                                attached_image_1.png ...
 └── by-contest/          次轴：国家 / 赛事 / <题号>          ← 符号链接
 ```
+
+`index.md` 是原文且逐字照录；`index.zh.md` / `index.en.md` 是机器生成、未经人工核验的派生产物，
+不得当作题源引用。译文产物与状态的语义正本见 `docs/译文契约-mathnet-full.md`。
 
 **为什么每题一个目录而不是一个 .md**：MathNet 原文用 `attached_image_N.png` 这种位置式
 相对引用插图（编号 1..N，全库 {n_img_prob:,} 道有图题零例外）。把配图放成 `index.md` 的兄弟
@@ -215,6 +308,12 @@ mathnet-full/
 精确统计一律以 `index.jsonl` 为准。
 
 ## 分布
+
+### 三语覆盖率
+
+| 语言 | passthrough | translated | missing |
+| --- | ---: | ---: | ---: |
+{coverage_rows}
 
 ### 板块
 
@@ -268,6 +367,20 @@ for line in open('mathnet-full/index.jsonl'):
 "
 ```
 
+按目标语言与覆盖状态筛选（兼容尚无三语字段的旧索引）：
+
+```bash
+python3 -c "
+import json
+target_lang, target_status = 'zh', 'translated'
+for line in open('mathnet-full/index.jsonl'):
+    r = json.loads(line)
+    status = (r.get('variants') or {{}}).get(target_lang, 'missing')
+    if status == target_status:
+        print(r['mathnet_id'], r['path'])
+"
+```
+
 在某个板块里全文检索题面（`--include` 避免顺着符号链接重复命中）：
 
 ```bash
@@ -282,6 +395,20 @@ grep -rl --include=index.md "functional equation" mathnet-full/by-topic/algebra/
 """
     with open(os.path.join(out, 'README.md'), 'w', encoding='utf-8') as fh:
         fh.write(md)
+
+
+def refresh_index(out):
+    """不访问 MathNet 语料，只从现有原文与 translation.json 刷新索引和 README。"""
+    index_path = os.path.join(out, 'index.jsonl')
+    if not os.path.exists(index_path):
+        die(f'{index_path} 不存在；--refresh-index 只能用于已有导出目录')
+    with open(index_path, encoding='utf-8') as fh:
+        rows = [json.loads(line) for line in fh if line.strip()]
+    rows = [project_index_row(row, out) for row in rows]
+    write_index(out, rows)
+    write_readme(out, rows, len({t for row in rows for t in row.get('topics', [])}))
+    print(f'{os.path.relpath(out, ROOT)}/ 索引与 README 已刷新：{len(rows)} 题')
+    return 0
 
 
 def export(out, with_images):
@@ -345,7 +472,7 @@ def export(out, with_images):
                 os.symlink(os.path.relpath(pdir, link_dir), link)
                 stat['links_contest'] += 1
 
-            index_rows.append({
+            index_rows.append(project_index_row({
                 'mathnet_id': mid,
                 'path': os.path.relpath(os.path.join(pdir, 'index.md'), out),
                 'category': meta_row.get('category'),
@@ -360,12 +487,10 @@ def export(out, with_images):
                 'n_solutions': len(rec.get('solutions_markdown') or []),
                 'final_answer': rec.get('final_answer'),
                 'status': meta_row.get('status'),
-            })
+            }, out))
         print(f'[{si}/{len(shards)}] {os.path.basename(shard)} → 累计 {stat["problems"]} 题', flush=True)
 
-    with open(os.path.join(out, 'index.jsonl'), 'w', encoding='utf-8') as fh:
-        for row in index_rows:
-            fh.write(json.dumps(row, ensure_ascii=False) + '\n')
+    write_index(out, index_rows)
     write_readme(out, index_rows, len({t for r in index_rows for t in r['topics']}))
 
     rel = os.path.relpath(out, ROOT)
@@ -381,8 +506,11 @@ def main():
     ap = argparse.ArgumentParser(description='把 MathNet 全量导出成板块 × 知识点的 markdown 树')
     ap.add_argument('--out', default=DEFAULT_OUT, help=f'输出目录（默认 {os.path.relpath(DEFAULT_OUT, ROOT)}/）')
     ap.add_argument('--no-images', action='store_true', help='不导配图，只出文本')
+    ap.add_argument('--refresh-index', action='store_true',
+                    help='不读数据集，只按已有 index.md / translation.json 刷新索引与 README')
     args = ap.parse_args()
-    sys.exit(export(os.path.abspath(args.out), with_images=not args.no_images))
+    out = os.path.abspath(args.out)
+    sys.exit(refresh_index(out) if args.refresh_index else export(out, with_images=not args.no_images))
 
 
 if __name__ == '__main__':

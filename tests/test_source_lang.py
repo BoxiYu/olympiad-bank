@@ -38,7 +38,7 @@ def test_english_high_confidence_recall_is_at_least_ninety_percent():
 
 
 def test_no_non_english_fixture_is_misclassified_as_english():
-    non_english = [case for case in CASES if case["expected"][0] not in {"en", "und"}]
+    non_english = [case for case in CASES if case["expected"][0] != "en"]
     false_english = [
         case["id"] for case in non_english
         if detect_source_lang(case["body"], case["meta"])[0] == "en"

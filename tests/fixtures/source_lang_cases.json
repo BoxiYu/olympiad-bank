@@ -156,6 +156,36 @@
     "expected": ["zh", "low"]
   },
   {
+    "id": "und_german_multilingual_english_meta",
+    "body": "Bestimme alle positiven ganzen Zahlen, für die diese Gleichung genau zwei Lösungen besitzt.",
+    "meta": {"language": "German; English"},
+    "expected": ["de", "low"]
+  },
+  {
+    "id": "und_japanese_not_chinese",
+    "body": "次の方程式を満たすすべての正の整数を求め、それぞれが条件を満たすことを証明せよ。",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
+    "id": "und_korean_not_chinese",
+    "body": "다음 방정식을 만족하는 모든 양의 정수를 구하고 각 답이 조건을 만족함을 증명하여라.",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
+    "id": "und_ukrainian_not_russian",
+    "body": "Знайдіть усі натуральні числа, для яких це рівняння має рівно два розв'язки.",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
+    "id": "und_bulgarian_not_russian",
+    "body": "Намерете всички естествени числа, за които даденото уравнение има точно две решения.",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
     "id": "und_only_math",
     "body": "## 题面\n\n$$\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}$$\n\n![plot](x.png)\n\n## 答案\n\n证明题",
     "meta": {"language": "English"},
