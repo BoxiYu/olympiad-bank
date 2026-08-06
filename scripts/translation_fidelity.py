@@ -17,6 +17,8 @@ from enum import Enum
 from itertools import zip_longest
 from pathlib import Path
 
+from source_lang import detect_source_lang
+
 
 class FindingType(str, Enum):
     """稳定的问题类型；字符串值可直接写入 JSON/CI 台账。"""
@@ -97,6 +99,10 @@ _PROTECTED_RE = re.compile(
 )
 _IMAGE_RE = re.compile(r'!\[\]\(attached_image_(\d+)\.png\)')
 _HAN_RE = re.compile(r'[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]')
+_SYMBOL_WORDS = {
+    'bmod', 'cos', 'gcd', 'inf', 'lcm', 'ln', 'log', 'max', 'min', 'mod',
+    'pmod', 'sin', 'sqrt', 'sup', 'tan',
+}
 _WHOLE_FENCE_RE = re.compile(
     r'\A[ \t]*(```|~~~)[^\n]*\n(?P<body>.*)\n\1[ \t]*\Z',
     re.DOTALL,
@@ -227,7 +233,7 @@ def _is_pure_symbol(value: str) -> bool:
         return False
     without_commands = re.sub(r'\\[A-Za-z]+', '', candidate)
     words = re.findall(r'[^\W\d_]+', without_commands, re.UNICODE)
-    return all(len(word) == 1 or word.casefold() in {'mod', 'pmod', 'bmod'} for word in words)
+    return all(len(word) == 1 or word.casefold() in _SYMBOL_WORDS for word in words)
 
 
 def _has_translatable_prose(section: _Section) -> bool:
@@ -239,19 +245,33 @@ def _has_translatable_prose(section: _Section) -> bool:
     return bool(re.search(r'[^\W\d_]', body, re.UNICODE))
 
 
-def _has_prose_outside_target_language(section: _Section, target_lang: str) -> bool:
+def _same_language_family(source_lang: str | None, target_lang: str) -> bool:
+    if not source_lang:
+        return False
+    family = re.split(r'[-_]', source_lang.casefold(), maxsplit=1)[0]
+    return family == target_lang
+
+
+def _has_prose_outside_target_language(
+    section: _Section,
+    target_lang: str,
+    source_lang: str | None,
+) -> bool:
     """源小节是否仍含需要翻到目标语言的散文。
 
     ``untranslated`` 只该拦截本应翻译却逐字照抄的内容。MathNet 生成器会把
     已是中文的状态说明写进英文原文（例如证明题的答案占位）；这类文字在中文
     variant 中原样保留是正确的，不能仅因“非空且相同”而告警。
 
-    中文可按 Unicode 文字脚本精确判断。英文原文到英文 variant 按契约必须走
-    ``passthrough``；英文 ``translated`` 模式还可能承载西语等同为拉丁脚本的
-    源文，因此继续保守告警，避免把共享文字脚本误当成已是目标语言。数学、
-    图片与纯符号内容仍由 ``_has_translatable_prose`` 先行排除。
+    中文可按 Unicode 文字脚本精确判断；英文使用与派单相同的保守语言检测器，
+    不能把共享拉丁脚本直接视为英文。若派单元数据已经表明源语言与目标语言同族，
+    则 Codex 原样返回表示“核验后无需改动”：仍以 ``translated`` 落盘，因为它
+    确实经过了模型，而 ``passthrough`` 继续只表示派单前的 ``en/high`` 直通。
+    数学、图片与纯符号内容仍由 ``_has_translatable_prose`` 先行排除。
     """
     if not _has_translatable_prose(section):
+        return False
+    if _same_language_family(source_lang, target_lang):
         return False
 
     body = _PROTECTED_RE.sub('', section.body)
@@ -260,7 +280,8 @@ def _has_prose_outside_target_language(section: _Section, target_lang: str) -> b
     letters = [ch for ch in body if unicodedata.category(ch).startswith('L')]
     if target_lang == 'zh':
         return any(_HAN_RE.fullmatch(ch) is None for ch in letters)
-    return True
+    detected_lang, _confidence = detect_source_lang(body, {})
+    return detected_lang != 'en'
 
 
 def _content_findings(
@@ -268,6 +289,7 @@ def _content_findings(
     translated: str,
     mode: str,
     target_lang: str,
+    source_lang: str | None,
 ) -> list[Finding]:
     findings = []
     if not translated.strip():
@@ -298,7 +320,8 @@ def _content_findings(
             if source_section.heading != translated_section.heading:
                 continue
             if (source_section.body == translated_section.body
-                    and _has_prose_outside_target_language(source_section, target_lang)):
+                    and _has_prose_outside_target_language(
+                        source_section, target_lang, source_lang)):
                 findings.append(Finding(
                     FindingType.UNTRANSLATED,
                     source_section.heading,
@@ -348,6 +371,7 @@ def verify_translation(
     *,
     mode: str = 'translated',
     target_lang: str = 'zh',
+    source_lang: str | None = None,
 ) -> list[Finding]:
     """校验一对 Markdown 字符串，返回全部可定位问题。
 
@@ -364,7 +388,7 @@ def verify_translation(
     findings.extend(_compare_occurrences(
         FindingType.IMAGE_MISMATCH, _images(source), _images(translated)))
     findings.extend(_structure_findings(source, translated))
-    findings.extend(_content_findings(source, translated, mode, target_lang))
+    findings.extend(_content_findings(source, translated, mode, target_lang, source_lang))
     findings.extend(_leak_findings(source, translated))
     return findings
 
