@@ -27,6 +27,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## gitignore 与重建：clone 后这些目录不存在
 
 - `candidates/`（含候选池与 `simindex/`）→ `uv run --group mathnet python scripts/mathnet_ingest.py`
+- 改过 `taxonomy/mathnet_map.yml` 的映射/召回规则，或 `taxonomy/contest_tiers.yml` 的赛名难度规则后必须重建候选池；排查实例正本见 `.claude/skills/ingest/SKILL.md`「实测坑」第 5 条
 - `candidates/simindex/` → `uv run --group similar python scripts/similar_index.py build --bank-only`
 - `maps/` → `uv run python scripts/bank.py map`
 - `data/sessions/` 是 spar 运行态，**不要手动删**（会毁掉进行中的攻坚会话）

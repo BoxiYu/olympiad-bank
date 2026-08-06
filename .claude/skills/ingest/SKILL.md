@@ -32,7 +32,7 @@ uv run --group mathnet python scripts/mathnet_import.py --dir data/review/geo-01
 bash scripts/lint.sh
 ```
 
-## 四个实测坑（这才是本技能存在的理由）
+## 七个实测坑（这才是本技能存在的理由）
 
 **1. 依赖组不对称，三步各不相同。** `batch` 与 `import` 读 HF 数据集，必须 `--group mathnet`，
 不加必 ImportError；`dispatch`/`merge` 不读，加了是照抄不理解。实测有人在这里翻过车。
@@ -49,6 +49,24 @@ uv run --group mathnet python scripts/mathnet_import.py --dir data/review/geo-01
 lint 强制题号连号，事后删题就得重排编号——实测这一步会写出重复文件。裁定要前置。
 
 **4. 批次目录名一经 dispatch 就被 `review_ref` 永久引用，不要事后改名。**
+
+**5. 改候选池输入规则后不重建，会让查询继续使用旧映射或旧难度估计。**
+`taxonomy/mathnet_map.yml` 的映射/召回规则，或 `taxonomy/contest_tiers.yml` 的赛名难度规则变更后，
+先执行：
+
+```bash
+uv run --group mathnet python scripts/mathnet_ingest.py
+```
+
+实证：勾股定理召回规则由 PR #5 于 2026-08-04 09:45 UTC 引入，但候选池构建于同日
+08:14 UTC；`bank.py candidates --gaps` 因此一度报候选 0，重建后变为 86。候选池有构建时点，
+`--selfcheck` 只校验映射表自洽，不能代替全量重建。
+
+**6. 采购单里的候选数不是可入库量。** 排批折算、拒收主因与批次证据的正本见
+`docs/入库SOP-MathNet.md`「排批量校准」。
+
+**7. `--difficulty 2-3` 会混入实际 ★1。** 偏差证据与评审策略的正本见
+`docs/入库SOP-MathNet.md`「低星段估级偏差」；不要绕过逐题评审或放宽准入线。
 
 ## 收尾（少了这几步就是半成品）
 
