@@ -33,6 +33,11 @@ from translation_fidelity import verify_translation
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CORPUS = ROOT / "mathnet-full"
 TARGET_LANGS = ("en", "zh")
+INDEX_TRANSLATION_FIELDS = ("source_lang", "variants", "translation_stale")
+
+# main() 在 apply/run 期间安装收集器。apply_record 只登记成功写回的题，命令退出前
+# 再合并成一次索引原子写；直接调用 apply_record 的库用户不会产生隐式副作用。
+_REINDEX_QUEUE: dict[Path, set[str]] | None = None
 
 SECTION_RE = re.compile(r"(?m)^## (?P<title>题面|解法(?: \d+)?|最终答案)[ \t]*\r?\n")
 PLACEHOLDER_RE = re.compile(r"\{\{MNT_\d{4}\}\}")
@@ -289,6 +294,185 @@ def read_translation_state(question_dir: Path) -> dict[str, Any] | None:
     return value if isinstance(value, dict) else None
 
 
+def translation_projection(source_path: Path, mathnet_id: str) -> dict[str, Any]:
+    """从一题的 translation.json/variant 文件投影索引字段。"""
+    fallback = {
+        "source_lang": "und",
+        "variants": {lang: "missing" for lang in TARGET_LANGS},
+        "translation_stale": False,
+    }
+    state = read_translation_state(source_path.parent)
+    if not state or state.get("mathnet_id") != mathnet_id:
+        return fallback
+
+    source_lang = state.get("source_lang")
+    if isinstance(source_lang, str):
+        source_lang = source_lang.strip().lower()
+    if not isinstance(source_lang, str) or not re.fullmatch(r"[a-z]{2}|und", source_lang):
+        source_lang = "und"
+
+    variants_meta = state.get("variants")
+    if not isinstance(variants_meta, dict):
+        variants_meta = {}
+    variants: dict[str, str] = {}
+    for lang in TARGET_LANGS:
+        item = variants_meta.get(lang)
+        mode = item.get("mode") if isinstance(item, dict) else None
+        if mode == "failed":
+            variants[lang] = mode
+            continue
+        target = source_path.with_name(f"index.{lang}.md")
+        if mode in {"passthrough", "translated"} and target.is_file():
+            target_sha = sha256_bytes(target.read_bytes())
+            variants[lang] = mode if item.get("sha256") == target_sha else "missing"
+        else:
+            variants[lang] = "missing"
+
+    return {
+        "source_lang": source_lang,
+        "variants": variants,
+        "translation_stale": state.get("source_sha256") != sha256_bytes(source_path.read_bytes()),
+    }
+
+
+def json_object_value_spans(line: str) -> tuple[dict[str, tuple[int, int]], int]:
+    """返回单行 JSON 对象顶层字段的 value span 与右花括号位置。"""
+    decoder = json.JSONDecoder()
+
+    def skip_space(position: int) -> int:
+        while position < len(line) and line[position].isspace():
+            position += 1
+        return position
+
+    position = skip_space(0)
+    if position >= len(line) or line[position] != "{":
+        raise TranslateError("index.jsonl 行必须是 JSON 对象")
+    position += 1
+    spans: dict[str, tuple[int, int]] = {}
+    position = skip_space(position)
+    if position < len(line) and line[position] == "}":
+        closing = position
+        position = skip_space(position + 1)
+        if position != len(line):
+            raise TranslateError("index.jsonl 对象后有多余内容")
+        return spans, closing
+
+    while True:
+        try:
+            key, key_end = decoder.raw_decode(line, position)
+        except json.JSONDecodeError as exc:
+            raise TranslateError(f"index.jsonl 字段名无法解析: {exc}") from exc
+        if not isinstance(key, str) or key in spans:
+            raise TranslateError("index.jsonl 顶层字段名必须唯一且为字符串")
+        position = skip_space(key_end)
+        if position >= len(line) or line[position] != ":":
+            raise TranslateError("index.jsonl 字段名后缺少冒号")
+        value_start = skip_space(position + 1)
+        try:
+            _, value_end = decoder.raw_decode(line, value_start)
+        except json.JSONDecodeError as exc:
+            raise TranslateError(f"index.jsonl 字段 {key} 的值无法解析: {exc}") from exc
+        spans[key] = (value_start, value_end)
+        position = skip_space(value_end)
+        if position >= len(line):
+            raise TranslateError("index.jsonl 对象未闭合")
+        if line[position] == "}":
+            closing = position
+            position = skip_space(position + 1)
+            if position != len(line):
+                raise TranslateError("index.jsonl 对象后有多余内容")
+            return spans, closing
+        if line[position] != ",":
+            raise TranslateError("index.jsonl 顶层字段之间缺少逗号")
+        position = skip_space(position + 1)
+
+
+def update_index_line(line: str, projection: dict[str, Any]) -> str:
+    """只替换/追加三个投影字段，保留该行其余字节（含空白与字段顺序）。"""
+    spans, closing = json_object_value_spans(line)
+    edits: list[tuple[int, int, str]] = []
+    missing = []
+    for key in INDEX_TRANSLATION_FIELDS:
+        encoded = json.dumps(projection[key], ensure_ascii=False, separators=(",", ":"))
+        if key in spans:
+            start, end = spans[key]
+            edits.append((start, end, encoded))
+        else:
+            missing.append((key, encoded))
+    if missing:
+        prefix = ", " if spans else ""
+        insertion = prefix + ", ".join(
+            f"{json.dumps(key, ensure_ascii=False)}: {encoded}" for key, encoded in missing
+        )
+        edits.append((closing, closing, insertion))
+    updated = line
+    for start, end, replacement in sorted(edits, reverse=True):
+        updated = updated[:start] + replacement + updated[end:]
+    return updated
+
+
+def index_source_path(root: Path, row: dict[str, Any]) -> Path:
+    relative = row.get("path")
+    if not isinstance(relative, str) or not relative:
+        raise TranslateError("index.jsonl 行缺少 path")
+    source = (root / relative).resolve()
+    try:
+        source.relative_to(root)
+    except ValueError as exc:
+        raise TranslateError(f"index.jsonl path 越出语料目录: {relative}") from exc
+    if source.name != "index.md" or not source.is_file():
+        raise TranslateError(f"index.jsonl 原文不存在或不是 index.md: {relative}")
+    return source
+
+
+def reindex(root: Path, selected: set[str] | None) -> int:
+    """按 index.jsonl 清单刷新选中题；selected=None 才表示显式全量。"""
+    root = root.resolve()
+    index_path = root / "index.jsonl"
+    try:
+        original = index_path.read_bytes()
+        text = original.decode("utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        raise TranslateError(f"无法读取索引 {index_path}: {exc}") from exc
+
+    found: set[str] = set()
+    output: list[str] = []
+    for line_number, complete_line in enumerate(text.splitlines(keepends=True), 1):
+        ending = complete_line[len(complete_line.rstrip("\r\n")):]
+        line = complete_line[:len(complete_line) - len(ending)] if ending else complete_line
+        if not line.strip():
+            output.append(complete_line)
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError as exc:
+            raise TranslateError(f"index.jsonl 第 {line_number} 行无法解析: {exc}") from exc
+        if not isinstance(row, dict):
+            raise TranslateError(f"index.jsonl 第 {line_number} 行不是对象")
+        mathnet_id = row.get("mathnet_id")
+        if not isinstance(mathnet_id, str) or not mathnet_id:
+            raise TranslateError(f"index.jsonl 第 {line_number} 行缺少 mathnet_id")
+        if selected is not None and mathnet_id not in selected:
+            output.append(complete_line)
+            continue
+        found.add(mathnet_id)
+        source = index_source_path(root, row)
+        output.append(update_index_line(line, translation_projection(source, mathnet_id)) + ending)
+
+    if selected is not None:
+        missing = sorted(selected - found)
+        if missing:
+            raise TranslateError(f"index.jsonl 未找到 {len(missing)} 个 id: {', '.join(missing)}")
+    atomic_write(index_path, "".join(output).encode("utf-8"))
+    print(f"reindex: {len(found)} 题 -> {index_path}")
+    return len(found)
+
+
+def queue_reindex(root: Path, mathnet_id: str) -> None:
+    if _REINDEX_QUEUE is not None:
+        _REINDEX_QUEUE.setdefault(root.resolve(), set()).add(mathnet_id)
+
+
 def variant_current(question_dir: Path, state: dict[str, Any] | None, mathnet_id: str,
                     source_sha256: str, lang: str) -> bool:
     if not state or state.get("mathnet_id") != mathnet_id or state.get("source_sha256") != source_sha256:
@@ -525,6 +709,10 @@ def apply_record(root: Path, record: dict[str, Any]) -> None:
         if target_bytes is not None:
             atomic_write(path.parent / f"index.{lang}.md", target_bytes)
     atomic_write(path.parent / "translation.json", json_bytes(state))
+    for lang, target_bytes in prepared.items():
+        if target_bytes is None:
+            (path.parent / f"index.{lang}.md").unlink(missing_ok=True)
+    queue_reindex(root, mathnet_id)
 
 
 def load_jsonl(path: Path) -> tuple[list[tuple[int, dict[str, Any]]], list[dict[str, Any]]]:
@@ -575,6 +763,15 @@ def apply_records(args: argparse.Namespace) -> int:
     atomic_write(failure_path, failure_data)
     print(f"apply: {applied} 题成功，{len(failures)} 题失败；失败清单 {failure_path}")
     return 1 if failures else 0
+
+
+def reindex_records(args: argparse.Namespace) -> int:
+    root = Path(args.root).resolve()
+    if not root.is_dir():
+        raise TranslateError(f"语料目录不存在: {root}")
+    selected = None if args.all else set(args.only)
+    reindex(root, selected)
+    return 0
 
 
 LANGUAGE_META_RE = re.compile(r"(?m)^[-*+]\s+语言[：:]\s*(?P<language>.+?)\s*$")
@@ -1400,7 +1597,17 @@ def parser() -> argparse.ArgumentParser:
     apply_parser.add_argument("--root", default=DEFAULT_CORPUS, help="语料根目录（默认 mathnet-full/）")
     apply_parser.add_argument("--in", dest="input", required=True, help="待写回译文 JSONL")
     apply_parser.add_argument("--failures", help="失败清单路径（默认 <输入>.failures.jsonl）")
+    apply_parser.add_argument(
+        "--no-reindex", action="store_true", help="写回后不自动增量刷新 index.jsonl"
+    )
     apply_parser.set_defaults(func=apply_records)
+
+    reindex_parser = commands.add_parser("reindex", help="不读数据集，原子刷新 index.jsonl 三语字段")
+    reindex_parser.add_argument("--root", default=DEFAULT_CORPUS, help="语料根目录（默认 mathnet-full/）")
+    scope = reindex_parser.add_mutually_exclusive_group(required=True)
+    scope.add_argument("--only", action="append", metavar="ID", help="只刷新指定 id；可重复")
+    scope.add_argument("--all", action="store_true", help="显式刷新 index.jsonl 中全部题目")
+    reindex_parser.set_defaults(func=reindex_records)
 
     run_parser = commands.add_parser("run", help="生成语言图并并发串起 export → Codex → apply")
     run_parser.add_argument("--root", default=DEFAULT_CORPUS, help="语料根目录（默认 mathnet-full/）")
@@ -1419,27 +1626,45 @@ def parser() -> argparse.ArgumentParser:
     )
     run_parser.add_argument("--strict", action="store_true", help="首个批次或题级失败即停止")
     run_parser.add_argument("--companion", help="显式 companion 路径（测试假桩；默认 find_companion）")
+    run_parser.add_argument(
+        "--no-reindex", action="store_true", help="运行结束后不自动增量刷新 index.jsonl"
+    )
     run_parser.set_defaults(func=run_records)
     return top
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = parser().parse_args(argv)
+    global _REINDEX_QUEUE
+    arguments = list(sys.argv[1:] if argv is None else argv)
+    no_reindex = "--no-reindex" in arguments
+    if no_reindex:
+        arguments = [argument for argument in arguments if argument != "--no-reindex"]
+    argument_parser = parser()
+    args = argument_parser.parse_args(arguments)
+    if no_reindex and args.command not in {"apply", "run"}:
+        argument_parser.error("--no-reindex 只适用于 apply/run")
     if getattr(args, "limit", None) is not None and args.limit < 0:
-        parser().error("--limit 不得小于 0")
+        argument_parser.error("--limit 不得小于 0")
     for name in ("batch_size", "concurrency"):
         if hasattr(args, name) and getattr(args, name) <= 0:
-            parser().error(f"--{name.replace('_', '-')} 必须大于 0")
+            argument_parser.error(f"--{name.replace('_', '-')} 必须大于 0")
     for name in ("timeout", "retry_backoff", "retry_backoff_max"):
         if hasattr(args, name) and getattr(args, name) < 0:
-            parser().error(f"--{name.replace('_', '-')} 不得小于 0")
+            argument_parser.error(f"--{name.replace('_', '-')} 不得小于 0")
     if hasattr(args, "retries") and args.retries < 0:
-        parser().error("--retries 不得小于 0")
+        argument_parser.error("--retries 不得小于 0")
+    _REINDEX_QUEUE = {} if args.command in {"apply", "run"} and not no_reindex else None
     try:
-        return args.func(args)
+        result = args.func(args)
+        if _REINDEX_QUEUE:
+            for root, mathnet_ids in _REINDEX_QUEUE.items():
+                reindex(root, mathnet_ids)
+        return result
     except TranslateError as exc:
         print(f"mathnet_translate: {exc}", file=sys.stderr)
         return 1
+    finally:
+        _REINDEX_QUEUE = None
 
 
 if __name__ == "__main__":

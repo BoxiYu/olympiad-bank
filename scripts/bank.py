@@ -307,16 +307,19 @@ def mathnet_search(args):
             if not inside_corpus or os.path.realpath(variant_path) != variant_path:
                 invalid_rows += 1
                 continue
-            if not os.path.isfile(variant_path):
-                if coverage_state == 'failed':
-                    failed_language += 1
-                else:
-                    missing_language += 1
+            if coverage_state == 'failed':
+                # failed 是 translation.json/index.jsonl 的权威状态；即使旧版本曾留下
+                # variant 文件，也不能把过期译文作为失败档结果展示。
+                failed_language += 1
                 # 没有关键词时，missing/failed 均可作为状态清单使用；两档不可互相代替。
-                if args.keyword or args.coverage not in {'missing', 'failed'}:
+                if args.keyword or args.coverage != 'failed':
                     continue
-                snippet = (f'（{args.lang} 译文校验失败）' if coverage_state == 'failed'
-                           else f'（{args.lang} 版本缺失）')
+                snippet = f'（{args.lang} 译文校验失败）'
+            elif not os.path.isfile(variant_path):
+                missing_language += 1
+                if args.keyword or args.coverage != 'missing':
+                    continue
+                snippet = f'（{args.lang} 版本缺失）'
             else:
                 try:
                     with open(variant_path, encoding='utf-8') as variant_fh:

@@ -18,6 +18,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import mathnet_translate as mt  # noqa: E402
 
 FIXTURE = Path(__file__).parent / "fixtures" / "mathnet_translate"
+REPO_ROOT = Path(__file__).resolve().parents[1]
+BANK = REPO_ROOT / "scripts" / "bank.py"
 NOW = "2026-08-06T12:00:00Z"
 
 
@@ -33,7 +35,34 @@ def read_jsonl(path: Path) -> list[dict]:
 def corpus(tmp_path: Path) -> Path:
     root = tmp_path / "mathnet-full"
     shutil.copytree(FIXTURE, root)
+    write_corpus_index(root)
     return root
+
+
+def index_row(root: Path, source: Path) -> dict:
+    return {
+        "mathnet_id": source.parent.name,
+        "path": source.relative_to(root).as_posix(),
+        "category": "algebra",
+        "topics": ["自造测试"],
+        "difficulty_est": 3,
+        "country": "Testland",
+        "source_lang": "und",
+        "variants": {"en": "missing", "zh": "missing"},
+        "translation_stale": False,
+    }
+
+
+def write_corpus_index(root: Path, only: set[str] | None = None) -> list[dict]:
+    rows = [
+        index_row(root, source)
+        for source in sorted(root.rglob("index.md"))
+        if only is None or source.parent.name in only
+    ]
+    (root / "index.jsonl").write_text(
+        "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows), encoding="utf-8"
+    )
+    return rows
 
 
 def export(corpus: Path, out: Path, *extra: str) -> list[dict]:
@@ -63,6 +92,28 @@ def apply_input(tmp_path: Path, row: dict, variants: dict) -> Path:
     record["variants"] = variants
     path.write_text(json.dumps(record, ensure_ascii=False) + "\n", encoding="utf-8")
     return path
+
+
+def apply_records_input(tmp_path: Path, records: list[dict]) -> Path:
+    path = tmp_path / "apply-many.jsonl"
+    path.write_text(
+        "".join(json.dumps(record, ensure_ascii=False) + "\n" for record in records),
+        encoding="utf-8",
+    )
+    return path
+
+
+def search(corpus: Path, lang: str, coverage: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [
+            sys.executable, str(BANK), "mathnet-search", "--lang", lang,
+            "--coverage", coverage, "--root", str(corpus),
+        ],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
 
 
 def test_export_covers_five_fixture_types_and_protects_content(corpus: Path, tmp_path: Path):
@@ -130,6 +181,210 @@ def test_passthrough_is_exact_and_reapply_is_noop(corpus: Path, tmp_path: Path):
     state = json.loads(metadata.read_text(encoding="utf-8"))
     assert state["variants"]["en"]["mode"] == "passthrough"
     assert state["variants"]["en"]["sha256"] == before
+
+
+def test_failed_retranslation_removes_obsolete_variant(corpus: Path, tmp_path: Path):
+    row = export(
+        corpus, tmp_path / "before.jsonl", "--only", "slv1",
+        "--source-lang", "sl", "--source-lang-confidence", "high",
+    )[0]
+    source = corpus / row["path"]
+    success = apply_input(tmp_path, row, {"en": translated_variant(row, "en")})
+    assert mt.main(["apply", "--root", str(corpus), "--in", str(success)]) == 0
+    target = source.with_name("index.en.md")
+    assert target.is_file()
+
+    source.write_bytes(source.read_bytes() + b"\n<!-- revised source -->\n")
+    revised_source = source.read_bytes()
+    revised = export(
+        corpus, tmp_path / "after.jsonl", "--only", "slv1",
+        "--source-lang", "sl", "--source-lang-confidence", "high",
+    )[0]
+    failed = apply_input(tmp_path, revised, {"en": {
+        "mode": "failed", "model": "test-model", "generated_at": NOW,
+        "error": "synthetic gate rejection",
+    }})
+
+    assert mt.main(["apply", "--root", str(corpus), "--in", str(failed)]) == 0
+    assert source.read_bytes() == revised_source
+    assert not target.exists()
+    state = json.loads((source.parent / "translation.json").read_text(encoding="utf-8"))
+    assert state["variants"]["en"]["mode"] == "failed"
+    result = search(corpus, "en", "failed")
+    assert result.returncode == 0
+    assert "slv1  " in result.stdout
+    assert "（en 译文校验失败）" in result.stdout
+
+
+def test_apply_immediately_refreshes_all_four_search_coverage_states(
+    corpus: Path, tmp_path: Path
+):
+    selected = {"eng1", "slv1", "bad1", "mcq1"}
+    write_corpus_index(corpus, selected)
+    sources = list(corpus.rglob("index.md"))
+    before = {path: digest(path) for path in sources}
+
+    eng = export(
+        corpus, tmp_path / "eng.jsonl", "--only", "eng1",
+        "--source-lang", "en", "--source-lang-confidence", "high",
+    )[0]
+    slv = export(
+        corpus, tmp_path / "slv.jsonl", "--only", "slv1",
+        "--source-lang", "sl", "--source-lang-confidence", "high",
+    )[0]
+    bad = export(
+        corpus, tmp_path / "bad.jsonl", "--only", "bad1",
+        "--source-lang", "fr", "--source-lang-confidence", "high",
+    )[0]
+    records = []
+    for row, variants in (
+        (eng, {"en": {"mode": "passthrough", "model": None, "generated_at": NOW}}),
+        (slv, {"en": translated_variant(slv, "en")}),
+        (bad, {"en": {
+            "mode": "failed", "model": "test-model", "generated_at": NOW,
+            "error": "synthetic gate rejection",
+        }}),
+    ):
+        record = {key: row[key] for key in (
+            "mathnet_id", "path", "source_sha256", "source_lang", "source_lang_confidence"
+        )}
+        record["variants"] = variants
+        records.append(record)
+
+    assert mt.main([
+        "apply", "--root", str(corpus), "--in", str(apply_records_input(tmp_path, records))
+    ]) == 0
+    expected = {
+        "translated": "slv1",
+        "passthrough": "eng1",
+        "failed": "bad1",
+        "missing": "mcq1",
+    }
+    for coverage, mathnet_id in expected.items():
+        result = search(corpus, "en", coverage)
+        assert result.returncode == 0, result.stderr
+        assert result.stdout.count(f"{mathnet_id}  ") == 1
+        assert "共 1 题" in result.stdout
+    assert {path: digest(path) for path in sources} == before
+
+
+def test_reindex_only_touches_selected_line_and_preserves_other_bytes(
+    corpus: Path, monkeypatch
+):
+    rows = write_corpus_index(corpus, {"eng1", "slv1"})
+    by_id = {row["mathnet_id"]: row for row in rows}
+    eng_source = corpus / by_id["eng1"]["path"]
+    eng_target = eng_source.with_name("index.en.md")
+    eng_target.write_bytes(eng_source.read_bytes())
+    (eng_source.parent / "translation.json").write_text(json.dumps({
+        "mathnet_id": "eng1",
+        "source_sha256": digest(eng_source),
+        "source_lang": "en",
+        "variants": {"en": {
+            "mode": "passthrough", "sha256": digest(eng_target),
+        }},
+    }), encoding="utf-8")
+
+    eng_line = (
+        '{"mathnet_id" : "eng1", "path":' + json.dumps(by_id["eng1"]["path"], ensure_ascii=False)
+        + ', "note" : "keep  spaces", "nested": {"z": 1}, "source_lang" : "old", '
+        '"variants": {"en": "missing"}, "translation_stale" : true}\n'
+    )
+    slv_line = json.dumps(by_id["slv1"], ensure_ascii=False) + "\n"
+    (corpus / "index.jsonl").write_text(eng_line + slv_line, encoding="utf-8")
+    calls = []
+    real_projection = mt.translation_projection
+
+    def tracking_projection(source: Path, mathnet_id: str):
+        calls.append(mathnet_id)
+        return real_projection(source, mathnet_id)
+
+    monkeypatch.setattr(mt, "translation_projection", tracking_projection)
+    assert mt.main(["reindex", "--root", str(corpus), "--only", "eng1"]) == 0
+
+    actual_eng, actual_slv = (corpus / "index.jsonl").read_text(encoding="utf-8").splitlines(True)
+    expected_eng = eng_line.replace('"old"', '"en"').replace(
+        '{"en": "missing"}', '{"en":"passthrough","zh":"missing"}'
+    ).replace('true}\n', 'false}\n')
+    assert actual_eng == expected_eng
+    assert actual_slv == slv_line
+    assert calls == ["eng1"]
+
+
+def test_reindex_requires_explicit_scope_and_all_processes_every_index_row(
+    corpus: Path, monkeypatch
+):
+    rows = write_corpus_index(corpus, {"eng1", "slv1"})
+    with pytest.raises(SystemExit) as exc_info:
+        mt.main(["reindex", "--root", str(corpus)])
+    assert exc_info.value.code == 2
+
+    calls = []
+    real_projection = mt.translation_projection
+
+    def tracking_projection(source: Path, mathnet_id: str):
+        calls.append(mathnet_id)
+        return real_projection(source, mathnet_id)
+
+    monkeypatch.setattr(mt, "translation_projection", tracking_projection)
+    assert mt.main(["reindex", "--root", str(corpus), "--all"]) == 0
+    assert calls == [row["mathnet_id"] for row in rows]
+
+
+def test_apply_no_reindex_leaves_index_bytes_unchanged(corpus: Path, tmp_path: Path):
+    write_corpus_index(corpus, {"eng1"})
+    index_path = corpus / "index.jsonl"
+    before = index_path.read_bytes()
+    row = export(
+        corpus, tmp_path / "eng-no-reindex.jsonl", "--only", "eng1",
+        "--source-lang", "en", "--source-lang-confidence", "high",
+    )[0]
+    apply_path = apply_input(tmp_path, row, {
+        "en": {"mode": "passthrough", "model": None, "generated_at": NOW}
+    })
+
+    assert mt.main([
+        "apply", "--root", str(corpus), "--in", str(apply_path), "--no-reindex"
+    ]) == 0
+    assert index_path.read_bytes() == before
+    assert ((corpus / row["path"]).parent / "translation.json").is_file()
+
+
+def test_reindex_clears_missing_metadata_and_marks_stale_or_missing_variants(corpus: Path):
+    rows = write_corpus_index(corpus, {"eng1", "slv1"})
+    by_id = {row["mathnet_id"]: row for row in rows}
+    index_path = corpus / "index.jsonl"
+    old_rows = []
+    for row in rows:
+        row.update({
+            "source_lang": "en",
+            "variants": {"en": "translated", "zh": "translated"},
+            "translation_stale": False,
+        })
+        old_rows.append(row)
+    index_path.write_text(
+        "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in old_rows), encoding="utf-8"
+    )
+
+    slv_source = corpus / by_id["slv1"]["path"]
+    (slv_source.parent / "translation.json").write_text(json.dumps({
+        "mathnet_id": "slv1",
+        "source_sha256": "outdated-source-hash",
+        "source_lang": "sl",
+        "variants": {"en": {"mode": "translated", "sha256": "missing-target-hash"}},
+    }), encoding="utf-8")
+    assert mt.main(["reindex", "--root", str(corpus), "--all"]) == 0
+
+    refreshed = {
+        row["mathnet_id"]: row
+        for row in map(json.loads, index_path.read_text(encoding="utf-8").splitlines())
+    }
+    assert refreshed["eng1"]["source_lang"] == "und"
+    assert refreshed["eng1"]["variants"] == {"en": "missing", "zh": "missing"}
+    assert refreshed["eng1"]["translation_stale"] is False
+    assert refreshed["slv1"]["source_lang"] == "sl"
+    assert refreshed["slv1"]["variants"] == {"en": "missing", "zh": "missing"}
+    assert refreshed["slv1"]["translation_stale"] is True
 
 
 @pytest.mark.parametrize(
@@ -365,6 +620,13 @@ def test_run_end_to_end_concurrent_and_resume_skips_completed(
         assert (directory / "index.zh.md").is_file()
         state = json.loads((directory / "translation.json").read_text(encoding="utf-8"))
         assert set(state["variants"]) == {"en", "zh"}
+    indexed = {
+        row["mathnet_id"]: row
+        for row in map(json.loads, (corpus / "index.jsonl").read_text(encoding="utf-8").splitlines())
+    }
+    assert indexed["eng1"]["variants"] == {"en": "passthrough", "zh": "translated"}
+    for mathnet_id in ("slv1", "mcq1"):
+        assert indexed[mathnet_id]["variants"] == {"en": "translated", "zh": "translated"}
     assert {path: digest(path) for path in sources} == before
     progress = json.loads((work / ".translate-progress.json").read_text(encoding="utf-8"))
     assert progress["questions"] and progress["batches"]
@@ -374,6 +636,20 @@ def test_run_end_to_end_concurrent_and_resume_skips_completed(
     assert "显式跳过 3 题" in resumed and "没有待处理译文" in resumed
     assert events.read_text(encoding="utf-8") == first_events
     assert {path: digest(path) for path in sources} == before
+
+
+def test_run_no_reindex_leaves_index_bytes_unchanged(corpus: Path, tmp_path: Path):
+    companion = fake_companion(tmp_path)
+    index_path = corpus / "index.jsonl"
+    before = index_path.read_bytes()
+
+    assert mt.main(run_args(
+        corpus, tmp_path / "run-no-reindex", companion,
+        "--only", "eng1", "--batch-size", "1", "--no-reindex",
+    )) == 0
+    assert index_path.read_bytes() == before
+    question = next(path.parent for path in corpus.rglob("index.md") if path.parent.name == "eng1")
+    assert (question / "translation.json").is_file()
 
 
 @pytest.mark.parametrize(
@@ -428,6 +704,11 @@ def test_run_fidelity_failure_is_recorded_without_target_files(
     state = json.loads((question / "translation.json").read_text(encoding="utf-8"))
     assert state["variants"]["en"]["mode"] == "failed"
     assert state["variants"]["zh"]["mode"] == "failed"
+    indexed = {
+        row["mathnet_id"]: row
+        for row in map(json.loads, (corpus / "index.jsonl").read_text(encoding="utf-8").splitlines())
+    }
+    assert indexed["slv1"]["variants"] == {"en": "failed", "zh": "failed"}
     ledger = (work / ".translate-failures.jsonl").read_text(encoding="utf-8")
     assert "保真校验失败" in ledger
     batch_outputs = list(work.glob("batches/*/translations.json"))
