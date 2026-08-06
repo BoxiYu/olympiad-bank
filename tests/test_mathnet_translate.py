@@ -74,6 +74,9 @@ def test_export_covers_five_fixture_types_and_protects_content(corpus: Path, tmp
     assert all(row["targets"] == ["en", "zh"] for row in rows)
 
     by_id = {row["mathnet_id"]: row for row in rows}
+    assert by_id["eng1"]["target_modes"] == {"en": "passthrough", "zh": "translated"}
+    assert by_id["slv1"]["target_modes"] == {"en": "translated", "zh": "translated"}
+    assert by_id["img1"]["target_modes"] == {"en": "translated", "zh": "translated"}
     eng_statement = by_id["eng1"]["units"][0]
     assert "$x$" not in eng_statement["source"] and "`x`" not in eng_statement["source"]
     assert len(eng_statement["protected"]) == 3
@@ -123,6 +126,30 @@ def test_passthrough_is_exact_and_reapply_is_noop(corpus: Path, tmp_path: Path):
     state = json.loads(metadata.read_text(encoding="utf-8"))
     assert state["variants"]["en"]["mode"] == "passthrough"
     assert state["variants"]["en"]["sha256"] == before
+
+
+@pytest.mark.parametrize(
+    ("source_lang", "confidence"),
+    [("en", "medium"), ("en", "low"), ("en-US", "high"), ("it", "high"), ("und", "low")],
+)
+def test_apply_rejects_every_passthrough_below_en_high(
+    corpus: Path, tmp_path: Path, source_lang: str, confidence: str
+):
+    row = export(
+        corpus, tmp_path / "batch.jsonl", "--only", "eng1",
+        "--source-lang", source_lang, "--source-lang-confidence", confidence,
+    )[0]
+    apply_path = apply_input(tmp_path, row, {
+        "en": {"mode": "passthrough", "model": None, "generated_at": NOW}
+    })
+
+    assert mt.main(["apply", "--root", str(corpus), "--in", str(apply_path)]) == 1
+    question = (corpus / row["path"]).parent
+    assert not (question / "index.en.md").exists()
+    assert not (question / "translation.json").exists()
+    assert "仅 source_lang=en" in read_jsonl(
+        apply_path.with_suffix(".jsonl.failures.jsonl")
+    )[0]["error"]
 
 
 def test_missing_unit_writes_nothing_to_question(corpus: Path, tmp_path: Path):
