@@ -2,7 +2,7 @@
 """相似度设施：题库 / MathNet 候选池的 embedding + 公式指纹索引与查询（库 + CLI 双用）
 
 用法：
-  # 只建库内 164 题（快速可用档，不需要 HF 缓存）：
+  # 只建库内题（快速可用档，不需要 HF 缓存）：
   uv run --group similar python scripts/similar_index.py build --bank-only
   # 建库内 + 候选池前 N 条 status=ok（验证用；读 HF 缓存需叠加 mathnet 组）：
   uv run --group similar --group mathnet python scripts/similar_index.py build --limit 500
@@ -264,6 +264,14 @@ def _save_corpus(name, ids, text_emb, text_mask, sol_emb, sol_mask, meta):
 def build_index(bank_only=False, limit=None, batch_size=64):
     t0 = time.time()
     os.makedirs(INDEX_DIR, exist_ok=True)
+    # 开建先清场：config.json 删掉，建到一半挂了守卫会拦住半成品；--bank-only 时
+    # 残留的旧 cand.npz 会被 load_index 安静合并进语料，必须一并删除
+    stale = ['config.json'] + (['cand.npz', 'cand_meta.jsonl'] if bank_only else [])
+    for name in stale:
+        p = os.path.join(INDEX_DIR, name)
+        if os.path.exists(p):
+            os.remove(p)
+            info(f'清除旧产物 {name}')
     model = get_model()
     dim = _dim(model)
 
@@ -308,8 +316,60 @@ def build_index(bank_only=False, limit=None, batch_size=64):
 
 # ───────────────────────── query ─────────────────────────
 
+REBUILD_CMD = 'uv run --group similar python scripts/similar_index.py build --bank-only'
+FULL_REBUILD_CMD = 'uv run --group similar --group mathnet python scripts/similar_index.py build'
+
+
+def count_bank_problems(root=None):
+    """problems/ 实际题数（只数文件，不读内容）——新鲜度判据统一用这个题数口径。"""
+    root = root or ROOT
+    n = 0
+    for cat in CATEGORIES:
+        d = os.path.join(root, 'problems', cat)
+        if os.path.isdir(d):
+            n += sum(1 for name in os.listdir(d) if name.endswith('.md'))
+    return n
+
+
+def freshness_issues(root=None):
+    """simindex 新鲜度判据唯一正本：config 缺失/不可解析、bank_n 与现库题数不符、
+    bank_only 构建下残留 cand.npz。返回 (问题描述列表, config 字典或 None)；
+    bank.py doctor 逐条汇报计数，查询守卫拒绝出结果，两处消费同一份判据。"""
+    root = root or ROOT
+    index_dir = os.path.join(root, 'candidates', 'simindex')
+    cfg_path = os.path.join(index_dir, 'config.json')
+    if not os.path.exists(cfg_path):
+        return [f'config.json：缺失（clone 后正常）——重建：{REBUILD_CMD}'], None
+    try:
+        with open(cfg_path, encoding='utf-8') as f:
+            cfg = json.load(f)
+        if not isinstance(cfg, dict):
+            raise ValueError('config.json 顶层必须是对象')
+    except (OSError, ValueError):
+        return [f'config.json：无法解析——重建：{REBUILD_CMD}'], None
+    issues = []
+    n_bank = count_bank_problems(root)
+    if cfg.get('bank_n') != n_bank:
+        issues.append(f"config.json：陈旧（bank_n={cfg.get('bank_n')}，现库 {n_bank} 题，"
+                      f"构建于 {cfg.get('built') or '?'}）——重建：{REBUILD_CMD}")
+    if cfg.get('bank_only') and os.path.exists(os.path.join(index_dir, 'cand.npz')):
+        issues.append(f'：残留（config 记 bank_only 构建，但候选索引 cand.npz 仍在，'
+                      f'similar 查询会混入陈旧候选）——重建：{FULL_REBUILD_CMD}')
+    return issues, cfg
+
+
+def ensure_index_fresh():
+    """查询前的廉价新鲜度守卫（判据正本在 freshness_issues，这里只负责拒绝）：
+    索引建自旧库或混有残留 cand 时安静返回错误语料比报错更糟，一律拒绝出结果。"""
+    issues, _cfg = freshness_issues()
+    if issues:
+        sys.exit('索引不可用，拒绝出结果：\n'
+                 + '\n'.join(f'  candidates/simindex/{msg}' for msg in issues))
+
+
 def load_index():
     """合并 bank + cand（若已建）为单一语料。返回 dict 或 None。"""
+    ensure_index_fresh()
     try:
         import numpy as np
     except ImportError:

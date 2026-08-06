@@ -13,6 +13,7 @@
     --d1:#86b6ef; --d2:#5598e7; --d3:#2a78d6; --d4:#1c5cab; --d5:#0d366b;
     --h1:#cde2fb; --h2:#9ec5f4; --h3:#6da7ec; --h4:#3987e5; --h5:#256abf; --h6:#184f95; --h7:#0d366b;
     --chip-ink-light:#0b0b0b; --chip-ink-dark:#ffffff;
+    --m-weak:#c0392b; --m-mid:#a97a0a; --m-solid:#1e7d43;
   }
   @media (prefers-color-scheme: dark) {
     :root:where(:not([data-theme="light"])) .viz-root {
@@ -22,6 +23,7 @@
       --grid:#2c2c2a; --border:rgba(255,255,255,0.10);
       --d1:#184f95; --d2:#256abf; --d3:#3987e5; --d4:#6da7ec; --d5:#9ec5f4;
       --h1:#104281; --h2:#184f95; --h3:#1c5cab; --h4:#256abf; --h5:#3987e5; --h6:#6da7ec; --h7:#9ec5f4;
+      --m-weak:#e0705c; --m-mid:#d9a13c; --m-solid:#4cbf82;
     }
   }
   :root[data-theme="dark"] .viz-root {
@@ -31,6 +33,7 @@
     --grid:#2c2c2a; --border:rgba(255,255,255,0.10);
     --d1:#184f95; --d2:#256abf; --d3:#3987e5; --d4:#6da7ec; --d5:#9ec5f4;
     --h1:#104281; --h2:#184f95; --h3:#1c5cab; --h4:#256abf; --h5:#3987e5; --h6:#6da7ec; --h7:#9ec5f4;
+    --m-weak:#e0705c; --m-mid:#d9a13c; --m-solid:#4cbf82;
   }
   * { box-sizing:border-box; margin:0; }
   body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
@@ -55,9 +58,10 @@
   .nname { font-size:13.5px; font-weight:650; }
   .ntotal { color:var(--ink-mut); font-size:12px; white-space:nowrap; }
   .heat { display:grid; grid-template-columns:repeat(5,1fr); gap:2px; margin-top:9px; }
-  .cell { height:30px; border-radius:5px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:11px; line-height:1.1; cursor:default; }
+  .cell { min-height:30px; padding:2px 0; border-radius:5px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:11px; line-height:1.1; cursor:default; }
   .cell .st { font-size:9px; opacity:.75; }
   .cell.z { border:1.5px dashed var(--grid); color:var(--ink-mut); background:transparent; }
+  .cell .sup { font-size:8.5px; letter-spacing:.02em; }
   .cell.b1,.cell.b2,.cell.b3 { color:var(--chip-ink-light); background:var(--h1); }
   .cell.b2 { background:var(--h2); } .cell.b3 { background:var(--h3); }
   .cell.b4,.cell.b5,.cell.b6,.cell.b7 { color:var(--chip-ink-dark); }
@@ -78,8 +82,20 @@
   .prow { display:flex; flex-wrap:wrap; gap:5px; align-items:center; margin-top:8px; color:var(--ink-mut); font-size:11.5px; }
   .pchip { border:1px dashed var(--grid); border-radius:7px; padding:2px 7px; font-size:11.5px; color:var(--ink-2); background:transparent; cursor:pointer; }
   .pchip:hover { border-color:var(--d3); color:var(--ink-1); }
-  .node.hl-pre { border-color:var(--d3); box-shadow:0 0 0 1px var(--d3); }
-  .node.hl-succ { border-style:dashed; border-color:var(--d4); }
+  /* 掌握层：开关开启时节点卡按学生四档状态描边（阈值正本 scripts/student_profile.py）。
+     悬停高亮两条规则放在其后且同特异度，保证前置/后继高亮盖过掌握描边 */
+  .show-mastery .node.m-weak { border-color:var(--m-weak); box-shadow:0 0 0 1px var(--m-weak); }
+  .show-mastery .node.m-mid { border-color:var(--m-mid); box-shadow:0 0 0 1px var(--m-mid); }
+  .show-mastery .node.m-solid { border-color:var(--m-solid); box-shadow:0 0 0 1px var(--m-solid); }
+  .show-mastery .node.m-none { border-style:dashed; }
+  .mst { display:none; font-size:11px; font-weight:400; white-space:nowrap; }
+  .show-mastery .mst { display:inline; }
+  .mst.m-weak { color:var(--m-weak); } .mst.m-mid { color:var(--m-mid); }
+  .mst.m-solid { color:var(--m-solid); } .mst.m-none { color:var(--ink-mut); }
+  .mlg { display:none; }
+  .show-mastery .mlg { display:flex; }
+  .viz-root .node.hl-pre { border-color:var(--d3); box-shadow:0 0 0 1px var(--d3); }
+  .viz-root .node.hl-succ { border-style:dashed; border-color:var(--d4); }
   .node.flash { animation:ndflash 1.5s ease-out; }
   @keyframes ndflash { 0% { box-shadow:0 0 0 3px var(--d3); } 100% { box-shadow:0 0 0 0 transparent; } }
 </style>
@@ -98,12 +114,15 @@
     <button class="fbtn" data-d="1">★1</button><button class="fbtn" data-d="2">★2</button>
     <button class="fbtn" data-d="3">★3</button><button class="fbtn" data-d="4">★4</button>
     <button class="fbtn" data-d="5">★5</button>
+    <button class="fbtn" id="masteryBtn" hidden>掌握层</button>
   </div>
   <div class="legend">
     <span class="lg-item">难度：<span class="sw" style="background:var(--d1)"></span>★1 <span class="sw" style="background:var(--d2)"></span>★2 <span class="sw" style="background:var(--d3)"></span>★3 <span class="sw" style="background:var(--d4)"></span>★4 <span class="sw" style="background:var(--d5)"></span>★5</span>
     <span class="lg-item">格内数字＝该知识点该星级题数（颜色越深越多）</span>
     <span class="lg-item"><span class="sw z"></span>＝缺口（0 题，扩容优先级）</span>
+    <span class="lg-item" id="supplyLg">缺口格灰字「可补n·est」＝候选池可补量（est 为启发式估级，非承诺量）</span>
     <span class="lg-item"><span class="pchip" style="cursor:default">前置</span>＝建议先掌握的知识点（点击跳转；悬停节点卡高亮前置/后继）</span>
+    <span class="lg-item mlg">掌握：<span class="sw" style="background:var(--m-solid)"></span>稳固 <span class="sw" style="background:var(--m-mid)"></span>进行中 <span class="sw" style="background:var(--m-weak)"></span>薄弱 <span class="sw z"></span>未测</span>
   </div>
   <div id="app"></div>
   <div id="tip"></div>
@@ -120,7 +139,16 @@ const preOf = new Map(), succOf = new Map();
   succOf.get(e.from).push(e.to);
 });
 document.getElementById('metaLine').textContent =
-  `共 ${DATA.total} 题 · ${DATA.cats.reduce((s,c)=>s+c.nodes.length,0)} 个知识点节点 · 生成于 ${DATA.generated}`;
+  `共 ${DATA.total} 题 · ${DATA.cats.reduce((s,c)=>s+c.nodes.length,0)} 个知识点节点 · 生成于 ${DATA.generated} · 静态快照，用 bank.py doctor 检查新鲜度`;
+/* 供给层缺失（clone 后候选池未重建）→ 页头提示 + 撤掉对应图例 */
+if (!DATA.has_supply) {
+  const warn = document.createElement('span');
+  warn.className = 'meta';
+  warn.textContent = '⚠ 候选供给未载入：candidates/mathnet.jsonl 缺失，重建候选池后重跑 bank.py map';
+  document.querySelector('header').appendChild(warn);
+  document.getElementById('supplyLg').style.display = 'none';
+}
+const M_CLS = {'稳固':'m-solid','进行中':'m-mid','薄弱':'m-weak','未测':'m-none'};
 let maxCell = 1;
 DATA.cats.forEach(c=>c.nodes.forEach(n=>Object.values(n.stars).forEach(v=>{ if(v>maxCell) maxCell=v; })));
 const bucket = v => v===0 ? 0 : Math.max(1, Math.ceil(v/maxCell*7));
@@ -135,8 +163,11 @@ for (const c of DATA.cats) {
     el.id = 'nd-' + n.key; el.dataset.key = n.key;
     const cells = [1,2,3,4,5].map(d=>{
       const v = n.stars[String(d)]; const b = bucket(v);
+      const sup = (n.supply || {})[String(d)] || 0;
       const ids = n.problems.filter(p=>p.d===d).map(p=>p.id).slice(0,8).join('、')||'—';
-      return `<div class="cell ${b===0?'z':'b'+b}" data-tip="★${d} × ${v} 题|${ids}"><span>${v}</span><span class="st">★${d}</span></div>`;
+      const l2 = (v===0 && sup) ? `候选池可补 ${sup} 题（est 为估级，非承诺量）` : ids;
+      const supHtml = (v===0 && sup) ? `<span class="sup">可补${sup}·est</span>` : '';
+      return `<div class="cell ${b===0?'z':'b'+b}" data-tip="★${d} × ${v} 题|${l2}"><span>${v}</span><span class="st">★${d}</span>${supHtml}</div>`;
     }).join('');
     const chips = n.problems.map(p=>
       `<span class="chip" data-d="${p.d}" data-txt="${(p.id+' '+p.t+' '+(p.c||'')).toLowerCase()}" data-tip="${p.id}｜${'★'.repeat(p.d)}|${p.t}（${p.c||'?'} ${p.y||''}）"><span class="dot d${p.d}"></span><span class="cid">${p.id}</span>${p.t}</span>`
@@ -146,7 +177,13 @@ for (const c of DATA.cats) {
       ? `<div class="prow">前置 →${pre.map(k =>
           `<span class="pchip" data-key="${k}" data-tip="${k}｜点击跳转">${k.split('/')[1]}</span>`).join('')}</div>`
       : '';
-    el.innerHTML = `<div class="nhead"><span class="nname">${n.name}</span><span class="ntotal">${n.total} 题</span></div>
+    const mst = DATA.mastery ? DATA.mastery.nodes[n.key] : null;
+    if (mst) el.classList.add(M_CLS[mst.status] || 'm-none');
+    const mstHtml = mst
+      ? ` <span class="mst ${M_CLS[mst.status]||'m-none'}">${mst.status}${
+          mst.mastery!=null ? ' '+Math.round(mst.mastery*100)+'%' : ''}${mst.n ? ' n='+mst.n : ''}</span>`
+      : '';
+    el.innerHTML = `<div class="nhead"><span class="nname">${n.name}${mstHtml}</span><span class="ntotal">${n.total} 题</span></div>
       <div class="heat">${cells}</div>${prow}
       <details><summary>题目列表</summary><div class="plist">${chips}</div></details>`;
     grid.appendChild(el);
@@ -202,11 +239,21 @@ const applyFilter = ()=>{
   });
 };
 document.getElementById('q').addEventListener('input', applyFilter);
-document.querySelectorAll('.fbtn').forEach(b=>b.addEventListener('click', ()=>{
+document.querySelectorAll('.fbtn[data-d]').forEach(b=>b.addEventListener('click', ()=>{
   df = Number(b.dataset.d);
-  document.querySelectorAll('.fbtn').forEach(x=>x.classList.toggle('on', x===b));
+  document.querySelectorAll('.fbtn[data-d]').forEach(x=>x.classList.toggle('on', x===b));
   applyFilter();
 }));
+/* 掌握层开关（无学生证据时 DATA.mastery 为 null，按钮保持隐藏） */
+if (DATA.mastery) {
+  const mb = document.getElementById('masteryBtn');
+  mb.hidden = false;
+  mb.textContent = `掌握层：${DATA.mastery.student} 证据 ${DATA.mastery.evidence} 条`;
+  mb.addEventListener('click', ()=>{
+    const on = document.getElementById('root').classList.toggle('show-mastery');
+    mb.classList.toggle('on', on);
+  });
+}
 /* theme toggle */
 document.getElementById('themeBtn').addEventListener('click', ()=>{
   const r = document.documentElement;

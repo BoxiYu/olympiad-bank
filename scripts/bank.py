@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""题库工具：lint / doclint / query / mathnet-search / stats / plan / coach / spar / review / similar / web / student / assess / profile
+"""题库工具：lint / doclint / query / mathnet-search / stats / plan / coach / spar / review / similar / web / student / assess / profile / gaps / doctor
 
 用法：
   uv run python scripts/bank.py web        # 浏览器训练台（学生推荐入口，scripts/web_app.py）
@@ -15,6 +15,8 @@
   uv run python scripts/bank.py student add <id> --name 张三  # 学生建档（student list 看名单）
   uv run python scripts/bank.py assess <id> --wave 基线-1 --id A-001 --score 1   # 测评波次录入
   uv run python scripts/bank.py profile <id> [--html]         # 能力图：基础值走势 + 节点状态 + 补齐队列
+  uv run python scripts/bank.py gaps [--student self]         # 统一缺口台账 → maps/gaps.json（coach --from-gaps 消费）
+  uv run python scripts/bank.py doctor     # 生成产物新鲜度自检（maps/ 与 simindex；只读，绝不代跑重建）
 """
 import argparse, os, re, sys, yaml
 
@@ -541,12 +543,75 @@ def build_coach_pool(problems, profile, excluded, rng):
     return pool
 
 
-def pick_week(pool, profile, n, rng):
-    """从候选池按星级配比取一周题目（就地消耗 pool），按（难度, 题号）排序返回。"""
+GAP_SHARE = 0.35          # coach --from-gaps：缺口名额占比（任务档 30–40% 取中值，round 后落在档内）
+GAPS_MIN_EVIDENCE = 10    # 证据下限：attempts+assessments 合计不足则能力图立不住，整体降级回纯配比
+
+
+def load_gap_picks(problems, profile, excluded):
+    """maps/gaps.json 缺口队列 → 有序候选 fm 列表（薄弱优先、队列序即拓扑序，跨周就地消耗）。
+
+    单一正本：只读 gaps 台账落盘的状态与选题，不 import student_profile 重算掌握值。
+    台账缺失/不可解析/证据不足 → 打印原因并返回空表（coach 整体降级为纯配比轮转）。
+    """
+    import json
+    path = os.path.join(ROOT, 'maps', 'gaps.json')
+    try:
+        data = json.load(open(path, encoding='utf-8'))
+    except OSError:
+        print('（--from-gaps）maps/gaps.json 不存在——先跑 uv run python scripts/bank.py gaps；'
+              '本次整体降级为纯配比轮转\n')
+        return []
+    except ValueError:
+        print('（--from-gaps）maps/gaps.json 无法解析——重建：uv run python scripts/bank.py gaps；'
+              '本次整体降级为纯配比轮转\n')
+        return []
+    total = data.get('evidence_total') or 0
+    if total < GAPS_MIN_EVIDENCE:
+        print(f'（--from-gaps）证据不足：attempts+assessments 共 {total} 条（<{GAPS_MIN_EVIDENCE}），'
+              f'能力图还立不住——本次整体降级为纯配比轮转\n')
+        return []
+    fmmap = {p['fm']['id']: p['fm'] for p in problems if p['fm']}
+    entries = [e for e in data.get('nodes') or [] if e.get('queue_rank') is not None]
+    # 台账队列序本身已按前置拓扑排（上游在前，blocked_by 只作标注）；这里再全局提薄弱
+    entries.sort(key=lambda e: (0 if e.get('status') == '薄弱' else 1, e['queue_rank']))
+    picked, seen = [], set()
+    for e in entries:
+        for pk in e.get('picks') or []:
+            fm = fmmap.get(pk.get('id'))
+            if fm is None or fm['id'] in seen or fm['id'] in excluded:
+                continue
+            if fm.get('difficulty') not in profile:   # 星级配比约束：目标赛事外的档位不进周计划
+                continue
+            seen.add(fm['id'])
+            picked.append(fm)
+    return picked
+
+
+def pick_week(pool, profile, n, rng, gap_fms=None):
+    """从候选池按星级配比取一周题目（就地消耗 pool），按（难度, 题号）排序返回。
+
+    gap_fms 非空时先从缺口队列头部取约 GAP_SHARE 名额（就地消耗，占用对应星级配额），
+    剩余名额仍走板块轮转——整周星级构成与纯配比完全一致。
+    """
     total_w = sum(profile.values())
+    quota = {d: max(1, round(n * wt / total_w)) for d, wt in profile.items()}
     picked = []
-    for d, wt in sorted(profile.items()):
-        k = max(1, round(n * wt / total_w))
+    if gap_fms:
+        # 先剔除已不在池里的队列项：上周经轮转进过计划的题仍留在 gap_fms，
+        # 不剔除会被缺口循环跨周再排一次（pool 去重那步拦不住已出池的题）
+        gap_fms[:] = [f for f in gap_fms if f in pool.get(f['difficulty'], [])]
+    if gap_fms:
+        k_gap = max(1, round(n * GAP_SHARE))
+        while gap_fms and len(picked) < k_gap:
+            fm = next((f for f in gap_fms if quota.get(f['difficulty'], 0) > 0), None)
+            if fm is None:
+                break
+            gap_fms.remove(fm)
+            quota[fm['difficulty']] -= 1
+            if fm in pool.get(fm['difficulty'], []):
+                pool[fm['difficulty']].remove(fm)
+            picked.append(fm)
+    for d, k in sorted(quota.items()):
         sel = _pick_rotating(pool.get(d, []), k, rng)
         for fm in sel:
             pool[d].remove(fm)
@@ -566,15 +631,22 @@ def coach(problems, args):
     graduated = {pid for pid, recs in hist.items() if sp.is_graduated(recs)}
     excluded = set(hist) | graduated   # 做过的走复习队列；毕业题永久不进周计划
     pool = build_coach_pool(problems, profile, excluded, rng)
+    gap_fms = load_gap_picks(problems, profile, excluded) if getattr(args, 'from_gaps', False) else []
     print(f'=== 教练周计划 | 目标 {args.target} | {args.weeks} 周 × 每周 {args.n} 题 | seed={args.seed} ===\n')
+    if gap_fms:
+        print(f'缺口名额：每周约 {round(GAP_SHARE * 100)}% 出自 maps/gaps.json 队列（薄弱优先、上游在前，'
+              f'标〔缺口〕），其余按配比轮转。\n')
     print('攻坚纪律：限时独立攻坚（' + '，'.join(f'★{d}≤{m}min' for d, m in sorted(TIME_LIMIT.items()) if d in profile)
           + '）；卡住按「提示阶梯」逐级解锁，每级之间再战 15 分钟；无论成败必须 spar finish 落账。\n')
     week1 = []
     for w in range(1, args.weeks + 1):
         print(f'—— 第 {w} 周 ——')
-        picked = pick_week(pool, profile, args.n, rng)
+        gap_before = {fm['id'] for fm in gap_fms}
+        picked = pick_week(pool, profile, args.n, rng, gap_fms)
+        gap_used = gap_before - {fm['id'] for fm in gap_fms}
         for fm in picked:
-            print(f"  {fm['id']}  {'★' * fm['difficulty']:<5} {fm.get('contest') or '?':<6} {fm['title']}"
+            mark = '〔缺口〕' if fm['id'] in gap_used else ''
+            print(f"  {fm['id']}  {'★' * fm['difficulty']:<5} {fm.get('contest') or '?':<6} {fm['title']}{mark}"
                   f"  → uv run python scripts/bank.py spar {fm['id']}")
         if not picked:
             print('  （题池已耗尽——先复习或扩池）')
@@ -641,6 +713,27 @@ def registry_report(problems):
     return bad
 
 
+MAP_STUDENT = 'self'  # 掌握层固定读 self（spar finish 的落账学生；多学生场景看 profile <id> --html）
+
+
+def _map_mastery(problems, reg):
+    """指示图掌握层：复用 student_profile 的证据装配与状态阈值（不复制折算逻辑）。
+
+    学生无档案或零证据 → None（前端隐藏开关，指示图退回纯供给视图）。
+    """
+    prof = stp.load_student(MAP_STUDENT)
+    if prof is None:
+        return None
+    fmmap = {p['fm']['id']: p['fm'] for p in problems if p['fm']}
+    evidence, _, _ = stp.build_evidence(
+        prof, stp.load_assessments(MAP_STUDENT), sp.load_attempts_v2(), fmmap, reg, resolve_topic)
+    if not evidence:
+        return None
+    return {'student': MAP_STUDENT, 'evidence': len(evidence),
+            'nodes': {f'{c}/{n}': {'status': st['status'], 'mastery': st['mastery'], 'n': st['n']}
+                      for (c, n), st in stp.node_table(evidence, reg).items()}}
+
+
 def gen_map(problems):
     import json, datetime
     reg = load_registry()
@@ -670,11 +763,17 @@ def gen_map(problems):
             nd['stars'][str(d)] += 1
             nd['problems'].append({'id': fm['id'], 'd': d, 't': fm.get('title', ''),
                                    'c': fm.get('contest', ''), 'y': fm.get('year', '')})
+    # 供给层：候选池按 节点×估级 聚合（计数正本 gap_counts，与 candidates --gaps / gaps 台账同源）；
+    # 池子缺失（clone 后常态）→ 节点不带 supply，前端按 has_supply 在页头提示
+    rows = load_candidates() if os.path.exists(_candidates_path()) else None
+    cand_map = gap_counts(problems, rows, reg)[1] if rows is not None else {}
     cats = []
     for cat in CATEGORIES:
-        for nd in all_nodes[cat].values():
+        for node, nd in all_nodes[cat].items():
             nd['problems'].sort(key=lambda x: (-x['d'], x['id']))
             nd['total'] = len(nd['problems'])
+            if rows is not None:
+                nd['supply'] = {str(d): v for d, v in sorted(cand_map.get((cat, node), {}).items())}
         cats.append({'cat': cat, 'label': CAT_LABEL[cat],
                      'nodes': [all_nodes[cat][n] for n in (reg.get(cat) or {})]})
     # 前置依赖边（正本 taxonomy/prereq.yml，校验在 doclint——map 只消费，端点不认识就跳过）
@@ -682,7 +781,8 @@ def gen_map(problems):
     edges = [{'from': v, 'to': k} for k, vs in (load_prereq() or {}).items()
              for v in vs if k in known and v in known]
     data = {'generated': datetime.date.today().isoformat(), 'total': len(problems),
-            'cats': cats, 'edges': edges}
+            'cats': cats, 'edges': edges,
+            'has_supply': rows is not None, 'mastery': _map_mastery(problems, reg)}
     os.makedirs(os.path.join(ROOT, 'maps'), exist_ok=True)
     with open(os.path.join(ROOT, 'maps', 'map_data.json'), 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=1)
@@ -691,6 +791,11 @@ def gen_map(problems):
         f.write(tpl.replace('__MAP_DATA__', json.dumps(data, ensure_ascii=False)))
     n_nodes = sum(len(c['nodes']) for c in cats)
     print(f'maps/指示图.html 已生成：{len(problems)} 题 → {n_nodes} 个知识点节点')
+    if rows is None:
+        print(f'候选池不存在——供给层已省略；重建：{CANDIDATES_REBUILD_CMD}')
+    m = data['mastery']
+    print(f"掌握层：学生 {m['student']} 证据 {m['evidence']} 条" if m else
+          '掌握层：无学生证据，已省略（student add + assess/spar 后重跑 map）')
     if unresolved:
         print(f'未注册 topic {len(unresolved)} 处（跑 lint 看明细）')
 
@@ -960,15 +1065,19 @@ def linkcheck(fetch=None):
 
 
 # ---------------- MathNet 候选池 ----------------
-CANDIDATES = os.path.join(ROOT, 'candidates', 'mathnet.jsonl')
+CANDIDATES_REBUILD_CMD = 'uv run --group mathnet python scripts/mathnet_ingest.py'
+
+
+def _candidates_path():
+    return os.path.join(ROOT, 'candidates', 'mathnet.jsonl')
 
 
 def load_candidates():
     import json
-    if not os.path.exists(CANDIDATES):
-        print('候选池不存在。先构建：uv run --group mathnet python scripts/mathnet_ingest.py')
+    if not os.path.exists(_candidates_path()):
+        print(f'候选池不存在。先构建：{CANDIDATES_REBUILD_CMD}')
         sys.exit(2)
-    return [json.loads(l) for l in open(CANDIDATES, encoding='utf-8') if l.strip()]
+    return [json.loads(l) for l in open(_candidates_path(), encoding='utf-8') if l.strip()]
 
 
 def apply_grade_floor(rows):
@@ -1044,33 +1153,173 @@ def candidates_cmd(problems, args):
     print(f'\n匹配 {len(pool)} 题，显示前 {len(shown)}（--limit 调整；est 为估级非定级，入库时按 SPEC 定稿）')
 
 
-def candidates_gaps(problems, rows):
-    """45 节点采购单：库内现有 vs 候选可补（含中低星细分）。"""
-    reg = load_registry()
+def gap_counts(problems, rows, reg):
+    """（板块,节点）→ 库内 {题号: 难度} 与候选 {估级: 题数}。candidates --gaps 与 gaps 台账共用的计数正本。
+
+    rows=None（候选池缺失）时候选侧返回空表——调用方自行决定按 0 打印还是置 null。
+    """
     bank = {}
     for p in problems:
         fm = p['fm'] or {}
         for t in fm.get('topics', []) or []:
             node = resolve_topic(reg, fm.get('category'), t)
             if node:
-                bank.setdefault((fm['category'], node), set()).add(fm['id'])
-    cand, cand_low = {}, {}
+                bank.setdefault((fm['category'], node), {})[fm['id']] = fm.get('difficulty')
+    cand = {}
     # 学段下界（SPEC §4）：★1 进不了库，计进采购单会虚报可补量
-    ok, _ = apply_grade_floor([r for r in rows if r['status'] == 'ok'])
+    ok, _ = apply_grade_floor([r for r in rows or [] if r['status'] == 'ok'])
     for r in ok:
         for node in r['topics']:
             k = (r['category'], node)
-            cand[k] = cand.get(k, 0) + 1
-            if r['difficulty_est'] <= 3:
-                cand_low[k] = cand_low.get(k, 0) + 1
+            by_star = cand.setdefault(k, {})
+            by_star[r['difficulty_est']] = by_star.get(r['difficulty_est'], 0) + 1
+    return bank, cand
+
+
+def candidates_gaps(problems, rows):
+    """45 节点采购单：库内现有 vs 候选可补（含中低星细分）。"""
+    reg = load_registry()
+    bank, cand = gap_counts(problems, rows, reg)
     print(f"{'板块':<6} {'知识点':<14} {'库内':>4} {'候选':>6} {'候选★≤3':>7}")
     for cat in CATEGORIES:
         for node in (reg.get(cat) or {}):
             k = (cat, node)
             b = len(bank.get(k, ()))
+            c_all = sum(cand.get(k, {}).values())
+            c_low = sum(v for d, v in cand.get(k, {}).items() if d <= 3)
             mark = ' ←缺' if b <= 2 else ''
-            print(f'{CAT_LABEL[cat]:<6} {node:<14} {b:>4} {cand.get(k, 0):>6} {cand_low.get(k, 0):>7}{mark}')
+            print(f'{CAT_LABEL[cat]:<6} {node:<14} {b:>4} {c_all:>6} {c_low:>7}{mark}')
     print('\n「←缺」= 库内 ≤2 题的薄弱节点；候选数为标签流估计，入库前须官方源核验。')
+
+
+def cmd_gaps(problems, args):
+    """统一缺口台账 → maps/gaps.json：学生缺口队列（student_profile.gap_queue 的落盘）
+    × 库内/候选供给（candidates --gaps 同源计数），键空间统一为（板块, 节点）。"""
+    import datetime, json
+    reg = load_registry()
+    if reg is None:
+        print('缺 taxonomy/registry.yml')
+        sys.exit(2)
+    rows = None
+    if os.path.exists(_candidates_path()):
+        rows = load_candidates()
+    else:
+        print(f'候选池不存在（candidates/mathnet.jsonl）——cand 计数置 null；重建：{CANDIDATES_REBUILD_CMD}')
+    bank_map, cand_map = gap_counts(problems, rows, reg)
+
+    sid = args.student
+    fmmap = {p['fm']['id']: p['fm'] for p in problems if p['fm']}
+    prof = stp.load_student(sid)
+    if prof is None:
+        print(f'学生 {sid} 无档案——按零证据产出（节点状态多为未测）；'
+              f'建档：uv run python scripts/bank.py student add {sid}')
+        evidence = []
+    else:
+        evidence, _, _ = stp.build_evidence(
+            prof, stp.load_assessments(sid), sp.load_attempts_v2(), fmmap, reg, resolve_topic)
+    ntable = stp.node_table(evidence, reg)
+    seen_refs = {e['ref'] for e in evidence}
+    queue = stp.gap_queue(ntable, reg, problems, resolve_topic, seen_refs, load_prereq())
+    rank = {(it['cat'], it['node']): (i, it) for i, it in enumerate(queue)}
+
+    nodes = []
+    for cat in CATEGORIES:
+        for node in (reg.get(cat) or {}):
+            k = (cat, node)
+            st = ntable[k]
+            bank_stars = {}
+            for d in bank_map.get(k, {}).values():
+                bank_stars[str(d)] = bank_stars.get(str(d), 0) + 1
+            in_q = rank.get(k)
+            nodes.append({
+                'cat': cat, 'node': node,
+                'status': st['status'], 'mastery': st['mastery'], 'n': st['n'],
+                'bank': {'total': len(bank_map.get(k, {})),
+                         'by_star': dict(sorted(bank_stars.items()))},
+                'cand': None if rows is None else
+                        {'total': sum(cand_map.get(k, {}).values()),
+                         'by_star': {str(d): v for d, v in sorted(cand_map.get(k, {}).items())}},
+                'queue_rank': in_q[0] if in_q else None,
+                'picks': in_q[1]['picks'] if in_q else [],
+                'blocked_by': (in_q[1].get('blocked_by') or []) if in_q else [],
+            })
+    data = {
+        'generated': datetime.datetime.now().isoformat(timespec='seconds'),
+        '_note': '生成产物，勿手改；重建：uv run python scripts/bank.py gaps（--student 换人）',
+        'student': sid,
+        'evidence_total': len(evidence),
+        'nodes': nodes,
+    }
+    os.makedirs(os.path.join(ROOT, 'maps'), exist_ok=True)
+    with open(os.path.join(ROOT, 'maps', 'gaps.json'), 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=1)
+    n_weak = sum(1 for e in nodes if e['status'] == '薄弱')
+    n_untested = sum(1 for e in nodes if e['status'] == '未测')
+    print(f'maps/gaps.json 已生成：{len(nodes)} 节点（薄弱 {n_weak}｜未测 {n_untested}｜队列 {len(queue)} 项）'
+          f'｜学生 {sid} 证据 {len(evidence)} 条')
+
+
+# ---------------- 生成产物新鲜度自检 doctor ----------------
+# 刻意不进 lint.sh：maps/ 与 candidates/ 是 gitignore 的本地缓存，clone 后缺失是常态，
+# 不该挡提交。doctor 只读比对，绝不代跑重建（重建命令都在输出里）。
+# simindex 的判据与重建命令正本在 similar_index.freshness_issues，这里只持有 maps/ 的。
+MAP_REBUILD_CMD = 'uv run python scripts/bank.py map'
+
+
+def doctor(problems):
+    """生成产物新鲜度自检：逐项比对内嵌规模与现库题数。任一缺失/陈旧 → exit 1，全新鲜 → 0。"""
+    import glob, json
+    n_bank = len(problems)
+    n_issue = 0
+
+    def _load_json(path):
+        try:
+            data = json.load(open(path, encoding='utf-8'))
+            return data if isinstance(data, dict) else None
+        except (OSError, ValueError):
+            return None
+
+    # a) maps/map_data.json：total vs 现库题数
+    map_path = os.path.join(ROOT, 'maps', 'map_data.json')
+    if not os.path.exists(map_path):
+        print(f'maps/map_data.json：缺失（clone 后正常）——重建：{MAP_REBUILD_CMD}')
+        n_issue += 1
+    else:
+        data = _load_json(map_path)
+        if data is None:
+            print(f'maps/map_data.json：无法解析——重建：{MAP_REBUILD_CMD}')
+            n_issue += 1
+        elif data.get('total') != n_bank:
+            print(f"maps/map_data.json：陈旧（生成于 {data.get('generated') or '?'}，记 {data.get('total')} 题，"
+                  f'现库 {n_bank} 题）——重建：{MAP_REBUILD_CMD}')
+            n_issue += 1
+        else:
+            print(f"maps/map_data.json：新鲜（{n_bank} 题，生成于 {data.get('generated') or '?'}）")
+
+    # b) candidates/simindex/：判据正本在 similar_index.freshness_issues（doctor 汇报计数，
+    #    similar 查询守卫拒绝出结果，两处消费同一份判据）
+    import similar_index
+    issues, cfg = similar_index.freshness_issues(ROOT)
+    for msg in issues:
+        print(f'candidates/simindex/{msg}')
+    n_issue += len(issues)
+    if not issues:
+        print(f"candidates/simindex/config.json：新鲜（bank_n={cfg.get('bank_n')}，"
+              f"cand_n={cfg.get('cand_n')}，构建于 {cfg.get('built') or '?'}）")
+
+    # c) maps/能力图-*.html：内嵌 __PROFILE_DATA__ 只有生成日期、无库内题数字段
+    #    （见 scripts/profile_template.html），没有可靠的新鲜度判据——注明跳过，不计入问题数
+    for path in sorted(glob.glob(os.path.join(ROOT, 'maps', '能力图-*.html'))):
+        rel = os.path.relpath(path, ROOT)
+        m = re.search(r'"generated":\s*"([^"]+)"', open(path, encoding='utf-8').read())
+        print(f"{rel}：跳过（内嵌数据只有生成日期 {m.group(1) if m else '?'}、无题数字段可比对；"
+              f'重建：uv run python scripts/bank.py profile <学生id> --html）')
+
+    if n_issue:
+        print(f'\nDOCTOR: {n_issue} 项缺失或陈旧（重建命令见上，doctor 不代跑）')
+        return 1
+    print('\nDOCTOR OK: 生成产物全部新鲜')
+    return 0
 
 
 def main():
@@ -1107,6 +1356,9 @@ def main():
     co.add_argument('--n', type=int, default=10)
     co.add_argument('--seed', type=int, default=1)
     co.add_argument('--save', action='store_true', help='把第 1 周选题写入 data/plan.json（spar next 按此出题）')
+    co.add_argument('--from-gaps', dest='from_gaps', action='store_true',
+                    help=f'约 {round(GAP_SHARE * 100)}%% 名额从 maps/gaps.json 缺口队列取（薄弱优先；'
+                         f'证据不足 {GAPS_MIN_EVIDENCE} 条自动降级纯配比）')
     spar = sub.add_parser('spar', help='攻坚会话：start <ID> / next / hint / reveal / finish')
     spar.add_argument('action', help='start|next|hint|reveal|finish，或直接给题号（= start）')
     spar.add_argument('target', nargs='?', help='start 的题号')
@@ -1154,6 +1406,9 @@ def main():
     pf = sub.add_parser('profile', help='能力图：基础值走势 + 节点状态 + 补齐队列 + 细分建议')
     pf.add_argument('sid', help='学生 id')
     pf.add_argument('--html', action='store_true', help='另生成 maps/能力图-<id>.html')
+    gp = sub.add_parser('gaps', help='统一缺口台账：学生缺口队列 × 库内/候选供给 → maps/gaps.json')
+    gp.add_argument('--student', default='self', help='学生 id（默认 self）')
+    sub.add_parser('doctor', help='生成产物新鲜度自检（maps/ 与 simindex；只读，任一缺失/陈旧 exit 1）')
     wb = sub.add_parser('web', help='浏览器训练台（学生推荐入口，本地服务）')
     wb.add_argument('--host', default='127.0.0.1')
     wb.add_argument('--port', type=int, default=8642)
@@ -1212,6 +1467,10 @@ def main():
         stp.cmd_assess(problems, load_registry(), resolve_topic, args)
     elif args.cmd == 'profile':
         stp.cmd_profile(problems, load_registry(), resolve_topic, args, load_prereq())
+    elif args.cmd == 'gaps':
+        cmd_gaps(problems, args)
+    elif args.cmd == 'doctor':
+        sys.exit(doctor(problems))
     elif args.cmd == 'candidates':
         candidates_cmd(problems, args)
     else:

@@ -45,6 +45,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 评审凭证 `verdicts.json` 是入库题的核验依据，lint 会打开 `review_ref` 指向的文件、
 并检查其中确实包含该题的 `mathnet_id`。凭证不入库 = 题不可信 = lint 红。
 `data/hints/`、`data/plan.json` 同理入库。
+`data/similar/edges.jsonl`（题-题关系边唯一正本）与评审凭证同理必须提交。
 
 `data/attempts.jsonl`（训练日志）也必须提交：它是学生能力图与复习调度的唯一数据来源，
 且只存在于本机——不入库就随时可能丢掉全部训练史。别和 `data/sessions/`（gitignore 的

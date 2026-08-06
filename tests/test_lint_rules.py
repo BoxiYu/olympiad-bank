@@ -17,6 +17,7 @@ sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'scripts'))
 import bank  # noqa: E402
 import spar_session as sp  # noqa: E402
+import student_profile as stp  # noqa: E402
 
 # ---------------- 假仓库脚手架 ----------------
 
@@ -144,6 +145,9 @@ def repo(tmp_path, monkeypatch):
     write_prereq(root)
     write_training_contract_docs(root)
     monkeypatch.setattr(bank, 'ROOT', root)
+    # gen_map 的掌握层会读学生与训练数据：路径一并重定向进 tmp，防止吸到真实 data/
+    monkeypatch.setattr(stp, 'STUDENTS_ROOT', os.path.join(root, 'data', 'students'))
+    monkeypatch.setattr(sp, 'ATTEMPTS_PATH', os.path.join(root, 'data', 'attempts.jsonl'))
     bank._VERDICT_CACHE.clear()   # 模块级缓存按 ref 相对路径存，换 ROOT 必须清，否则串味
     bank._MACHINE_CACHE.clear()
     yield root
@@ -602,14 +606,18 @@ class TestPrereqGraph:
         assert 'geometry/圆幂' not in out.split('依赖图有环')[1].splitlines()[0]
 
 
+def run_map(repo, capsys):
+    _write(os.path.join(repo, 'scripts', 'map_template.html'), '<html>__MAP_DATA__</html>')
+    bank.gen_map(bank.load_all())
+    out = capsys.readouterr().out
+    return json.load(open(os.path.join(repo, 'maps', 'map_data.json'), encoding='utf-8')), out
+
+
 class TestGenMapEdges:
     def test_map_data_contains_edges_and_node_keys(self, repo, capsys):
         """gen_map 产物：节点带 key（cat/name），edges 来自 prereq.yml。"""
         make_problem(repo)
-        _write(os.path.join(repo, 'scripts', 'map_template.html'), '<html>__MAP_DATA__</html>')
-        bank.gen_map(bank.load_all())
-        capsys.readouterr()
-        data = json.load(open(os.path.join(repo, 'maps', 'map_data.json'), encoding='utf-8'))
+        data, _ = run_map(repo, capsys)
         assert {'from': 'algebra/不等式', 'to': 'algebra/函数方程'} in data['edges']
         keys = {n['key'] for c in data['cats'] for n in c['nodes']}
         assert 'algebra/不等式' in keys
@@ -618,11 +626,65 @@ class TestGenMapEdges:
         """map 只消费不校验（校验正本在 doclint）：端点不认识的边跳过，不崩、不输出。"""
         write_prereq(repo, {'algebra/函数方程': ['algebra/幽灵节点']})
         make_problem(repo)
-        _write(os.path.join(repo, 'scripts', 'map_template.html'), '<html>__MAP_DATA__</html>')
-        bank.gen_map(bank.load_all())
-        capsys.readouterr()
-        data = json.load(open(os.path.join(repo, 'maps', 'map_data.json'), encoding='utf-8'))
+        data, _ = run_map(repo, capsys)
         assert data['edges'] == []
+
+
+class TestGenMapLayers:
+    """指示图叠层：供给层（候选池可补量）与掌握层（self 四档状态）的 schema 锚点。"""
+
+    def test_supply_per_node_by_star(self, repo, capsys):
+        """候选池存在时节点 stars 旁带 supply：status=ok 且 est≥学段下界才计入，按估级细分
+        （计数与 candidates --gaps / gaps 台账同源 gap_counts）。"""
+        make_problem(repo)
+        rows = [{'mathnet_id': '0001', 'status': 'ok', 'category': 'algebra',
+                 'topics': ['不等式'], 'difficulty_est': 2},
+                {'mathnet_id': '0002', 'status': 'ok', 'category': 'algebra',
+                 'topics': ['不等式'], 'difficulty_est': 3},
+                {'mathnet_id': '0003', 'status': 'ok', 'category': 'algebra',
+                 'topics': ['不等式'], 'difficulty_est': 1},      # ★1：学段下界之下，不计
+                {'mathnet_id': '0004', 'status': 'dropped', 'category': 'algebra',
+                 'topics': ['不等式'], 'difficulty_est': 3}]      # 非 ok：不计
+        _write(os.path.join(repo, 'candidates', 'mathnet.jsonl'),
+               ''.join(json.dumps(r, ensure_ascii=False) + '\n' for r in rows))
+        data, _ = run_map(repo, capsys)
+        assert data['has_supply'] is True
+        by_key = {n['key']: n for c in data['cats'] for n in c['nodes']}
+        assert by_key['algebra/不等式']['supply'] == {'2': 1, '3': 1}
+        assert by_key['algebra/函数方程']['supply'] == {}
+
+    def test_supply_omitted_without_pool(self, repo, capsys):
+        """候选池缺失（clone 后常态）：节点不带 supply、has_supply=False，CLI 提示重建。"""
+        make_problem(repo)
+        data, out = run_map(repo, capsys)
+        assert data['has_supply'] is False
+        assert all('supply' not in n for c in data['cats'] for n in c['nodes'])
+        assert '供给层已省略' in out and 'mathnet_ingest.py' in out
+
+    def test_mastery_reuses_student_profile(self, repo, capsys):
+        """掌握层复用 student_profile 装配：fail 证据 → 该节点薄弱，registry 其余节点未测。"""
+        make_problem(repo)
+        stp.save_student({'id': 'self', 'attempt_aliases': []})
+        _write(os.path.join(repo, 'data', 'attempts.jsonl'),
+               json.dumps({'id': 'A-001', 'result': 'fail', 'date': '2026-08-01',
+                           'student': 'self'}) + '\n')
+        data, out = run_map(repo, capsys)
+        m = data['mastery']
+        assert m['student'] == 'self' and m['evidence'] == 1
+        assert m['nodes']['algebra/不等式']['status'] == '薄弱'
+        assert m['nodes']['algebra/函数方程']['status'] == '未测'
+        assert set(m['nodes']) == {f'{c}/{n}' for c, ns in REGISTRY.items() for n in ns}
+        assert '掌握层：学生 self 证据 1 条' in out
+
+    def test_mastery_null_without_evidence(self, repo, capsys):
+        """空态两档都不报错：无档案 → null；有档案零证据 → 仍是 null。"""
+        make_problem(repo)
+        data, out = run_map(repo, capsys)
+        assert data['mastery'] is None
+        assert '掌握层：无学生证据' in out
+        stp.save_student({'id': 'self', 'attempt_aliases': []})
+        data, _ = run_map(repo, capsys)
+        assert data['mastery'] is None
 
 # ---------------- 机器核验凭证（可选字段 machine_check_ref） ----------------
 
