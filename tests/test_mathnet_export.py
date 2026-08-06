@@ -136,3 +136,35 @@ def test_old_index_variant_reader_defaults_to_missing():
     assert me.variant_status({}, 'en') == 'missing'
     assert me.variant_status({'variants': None}, 'zh') == 'missing'
     assert me.variant_status({'variants': {'en': 'unexpected'}}, 'en') == 'missing'
+
+
+def test_prepare_out_stashes_and_restores_translation_artifacts(tmp_path):
+    """全量重导出不得销毁译文产物（付费模型产出）：rmtree 前按 mathnet_id 暂存，
+    写完新原文后回填——分类挪了窝也跟着走，原文变动交给 source_sha256 判定失效。"""
+    out = tmp_path / 'mathnet-full'
+    out.mkdir()
+    (out / 'index.jsonl').write_text('', encoding='utf-8')
+    _rel, path = _problem(out, 'keep1', '# keep1\n')
+    pdir = path.parent
+    (pdir / 'index.zh.md').write_text('# keep1 中文\n', encoding='utf-8')
+    (pdir / 'translation.json').write_text('{"mathnet_id": "keep1"}', encoding='utf-8')
+
+    stash, stash_root = me.prepare_out(str(out))
+    assert set(stash) == {'keep1'}
+    assert not path.exists()                       # 原文树整体清空
+    assert os.path.isdir(stash_root)               # 暂存目录在 out 兄弟位（同盘）
+
+    new_pdir = out / 'by-topic' / 'algebra' / '换了知识点' / 'keep1'
+    new_pdir.mkdir(parents=True)
+    me.restore_translations(stash, 'keep1', str(new_pdir))
+    assert (new_pdir / 'index.zh.md').read_text(encoding='utf-8') == '# keep1 中文\n'
+    assert json.loads((new_pdir / 'translation.json').read_text(encoding='utf-8')) == {
+        'mathnet_id': 'keep1'}
+    assert stash == {}                             # 就地消耗，剩余项即为找不到归属的译文
+
+
+def test_prepare_out_fresh_dir_has_nothing_to_stash(tmp_path):
+    out = tmp_path / 'mathnet-full'
+    stash, stash_root = me.prepare_out(str(out))
+    assert stash == {} and stash_root is None
+    assert os.path.isdir(str(out))
