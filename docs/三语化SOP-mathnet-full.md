@@ -111,7 +111,11 @@ mathnet-full/.mathnet-translate-run/.translate-failures.jsonl
 
 先按每行的 `scope`、`mathnet_id`、`target_lang` 与 `error` 判断是整批调用失败，还是单题写回/
 保真失败。临时服务错误可直接重跑第 3 节命令；驱动只重新导出无效目标，成功后会从失败清单
-清除对应记录。只想重试少数题时，从失败清单取得 id，并用 `run --only ID`；`--only` 可重复。
+清除对应记录。
+
+失败清单含 `scope=batch` 时，必须重跑第 3 节的原全量命令，让驱动以原批次 ID 清除批次记录；
+不要拆成逐题重试。只有清单仅剩 `scope=target` 记录时，才从中取得 id，并用 `run --only ID`
+重试少数题；`--only` 可重复。
 
 如果同一错误稳定复现，先修原文之外的调用或译文生成问题，再重跑。`index.md` 是输入，不通过
 手工改原文来让译文检查变绿；原文与译文边界见第 8 节。
