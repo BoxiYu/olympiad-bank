@@ -35,6 +35,7 @@ from collections import Counter
 
 from mathnet_ingest import in_bank_snapshot
 from mathnet_translation_assets import (
+    EXPORT_RECOVERY_MARKER,
     TRANSLATION_RUN_DIRNAME,
     TRANSLATION_STASH_ARCHIVE_DIRNAME,
     TRANSLATION_STASH_PREFIX,
@@ -183,9 +184,13 @@ def translation_stash_roots(out):
 def describe_stashes(roots):
     details = []
     for root in roots:
-        run_note = '，含翻译续跑账本' if os.path.isdir(
-            os.path.join(root, TRANSLATION_RUN_DIRNAME)) else ''
-        details.append(f'{root}（{translation_count(root)} 份 translation.json{run_note}）')
+        notes = []
+        if os.path.isdir(os.path.join(root, TRANSLATION_RUN_DIRNAME)):
+            notes.append('含翻译续跑账本')
+        if os.path.isfile(os.path.join(root, EXPORT_RECOVERY_MARKER)):
+            notes.append('含导出恢复标记')
+        note = f'，{"、".join(notes)}' if notes else ''
+        details.append(f'{root}（{translation_count(root)} 份 translation.json{note}）')
     return '；'.join(details)
 
 
@@ -234,9 +239,13 @@ def stash_translations(out, prefer_live_translations=False):
         live.append((mid, dirpath, present))
 
     live_run = os.path.join(out, TRANSLATION_RUN_DIRNAME)
-    if stash_root is None and (live or os.path.isdir(live_run)):
-        # out 内同盘；同时受 out 的 gitignore 规则保护。
+    if stash_root is None:
+        # 每次 destructive prepare 都先落持久恢复标记；即使最后一份译文已经 restore，
+        # 新 index.jsonl 提交前的 SIGKILL 也仍能证明残留树是可恢复的本脚本产物。
         stash_root = tempfile.mkdtemp(prefix=TRANSLATION_STASH_PREFIX, dir=out)
+    marker = os.path.join(stash_root, EXPORT_RECOVERY_MARKER)
+    with open(marker, 'a', encoding='utf-8'):
+        pass
 
     conflicting_mids = []
     run_conflict = False
@@ -329,7 +338,8 @@ def prepare_out(out, prefer_live_translations=False):
     ordinary_entries = entries - protected_entries
     recoverable = bool(roots and (
         translation_count(roots[0])
-        or os.path.isdir(os.path.join(roots[0], TRANSLATION_RUN_DIRNAME))))
+        or os.path.isdir(os.path.join(roots[0], TRANSLATION_RUN_DIRNAME))
+        or os.path.isfile(os.path.join(roots[0], EXPORT_RECOVERY_MARKER))))
     if ordinary_entries and 'index.jsonl' not in ordinary_entries and not recoverable:
         recovery = describe_stashes(roots) if roots else '未发现译文暂存目录（0 份译文）'
         die(f'{out} 非空且不像本脚本的产物（没有 index.jsonl），拒绝删除；{recovery}；'
@@ -361,7 +371,7 @@ def report_recovery_stashes(out):
               file=sys.stderr)
 
 
-def finish_translation_stash(stash, stash_root):
+def finish_translation_stash(stash, stash_root, export_completed=True):
     """finally 收尾；未认领题继续留在持久暂存，空暂存才删除。"""
     if stash_root is None or not os.path.isdir(stash_root):
         return
@@ -369,7 +379,14 @@ def finish_translation_stash(stash, stash_root):
         print(f'  ⚠️ {len(stash)} 题的译文产物尚未回填，保留在 {stash_root}（'
               f'{translation_count(stash_root)} 份译文）；下次重跑会主动认领', file=sys.stderr)
         return
+    marker = os.path.join(stash_root, EXPORT_RECOVERY_MARKER)
+    if not export_completed:
+        print(f'  ⚠️ 导出尚未提交新索引；恢复标记保留在 {marker}，下次重跑会主动认领',
+              file=sys.stderr)
+        return
     try:
+        if os.path.isfile(marker):
+            os.unlink(marker)
         os.rmdir(stash_root)
     except OSError as exc:
         print(f'  ⚠️ 空暂存目录 {stash_root} 无法移除：{exc}', file=sys.stderr)
@@ -846,15 +863,18 @@ def export(out, with_images, prefer_live_translations=False):
 
     previous_handlers = install_interrupt_handlers()
     stash, stash_root = {}, None
+    export_completed = False
     exit_notice = lambda: report_recovery_stashes(out)
     atexit.register(exit_notice)
     try:
         # stash → 清理 → 逐题 restore 的整个窗口必须受 finally 保护；信号会转成异常走这里。
         stash, stash_root = prepare_out(
             out, prefer_live_translations=prefer_live_translations)
-        return export_prepared(out, with_images, node_cat, meta, bank_marks, shards, stash)
+        result = export_prepared(out, with_images, node_cat, meta, bank_marks, shards, stash)
+        export_completed = True
+        return result
     finally:
-        finish_translation_stash(stash, stash_root)
+        finish_translation_stash(stash, stash_root, export_completed=export_completed)
         report_recovery_stashes(out)
         atexit.unregister(exit_notice)
         restore_interrupt_handlers(previous_handlers)

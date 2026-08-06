@@ -206,8 +206,78 @@ def test_prepare_out_stashes_and_restores_translation_artifacts(tmp_path):
 def test_prepare_out_fresh_dir_has_nothing_to_stash(tmp_path):
     out = tmp_path / 'mathnet-full'
     stash, stash_root = me.prepare_out(str(out))
-    assert stash == {} and stash_root is None
+    assert stash == {}
+    assert (Path(stash_root) / me.EXPORT_RECOVERY_MARKER).is_file()
     assert os.path.isdir(str(out))
+    me.finish_translation_stash(stash, stash_root)
+
+
+def test_last_translation_restored_then_failure_keeps_recovery_marker(
+        tmp_path, monkeypatch, capsys):
+    out = tmp_path / 'mathnet-full'
+    out.mkdir()
+    (out / 'index.jsonl').write_text('', encoding='utf-8')
+    _rel, path = _problem(out, 'last1', '# old source\n')
+    (path.parent / 'translation.json').write_text(
+        '{"mathnet_id":"last1"}', encoding='utf-8')
+    snapshot = tmp_path / 'snapshot'
+    shard_dir = snapshot / 'data' / 'all'
+    shard_dir.mkdir(parents=True)
+    (shard_dir / 'part.parquet').write_bytes(b'not read by test')
+    monkeypatch.setattr(me, 'load_node_category', lambda: {})
+    monkeypatch.setattr(me, 'load_pool', lambda: {})
+    monkeypatch.setattr(me, 'in_bank_snapshot', lambda: {})
+    monkeypatch.setattr(me, 'snapshot_dir', lambda: str(snapshot))
+
+    def fail_after_last_restore(out_arg, _with_images, _node_cat, _meta, _marks, _shards,
+                                stash):
+        new_dir = Path(out_arg) / 'by-topic' / 'algebra' / 'new' / 'last1'
+        new_dir.mkdir(parents=True)
+        (new_dir / 'index.md').write_text('# new source\n', encoding='utf-8')
+        me.restore_translations(stash, 'last1', str(new_dir))
+        raise RuntimeError('after final restore, before index')
+
+    monkeypatch.setattr(me, 'export_prepared', fail_after_last_restore)
+    with pytest.raises(RuntimeError, match='after final restore'):
+        me.export(str(out), with_images=False)
+
+    roots = me.translation_stash_roots(str(out))
+    assert len(roots) == 1
+    assert me.translation_count(roots[0]) == 0
+    assert (Path(roots[0]) / me.EXPORT_RECOVERY_MARKER).is_file()
+    assert '导出尚未提交新索引' in capsys.readouterr().err
+
+    stash, stash_root = me.prepare_out(str(out))
+    assert set(stash) == {'last1'}
+    me.finish_translation_stash(stash, stash_root)
+
+
+@pytest.mark.skipif(not hasattr(os, 'fork'), reason='SIGKILL 场景需要 fork')
+def test_last_translation_restored_then_sigkill_is_recoverable(tmp_path):
+    out = tmp_path / 'mathnet-full'
+    out.mkdir()
+    (out / 'index.jsonl').write_text('', encoding='utf-8')
+    _rel, path = _problem(out, 'last-kill', '# old source\n')
+    (path.parent / 'translation.json').write_text(
+        '{"mathnet_id":"last-kill"}', encoding='utf-8')
+
+    pid = os.fork()
+    if pid == 0:
+        stash, _stash_root = me.prepare_out(str(out))
+        new_dir = out / 'by-topic' / 'algebra' / 'new' / 'last-kill'
+        new_dir.mkdir(parents=True)
+        (new_dir / 'index.md').write_text('# new source\n', encoding='utf-8')
+        me.restore_translations(stash, 'last-kill', str(new_dir))
+        os.kill(os.getpid(), signal.SIGKILL)
+    _pid, status = os.waitpid(pid, 0)
+    assert os.WIFSIGNALED(status) and os.WTERMSIG(status) == signal.SIGKILL
+
+    roots = me.translation_stash_roots(str(out))
+    assert len(roots) == 1 and me.translation_count(roots[0]) == 0
+    assert (Path(roots[0]) / me.EXPORT_RECOVERY_MARKER).is_file()
+    stash, stash_root = me.prepare_out(str(out))
+    assert set(stash) == {'last-kill'}
+    me.finish_translation_stash(stash, stash_root)
 
 
 def test_prepare_out_refusal_names_every_stash_and_translation_count(tmp_path, capsys):
