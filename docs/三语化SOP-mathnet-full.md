@@ -18,6 +18,7 @@
 uv run python scripts/mathnet_translate.py export --help
 uv run python scripts/mathnet_translate.py run --help
 uv run python scripts/mathnet_translate.py apply --help
+uv run python scripts/mathnet_translate.py reindex --help
 uv run --group mathnet python scripts/mathnet_export.py --help
 uv run python scripts/bank.py mathnet-search --help
 uv run python scripts/checks/check_translation_contract.py --help
@@ -37,11 +38,11 @@ uv run python scripts/mathnet_translate.py run \
   --strict
 ```
 
-`--strict` 适合烟雾测试：首个批次或题级失败便停止，避免错误扩散。命令成功后刷新索引，再检查
-产物契约与仓库硬门槛：
+`--strict` 适合烟雾测试：首个批次或题级失败便停止，避免错误扩散。`run` 成功写回后会自动把
+相应题目的三语状态增量刷新到 `index.jsonl`；下面的覆盖率查询正是读取这些字段。正常流程无需
+手动 reindex，接着检查产物契约与仓库硬门槛：
 
 ```bash
-uv run python scripts/mathnet_export.py --out mathnet-full --refresh-index
 uv run python scripts/checks/check_translation_contract.py --sample 10
 bash scripts/lint.sh
 ```
@@ -58,14 +59,14 @@ uv run python scripts/bank.py mathnet-search --coverage stale --limit 20
 
 ## 3｜全量运行
 
-小批通过后去掉 `--limit` 与 `--strict`。默认值本来就是每批 25 题、4 个并发，这里显式写出，
-方便运行日志与手册互相核对：
+小批通过后去掉 `--limit` 与 `--strict`。`--help` 中的默认值仍是每批 25 题、4 个并发；按第 8 节
+的实测标定，全量推荐每批 100 题、6～8 个并发。下面取并发 8：
 
 ```bash
 uv run python scripts/mathnet_translate.py run \
   --root mathnet-full \
-  --batch-size 25 \
-  --concurrency 4
+  --batch-size 100 \
+  --concurrency 8
 ```
 
 全量模式会继续处理其他批次，并在最后以退出码 1 汇总任何失败。标准输出持续给出批次、题目、
@@ -113,6 +114,15 @@ mathnet-full/.mathnet-translate-run/.translate-failures.jsonl
 保真失败。临时服务错误可直接重跑第 3 节命令；驱动只重新导出无效目标，成功后会从失败清单
 清除对应记录。
 
+逐字相同不再天然等于失败。纯符号最终答案必须原样保留；源小节已经是目标语言时无需改写；
+`en/*` 源生成英文目标且模型判定无需改动时，也可按已核验的 `translated` 结果落盘。只有派单前
+满足译文契约直通条件的英文版本才记为 `passthrough`。混合语言小节中仍残留非目标语言散文，
+则仍属于真正的 `untranslated`，不能用整篇源语言标签绕过。
+
+因此，清单中值得人工看的题级记录主要是稳定复现的非目标语言散文、数学/图片/章节骨架漂移、
+纯符号答案被改动、空译文或缺译文，以及模型自述等污染。`scope=batch` 的超时、服务错误或非法
+批次输出先交给幂等续跑；只有多轮仍稳定复现，才按错误类型检查生成结果或调用链。
+
 失败清单含 `scope=batch` 时，必须重跑第 3 节的原全量命令，让驱动以原批次 ID 清除批次记录；
 不要拆成逐题重试。只有清单仅剩 `scope=target` 记录时，才从中取得 id，并用 `run --only ID`
 重试少数题；`--only` 可重复。
@@ -122,25 +132,33 @@ mathnet-full/.mathnet-translate-run/.translate-failures.jsonl
 
 ## 6｜发现并重译过期译文
 
-原文变化后，先刷新索引，再查 `stale`：
+`mathnet-search --coverage ...` 读取的是 `index.jsonl` 中的三语字段。正常的 `run` 与 `apply`
+写回后会自动增量 reindex，不需要额外命令。若手工拆开执行过 `apply`（尤其用了
+`--no-reindex`），或进程中途被 kill、无法确认增量收尾完整，先显式重建全量视图，再查
+`stale`：
 
 ```bash
-uv run python scripts/mathnet_export.py --out mathnet-full --refresh-index
+uv run python scripts/mathnet_translate.py reindex --root mathnet-full --all
 uv run python scripts/bank.py mathnet-search --coverage stale --limit 20
 ```
 
 `stale` 非零表示译文记录的 `source_sha256` 与当前 `index.md` 不一致。直接重跑第 3 节命令；驱动会
-丢弃相应旧进度，把过期目标重新 export、重新翻译并 apply。完成后再次刷新索引并重复查询，直到
-`共 0 题`。若只处理清单中的个别 id，使用可重复的 `--only ID`。
+丢弃相应旧进度，把过期目标重新 export、重新翻译并 apply。完成后自动增量刷新索引，再重复查询，
+直到 `共 0 题`。若只需手动刷新个别 id 的视图，使用
+`uv run python scripts/mathnet_translate.py reindex --root mathnet-full --only <id>`；`--only` 可重复。
+
+不要为了刷新覆盖率运行 `mathnet_export.py`。它的职责是从 Hugging Face 数据集全量重铺语料目录，
+代价远高于只读取本地 `index.md` / `translation.json` 的 `reindex`。
 
 apply 也会拒绝写入原文哈希已经变化的旧批次；不要绕过拒绝，重新 export 才能得到当前输入。
 
 ## 7｜全量收尾与校验
 
-翻译结束后先重建 `index.jsonl` 和 README 的三语状态投影：
+翻译结束时，正常 `run` 已自动增量刷新 `index.jsonl`。全量收尾仍显式重建一次索引视图，以覆盖
+曾被 kill、手工 apply 或断点恢复留下的任何投影缺口：
 
 ```bash
-uv run python scripts/mathnet_export.py --out mathnet-full --refresh-index
+uv run python scripts/mathnet_translate.py reindex --root mathnet-full --all
 ```
 
 当前全量是 27,817 题。用不小于该题数的样本上限执行全覆盖契约与保真检查，并确认输出中的
@@ -167,12 +185,55 @@ bash scripts/lint.sh
 
 ## 8｜成本、耗时与题源边界
 
-当前量级为 27,817 题，预计约 1,800 万输入 token。约 84% 的英文原文在生成英文版时走
-passthrough，因此该目标语言不调用模型；中文版仍需翻译。实际费用取决于当时模型单价，运行前
-据此 token 量另算，不在本文固化价格。
+全量实测共 27,817 题，源语言分布如下：
 
-这不是分钟级任务。应预留数小时到过夜的本地运行窗口；模型延迟、限流、重试与并发设置都会
-改变总耗时，以 `run` 的实时 ETA 和进度文件为准。
+| 源语言 | 题数 |
+| --- | ---: |
+| `en` | 21,139（76.0%） |
+| `und` | 1,966（7.1%） |
+| `pt` | 985 |
+| `fr` | 875 |
+| `es` | 789 |
+| `it` | 675 |
+| `sl` | 577 |
+| `de` | 546 |
+| `ru` | 149 |
+| `zh` | 116 |
+
+英文版有 19,812 题（71.2%）走 passthrough，零模型调用；不是早期抽样估计的 84%。中文版需真翻
+27,817 份，源文 55.7 MB；英文版需真翻 8,005 份，源文 15.7 MB。合计需生成 35,822 份译文，
+源文输入约 2,340 万 token。若按 25 题一批，就是 1,113 个中文批次加 321 个英文批次，共
+1,434 批派单。实际费用取决于运行时模型单价，本文不固化价格。
+
+批大小标定使用真实 Codex、并发 2，三个实测点为：
+
+| 批大小 | 耗时 |
+| ---: | ---: |
+| 25 | 12m19s |
+| 50 | 14m08s |
+| 100 | 17m20s |
+
+线性拟合为 `t = 639s + 4.01s × N`；用 `N=50` 回代为 840 秒，实测 848 秒，误差约 1%。也就是
+每批固定开销约 10.6 分钟，每题只增加约 4 秒；批 25 时，固定开销占总耗时约 86%，因此加大批量
+能显著减少总派单时间。
+
+对全量 35,822 份真翻，串行总时可按 `22.89M/N + 143.6k` 秒估算：
+
+| 批大小 | 串行 | 并发 4 | 并发 8 |
+| ---: | ---: | ---: | ---: |
+| 25 | 294 h | 74 h | 37 h |
+| 50 | 167 h | 42 h | 21 h |
+| **100** | **103 h** | **26 h** | **13 h** |
+| 200（外推） | 72 h | 18 h | 9 h |
+| 理论下限 | 40 h | 10 h | 5 h |
+
+推荐配置是批 100、并发 6～8，预计约 13～17 小时。批 100 是实测点；批 200 只是外推，而且
+200 题一批约 340 KB，会塞进单个 Codex 上下文，质量与上下文风险尚未验证，收益却只是在并发 8
+时把约 13 小时降到约 9 小时，因此不作为推荐值。
+
+当前校验语义下的真实失败率为 14/187，即 7.5%；此前 8% 与 17.3% 均来自仍会误拒正确结果的
+旧版本，不能横向比较。`run` 幂等，失败项会在下一轮自动重派；安排全量窗口时，在上述估算上
+再留约 10% 时间余量。模型延迟、限流与重试仍会改变实耗，以 `run` 的实时 ETA 和进度文件为准。
 
 `index.zh.md`、`index.en.md` 是机器生成、未经人工核验的派生产物，只用于本地检索与筛选。
 `problems/` 入库题的题面和答案仍须逐字照录 MathNet 原文，不得引用译文作为题源；入库规则正本
