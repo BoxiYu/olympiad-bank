@@ -640,6 +640,13 @@ def _training_contract_errors():
     return errors
 
 
+def _strip_math(text):
+    """挖掉 $$…$$ 与行内 $…$ 数学环境：公式里的 [..](..) 是数学记号不是链接
+    （实例：A-047 官方解的 c[(x+r)-(x+r-d-1)](x+r-1)），照录内容不可改，只能让扫描避开。"""
+    text = re.sub(r'\$\$.*?\$\$', '', text, flags=re.S)
+    return re.sub(r'\$[^$\n]+\$', '', text)
+
+
 def doclint():
     errors = []
     link_re = re.compile(r'\[[^\]]*\]\(([^)\s]+)\)')
@@ -648,8 +655,8 @@ def doclint():
         n_files += 1
         rel = os.path.relpath(path, ROOT)
         text = open(path, encoding='utf-8').read()
-        # a) 死链：相对路径引用的文件必须存在（跳过 URL/锚点/绝对路径）
-        for m in link_re.finditer(text):
+        # a) 死链：相对路径引用的文件必须存在（跳过 URL/锚点/绝对路径；数学环境不参与）
+        for m in link_re.finditer(_strip_math(text)):
             tgt = m.group(1)
             if tgt.startswith(('http://', 'https://', 'mailto:', '#', '/')) or '://' in tgt:
                 continue

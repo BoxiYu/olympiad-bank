@@ -1,0 +1,214 @@
+[
+ {
+  "mathnet_id": "0keb",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "不等式",
+   "变换几何",
+   "解析几何与向量复数法"
+  ],
+  "contest": "HMIC",
+  "problem": "Problem:\n\nA triangle and a circle are in the same plane. Show that the area of the intersection of the triangle and the circle is at most one third of the area of the triangle plus one half of the area of the circle.",
+  "solution_head": "Solution:\n\nLet $\\triangle$ denote the triangle, $\\circ$ denote the circle, and $\\triangle'$ denote the reflection of the triangle in the center of the circle. Letting overline denote complement,\n$$\n\\begin{aligned}\n[\\triangle \\cap \\circ] & \\leq \\frac{1}{3}[\\triangle]+\\frac{1}{2}[\\mathrm{o}] \\\\\n\\Longleftrightarrow\\left[\\triangle \\cap \\triangle' \\cap \\circ\\right]+\\left[\\triangle \\cap \\overline{\\triangle'} \\cap \\circ\\right] & \\leq \\frac{1}{3}[\\triangle]+\\frac{1}{2}\\left[\\left[\\circ \\cap \\triangle \\cap \\triangle'\\right]+2\\left[\\circ \\cap \\triangle \\cap \\overline{\\triangle'}\\right]+\\left[\\circ \\cap \\overline{\\triangle} \\cap \\overline{\\triangle'}\\right]\\right] \\\\\n\\Longleftrightarrow \\frac{1}{2}\\left[\\triangle \\cap \\triangle' \\cap \\circ\\right] & \\leq \\frac{1}{3}[\\triangle]+\\frac{1}{2}\\left[\\circ \\cap \\overline{\\triangle} \\cap \\overline{\\triangle'}\\right] \\\\\n\\Longleftrightarrow\\left[\\triangle \\cap \\triangle' \\cap \\circ\\right] & \\leq \\frac{2}{3}[\\triangle]+\\left[\\circ \\cap \\overline{\\triangle} \\cap \\overline{\\triangle'}\\right] .\n\\end{aligned}\n$$\nSince $\\triangle \\cap \\triangle' \\cap \\circ$ is "
+ },
+ {
+  "mathnet_id": "03gg",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形与四边形基本性质",
+   "面积法与三角法"
+  ],
+  "contest": "Canadian Mathematical Olympiad",
+  "problem": "Problem:\n\n$ABCD$ is a quadrilateral with $AD = BC$. If $\\angle ADC$ is greater than $\\angle BCD$, prove that $AC > BD$.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0euv",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理"
+  ],
+  "contest": "24th Korean Mathematical Olympiad Final Round",
+  "problem": "Let $ABC$ be a triangle with $AC < AB < BC$. Choose a point $D$ on the side $AB$. Suppose the circumcircle of $ABC$ meets the internal angle bisector of $\\angle A$ and $CD$ at $E$ ($\\neq A$) and $F$ ($\\neq C$), respectively. Let $K$ be the intersection point of $BC$ and $DE$. Prove that $CK = AC$ if and only if $DK \\cdot EF = AC \\cdot DF$.",
+  "solution_head": "Let $T$ be the intersection point of $ED$ and the circumcircle of $ABC$ other than $E$. Since $\\angle CTD = \\angle EFD$ and $\\angle CDT = \\angle EDF$, $DCT$ and $DEF$ are similar triangles. Hence\n$$\n\\frac{EF}{DF} = \\frac{TC}{DT}\n$$\nNote that $AE$ is the perpendicular bisector of the line segment $CD$, as $AD = AC$ and $\\angle DAE = \\angle CAE$. It follows that $EB = EC = ED$, which means that $E$ is the circumcenter of the triangle $BCD$. Thus $\\angle BEF = \\angle DEF$. This implies that $CD$ is the angle bisector of $\\angle TCK$. In fact, since $\\angle TCB = \\angle TEB$, $\\angle TCB = 2\\angle BEF$. Then $\\angle TCB = 2\\angle BCD$ comes from $\\angle BEF = \\angle BCD$. In a triangle $CKT$, $CD$ being the angle bisector of $\\angle TCK$ gives rise to the following:\n$$\n\\frac{TC}{DT} = \\frac{KC}{DK}\n$$\n\nFrom this along with the result obtained above, we obtain $\\frac{EF}{DF} = \\frac{KC}{DK}$. Thus,\n$$\nDK \\cdot EF = KC \\cdot DF.\n$$\nNow since $DK \\cdot EF = KC \\cdot DF$,\n$$\nDK \\cdot EF = AC \\cdot DF \\iff AC \\cdot DF = KC \\cdot DF.\n$$\nBut, since $AB > AC$, $D \\neq B$, and so $DF \\neq 0$. The"
+ },
+ {
+  "mathnet_id": "03k7",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形与四边形基本性质",
+   "面积法与三角法",
+   "三角形五心与经典引理",
+   "解析几何与向量复数法"
+  ],
+  "contest": "Canadian Mathematical Olympiad",
+  "problem": "Problem:\nIn triangle $ABC$, the medians to the sides $AB$ and $AC$ are perpendicular. Prove that $\\cot B + \\cot C \\geq \\frac{2}{3}$.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0jlf",
+  "est": 4,
+  "conf": "mid",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "相似位似与全等",
+   "三角形五心与经典引理"
+  ],
+  "contest": "IMO Team Selection Test",
+  "problem": "Let $ABCD$ be a cyclic quadrilateral, and let $E, F, G$, and $H$ be the midpoints of $AB, BC, CD$, and $DA$, respectively. Let $W, X, Y$, and $Z$ be the orthocenters of triangles $AHE, BEF, CFG$, and $DGH$, respectively. Prove that quadrilaterals $ABCD$ and $WXYZ$ have the same area.\n(This problem was suggested by Zhonghao Ye)",
+  "solution_head": "**Lemma.** Let $ABCD$ be any quadrilateral with $E, F, G, H$ the midpoints of sides $AB, BC, CD, DA$, respectively. Then $[ABCD] = 2[EFGH]$.\n*Proof.* Let $P$ be the intersection of diagonals $AC$ and $BD$. $HE$ is the midline of triangle $ABD$ so $HE$ bisects segment $AP$. It follows that $2[HPE] = [AHPE]$. Similarly, we obtain $2[EPF] = [BEPF]$, $2[FPG] = [CFPG]$, and $2[GPH] = [DGPH]$. Summing these up yields the desired result. $\\square$\n\nLet $O$ denote the circumcenter of $ABCD$, and let $P, Q, R, S$ denote the midpoints of $HE, EF, FG, GH$ respectively. Applying the lemma to $ABCD$ and then $EFGH$, we get $[ABCD] = 2[EFGH] = 4[PQRS]$.\n\nWe have $WH\\parallel OE$ since they are both perpendicular to $AB$, and similarly $WE\\parallel OH$, so $WHOE$ is a parallelogram. It follows that $W$ is the image of the midpoint of $P$ (i.e. the midpoint of $HE$) under dilation from $O$ by a factor of $2$. Similarly $X, Y, Z$ are the images of $R, S, T$ under the same transformation, so $WXYZ$ is the image of $PQRS$ under a dilation of factor $2$. Thus, it follows that $[WXYZ] = 4[PQRS] = [ABCD]$"
+ },
+ {
+  "mathnet_id": "062a",
+  "est": 4,
+  "conf": "mid",
+  "category": "geometry",
+  "topics": [
+   "面积法与三角法",
+   "圆与四点共圆",
+   "变换几何"
+  ],
+  "contest": "1. IMO-Auswahlklausur",
+  "problem": "Problem:\n\nDer Punkt $P$ liege im Inneren des Dreiecks $A B C$ und erfülle\n$$\n\\varangle B P C-\\varangle B A C=\\varangle C P A-\\varangle C B A=\\varangle A P B-\\varangle A C B .\n$$\nMan beweise, dass dann gilt:\n$$\n\\overline{P A} \\cdot \\overline{B C}=\\overline{P B} \\cdot \\overline{A C}=\\overline{P C} \\cdot \\overline{A B}\n$$\nZunächst überlegt man sich, daß $\\varangle B P C=60^{\\circ}+\\alpha, \\varangle C P A=60^{\\circ}+\\beta, \\varangle A P B=60^{\\circ}+\\gamma$. Aus Symmetriegründen genügt es, eine der beiden behaupteten Gleichungen zu zeigen. (Hinweis: Für einen Winkel $\\varangle X Y Z$ mit $0^{\\circ}<\\varangle X Y Z<180^{\\circ}$ im mathematisch positiven Sinn setze $\\varangle Z Y X:= 180^{\\circ}-\\varangle X Y Z$. Mit dieser Konvention gilt z. B. für vier paarweise verschiedene Punkte $W, X, Y, Z$ auf einer Kreislinie stets $\\varangle X Y Z=\\varangle X W Z$ ).",
+  "solution_head": "Solution:\n\n1.\nDie Verlängerungen von $A P, B P, C P$ mögen den Umkreis des Dreiecks $A B C$ erneut in $A'$, $B'$, $C'$ treffen. Mit Hilfe des Peripheriewinkelsatzes und einem einfachen Winkelsummenargument finden wir $\\varangle B' A' C' = \\varangle B' A' A + \\varangle A A' C' = \\varangle B' B A + \\varangle A C C' = \\varangle B P C - \\varangle B A C = 60^{\\circ}$. Ebenso $\\varangle A' C' B' = 60^{\\circ}$ und folglich ist das Dreieck $A' B' C'$ gleichseitig, d.h. $A' B' = B' C' = C' A'$. Wie üblich haben wir $A P B \\sim B' P A'$ und $A P C \\sim C' P A'$; hieraus ergibt sich $\\frac{A P}{A C} = \\frac{C' P}{C' A'}$ und $\\frac{B P}{B C} = \\frac{C' P}{C' B'}$. In Verbindung mit vorigem lehrt dies $\\frac{A P}{A C} = \\frac{B P}{B C}$ und somit in der Tat $A B \\cdot P C = A C \\cdot P B$.\n\n2.\nWähle den Punkt $J$ so, daß die Dreiecke $A B C$, $P B J$ (gleichorientiert) ähnlich sind. Sodann ist $\\frac{A B}{B P} = \\frac{B C}{B J}$ und $\\varangle P B A = \\varangle J B C$, weshalb auch die Dreiecke $A B P$, $C B J$ (gleichorientiert) ähnlich sein müssen. Folglich gilt $\\varangle C J P = \\varangle C "
+ },
+ {
+  "mathnet_id": "03h6",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "解析几何与向量复数法"
+  ],
+  "contest": "Canadian Mathematical Olympiad",
+  "problem": "Problem:\nFour distinct lines $L_{1}, L_{2}, L_{3}, L_{4}$ are given in the plane: $L_{1}$ and $L_{2}$ are respectively parallel to $L_{3}$ and $L_{4}$. Find the locus of a point moving so that the sum of its perpendicular distances from the four lines is constant.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "09rg",
+  "est": 4,
+  "conf": "mid",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆"
+  ],
+  "contest": "MO-selectietoets",
+  "problem": "Problem:\n\nGegeven is een driehoek $ABC$. Zij $\\Gamma_1$ de cirkel door $B$ die raakt aan zijde $AC$ in $A$. Zij $\\Gamma_2$ de cirkel door $C$ die raakt aan zijde $AB$ in $A$. Het tweede snijpunt van $\\Gamma_1$ en $\\Gamma_2$ noemen we $D$. De lijn $AD$ snijdt de omgeschreven cirkel van $\\triangle ABC$ nog een keer in $E$. Bewijs dat $D$ het midden is van $AE$.",
+  "solution_head": "Solution:\n\nWe bekijken de configuratie waar $D$ binnen $\\triangle ABC$ ligt. De andere configuratie gaat analoog. Vanwege de raaklijnomtrekshoekstelling in $\\Gamma_1$ geldt $\\angle DAC = \\angle DBA$. Vanwege de raaklijnomtrekshoekstelling in $\\Gamma_2$ geldt $\\angle DAB = \\angle DCA$. Er geldt dus $\\triangle ABD \\sim \\triangle CAD$ (hh), waaruit volgt\n$$\n\\frac{|BD|}{|AD|} = \\frac{|AD|}{|CD|}, \\quad \\text{oftewel} \\quad |AD|^2 = |BD| \\cdot |CD|\n$$\nVolgens de omtrekshoekstelling geldt $\\angle ECB = \\angle EAB = \\angle DAB = \\angle DCA$. Dus $\\angle ECD = \\angle ECB + \\angle BCD = \\angle DCA + \\angle BCD = \\angle BCA$. Verder is $\\angle DEC = \\angle AEC = \\angle ABC$ vanwege de omtrekshoekstelling. Dus $\\triangle CDE \\sim \\triangle CAB$ (hh). Analoog zien we dat $\\triangle BDE \\sim \\triangle BAC$. We concluderen dat $\\triangle CDE \\sim \\triangle EDB$, waaruit volgt\n$$\n\\frac{|CD|}{|DE|} = \\frac{|ED|}{|DB|}, \\quad \\text{oftewel} \\quad |DE|^2 = |BD| \\cdot |CD|\n$$\nSamen met (1) geeft dit $|DE|^2 = |AD|^2$, dus $|DE| = |AD|$, wat betekent dat $D$ het midden $\\operatorname{van} AE$ is.\n\n---\n\n"
+ },
+ {
+  "mathnet_id": "0gmc",
+  "est": 4,
+  "conf": "mid",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "变换几何",
+   "圆与四点共圆"
+  ],
+  "contest": "TEAM SELECTION EXAMINATION FOR THE 42nd INTERNATIONAL MATH- EMATICAL OLYMPIAD. TURKEY.",
+  "problem": "In an acute triangle $ABC$, let $H$ be the intersection of its heights and $D$ the midpoint of $[AC]$. Show that the line $DH$ passes through an intersection point of the circumcircle of $ABC$ with the circle for which $[BH]$ is a diameter.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "0l9d",
+  "est": 4,
+  "conf": "mid",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "共线共点定理",
+   "相似位似与全等",
+   "解析几何与向量复数法",
+   "三角形与四边形基本性质"
+  ],
+  "contest": "Vietnamese Team Selection Contest for the 44th IMO",
+  "problem": "On the sides of triangle $ABC$ take the points $M_1$, $N_1$, $P_1$ such that each line $MM_1$, $NN_1$, $PP_1$ divides the perimeter of $ABC$ into two equal parts ($M$, $N$, $P$ are respectively the midpoints of sides $BC$, $CA$, $AB$).\n\n1/ Prove that the lines $MM_1$, $NN_1$, $PP_1$ are concurrent at a point $K$.\n\n2/ Prove that among the ratios $\\frac{KA}{BC}$, $\\frac{KB}{CA}$, $\\frac{KC}{AB}$ there exists at least a ratio which is not less than $\\frac{1}{\\sqrt{3}}$.",
+  "solution_head": ""
+ },
+ {
+  "mathnet_id": "09px",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "共线共点定理"
+  ],
+  "contest": "Dutch TST",
+  "problem": "Problem:\nZij $ABC$ een driehoek, punt $P$ het midden van $BC$ en punt $Q$ op lijnstuk $CA$ zodat $|CQ|=2|QA|$. Zij $S$ het snijpunt van $BQ$ en $AP$. Bewijs dat $|AS|=|SP|$.",
+  "solution_head": "Solution:\nOplossing I. Trek een lijn door $P$ evenwijdig aan $AC$ en zij $T$ het snijpunt van deze lijn met $BQ$. Dan is $PT$ een middenparallel in driehoek $BCQ$, dus geldt $|PT|=\\frac{1}{2}|CQ|=|QA|$. Nu is $ATPQ$ een vierhoek met een paar even lange, evenwijdige zijden, dus $ATPQ$ is een parallellogram. Van een parallellogram weten we dat de diagonalen elkaar middendoor snijden, dus $|AS|=|SP|$.\n\nOplossing II. We passen de stelling van Menelaos toe in driehoek $PCA$. We weten dat de punten $B, S$ en $Q$ op één lijn liggen, dus\n$$\n-1=\\frac{PB}{BC} \\cdot \\frac{CQ}{QA} \\cdot \\frac{AS}{SP}=\\frac{-1}{2} \\cdot \\frac{2}{1} \\cdot \\frac{AS}{SP}=-\\frac{AS}{SP}\n$$\nDus $\\frac{AS}{SP}=1$, waaruit volgt dat $S$ midden tussen $A$ en $P$ ligt.\n\nOplossing III. Zij $M$ het midden van $QC$ en noem $x=[AQS]=[QMS]=[MCS]$ en $y=[CPS]=[PBS]$. Omdat $[CPA]=[PBA]$ geldt dat $[ASB]=3x$. Maar dan is $[AQB]=x+3x$ terwijl anderzijds $2[AQB]=[QCB]$, dus $2x+2y=[QCB]=2[AQB]=8x$. Dus $y=3x$. Maar dan $[ASB]=3x=y=[SPB]$, dus $|AS|=|SP|$.\n\nOplossing IV. Zij $R$ het snijpunt van $CS$ en $AB$. Volgens de stelling va"
+ },
+ {
+  "mathnet_id": "075v",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "圆与四点共圆"
+  ],
+  "contest": "Indija TS 2013",
+  "problem": "In a triangle $ABC$, with $AB \\neq BC$, $E$ is a point on the line $AC$ such that $BE$ is perpendicular to $AC$. A circle passing through $A$ and touching the line $BE$ at a point $P \\neq B$ intersects the line $AB$ for the second time at $X$. Let $Q$ be a point on the line $PB$ different from $P$ such that $BQ = BP$. Let $Y$ be the point of intersection of the lines $CP$ and $AQ$. Prove that the points $C, X, Y, A$ are concyclic if and only if $CX$ is perpendicular to $AB$.",
+  "solution_head": "We need the following well-known result.\n**Lemma.** In a triangle $KLM$ with $KL \\neq KM$, $R$ is a point on the $LM$ such that $KR$ is perpendicular to $LM$. Let $U$ be a point on the line $KR$. Let the lines $LU$ and $MU$ intersect $KM$ and $KL$, respectively, at $S$ and $T$ respectively. Then $L, T, S, M$ are concyclic if and only if $U$ is the orthocenter of triangle $KLM$.\n\nSuppose that $C, X, Y, A$ are concyclic. Let the lines $AP$ and $CQ$ intersect at $Z$. Since $BP = BQ$ we have $BQ^2 = BX \\cdot BA$, so $BQ$ is tangent to the circumcircle of triangle $AXQ$. Hence $\\angle BQX = \\angle XAQ = \\angle XCY$. Therefore the points $Q, X, P, C$ are concyclic. Further, $\\angle XAP = \\angle XPQ = \\angle XCQ$. Adding the two we get $\\angle YCZ = \\angle YAZ$. This proves that the points $A, Y, Z, C$ are concyclic. Applying the lemma to triangle $QAC$ we get that $P$ is the orthocenter of triangle $QAC$. Hence $\\angle CXA = \\angle CYA = 90^\\circ$.\n\nFor the converse, suppose that $CX$ is perpendicular to $AB$. Let the line $CP$ intersect the circumcircle of triangle $AXC$ at $Y'$, and let "
+ },
+ {
+  "mathnet_id": "0fv1",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆"
+  ],
+  "contest": "IMO Selektion",
+  "problem": "Problem:\n\nIm Dreieck $A B C$ sei $D$ der Mittelpunkt der Seite $B C$ und $E$ die Projektion von $C$ auf $A D$. Angenommen es gelte $\\angle A C E=\\angle A B C$. Zeige, dass das Dreieck $A B C$ gleichschenklig oder rechtwinklig ist.",
+  "solution_head": "Solution:\n\nWir zeigen, dass entweder $A B=A C$ oder $\\angle C A B=90^{\\circ}$ gilt. Es sei $F$ der Schnittpunkt von $A D$ mit der Rechtwinkligen zu $A C$ durch $C$. Nun gilt nach Voraussetzung\n$$\n\\angle A F C=90^{\\circ}-\\angle F A C=\\angle A C E=\\angle A B C\n$$\nSomit liegen die Punkte $A, B, F, C$ auf einem Kreis, dem Thaleskreis über $A F$. Damit der Durchmesser $A F$ die Sehne $B C$ halbiert, muss diese entweder rechtwinklig auf $A F$ stehen oder ebenfalls durch den Mittelpunkt des Thaleskreises gehen. Im ersten Fall fallen die Mittelsenkrechte von $B C$ und die Höhe durch $A$ zusammen und somit gilt $A B=A C$. Im zweiten Fall ist $B C$ ein Durchmesser des Kreises und somit $\\angle B A C=90^{\\circ}$.\n\nSei $S$ die Spiegelung von $C$ an $E$. Nach Voraussetzung gilt\n$$\n\\angle A S C=\\angle A C E=\\angle A B C\n$$\nSomit liegen die Punkte $A, S, B, C$ auf einem Kreis, dessen Mittelpunkt $O$ auf der Gerade $A D$ liegt ($A D$ ist die Mittelsenkrechte von $C S$). Den Beweis kann man nun mit demselben Argument wie in der ersten Lösung beenden.\n\nWie üblich seien $\\angle A B C=\\beta$ und $\\angle"
+ },
+ {
+  "mathnet_id": "0goo",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形五心与经典引理",
+   "圆与四点共圆",
+   "相似位似与全等"
+  ],
+  "contest": "Team Selection Test",
+  "problem": "In an acute triangle $ABC$, let $D$ be point on the side $[BC]$ different than the vertices. Let $M_1, M_2, M_3, M_4, M_5$ be the midpoints of the line segments $[AD], [AB], [AC], [BD], [CD]$, respectively; $O_1, O_2, O_3, O_4$ be the circumcenters of the triangles $ABD, ACD, M_1M_2M_4, M_1M_3M_5$, respectively; $S$ and $T$ be the midpoints of the line segments $AO_1$ and $AO_2$, respectively. Prove that $SO_3O_4T$ is an isosceles trapezoid.",
+  "solution_head": "As $\\angle O_1M_1A = \\angle O_1M_2A = 90^\\circ$, we have that $O_1M_1AM_2$ is a cyclic quadrilateral and the point $S$ is its circumcenter. Hence $S$ is the circumcenter of the triangle $AM_1M_2$.\n\nNext we observe that the triangles $AM_1M_2$ and $M_4M_2M_1$ are congruent since $AM_1 = M_4M_2 = \\frac{AD}{2}$ and $AM_2 = M_4M_1 = \\frac{AB}{2}$. Therefore we obtain that the quadrilateral $SM_1O_3M_2$ is a rhombus and hence the line $M_1M_2$ is the perpendicular bisector of the line segment $[SO_3]$.\n\nSimilarly we can get that $M_1M_3$ is the perpendicular bisector of the line segment $[TO_1]$. As the points $M_1, M_2$ and $M_3$ are collinear, the result follows."
+ },
+ {
+  "mathnet_id": "0cta",
+  "est": 4,
+  "conf": "high",
+  "category": "geometry",
+  "topics": [
+   "三角形与四边形基本性质"
+  ],
+  "contest": "Russian Mathematical Olympiad",
+  "problem": "A point $X$ is chosen inside a convex 100-gon ($X$ does not lie on sides or diagonals of the 100-gon). Initially, the vertices of the polygon are not marked. Pete and Bazil mark the vertices in turn. Pete starts and marks two vertices by his first move; after that, by any move a player marks one vertex. If after someone's move the point $X$ appears to lie inside a polygon whose vertices are all marked, the player who made this move loses the game. Prove that Pete has a winning strategy.\n\nВпутри выпуклого 100-угольника выбрана точка $X$, не лежащая ни на одной его стороне или диагонали. Исходно вершины многоугольника не отмечены. Петя и Вася по очереди отмечают ещё не отмеченные вершины 100-угольника, причём Петя начинает и первым ходом отмечает сразу две вершины, а далее каждый своим очередным ходом отмечает по одной вершине. Проигрывает тот, после чьего хода точка $X$ будет лежать впутри многоугольника с отмеченными вершинами. Докажите, что Петя может выиграть, как бы ни ходил Вася.",
+  "solution_head": "Paint the sides of the polygon alternately in black and white. Consider some convex quadrilateral $ABCD$ where $AB$ and $CD$ are sides of the same color; let $K$ be the meeting point of its diagonals. If $X$ lies in the triangle $KBC$ (see Fig. 17), then Pete can mark $B$ and $C$ by his first move and win (no succeeding moves can be made at the same half-plane of $BC$ as $X$). It remains to prove that there exists such quadrilateral.\n\nAssume the contrary. Let $T$ be a vertex of the 100-gon, let the ray $TX$ intersect a black side $PQ$, and let $TR$ be a black side adjacent to $T$ (see Fig. 18). Then the ray $RX$ should also meet the segment $PQ$. Next, if $S$ is the other vertex adjacent to $R$, then the ray $SX$ also should cross a black side (otherwise the ray $RX$ would meet a white side). Proceeding similarly, we get that for every black side $MN$, the rays $MX$ and $NX$ should both cross one black side; but this fails for the black side $PQ$.\n\n---\n\nРаскрасим стороны 100-угольника в чёрный и белый цвета так, чтобы любые две соседних стороны имели разные цвета. Рассмотрим две одно"
+ },
+ {
+  "mathnet_id": "0cbe",
+  "est": 4,
+  "conf": "mid",
+  "category": "geometry",
+  "topics": [
+   "圆与四点共圆",
+   "射影几何与调和点列"
+  ],
+  "contest": "THE 73rd NMO SELECTION TESTS FOR THE BALKAN AND INTERNATIONAL MATHEMATICAL OLYMPIADS - SECOND SELECTION TEST",
+  "problem": "Let $ABCD$ be a cyclic quadrangle and let $M$ and $N$ be the midpoints of the sides $AD$ and $BC$, respectively. The circle through $A$ and $D$ tangent to $AC$ crosses the line $AB$ again at $P$ and the circle through $B$ and $C$ tangent to $BD$ crosses the line $AB$ again at $Q$. Let $t_A$ be the tangent of the circle $AMP$ at $A$ and let $t_B$ be the tangent of the circle $BNQ$ at $B$. Prove that the lines $CD$, $t_A$ and $t_B$ are concurrent.",
+  "solution_head": "We first prove that the triangles $ADP$ and $CDB$ are similar. Since $ABCD$ is cyclic, $\\angle DAP = \\angle DCB$; and since $AC$ is tangent to the circle $ADP$, $\\angle CBD = \\angle CAD = \\angle APD$. Consequently, the triangles $ADP$ and $CDB$ are similar.\n\nLet $R$ be the midpoint of $CD$. The points $M$ and $R$ correspond under the above similarity, so $\\angle PMA = \\angle BRC$.\n\nLet the line $CD$ meet the circle $ABR$ again at $K$ (possibly, $K = R$). Notice that $\\angle BAK = \\angle BRC = \\angle PMA$, so $AK$ is tangent to the circle $AMP$.\n\nSimilarly, $BK$ is tangent to the circle $BNQ$ and the conclusion follows.\n\nAlternative solution.\nWe prove the conclusion under the weaker assumptions that $ABCD$ is merely convex and $AM/DM = CN/BN$.\n\nLet $AB$ and $CD$ meet at $E$; if the two are parallel, then $E$ is their common ideal point. Let $CD$ cross $t_A$ and $t_B$ at $K_A$ and $K_B$, respectively. We will show that $K_A = K_B$, whence the conclusion.\n\nLet $I$ and $J$ be the ideal points of $AD$ and $BC$, respectively. The line pencils\n($AD, AC, AE, AK_A$) and ($PA, PD, PI, PM$)\nare"
+ }
+]

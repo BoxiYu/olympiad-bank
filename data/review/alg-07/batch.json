@@ -1,0 +1,233 @@
+[
+ {
+  "mathnet_id": "0dad",
+  "est": 4,
+  "conf": "mid",
+  "category": "algebra",
+  "topics": [
+   "数列与递推",
+   "代数变换技巧",
+   "不等式"
+  ],
+  "contest": "Team selection tests for IMO 2018",
+  "problem": "$$\nf(x)=\\left(x-F_{1}\\right)\\left(x-F_{2}\\right) \\ldots\\left(x-F_{3030}\\right)\n$$\nwith $\\left(F_{n}\\right)$ is the Fibonacci sequence, which defined as $F_{1}=1, F_{2}=2, F_{n+2}= F_{n+1}+F_{n}, n \\geq 1$. Suppose that on the range $\\left(F_{1}, F_{3030}\\right)$, the function $|f(x)|$ takes on the maximum value at $x=x_{0}$. Prove that $x_{0}>2^{2018}$.",
+  "solution_head": "We will prove that $x_{0} \\in\\left(F_{3029}, F_{3030}\\right)$ by showing that for all $x^{*} \\in\\left(F_{1}, F_{3029}\\right]$, there is some $x^{**} \\in\\left(F_{3029}, F_{3030}\\right)$ for which $\\left|f\\left(x^{**}\\right)\\right|>\\left|f\\left(x^{*}\\right)\\right|$.\n\nIndeed, if\n$$\nx^{*} \\in\\left\\{F_{1}, F_{2}, \\ldots, F_{3029}\\right\\}\n$$\nthen $\\left|f\\left(x^{*}\\right)\\right|=0$ which is obvious.\n\nSuppose that $x^{*} \\in\\left(F_{k}, F_{k+1}\\right)$ for $1 \\leq k \\leq 3028$ then put $m=x^{*}-F_{k}$, we choose $x^{**}=F_{3030}-m$. We need\n$$\n\\left|f\\left(x^{**}\\right)\\right|>\\left|f\\left(x^{*}\\right)\\right| \\Leftrightarrow\\left|\\prod_{i=1}^{3030}\\left(x^{**}-F_{i}\\right)\\right|>\\left|\\prod_{i=1}^{3030}\\left(x^{*}-F_{i}\\right)\\right|.\n$$\nEach side has 3030 positive factors then we will make pair one of the left and one of the right such that the value of the right is bigger (except the case $i=k$ then $\\left|x^{*}-F_{k}\\right|=m=\\left|x^{**}-F_{3030}\\right|$ ). For details:\n\n1. If $i=1,2, \\ldots, k$, it is clearly that $x^{**}-F_{i}>x^{*}-F_{i}>0$.\n\n2. If $1 \\leq i \\leq 3030-k$, we have $"
+ },
+ {
+  "mathnet_id": "073s",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "不等式"
+  ],
+  "contest": "Indija TS 2008",
+  "problem": "Let $a$, $b$, $c$ be positive real numbers such that $a^2 + b^2 + c^2 < 2(a + b + c)$. Prove that\n$$\n3abc < 4(a + b + c).\n$$",
+  "solution_head": "The Cauchy-Schwarz inequality gives\n$$\n(a + b + c)^2 \\le 3(a^2 + b^2 + c^2).\n$$\nThus $(a + b + c) < 6$ and hence $\\frac{(a + b + c)^3}{9} < 4(a + b + c)$. Now the AM-GM inequality gives\n$$\n(a + b + c)^3 \\ge 27abc.\n$$\nThus\n$$\n3abc \\le \\frac{(a + b + c)^3}{9} < 4(a + b + c).\n$$\n\nAlternately, we have $a + b + c < 6$ so that $a^2 + b^2 + c^2 < 2(a + b + c) < 12$. Thus\n$$\n(a^2 + b^2 + c^2)(a + b + c) < 12(a + b + c).\n$$\nUsing the AM-GM inequality, we have\n$$\na^2 + b^2 + c^2 \\ge 3(abc)^{2/3}, \\quad a + b + c \\ge 3(abc)^{1/3}.\n$$\nThus\n$$\n9abc \\le (a^2 + b^2 + c^2)(a + b + c) < 12(a + b + c),\n$$\ngiving the required inequality. Thus"
+ },
+ {
+  "mathnet_id": "06xg",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "函数方程",
+   "数列与递推"
+  ],
+  "contest": "International Mathematical Olympiad Shortlist",
+  "problem": "Let $\\mathbb{R}_{>0}$ be the set of positive real numbers. Determine all functions $f: \\mathbb{R}_{>0} \\rightarrow \\mathbb{R}_{>0}$ such that\n$$\nx(f(x)+f(y)) \\geqslant (f(f(x))+y) f(y)\n$$\nfor every $x, y \\in \\mathbb{R}_{>0}$.",
+  "solution_head": "Answer: All functions $f(x)=\\frac{c}{x}$ for some $c>0$.\n\nSolution 1. Let $f: \\mathbb{R}_{>0} \\rightarrow \\mathbb{R}_{>0}$ be a function that satisfies the inequality of the problem statement. We will write $f^{k}(x)=f(f(\\cdots f(x) \\cdots))$ for the composition of $f$ with itself $k$ times, with the convention that $f^{0}(x)=x$. Substituting $y=x$ gives\n$$\nx \\geqslant f^{2}(x)\n$$\nSubstituting $x=f(y)$ instead leads to $f(y)+f^{2}(y) \\geqslant y+f^{3}(y)$, or equivalently\n$$\nf(y)-f^{3}(y) \\geqslant y-f^{2}(y)\n$$\nWe can generalise this inequality. If we replace $y$ by $f^{n-1}(y)$ in the above inequality, we get\n$$\nf^{n}(y)-f^{n+2}(y) \\geqslant f^{n-1}(y)-f^{n+1}(y)\n$$\nfor every $y \\in \\mathbb{R}_{>0}$ and for every integer $n \\geqslant 1$. In particular, $f^{n}(y)-f^{n+2}(y) \\geqslant y-f^{2}(y) \\geqslant 0$ for every $n \\geqslant 1$. Hereafter consider even integers $n=2 m$. Observe that\n$$\ny-f^{2 m}(y)=\\sum_{i=0}^{m-1}\\left(f^{2 i}(y)-f^{2 i+2}(y)\\right) \\geqslant m\\left(y-f^{2}(y)\\right) .\n$$\nSince $f$ takes positive values, it holds that $y-f^{2 m}(y)<y$ for every $m \\geqslant 1$"
+ },
+ {
+  "mathnet_id": "09s9",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "多项式"
+  ],
+  "contest": "IMO-selectietoets",
+  "problem": "Problem:\n\nBepaal alle polynomen $P(x)$ met reële coëfficiënten waarvoor het polynoom\n$$\nQ(x) = (x+1) P(x-1) - (x-1) P(x)\n$$\nconstant is.",
+  "solution_head": "Solution:\n\nOplossing I. Stel dat $P(x)$ een constant polynoom is, zeg $P(x) = a$ met $a \\in \\mathbb{R}$. Dan is\n$$\nQ(x) = (x+1) a - (x-1) a = a x + a - a x + a = 2 a,\n$$\nen dat is constant. Dus elk constant polynoom $P(x)$ voldoet.\n\nWe nemen nu verder aan dat $P$ niet constant is. We kunnen dan schrijven $P(x) = a_{n} x^{n} + a_{n-1} x^{n-1} + \\ldots + a_{1} x + a_{0}$ met $n \\geq 1$ en $a_{n} \\neq 0$. Bekijk de coëfficiënt van $x^{n}$ in $Q(x)$. Deze is de som van de coëfficiënten van $x^{n}$ in $x P(x-1)$, $P(x-1)$, $-x P(x)$ en $P(x)$. In de eerste is deze coëfficiënt gelijk aan $a_{n-1} - n a_{n}$, in de tweede aan $a_{n}$, in de derde aan $-a_{n-1}$ en in de vierde aan $a_{n}$. Samen is dat\n$$\na_{n-1} - n a_{n} + a_{n} - a_{n-1} + a_{n} = (2-n) a_{n}.\n$$\nMaar in $Q(x)$ moet deze coëfficiënt gelijk zijn aan $0$. Omdat $a_{n} \\neq 0$, volgt hieruit $n = 2$. Dus $P(x) = a_{2} x^{2} + a_{1} x + a_{0}$ met $a_{2} \\neq 0$.\n\nBekijk nu de constante coëfficiënt van $Q(x)$. Deze is de som van de constante coëfficiënten van $x P(x-1)$, $P(x-1)$, $-x P(x)$ en $P(x)$. Dit zijn achtereenvolge"
+ },
+ {
+  "mathnet_id": "0lag",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "数列与递推"
+  ],
+  "contest": "Vijetnam 2009",
+  "problem": "A sequence of real numbers $(x_n)$ is given by\n$$\nx_1 = \\frac{1}{2} \\quad \\text{and} \\quad x_n = \\frac{\\sqrt{x_{n-1}^2 + 4x_{n-1}} + x_{n-1}}{2} \\quad \\text{for all } n \\ge 2.\n$$\nFor each non-negative integer $n$, let\n$$\ny_n = \\sum_{i=1}^{n} \\frac{1}{x_i^2}.\n$$\nShow that the sequence $(y_n)$ has a finite limit when $n \\to \\infty$. Find this limit.",
+  "solution_head": "From its definition, it is easy to see that $x_n > 0$ for all $n \\ge 1$.\n\nReformulate the defining relation for the sequence $(x_n)$ in the following form:\n$$\n2x_n - x_{n-1} = \\sqrt{x_{n-1}^2 + 4x_{n-1}} \\quad \\forall n \\ge 2.\n$$\nIt follows that:\n$$\nx_{n-1} = x_n^2 - x_n x_{n-1} \\quad \\forall n \\ge 2.\n$$\nConsequently:\n$$\n\\frac{1}{x_n^2} = \\frac{1}{x_{n-1}} - \\frac{1}{x_n} \\quad \\forall n \\ge 2\n$$\n(since $x_n \\ne 0$ for all $n \\ge 2$).\n\nHence, for all $n \\ge 2$, we have\n$$\ny_n = \\sum_{i=1}^{n} \\frac{1}{x_i^2} = \\frac{1}{x_1^2} + \\sum_{i=2}^{n} \\left( \\frac{1}{x_{i-1}} - \\frac{1}{x_i} \\right) = \\frac{1}{x_1^2} + \\frac{1}{x_1} - \\frac{1}{x_n} = 6 - \\frac{1}{x_n}\n$$\nIt follows easily that $\\left(\\frac{1}{x_n}\\right)$ is a decreasing sequence, bounded below by $0$. Hence $\\left(\\frac{1}{x_n}\\right)$ converges and according to the above, we have\n$$\n\\lim_{n \\to \\infty} \\frac{1}{x_n} = 0.\n$$\nThus $(y_n)$ is convergent and\n$$\n\\lim_{n \\to \\infty} y_n = 6.\n$$"
+ },
+ {
+  "mathnet_id": "03nb",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "多项式",
+   "数列与递推",
+   "函数方程"
+  ],
+  "contest": "Canadian Mathematical Olympiad",
+  "problem": "Problem:\nFind all polynomials $p(x)$ with real coefficients that have the following property: There exists a polynomial $q(x)$ with real coefficients such that\n$$\np(1)+p(2)+p(3)+\\cdots+p(n)=p(n) q(n)\n$$\nfor all positive integers $n$.",
+  "solution_head": "Solution:\nThe property clearly holds whenever $p(x)$ is a constant polynomial, since we can take $q(x)=x$. Assume henceforth that $p(x)$ is nonconstant and has the stated property. Let $d$ be the degree of $p(x)$, so $p(x)$ is of the form\n$$\np(x)=c x^{d}+\\cdots .\n$$\nBy a Lemma (which we will prove at the end), $\\sum_{k=1}^{n} k^{d}$ is a polynomial in $n$ of degree $d+1$, so $p(1)+p(2)+\\cdots+p(n)$ is a polynomial in $n$ of degree $d+1$. Hence, $q(n)$ is a polynomial of degree 1. Furthermore, the coefficient of $n^{d+1}$ in $\\sum_{k=1}^{n} k^{d}$ is $\\frac{1}{d+1}$, so the coefficient of $n$ in $q(n)$ is also $\\frac{1}{d+1}$. Let $q(x)=\\frac{1}{d+1}(x+r)$. We have that\n$$\np(1)+p(2)+p(3)+\\cdots+p(n)=p(n) q(n)\n$$\nand\n$$\np(1)+p(2)+p(3)+\\cdots+p(n)+p(n+1)=p(n+1) q(n+1) \\text{.}\n$$\nSubtracting the first equation from the second, we get\n$$\np(n+1)=p(n+1) q(n+1)-p(n) q(n),\n$$\nand hence\n$$\np(n) q(n)=p(n+1)[q(n+1)-1] .\n$$\nSince this holds for all positive integers $n$, it follows that\n$$\np(x) q(x)=p(x+1)[q(x+1)-1]\n$$\nfor all real numbers $x$. We can then write\n$$\np(x) \\cdot \\frac{1}{d+1}(x+r)="
+ },
+ {
+  "mathnet_id": "0a3h",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "根与系数",
+   "多项式"
+  ],
+  "contest": "IMO-selectietoets III",
+  "problem": "Problem:\n\nZij $P(x)$ een polynoom met gehele coëfficienten van graad $n>1$ waarvoor geldt dat $Q(x)=P(P(P(x)))-P(x)$ precies $n^{3}$ verschillende reële nulpunten heeft. Bewijs dat de nulpunten van $Q(x)$ in twee groepen verdeeld kunnen worden waarvan het rekenkundig gemiddelde hetzelfde is.",
+  "solution_head": "Solution:\n\nWe schrijven $\\gamma_{i}$ met $1 \\leq i \\leq n^{3}$ voor de verschillende wortels zijn van $Q(x)$. Dat betekent dat $P\\left(P\\left(P\\left(\\gamma_{i}\\right)\\right)\\right)-P\\left(\\gamma_{i}\\right)=0$, dus $P\\left(\\gamma_{i}\\right)$ is een nulpunt van het polynoom $P(P(x))-x$. De graad van $P(P(x))-x$ is $n^{2}$, dus dit polynoom heeft maximaal $n^{2}$ nulpunten, die we noteren met $\\beta_{i}$. Voor elk nulpunt $\\beta_{i}$ heeft de vergelijking $P(x)=\\beta_{i}$ maximaal $n$ oplossingen. In totaal hebben we dus maximaal $n^{2} \\cdot n$ oplossingen $\\gamma_{i}$ zo dat $P\\left(\\gamma_{i}\\right)$ is een nulpunt van $P(P(x))-x$. Aangezien dit maximum bereikt wordt, zijn er $n^{2}$ nulpunten $\\beta_{i}$ van $P(P(x))-x$ en hebben we voor elke $\\beta_{i}$ precies $n$ oplossingen van $P(x)=\\beta_{i}$.\n\nWe schrijven $P(x)=a x^{n}-b x^{n-1}+P^{\\prime}(x)$ met $\\operatorname{deg} P^{\\prime}(x) \\leq n-2$. Anderzijds krijgen we voor elke $\\beta_{i}$ een deelverzameling $\\left\\{\\delta_{1}, \\delta_{2}, \\ldots, \\delta_{n}\\right\\}$ van de wortels $\\left\\{\\gamma_{1}, \\ldots, \\gamma_{n^{3}}\\righ"
+ },
+ {
+  "mathnet_id": "0iym",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "不等式",
+   "根与系数"
+  ],
+  "contest": "Team Selection Test 2009",
+  "problem": "$$\nx^3(y^2 + z^2)^2 + y^3(z^2 + x^2)^2 + z^3(x^2 + y^2)^2 \\ge xyz[xy(x+y)^2 + yz(y+z)^2 + zx(z+x)^2].\n$$",
+  "solution_head": "We multiply both sides of the desired inequality by $\\sum_{\\text{cyc}} x = (x + y + z)$; that is, we are going to show that\n$$\n\\left(\\sum_{\\text{cyc}} x\\right) \\cdot L = (x + y + z) \\cdot L \\geq (x + y + z) \\cdot R = \\left(\\sum_{\\text{cyc}} x\\right) \\cdot R\n$$\nor\n$$\n\\left(\\sum_{\\text{cyc}} x\\right) \\cdot L - \\left(\\sum_{\\text{cyc}} x\\right) \\cdot R \\geq 0.\n$$\nNote that\n$$\n\\begin{aligned} \\left(\\sum_{\\text{cyc}} x\\right) L &= \\left(\\sum_{\\text{cyc}} x\\right) \\cdot \\left(\\sum_{\\text{cyc}} x^3(y^4 + z^4) + 2x^2y^2z^2 \\sum_{\\text{cyc}} x\\right) \\\\ &= \\left(\\sum_{\\text{cyc}} x\\right) \\left(\\sum_{\\text{cyc}} x^3(y^4 + z^4)\\right) + 2x^2y^2z^2 \\left(\\sum_{\\text{cyc}} x\\right)^2 \\\\ &= \\sum_{\\text{cyc}} x^5(y^3 + z^3) + 2 \\sum_{\\text{cyc}} x^4 y^4 + xyz \\sum_{\\text{cyc}} x^3(y^2 + z^2) + 2x^2y^2z^2 \\sum_{\\text{cyc}} x^2 + 4x^2y^2z^2 \\sum_{\\text{cyc}} xy \\end{aligned}\n$$\nand\n$$\n\\begin{aligned} \\left(\\sum_{\\text{cyc}} x\\right) R &= \\left(\\sum_{\\text{cyc}} x\\right) \\cdot \\left( xyz \\sum_{\\text{cyc}} xy(x^2 + y^2) + 2xyz \\sum_{\\text{cyc}} x^2 y^2 \\right) \\\\ &= xyz \\left( \\sum_{\\text{cyc}} x^4(y +"
+ },
+ {
+  "mathnet_id": "0cmg",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "多项式"
+  ],
+  "contest": "Russian mathematical olympiad",
+  "problem": "Find all positive integers $n$ such that there exist nonzero real numbers $a, b, c, d$ for which the polynomial\n$$\n(ax + b)^{1000} - (cx + d)^{1000}\n$$\nafter expanding all brackets (and collecting terms) has exactly $n$ nonzero coefficients.",
+  "solution_head": "The answers are $1001$, $1000$, and $500$.\n\nIt is clear that there exist such polynomials with $1001$ and $1000$ nonzero coefficients (for example, $(2x+2)^{1000} - (x+1)^{1000}$ and $(2x+1)^{1000} - (x+1)^{1000}$).\n\nSuppose that in our polynomial there are two coefficients equal to zero — for $x^i$ and $x^j$ ($i > j$). Then $a^i b^{1000-i} = c^i d^{1000-i}$, $a^j b^{1000-j} = c^j d^{1000-j}$; dividing the first equation by the second, we get\n$$(\\frac{ad}{bc})^i = (\\frac{d}{b})^{1000} = (\\frac{ad}{bc})^j.$$\nHence $|\\frac{ad}{bc}| = 1$, $|\\frac{d}{b}| = 1$ and $|\\frac{a}{c}| = 1$.\n\nIt is clear that replacing $ax+b$ with $(-a)x + (-b)$ does not change our polynomial. Therefore, we may assume $\\frac{a}{c} = 1$. Then, if $\\frac{b}{d} = 1$, the resulting polynomial $(ax+b)^{1000} - (ax+b)^{1000}$ is identically zero, and if $\\frac{b}{d} = -1$, then in the resulting polynomial $(ax+b)^{1000} - (ax - b)^{1000}$, exactly the coefficients at even powers of $x$ vanish, so we get $500$ nonzero coefficients."
+ },
+ {
+  "mathnet_id": "03nn",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "不等式",
+   "数列与递推"
+  ],
+  "contest": "Canadian Mathematical Olympiad",
+  "problem": "Problem:\nLet $n \\geq 2$ be some fixed positive integer and suppose that $a_{1}, a_{2}, \\ldots, a_{n}$ are positive real numbers satisfying $a_{1}+a_{2}+\\cdots+a_{n}=2^{n}-1$.\nFind the minimum possible value of\n$$\n\\frac{a_{1}}{1}+\\frac{a_{2}}{1+a_{1}}+\\frac{a_{3}}{1+a_{1}+a_{2}}+\\cdots+\\frac{a_{n}}{1+a_{1}+a_{2}+\\cdots+a_{n-1}}.\n$$",
+  "solution_head": "Solution:\nWe claim the the minimum possible value of this expression is $n$. Observe that by AM-GM, we have that\n$$\n\\begin{aligned}\n\\frac{a_{1}}{1} &+ \\frac{a_{2}}{1+a_{1}}+\\cdots+\\frac{a_{n}}{1+a_{1}+a_{2}+\\cdots+a_{n-1}} \\\\\n&=\\frac{1+a_{1}}{1}+\\frac{1+a_{1}+a_{2}}{1+a_{1}}+\\cdots+\\frac{1+a_{1}+a_{2}+\\cdots+a_{n}}{1+a_{1}+a_{2}+\\cdots+a_{n-1}}-n \\\\\n&\\geq n \\cdot \\sqrt[n]{\\frac{1+a_{1}}{1} \\cdot \\frac{1+a_{1}+a_{2}}{1+a_{1}} \\cdots \\frac{1+a_{1}+a_{2}+\\cdots+a_{n}}{1+a_{1}+a_{2}+\\cdots+a_{n-1}}}-n \\\\\n&=n \\cdot \\sqrt[n]{1+a_{1}+a_{2}+\\cdots+a_{n}}-n \\\\\n&=2n-n=n.\n\\end{aligned}\n$$\nFurthermore, equality is achieved when $a_{k}=2^{k-1}$ for each $1 \\leq k \\leq n$."
+ },
+ {
+  "mathnet_id": "09ru",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "不等式",
+   "根与系数"
+  ],
+  "contest": "Selectietoets",
+  "problem": "Problem:\n\nVind alle niet-negatieve gehele getallen $n$ waarvoor er gehele getallen $a$ en $b$ bestaan met $n^{2}=a+b$ en $n^{3}=a^{2}+b^{2}$.",
+  "solution_head": "Solution:\n\nOplossing I. Vanwege de ongelijkheid van het rekenkundig en meetkundig gemiddelde, toegepast op $a^{2}$ en $b^{2}$, geldt $a^{2}+b^{2} \\geq 2 a b$. Aangezien $2 a b=(a+b)^{2}-\\left(a^{2}+b^{2}\\right)$, volgt hieruit $n^{3} \\geq\\left(n^{2}\\right)^{2}-n^{3}$, oftewel $2 n^{3} \\geq n^{4}$. Dit betekent $n=0$ of $2 \\geq n$. Dus $n=0, n=1$ en $n=2$ zijn de enige mogelijkheden. Voor $n=0$ vinden we $a=b=0$ als oplossing, voor $n=1$ vinden we $a=0, b=1$ als oplossing en voor $n=2$ vinden we $a=b=2$ als oplossing. De getallen $n$ die voldoen zijn dus precies $n=0, n=1$ en $n=2$.\n\n\nOplossing II. Schrijf $b=n^{2}-a$ en vul dat in:\n$$\nn^{3}=a^{2}+b^{2}=a^{2}+\\left(n^{2}-a\\right)^{2}=a^{2}+n^{4}-2 a n^{2}+a^{2} .\n$$\nDus\n$$\n2 a^{2}-2 n^{2} a+n^{4}-n^{3}=0 .\n$$\nDit is een kwadratische vergelijking in $a$, waarvan de discriminant gelijk is aan\n$$\nD=\\left(-2 n^{2}\\right)^{2}-4 \\cdot 2 \\cdot\\left(n^{4}-n^{3}\\right)=-4 n^{4}+8 n^{3}=4 n^{2}\\left(-n^{2}+2 n\\right) .\n$$\nVoor $n \\geq 3$ geldt $-n^{2}+2 n \\leq-3 n+2 n=-n<0$, dus dan is er geen oplossing voor $a$. Er moet dus gelden $n \\leq 2$. "
+ },
+ {
+  "mathnet_id": "0crv",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "多项式",
+   "根与系数"
+  ],
+  "contest": "XL Russian mathematical olympiad",
+  "problem": "Числа $x$, $y$ и $z$ таковы, что все три числа $x + yz$, $y + zx$ и $z + xy$ рациональны, а $x^2 + y^2 = 1$. Докажите, что число $xyz^2$ также рационально.",
+  "solution_head": "Из условия следует, что число $(x + yz)(y + zx) = xy + (x^2 + y^2)z + xyz^2 = (xy + z) + xyz^2$ рационально. Поскольку число $xy + z$ также рационально по условию, то и число $xyz^2 = (x + yz)(y + zx) - (xy + z)$ также рационально."
+ },
+ {
+  "mathnet_id": "065i",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "多项式",
+   "素数与算术基本定理"
+  ],
+  "contest": "SELECTION EXAMINATION",
+  "problem": "Let $\\alpha$, $\\beta$, $\\gamma$ are positive integers such that the number\n$$\nA = \\frac{\\alpha\\sqrt{2} + \\beta\\sqrt{3}}{\\beta\\sqrt{2} + \\gamma\\sqrt{3}}\n$$\nis rational. Prove that the number\n$$\nB = \\frac{\\alpha^2 + \\beta^2 + \\gamma^2}{\\alpha + \\beta + \\gamma}\n$$\nis integer.",
+  "solution_head": "First of all, it is easy to see that:\n$$\n\\alpha_1\\sqrt{2} + \\alpha_2\\sqrt{3} = \\alpha_3\\sqrt{2} + \\alpha_4\\sqrt{3}, \\text{ with } \\alpha_1, \\alpha_2, \\alpha_3, \\alpha_4 \\in \\mathbb{Q}^* \\Leftrightarrow \\alpha_1 = \\alpha_3 \\text{ and } \\alpha_2 = \\alpha_4.\n$$\nIn fact, we can write the first relation in the form\n$$\n(\\alpha_1 - \\alpha_3)\\sqrt{2} = (\\alpha_4 - \\alpha_2)\\sqrt{3},\n$$\nand if $\\alpha_1 - \\alpha_3 \\neq 0$, then $\\frac{\\alpha_4 - \\alpha_2}{\\alpha_1 - \\alpha_3} = \\frac{\\sqrt{3}}{\\sqrt{2}}$, absurd. Hence $\\alpha_1 = \\alpha_3$ and $\\alpha_2 = \\alpha_4$.\nThe converse is clear.\nLet now $\\frac{\\alpha\\sqrt{2} + \\beta\\sqrt{3}}{\\beta\\sqrt{2} + \\gamma\\sqrt{3}} = \\kappa \\in \\mathbb{Q}$. Then $\\alpha = \\kappa\\beta$ and $\\beta = \\kappa\\gamma$, that is\n$$\n\\frac{\\alpha}{\\beta} = \\frac{\\beta}{\\gamma} \\Leftrightarrow \\beta^2 = \\alpha\\gamma.\n$$\nHence we have:\n\n$$\n\\begin{aligned}\n\\alpha^2 + \\beta^2 + \\gamma^2 &= \\alpha^2 + \\alpha\\gamma + \\gamma^2 = \\alpha^2 + 2\\alpha\\gamma + \\gamma^2 - \\alpha\\gamma \\\\\n&= (\\alpha + \\gamma)^2 - \\beta^2 = (\\alpha + \\beta + \\gamma)(\\alpha - \\beta + \\gamma),\n\\end{al"
+ },
+ {
+  "mathnet_id": "065v",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "不定方程",
+   "根与系数",
+   "多项式"
+  ],
+  "contest": "SELECTION EXAMINATION",
+  "problem": "Determine the integer solutions of the equation\n$$\n8x^3 - 4 = y(6x - y^2)\n$$",
+  "solution_head": "The given equation can be written as\n$$\n\\begin{aligned}\n8x^3 + y^3 - 6xy &= 4 \n\\Leftrightarrow (2x)^3 + y^3 + 1^3 - 3 \\cdot 2x \\cdot y \\cdot 1 = 5 \\\\\n&\\Leftrightarrow (2x + y + 1)(4x^2 + y^2 + 1 - 2xy - 2x - y) = 5\n\\end{aligned} \\quad (1)\n$$\n$$\n\\Leftrightarrow \\frac{1}{2}(2x+y+1)[(2x-y)^2+(2x-1)^2+(y-1)^2]=5 \\quad (2)\n$$\nFrom (2), since $(2x-y)^2 + (2x-1)^2 + (y-1)^2 > 0$, we have $2x + y + 1 > 0$, and hence from (1) we get\n$$\n2x + y + 1 = 1 \\text{ or } 2x + y + 1 = 5 \\Leftrightarrow 2x + y = 0 \\text{ or } 2x + y = 4.\n$$\nFrom (1), for $2x + y = 4$, we have\n$$\n4x^2 + y^2 + 1 - 2xy - 2x - y = 1 \\Leftrightarrow (2x + y)^2 - 6xy - (2x + y) = 0 \\Leftrightarrow xy = 2\n$$\nFrom the system $2x + y = 4$, $xy = 2$ we get the solution $(x, y) = (1, 2)$.\nAlso, from (1) for $2x + y = 0$ we have\n$$\n4x^2 + y^2 + 1 - 2xy - 2x - y = 5 \\Leftrightarrow (2x + y)^2 - 6xy - (2x + y) = 4 \\Leftrightarrow xy = -\\frac{2}{3}.\n$$\nHowever, from the system $2x + y = 0$, $xy = -\\frac{2}{3}$ we get no solutions.\n**We also can work in the following way:** The equation can be written as\n$$8x^3 + y^3 - 6xy = 4 \\Leftrig"
+ },
+ {
+  "mathnet_id": "0gpa",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "数列与递推"
+  ],
+  "contest": "Team Selection Test",
+  "problem": "Let $S_r(n) = 1^r + 2^r + \\dots + n^r$ where $r$ is a rational number and $n$ is a positive integer. Find all triples $(a, b, c)$ where $a$ and $b$ are positive rational numbers and $c$ is a positive integer for which there exist infinitely many positive integers $n$ satisfying $S_a(n) = (S_b(n))^c$.",
+  "solution_head": "The answer is $a = 3, b = 1, c = 2$ and $a = b \\in \\mathbb{Q}^+, c = 1$.\nApplying induction on $n$ by using Bernoulli's inequality gives\n$$\n\\frac{n^{r+1}}{r+1} \\le S_r(n) \\le \\frac{(n+1)^{r+1}}{r+1}\n$$\nfor all positive integer $n$ and positive rational number $r$.\nAs $S_a(n) = (S_b(n))^c$ letting $r = a$ and $r = b$ gives that\n$$\n\\frac{n^{a+1}}{a+1} \\le \\left( \\frac{(n+1)^{b+1}}{b+1} \\right)^c \\text{ and } \\left( \\frac{n^{b+1}}{b+1} \\right)^c \\le \\frac{(n+1)^{a+1}}{a+1}\n$$\ni.e.\n$$\n\\frac{n^{(b+1)c}}{(n+1)^{a+1}} \\le \\frac{(b+1)^c}{a+1} \\le \\frac{(n+1)^{(b+1)c}}{n^{a+1}}\n$$\nholds for infinitely many positive integers $n$. By letting $n \\to \\infty$ in the last inequality, we obtain that $(b+1)c = a+1$ and $(b+1)^c = a+1$. If $c=1$, then $a=b$ and we get the trivial solutions.\nIf $c > 1$, then $c = (b+1)^{c-1}$ implies that $b$ is an integer since $c$ is an integer. As $b \\ge 1$, we get that $c \\ge 2^{c-1}$ and hence $c = 2$. This leads to $b = 1, a = 3$ and this solution clearly satisfies the condition."
+ },
+ {
+  "mathnet_id": "078r",
+  "est": 4,
+  "conf": "mid",
+  "category": "algebra",
+  "topics": [
+   "函数方程",
+   "根与系数"
+  ],
+  "contest": "IMO TST",
+  "problem": "Find all functions $f : \\mathbb{R} \\to \\mathbb{R}$ such that for all real numbers $a, b, c$, we have\n$$\nf(a + b + c)f(ab + bc + ca) - f(a)f(b)f(c) = f(a + b)f(b + c)f(c + a).\n$$",
+  "solution_head": "Let $\\mathcal{P}(a, b, c)$ denote the expression\n$$\nf(a + b + c)f(ab + bc + ca) = f(a)f(b)f(c) + f(a + b)f(b + c)f(c + a).\n$$\n\n$\\mathcal{P}(0, 0, 0) \\Rightarrow f(0)^2 = 2f(0)^3.$ So, $f(0) = \\frac{1}{2}$ or $f(0) = 0$. Exclude the solution $f \\equiv 0$.\n\n**Case 1** ($f(0) = \\frac{1}{2}$):\n$\\mathcal{P}(a, 0, 0) \\Rightarrow \\frac{1}{4}f(a) = \\frac{1}{2}f(a)^2 \\Rightarrow \\forall a, f(a) = 0$ or $f(a) = \\frac{1}{2}$.\n\nNow, if there is $r \\neq 0$ such that $f(r) = \\frac{1}{2}$, take any $a \\in \\left(-\\frac{|r|}{3}, \\frac{|r|}{3}\\right)$. Then, since $(r + 3a)(r - a) > 0$, we will find real solutions to $x^2 + (a - r)x + a(a - r) = 0$, which we call $b$ and $c$. Then, $(a + b + c) = r$ and $(ab + bc + ca) = 0$. Therefore, $\\mathcal{P}(a, b, c) \\Rightarrow f(a)f(b)f(c) + f(a + b)f(b + c)f(c + a) = \\frac{1}{4}$, so $f(a) = \\frac{1}{2}$. So $f(a) = \\frac{1}{2}$ for all $a \\in \\left(-\\frac{|r|}{3}, \\frac{|r|}{3}\\right)$.\n\nIf $f(a+b) = 0$, then $\\mathcal{P}(a, b, 0) \\Rightarrow \\frac{1}{2}f(a)f(b) = 0$, so $f(a) = 0$ or $f(b) = 0$. Therefore, if $f(a) = f(b) = \\frac{1}{2}$, then $f(a+b) = \\fr"
+ },
+ {
+  "mathnet_id": "0fyx",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "方程与设元",
+   "不等式"
+  ],
+  "contest": "IMO Selektion",
+  "problem": "Problem:\nFinde natürliche Zahlen $a, b, c$, so dass die Quersumme von $a+b, b+c$ und $c+a$ jeweils kleiner als 5 ist, die Quersumme von $a+b+c$ aber grösser als 50.",
+  "solution_head": "Solution:\nDie Idee ist, zuerst die paarweisen Summen $u = a + b$, $v = b + c$ und $w = c + a$ festzulegen. Damit diese Summen wirklich zu natürlichen Zahlen $a, b, c$ gehören, müssen sie die Seitenlängen eines nichtdegenerierten Dreiecks mit geradem Umfang sein. Wir wählen diese Summen so, dass deren Dezimaldarstellung aus jeweils 4 Einsen und ansonsten nur Nullen bestehen. Um die Dreiecksbedingung zu erfüllen, sollten alle Zahlen dieselbe Anzahl Stellen haben und mit einer Null enden. Ausserdem gilt $a + b + c = \\frac{1}{2}(u + v + w)$, also sollten die Einsen in den Dezimaldarstellungen von $u, v, w$ möglichst an verschiedenen Stellen stehen, damit bei obiger Division durch 2 möglichst viele Fünfen produziert werden. Ein naheliegender Versuch ist\n$$\nu = 11110000000, \\quad v = 10001110000, \\quad w = 10000001110$$\nalso\n$$a = 5554445555, \\quad b = 5555554445, \\quad c = 4445555555$$\nIn der Tat erhält man dann\n$$a + b + c = \\frac{1}{2}(u + v + w) = \\frac{1}{2} \\cdot 31111111110 = 15555555555$$\nund somit $q(a + b + c) = 51$."
+ },
+ {
+  "mathnet_id": "0idc",
+  "est": 4,
+  "conf": "high",
+  "category": "algebra",
+  "topics": [
+   "函数方程"
+  ],
+  "contest": "USA IMO",
+  "problem": "Let $\\mathbb{N}_0^+$ and $\\mathbb{Q}$ be the set of nonnegative integers and rational numbers, respectively. Define the function $f : \\mathbb{N}_0^+ \\to \\mathbb{Q}$ by $f(0) = 0$ and\n$$f(3n + k) = -\\frac{3f(n)}{2} + k, \\quad \\text{for } k = 0, 1, 2.$$ \nProve that $f$ is one-to-one, and determine its range.",
+  "solution_head": "We prove that the range of $f$ is the set $T$ of rational numbers of the form $m/2^n$ for $m \\in \\mathbb{Z}$ and $n \\in \\mathbb{N}_0^+$ (also known as the *dyadic rational numbers*). For $x, y \\in T$, we write $x \\equiv y \\pmod 3$ to mean that the numerator of $x - y$, when written in lowest terms, is divisible by 3. Define the function $g : T \\to \\{0, 1, 2\\}$ by declaring that for $x \\in T$, $g(x)$ is the unique element of $\\{0, 1, 2\\}$ such that $g(x) \\equiv x \\pmod 3$.\n\nWe first check that $f$ is one-to-one. Suppose that $f(a) = f(b)$ for some $a, b \\in \\mathbb{N}_0^+$ with $a < b$; choose such a pair with $b$ minimal. Now note that $f(a) \\equiv a \\pmod 3$ and $f(b) \\equiv b \\pmod 3$ from the definition of $f$. Hence $a \\equiv b \\pmod 3$. Choose the $i \\in \\{0, 1, 2\\}$ that is congruent to $a$ and $b$ modulo 3, and put $a' = (a-i)/3$ and $b' = (b-i)/3$. Then $f(a') = f(b')$, but $a' < b'$ and $b' < b$ since $b > 0$. This contradicts the choice of $a$ and $b$. Hence no such pairs exist.\n\nWe next verify that $T$, which clearly contains the range of $f$, is in fact equal to it. Defin"
+ }
+]
