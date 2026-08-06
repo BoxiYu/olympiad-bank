@@ -3,9 +3,8 @@
 > **项目使命：用 AI 促进数学教育，帮助学生高效地学习数学。**
 > AI 教学的可靠性取决于题目与答案的可靠性——先建成每道题都可溯源核实的题库，再在其上生长训练系统。
 
-**现状一句话**：题库供给自 MathNet 数据集，经 Codex 逐题评审通过后入库；2026-08-06 的
-`bash scripts/lint.sh` 基线为 193 题，之后的实时规模与分布以该命令和
-`uv run python scripts/bank.py stats` 的输出为准。
+**现状一句话**：题库供给自 MathNet 数据集，经 Codex 逐题评审通过后入库；实时规模与分布
+以 `bash scripts/lint.sh` 和 `uv run python scripts/bank.py stats` 的输出为准，本文不手写数字。
 
 ## 先做一次准备
 
@@ -41,7 +40,8 @@ uv run python scripts/bank.py coach --target IMO --save
 uv run python scripts/bank.py web
 ```
 
-`IMO` 可换成学生目标赛事；第一条先预览单周配额，并显示当前库存缺口，第二条再保存周计划。
+`IMO` 可换成学生目标赛事；第一条只预览题库总库存及缺口，不排除该学生做过的题，因此不能
+保证第二条保存的个性化周计划达到相同题数。
 更多解释以及建档、测评波次与能力图入口见 [教练手册](docs/教练手册.md)。
 
 ### 维护者：检查库况，再进入补题流程
