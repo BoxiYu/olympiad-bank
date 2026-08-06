@@ -227,6 +227,95 @@ def test_prepare_out_refusal_names_every_stash_and_translation_count(tmp_path, c
     assert error.count('1 份 translation.json') == 2
 
 
+def test_interrupted_export_then_translation_rerun_has_explicit_unlock(tmp_path, capsys):
+    out = tmp_path / 'mathnet-full'
+    out.mkdir()
+    (out / 'index.jsonl').write_text('', encoding='utf-8')
+    _rel, old_path = _problem(out, 'resume1', '# old source\n')
+    (old_path.parent / 'index.zh.md').write_text('# old paid translation\n', encoding='utf-8')
+    (old_path.parent / 'translation.json').write_text(
+        '{"mathnet_id":"resume1","generation":"old"}', encoding='utf-8')
+    _stash, stash_root = me.prepare_out(str(out))
+
+    # 模拟中断发生在新 index.md 已写、旧译文尚未 restore；运维随后补跑了翻译。
+    _rel, live_path = _problem(out, 'resume1', '# new source\n')
+    (live_path.parent / 'index.zh.md').write_text('# new paid translation\n', encoding='utf-8')
+    (live_path.parent / 'translation.json').write_text(
+        '{"mathnet_id":"resume1","generation":"new"}', encoding='utf-8')
+
+    with pytest.raises(SystemExit):
+        me.prepare_out(str(out))
+    error = capsys.readouterr().err
+    assert '--prefer-live-translations' in error
+    assert f'--out {out}' in error
+    assert me.TRANSLATION_STASH_ARCHIVE_DIRNAME in error
+    assert (Path(stash_root) / 'resume1' / 'translation.json').exists()
+    assert (live_path.parent / 'translation.json').exists()
+
+    stash, resumed_root = me.prepare_out(str(out), prefer_live_translations=True)
+    new_dir = out / 'by-topic' / 'algebra' / 'new-topic' / 'resume1'
+    new_dir.mkdir(parents=True)
+    me.restore_translations(stash, 'resume1', str(new_dir))
+    assert json.loads((new_dir / 'translation.json').read_text(encoding='utf-8')) == {
+        'mathnet_id': 'resume1', 'generation': 'new'}
+    archives = list((out / me.TRANSLATION_STASH_ARCHIVE_DIRNAME).glob(
+        'resume1-*/stashed/translation.json'))
+    assert len(archives) == 1
+    assert json.loads(archives[0].read_text(encoding='utf-8')) == {
+        'mathnet_id': 'resume1', 'generation': 'old'}
+    me.finish_translation_stash(stash, resumed_root)
+
+
+def test_prepare_out_preserves_translation_run_ledger(tmp_path):
+    out = tmp_path / 'mathnet-full'
+    out.mkdir()
+    (out / 'index.jsonl').write_text('', encoding='utf-8')
+    run = out / me.TRANSLATION_RUN_DIRNAME
+    run.mkdir()
+    progress = run / '.translate-progress.json'
+    failures = run / '.translate-failures.jsonl'
+    progress.write_bytes(b'{"done":1064}\n')
+    failures.write_bytes(b'{"mathnet_id":"failed-1"}\n')
+
+    stash, stash_root = me.prepare_out(str(out))
+
+    assert stash == {}
+    assert progress.read_bytes() == b'{"done":1064}\n'
+    assert failures.read_bytes() == b'{"mathnet_id":"failed-1"}\n'
+    assert not (Path(stash_root) / me.TRANSLATION_RUN_DIRNAME).exists()
+    me.finish_translation_stash(stash, stash_root)
+    assert not Path(stash_root).exists()
+
+
+@pytest.mark.skipif(not hasattr(os, 'fork'), reason='SIGKILL 场景需要 fork')
+def test_translation_run_ledger_survives_sigkill_inside_prepare_out(tmp_path):
+    out = tmp_path / 'mathnet-full'
+    out.mkdir()
+    (out / 'index.jsonl').write_text('', encoding='utf-8')
+    (out / 'by-topic' / 'partial').mkdir(parents=True)
+    run = out / me.TRANSLATION_RUN_DIRNAME
+    run.mkdir()
+    progress_bytes = b'{"paid_batches":24012}\n'
+    (run / '.translate-progress.json').write_bytes(progress_bytes)
+
+    pid = os.fork()
+    if pid == 0:
+        me.shutil.rmtree = lambda _path: os.kill(os.getpid(), signal.SIGKILL)
+        me.prepare_out(str(out))
+        os._exit(2)
+    _pid, status = os.waitpid(pid, 0)
+    assert os.WIFSIGNALED(status) and os.WTERMSIG(status) == signal.SIGKILL
+
+    roots = me.translation_stash_roots(str(out))
+    assert len(roots) == 1
+    stashed_progress = Path(roots[0]) / me.TRANSLATION_RUN_DIRNAME / '.translate-progress.json'
+    assert stashed_progress.read_bytes() == progress_bytes
+
+    stash, stash_root = me.prepare_out(str(out))
+    assert (out / me.TRANSLATION_RUN_DIRNAME / '.translate-progress.json').read_bytes() == progress_bytes
+    me.finish_translation_stash(stash, stash_root)
+
+
 def test_prepare_out_adopts_legacy_sibling_stash(tmp_path):
     out = tmp_path / 'mathnet-full'
     out.mkdir()

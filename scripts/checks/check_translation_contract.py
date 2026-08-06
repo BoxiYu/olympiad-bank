@@ -24,6 +24,7 @@ SCRIPTS_DIR = os.path.join(ROOT, 'scripts')
 if SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, SCRIPTS_DIR)
 from source_lang import should_passthrough
+from mathnet_translation_assets import TRANSLATION_STASH_PREFIX
 
 DEFAULT_SAMPLE = 100
 VALID_MODES = {'passthrough', 'translated', 'failed'}
@@ -68,12 +69,13 @@ def _relative(path, corpus):
 
 
 def discover_contracts(corpus):
-    """只走真实目录，不跟随 by-contest/ 与多知识点挂载产生的符号链接。"""
+    """只走真实语料目录；导出恢复暂存不是完整题目，必须整棵跳过。"""
     paths = []
     for dirpath, dirnames, filenames in os.walk(corpus, followlinks=False):
         dirnames[:] = sorted(
             name for name in dirnames
             if not os.path.islink(os.path.join(dirpath, name))
+            and not name.startswith(TRANSLATION_STASH_PREFIX)
         )
         if 'translation.json' in filenames:
             paths.append(os.path.join(dirpath, 'translation.json'))
