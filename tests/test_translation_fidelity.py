@@ -293,6 +293,36 @@ def test_constructed_same_genre_cluster_compares_target_and_source_to_same_peer(
     assert batch_report(rows, target_lang='en').findings == {}
 
 
+def test_constructed_paired_source_templates_do_not_punch_through_boilerplate_cluster():
+    translated = 'The requested result follows from the stated conditions.'
+    sources = (
+        'Find the maximum value of the function under the stated algebraic constraints.',
+        'Find the minimum value of the function under the stated algebraic constraints.',
+        'Prove that the two circles in the stated geometric configuration are tangent.',
+        'Prove that the two circles in the stated geometric configuration are orthogonal.',
+    )
+    rows = [
+        {
+            'mathnet_id': f'constructed-paired-template-{index}',
+            'source': source,
+            'translated': translated,
+        }
+        for index, source in enumerate(sources, start=1)
+    ]
+
+    report = batch_report(rows, target_lang='en')
+
+    assert set(report.findings) == {row['mathnet_id'] for row in rows}
+    assert all(
+        FindingType.BATCH_BOILERPLATE in {finding.type for finding in findings}
+        for findings in report.findings.values()
+    )
+    assert all(
+        '簇级跨模板源文相似度' in report.signals[row['mathnet_id']][0].detail
+        for row in rows
+    )
+
+
 def test_echoing_one_distinctive_number_does_not_exempt_boilerplate_cluster():
     sources = (
         'Demonstrați teorema geometrică despre cercuri și tangente în cazul 101.',
