@@ -18,6 +18,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import mathnet_translate as mt  # noqa: E402
 
 FIXTURE = Path(__file__).parent / "fixtures" / "mathnet_translate"
+IDENTICAL_EN_FIXTURE = (
+    Path(__file__).parent / "fixtures" / "translation_fidelity" / "identical-en"
+)
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BANK = REPO_ROOT / "scripts" / "bank.py"
 NOW = "2026-08-06T12:00:00Z"
@@ -455,6 +458,55 @@ def test_apply_payload_accepts_en_non_high_identical_model_result(
     assert (question / "index.en.md").read_bytes() == (question / "index.md").read_bytes()
     state = json.loads((question / "translation.json").read_text(encoding="utf-8"))
     assert state["variants"]["en"]["mode"] == "translated"
+
+
+def test_und_identical_english_model_result_is_translated_and_written(
+    corpus: Path, tmp_path: Path
+):
+    # These deliberately exercise the short-English detector gap behind CXB-520.
+    assert mt.detect_source_lang("Compute $x$.", {}) == ("und", "low")
+    assert mt.detect_source_lang("Use $x=2$.", {}) == ("und", "low")
+    source = next(path for path in corpus.rglob("index.md") if path.parent.name == "eng1")
+    source.write_text(
+        (IDENTICAL_EN_FIXTURE / "und.md").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    row = export(
+        corpus, tmp_path / "batch.jsonl", "--only", "eng1",
+        "--source-lang", "und", "--source-lang-confidence", "low",
+    )[0]
+    assert row["target_modes"]["en"] == "translated"
+    apply_path = apply_input(tmp_path, row, {
+        "en": identical_translated_variant(row),
+    })
+
+    assert mt.main(["apply", "--root", str(corpus), "--in", str(apply_path)]) == 0
+    question = source.parent
+    assert (question / "index.en.md").read_bytes() == source.read_bytes()
+    state = json.loads((question / "translation.json").read_text(encoding="utf-8"))
+    assert state["variants"]["en"]["mode"] == "translated"
+    assert apply_path.with_suffix(".jsonl.failures.jsonl").read_text(encoding="utf-8") == ""
+
+
+@pytest.mark.parametrize("source_lang", ["de", "es", "sl", "pt"])
+def test_known_foreign_identical_english_model_result_is_rejected(
+    corpus: Path, tmp_path: Path, source_lang: str
+):
+    source = next(path for path in corpus.rglob("index.md") if path.parent.name == "eng1")
+    source.write_text(
+        (IDENTICAL_EN_FIXTURE / f"{source_lang}.md").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    row = export(
+        corpus, tmp_path / "batch.jsonl", "--only", "eng1",
+        "--source-lang", source_lang, "--source-lang-confidence", "high",
+    )[0]
+
+    with pytest.raises(mt.TranslateError, match="untranslated@题面"):
+        mt.apply_payload(corpus, row, "en", identical_translated_variant(row))
+
+    assert not (source.parent / "index.en.md").exists()
+    assert not (source.parent / "translation.json").exists()
 
 
 def test_apply_payload_rejects_mixed_section_despite_matching_file_language(

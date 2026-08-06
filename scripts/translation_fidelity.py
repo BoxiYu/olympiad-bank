@@ -530,7 +530,15 @@ def _same_language_family(source_lang: str | None, target_lang: str) -> bool:
     if not source_lang:
         return False
     family = re.split(r'[-_]', source_lang.casefold(), maxsplit=1)[0]
-    return family == target_lang
+    if family == target_lang:
+        return True
+    # ``und`` is deliberately *not* a passthrough language: the model must see
+    # the document first.  For an English target, however, an identical
+    # ``translated`` result is the model's explicit verdict that no rewrite is
+    # needed.  Accept that verified-identical verdict after the section-level
+    # detector and known foreign-fragment checks above have found no contrary
+    # evidence.  Known de/es/sl/pt/etc. sources therefore remain rejectable.
+    return family == 'und' and target_lang == 'en'
 
 
 def _ascii_fold(value: str) -> str:
