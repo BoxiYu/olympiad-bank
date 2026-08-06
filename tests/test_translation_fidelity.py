@@ -8,7 +8,14 @@ import pytest
 
 sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'scripts'))
-from translation_fidelity import FindingType, main, verify_directory, verify_translation  # noqa: E402
+from translation_fidelity import (  # noqa: E402
+    BatchConfig,
+    FindingType,
+    main,
+    verify_batch,
+    verify_directory,
+    verify_translation,
+)
 
 
 FIXTURES = Path(__file__).parent / 'fixtures' / 'translation_fidelity'
@@ -78,6 +85,87 @@ def types(source=SOURCE, translated=VALID_TRANSLATION, **kwargs):
 def test_legal_translation_has_zero_findings():
     """自然语言可翻译；数学、代码、图片、骨架和纯符号答案原样保留。"""
     assert verify_translation(SOURCE, VALID_TRANSLATION) == []
+
+
+def degenerate_fixture():
+    return json.loads((FIXTURES / 'degenerate-batch.json').read_text(encoding='utf-8'))
+
+
+def normal_batch(size=97):
+    objects = ('sum', 'product', 'remainder', 'perimeter', 'area', 'maximum', 'minimum',
+               'coefficient', 'root', 'divisor')
+    methods = ('factoring', 'induction', 'symmetry', 'counting', 'reflection', 'substitution',
+               'invariance', 'parity', 'recursion', 'comparison')
+    object_zh = ('和', '积', '余数', '周长', '面积', '最大值', '最小值', '系数', '根', '因数')
+    method_zh = ('因式分解', '归纳法', '对称性', '计数法', '反射法', '代换法',
+                 '不变量', '奇偶性', '递推法', '比较法')
+    rows = []
+    for index in range(size):
+        left, right = index % 10, index // 10
+        rows.append({
+            'mathnet_id': f'normal-{index:03d}',
+            'source': (f'Find the {objects[left]} using {methods[right]} in case '
+                       f'{index + 100}.'),
+            'translated': (f'在编号 {index + 100} 的情形中，用{method_zh[right]}'
+                           f'求{object_zh[left]}。'),
+        })
+    return rows
+
+
+def batch_report(rows, **kwargs):
+    return verify_batch(
+        [row['source'] for row in rows],
+        [row['translated'] for row in rows],
+        keys=[row['mathnet_id'] for row in rows],
+        **kwargs,
+    )
+
+
+def test_real_degenerate_fixture_blocks_all_three_boilerplate_translations():
+    rows = degenerate_fixture()
+    report = batch_report(rows)
+
+    assert set(report.findings) == {row['mathnet_id'] for row in rows}
+    assert all(
+        {finding.type for finding in findings} == {FindingType.BATCH_BOILERPLATE}
+        for findings in report.findings.values()
+    )
+
+
+def test_three_degenerate_items_in_one_hundred_only_block_those_three():
+    bad = degenerate_fixture()
+    rows = normal_batch() + bad
+    report = batch_report(rows)
+
+    assert set(report.findings) == {row['mathnet_id'] for row in bad}
+    assert not (set(report.findings) & {row['mathnet_id'] for row in rows[:97]})
+
+
+def test_normal_batch_has_zero_findings():
+    assert batch_report(normal_batch()).findings == {}
+
+
+def test_length_ratio_is_a_signal_but_never_blocks_alone():
+    source = 'Consider the complete configuration and all of its stated restrictions carefully.'
+    report = verify_batch([source], ['简答'], keys=['short'])
+
+    assert report.findings == {}
+    assert [signal.type for signal in report.signals['short']] == [FindingType.LENGTH_RATIO]
+
+
+def test_length_and_missing_anchor_block_as_separate_findings():
+    source = 'Find the unique integer satisfying every one of the listed divisibility restrictions.'
+    report = verify_batch([source], ['整数'], keys=['hollow'])
+
+    assert {finding.type for finding in report.findings['hollow']} == {
+        FindingType.LENGTH_RATIO,
+        FindingType.CONTENT_ANCHOR_MISSING,
+    }
+
+
+def test_batch_thresholds_are_configurable():
+    report = batch_report(degenerate_fixture(), config=BatchConfig(boilerplate_min_group=4))
+    assert report.findings == {}
 
 
 @pytest.mark.parametrize(('old', 'new'), [

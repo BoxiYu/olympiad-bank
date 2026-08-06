@@ -1,0 +1,17 @@
+[
+  {
+    "mathnet_id": "degenerate-001",
+    "source": "Problem: Prove the identity {{MNT_0001}}",
+    "translated": "题目：请根据下列条件求解或证明。{{MNT_0001}}"
+  },
+  {
+    "mathnet_id": "degenerate-002",
+    "source": "Problem: Show that for positive integers {{MNT_0001}}, {{MNT_0002}}",
+    "translated": "题目：请根据下列条件求解或证明。{{MNT_0001}}，{{MNT_0002}}"
+  },
+  {
+    "mathnet_id": "degenerate-003",
+    "source": "Problem: Show that for positive integers {{MNT_0001}}, {{MNT_0002}}",
+    "translated": "题目：请根据下列条件求解或证明。{{MNT_0001}}，{{MNT_0002}}"
+  }
+]

@@ -571,6 +571,85 @@ def test_atomic_write_uses_same_directory_replace_and_cleans_failed_temp(tmp_pat
     assert not list(tmp_path.glob(".translation.json.*.tmp"))
 
 
+def test_batch_output_rejects_real_boilerplate_fixture(tmp_path: Path):
+    fixture = json.loads(
+        (REPO_ROOT / "tests" / "fixtures" / "translation_fidelity" / "degenerate-batch.json")
+        .read_text(encoding="utf-8")
+    )
+    records = tuple({
+        "mathnet_id": row["mathnet_id"],
+        "units": [{
+            "id": "statement",
+            "source": row["source"],
+            "translatable": True,
+        }],
+    } for row in fixture)
+    job = mt.BatchJob("zh-degenerate", "zh", records, tmp_path / "batch")
+    job.directory.mkdir()
+    job.output_path.write_text(json.dumps({
+        "model": "fake-codex",
+        "translations": [{
+            "mathnet_id": row["mathnet_id"],
+            "units": {"statement": row["translated"]},
+        } for row in fixture],
+    }, ensure_ascii=False), encoding="utf-8")
+
+    with pytest.raises(mt.TranslateError, match=r"批级退化校验失败（3/3 题）"):
+        mt.validate_batch_output(job)
+
+
+def test_apply_preflight_rejects_only_real_boilerplate_records(tmp_path: Path):
+    fixture = json.loads(
+        (REPO_ROOT / "tests" / "fixtures" / "translation_fidelity" / "degenerate-batch.json")
+        .read_text(encoding="utf-8")
+    )
+    root = tmp_path / "corpus"
+    records = []
+    for row in fixture:
+        source_statement = (
+            row["source"]
+            .replace("{{MNT_0001}}", "$x$")
+            .replace("{{MNT_0002}}", "$y$")
+        )
+        problem_dir = root / row["mathnet_id"]
+        problem_dir.mkdir(parents=True)
+        source_path = problem_dir / "index.md"
+        source_path.write_text(
+            f"# {row['mathnet_id']}\n\n## 题面\n{source_statement}\n\n## 最终答案\nD\n",
+            encoding="utf-8",
+        )
+        units = mt.export_units(mt.parse_document(source_path.read_text(encoding="utf-8")))
+        translations = {
+            unit["id"]: row["translated"] if unit["id"] == "statement" else unit["source"]
+            for unit in units
+        }
+        records.append({
+            "mathnet_id": row["mathnet_id"],
+            "path": source_path.relative_to(root).as_posix(),
+            "source_sha256": digest(source_path),
+            "source_lang": "en",
+            "source_lang_confidence": "high",
+            "variants": {"zh": {
+                "mode": "translated",
+                "model": "fake-codex",
+                "generated_at": NOW,
+                "units": translations,
+            }},
+        })
+    input_path = apply_records_input(tmp_path, records)
+    args = type("Args", (), {
+        "root": root,
+        "input": input_path,
+        "failures": tmp_path / "failures.jsonl",
+    })()
+
+    assert mt.apply_records(args) == 1
+    failures = read_jsonl(args.failures)
+    assert len(failures) == 3
+    assert all("batch_boilerplate" in failure["error"] for failure in failures)
+    assert not list(root.rglob("index.zh.md"))
+
+
 def test_apply_never_changes_any_fixture_index(corpus: Path, tmp_path: Path):
     sources = list(corpus.rglob("index.md"))
     before = {path: digest(path) for path in sources}

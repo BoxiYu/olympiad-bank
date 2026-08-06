@@ -28,7 +28,7 @@ from pathlib import Path
 from typing import Any
 
 from source_lang import detect_source_lang, should_passthrough
-from translation_fidelity import verify_translation
+from translation_fidelity import verify_batch, verify_translation
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CORPUS = ROOT / "mathnet-full"
@@ -735,6 +735,59 @@ def load_jsonl(path: Path) -> tuple[list[tuple[int, dict[str, Any]]], list[dict[
     return rows, failures
 
 
+def batch_degradation_errors(
+    root: Path,
+    rows: list[tuple[int, dict[str, Any]]],
+) -> dict[int, str]:
+    """在 apply 写盘前按目标语言做批级退化预检；单行 schema 错误留给 apply_record。"""
+    candidates: dict[str, list[tuple[int, str, str, str]]] = {lang: [] for lang in TARGET_LANGS}
+    for line_number, record in rows:
+        try:
+            path = safe_record_path(root, record)
+            source_bytes = path.read_bytes()
+            if record.get("source_sha256") != sha256_bytes(source_bytes):
+                continue
+            source_lang = record.get("source_lang")
+            confidence = record.get("source_lang_confidence", "unknown")
+            variants = record.get("variants")
+            if not isinstance(source_lang, str) or not isinstance(confidence, str):
+                continue
+            if not isinstance(variants, dict):
+                continue
+            source_text = source_bytes.decode("utf-8")
+            document = parse_document(source_text, record.get("path", "index.md"))
+            for lang, payload in variants.items():
+                if lang not in TARGET_LANGS or not isinstance(payload, dict):
+                    continue
+                if payload.get("mode") != "translated":
+                    continue
+                target_bytes, _metadata = prepare_variant(
+                    lang, payload, source_lang, confidence, source_bytes, document
+                )
+                if target_bytes is not None:
+                    key = f"{line_number}:{record.get('mathnet_id')}:{lang}"
+                    candidates[lang].append((line_number, key, source_text, target_bytes.decode("utf-8")))
+        except (OSError, UnicodeError, TranslateError):
+            continue
+
+    errors: dict[int, list[str]] = {}
+    for lang, items in candidates.items():
+        if not items:
+            continue
+        line_numbers, keys, sources, translated = zip(*items)
+        report = verify_batch(
+            list(sources), list(translated), keys=list(keys), target_lang=lang
+        )
+        line_by_key = dict(zip(keys, line_numbers))
+        for key, findings in report.findings.items():
+            kinds = ",".join(sorted({finding.type.value for finding in findings}))
+            errors.setdefault(line_by_key[key], []).append(f"{lang}[{kinds}]")
+    return {
+        line_number: "批级退化校验失败：" + "、".join(details)
+        for line_number, details in errors.items()
+    }
+
+
 def apply_records(args: argparse.Namespace) -> int:
     root = Path(args.root).resolve()
     if not root.is_dir():
@@ -742,14 +795,27 @@ def apply_records(args: argparse.Namespace) -> int:
     input_path = Path(args.input)
     rows, failures = load_jsonl(input_path)
     seen: set[str] = set()
-    applied = 0
+    unique_rows = []
     for line_number, record in rows:
         mathnet_id = record.get("mathnet_id")
         if isinstance(mathnet_id, str) and mathnet_id in seen:
-            failures.append({"line": line_number, "mathnet_id": mathnet_id, "error": "输入中 mathnet_id 重复"})
+            failures.append({"line": line_number, "mathnet_id": mathnet_id,
+                             "error": "输入中 mathnet_id 重复"})
             continue
         if isinstance(mathnet_id, str):
             seen.add(mathnet_id)
+        unique_rows.append((line_number, record))
+    batch_errors = batch_degradation_errors(root, unique_rows)
+    applied = 0
+    for line_number, record in unique_rows:
+        mathnet_id = record.get("mathnet_id")
+        if line_number in batch_errors:
+            failures.append({
+                "line": line_number,
+                "mathnet_id": mathnet_id,
+                "error": batch_errors[line_number],
+            })
+            continue
         try:
             apply_record(root, record)
             applied += 1
@@ -1081,6 +1147,35 @@ def validate_batch_output(job: BatchJob) -> dict[str, dict[str, Any]]:
     missing = sorted(set(expected) - set(result))
     if missing:
         raise TranslateError(f"translations 缺少 {len(missing)} 题：{', '.join(missing)}")
+    keys = list(expected)
+    source_texts = []
+    translated_texts = []
+    for mathnet_id in keys:
+        row = expected[mathnet_id]
+        units = result[mathnet_id]["units"]
+        translatable = [unit for unit in row["units"] if unit["translatable"]]
+        source_texts.append("\n\n".join(
+            f"## {unit['id']}\n{unit['source']}" for unit in translatable
+        ))
+        translated_texts.append("\n\n".join(
+            f"## {unit['id']}\n{units[unit['id']]}" for unit in translatable
+        ))
+    batch_report = verify_batch(
+        source_texts,
+        translated_texts,
+        keys=keys,
+        target_lang=job.target_lang,
+    )
+    if batch_report.findings:
+        details = []
+        for mathnet_id, findings in batch_report.findings.items():
+            kinds = ",".join(sorted({finding.type.value for finding in findings}))
+            details.append(f"{mathnet_id}[{kinds}]")
+        raise TranslateError(
+            f"批级退化校验失败（{len(batch_report.findings)}/{len(keys)} 题）："
+            + "、".join(details[:12])
+            + (f"、另 {len(details) - 12} 题" if len(details) > 12 else "")
+        )
     return result
 
 

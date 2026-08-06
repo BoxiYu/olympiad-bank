@@ -13,6 +13,7 @@ import re
 import unicodedata
 from collections import Counter
 from dataclasses import asdict, dataclass
+from difflib import SequenceMatcher
 from enum import Enum
 from itertools import zip_longest
 from pathlib import Path
@@ -32,6 +33,9 @@ class FindingType(str, Enum):
     MODEL_META_LEAK = 'model_meta_leak'
     EXTRA_CODE_FENCE = 'extra_code_fence'
     MISSING_TRANSLATION = 'missing_translation'
+    BATCH_BOILERPLATE = 'batch_boilerplate'
+    LENGTH_RATIO = 'length_ratio'
+    CONTENT_ANCHOR_MISSING = 'content_anchor_missing'
 
 
 @dataclass(frozen=True)
@@ -73,6 +77,68 @@ class DirectoryReport:
 
 
 @dataclass(frozen=True)
+class BatchConfig:
+    """批级退化信号的可配置阈值与权重。
+
+    默认 ``boilerplate_min_group=3`` 对应最小可行动重复簇：两条短题偶然同句很常见，
+    三条不同原文却共用译文已足以复核。相似度 0.9 在剥离数学与标点后容忍少量虚词漂移；
+    译文相似度还须比源文相似度至少高 0.2，避免误伤同模板原文的忠实同模板翻译。
+    少于 8 个文字/数字的短答案不参与套话聚类。长度比采用很宽的 0.25--4.0 区间，
+    适配英中字符密度差；长度和锚点各权重 1，必须同时出现才达到默认阻断分 2，
+    因而长度异常绝不会单独产生 Finding。套话权重 2，可独立阻断。
+    超过 500 条时只做线性精确聚类，避免目录审计退化成二次复杂度；生产翻译批次默认 25，
+    SOP 最大 100，仍会执行高重合模糊比较。
+    """
+
+    boilerplate_min_group: int = 3
+    boilerplate_similarity: float = 0.9
+    boilerplate_source_similarity_gap: float = 0.2
+    boilerplate_min_chars: int = 8
+    length_ratio_min: float = 0.25
+    length_ratio_max: float = 4.0
+    boilerplate_weight: int = 2
+    length_weight: int = 1
+    anchor_weight: int = 1
+    block_score: int = 2
+    fuzzy_comparison_limit: int = 500
+
+
+@dataclass(frozen=True)
+class BatchSignal:
+    """一条独立批级信号；信号不等于阻断 Finding。"""
+
+    type: FindingType
+    section: str
+    score: float
+    detail: str
+
+    def to_dict(self) -> dict[str, str | float]:
+        row = asdict(self)
+        row['type'] = self.type.value
+        return row
+
+
+@dataclass(frozen=True)
+class BatchReport:
+    """批级报告；``findings`` 只含达到阻断权重的条目。"""
+
+    findings: dict[str, list[Finding]]
+    signals: dict[str, list[BatchSignal]]
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            'findings': {
+                key: [finding.to_dict() for finding in findings]
+                for key, findings in self.findings.items()
+            },
+            'signals': {
+                key: [signal.to_dict() for signal in signals]
+                for key, signals in self.signals.items()
+            },
+        }
+
+
+@dataclass(frozen=True)
 class _Occurrence:
     text: str
     section: str
@@ -98,6 +164,7 @@ _PROTECTED_RE = re.compile(
     re.DOTALL,
 )
 _IMAGE_RE = re.compile(r'!\[\]\(attached_image_(\d+)\.png\)')
+_PLACEHOLDER_RE = re.compile(r'\{\{MNT_\d{4}\}\}')
 _HAN_RE = re.compile(r'[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]')
 _SYMBOL_WORDS = {
     'bmod', 'cos', 'gcd', 'inf', 'lcm', 'ln', 'log', 'max', 'min', 'mod',
@@ -139,12 +206,109 @@ _MODEL_META_PATTERNS = (
     re.compile(r'\bas an AI\b', re.IGNORECASE),
     re.compile(r'\bI (?:have )?translated\b', re.IGNORECASE),
 )
+_ZH_TASK_ANCHORS = (
+    (re.compile(r'\b(?:prove|show|demonstrate)\b', re.IGNORECASE),
+     re.compile(r'证明|证实|说明|表明')),
+    (re.compile(r'\b(?:find|determine)\b', re.IGNORECASE),
+     re.compile(r'求(?:出|得)?|找出|确定')),
+    (re.compile(r'\b(?:calculate|compute|evaluate)\b', re.IGNORECASE),
+     re.compile(r'计算|求(?:出|得)?')),
+    (re.compile(r'\bsolve\b', re.IGNORECASE), re.compile(r'求解|解(?:出|方程|不等式)')),
+    (re.compile(r'\bconstruct\b', re.IGNORECASE), re.compile(r'构造|作出')),
+    (re.compile(r'\bclassif(?:y|ies)\b', re.IGNORECASE), re.compile(r'分类|归类')),
+    (re.compile(r'\bcount\b', re.IGNORECASE), re.compile(r'计数|数出|多少')),
+)
+_ZH_NAME_ANCHORS = {
+    'cauchy': re.compile(r'Cauchy|柯西', re.IGNORECASE),
+    'ceva': re.compile(r'Ceva|塞瓦', re.IGNORECASE),
+    'euler': re.compile(r'Euler|欧拉', re.IGNORECASE),
+    'fermat': re.compile(r'Fermat|费马', re.IGNORECASE),
+    'fibonacci': re.compile(r'Fibonacci|斐波那契', re.IGNORECASE),
+    'jensen': re.compile(r'Jensen|詹森|琴生', re.IGNORECASE),
+    'menelaus': re.compile(r'Menelaus|梅涅劳斯', re.IGNORECASE),
+    'pascal': re.compile(r'Pascal|帕斯卡', re.IGNORECASE),
+    'pythagoras': re.compile(r'Pythagoras|Pythagorean|勾股|毕达哥拉斯', re.IGNORECASE),
+    'schwarz': re.compile(r'Schwarz|施瓦茨', re.IGNORECASE),
+    'vieta': re.compile(r'Vieta|韦达', re.IGNORECASE),
+    'wilson': re.compile(r'Wilson|威尔逊', re.IGNORECASE),
+}
 
 
 def _excerpt(value: str, limit: int = 160) -> str:
     if len(value) <= limit:
         return value
     return value[: limit - 1] + '…'
+
+
+def _plain_prose(value: str) -> str:
+    """剥离数学、占位符、图片与 Markdown 标记，保留可比较的散文。"""
+    value = _PROTECTED_RE.sub(' ', value)
+    value = _PLACEHOLDER_RE.sub(' ', value)
+    value = _IMAGE_RE.sub(' ', value)
+    value = re.sub(r'<[^>]+>', ' ', value)
+    value = re.sub(r'(?m)^#{1,6}[ \t]+.*$', ' ', value)
+    value = _META_RE.sub(' ', value)
+    value = re.sub(r'[`*_~>|\[\]()]', ' ', value)
+    return re.sub(r'\s+', ' ', value).strip()
+
+
+def _normalize_prose(value: str) -> str:
+    folded = unicodedata.normalize('NFKC', _plain_prose(value)).casefold()
+    return ''.join(char for char in folded if char.isalpha() or char.isdigit())
+
+
+def _semantic_sections(value: str) -> list[tuple[str, str, str]]:
+    sections = _sections(value)
+    if not sections:
+        plain = _plain_prose(value)
+        return [('文档', _normalize_prose(value), plain)]
+    return [
+        (section.heading, _normalize_prose(section.body), _plain_prose(section.body))
+        for section in sections
+    ]
+
+
+def _missing_content_anchors(source: str, translated: str, target_lang: str) -> list[str]:
+    """返回保守的缺失内容锚点；没有可靠跨语言映射时不猜。"""
+    if target_lang != 'zh':
+        return []
+    missing = []
+    source_plain = _plain_prose(source)
+    translated_plain = _plain_prose(translated)
+    for source_pattern, target_pattern in _ZH_TASK_ANCHORS:
+        match = source_pattern.search(source_plain)
+        if match and not target_pattern.search(translated_plain):
+            missing.append(match.group(0).casefold())
+    # 只锚定至少两位的十进制数；个位数常是列表编号或被自然改写，误报风险更高。
+    for number in sorted(set(re.findall(r'(?<!\w)\d{2,}(?!\w)', source_plain))):
+        if number not in translated_plain:
+            missing.append(number)
+    for name, target_pattern in _ZH_NAME_ANCHORS.items():
+        if target_pattern.search(source_plain) and not target_pattern.search(translated_plain):
+            missing.append(name)
+    # 仅检查明确独立出现的单字母变量，排除英文冠词 a 与代词 I；数学环境中的变量已被剥离。
+    variables = set(re.findall(r'(?<![A-Za-z])[b-hj-zB-HJ-Z](?![A-Za-z])', source_plain))
+    for variable in sorted(variables):
+        if not re.search(rf'(?<![A-Za-z]){re.escape(variable)}(?![A-Za-z])', translated_plain):
+            missing.append(variable)
+    return missing
+
+
+def _validate_batch_config(config: BatchConfig) -> None:
+    if config.boilerplate_min_group < 2:
+        raise ValueError('boilerplate_min_group must be at least 2')
+    if not 0 < config.boilerplate_similarity <= 1:
+        raise ValueError('boilerplate_similarity must be in (0, 1]')
+    if not 0 <= config.boilerplate_source_similarity_gap <= 1:
+        raise ValueError('boilerplate_source_similarity_gap must be in [0, 1]')
+    if config.boilerplate_min_chars <= 0:
+        raise ValueError('boilerplate_min_chars must be positive')
+    if not 0 < config.length_ratio_min < config.length_ratio_max:
+        raise ValueError('length ratio thresholds must satisfy 0 < min < max')
+    if min(config.boilerplate_weight, config.length_weight, config.anchor_weight) < 0:
+        raise ValueError('signal weights must be non-negative')
+    if config.block_score <= 0 or config.fuzzy_comparison_limit < 0:
+        raise ValueError('block_score must be positive and fuzzy_comparison_limit non-negative')
 
 
 def _section_matches(text: str) -> list[re.Match[str]]:
@@ -435,6 +599,188 @@ def verify_translation(
     return findings
 
 
+def verify_batch(
+    sources: list[str] | tuple[str, ...],
+    translated: list[str] | tuple[str, ...],
+    *,
+    keys: list[str] | tuple[str, ...] | None = None,
+    target_lang: str = 'zh',
+    config: BatchConfig | None = None,
+) -> BatchReport:
+    """从跨条目视角检查退化翻译，不改变逐题 ``verify_translation`` 的语义。
+
+    返回的三路 ``signals`` 始终分开保留；只有单条信号权重之和达到
+    ``config.block_score`` 才会复制为阻断 ``findings``。默认套话信号可独立阻断，
+    长度异常与锚点缺失必须共同出现。调用方应按一次模型输出或一次抽检批次传入，
+    不能把互不相关的目标语言混在同一批。
+    """
+    if target_lang not in {'en', 'zh'}:
+        raise ValueError(f'unsupported target language: {target_lang}')
+    if len(sources) != len(translated):
+        raise ValueError('sources and translated must have the same length')
+    item_keys = list(keys) if keys is not None else [str(index) for index in range(len(sources))]
+    if len(item_keys) != len(sources):
+        raise ValueError('keys and sources must have the same length')
+    if len(set(item_keys)) != len(item_keys) or not all(isinstance(key, str) for key in item_keys):
+        raise ValueError('keys must be unique strings')
+    if not all(isinstance(value, str) for value in (*sources, *translated)):
+        raise TypeError('batch source and translated values must be strings')
+
+    batch_config = config or BatchConfig()
+    _validate_batch_config(batch_config)
+    signals: dict[str, list[BatchSignal]] = {key: [] for key in item_keys}
+    source_by_key = dict(zip(item_keys, sources))
+    translated_by_key = dict(zip(item_keys, translated))
+
+    source_sections = [dict(
+        (heading, normalized) for heading, normalized, _plain in _semantic_sections(value)
+    ) for value in sources]
+    translated_sections = [_semantic_sections(value) for value in translated]
+    by_heading: dict[str, list[tuple[int, str, str]]] = {}
+    for index, sections in enumerate(translated_sections):
+        for heading, normalized, plain in sections:
+            if len(normalized) >= batch_config.boilerplate_min_chars:
+                by_heading.setdefault(heading, []).append((index, normalized, plain))
+
+    for heading, entries in by_heading.items():
+        parent = list(range(len(entries)))
+
+        def find(index: int) -> int:
+            while parent[index] != index:
+                parent[index] = parent[parent[index]]
+                index = parent[index]
+            return index
+
+        def union(left: int, right: int) -> None:
+            left_root, right_root = find(left), find(right)
+            if left_root != right_root:
+                parent[right_root] = left_root
+
+        exact: dict[str, list[int]] = {}
+        for position, (_index, normalized, _plain) in enumerate(entries):
+            exact.setdefault(normalized, []).append(position)
+        for positions in exact.values():
+            for position in positions[1:]:
+                union(positions[0], position)
+
+        if len(entries) <= batch_config.fuzzy_comparison_limit:
+            for left in range(len(entries)):
+                left_text = entries[left][1]
+                for right in range(left + 1, len(entries)):
+                    right_text = entries[right][1]
+                    if left_text == right_text:
+                        continue
+                    shorter, longer = sorted((len(left_text), len(right_text)))
+                    if shorter / longer < batch_config.boilerplate_similarity:
+                        continue
+                    similarity = SequenceMatcher(None, left_text, right_text).ratio()
+                    if similarity >= batch_config.boilerplate_similarity:
+                        union(left, right)
+
+        groups: dict[int, list[int]] = {}
+        for position in range(len(entries)):
+            groups.setdefault(find(position), []).append(position)
+        for positions in groups.values():
+            if len(positions) < batch_config.boilerplate_min_group:
+                continue
+            item_indexes = [entries[position][0] for position in positions]
+            group_sources = [source_sections[index].get(heading, '') for index in item_indexes]
+            distinct_sources = set(group_sources) - {''}
+            # 相同原文的合法重复翻译不构成退化；至少要看到两种不同源散文。
+            if len(distinct_sources) < 2:
+                continue
+            group_texts = [entries[position][1] for position in positions]
+            if len(positions) > batch_config.fuzzy_comparison_limit:
+                # 大目录只会把完全相同的译文连成大簇；用四个源文极值作线性近似，
+                # 足以找到“译文全同但源文明显不同”的证据且避免 O(n²)。
+                exemplar_indexes = {
+                    min(range(len(group_sources)), key=lambda index: len(group_sources[index])),
+                    max(range(len(group_sources)), key=lambda index: len(group_sources[index])),
+                    min(range(len(group_sources)), key=group_sources.__getitem__),
+                    max(range(len(group_sources)), key=group_sources.__getitem__),
+                }
+            else:
+                exemplar_indexes = set(range(len(group_sources)))
+            candidates = []
+            for group_position, position in enumerate(positions):
+                item_index, normalized, _plain = entries[position]
+                target_similarity = (
+                    1.0 if len(positions) > batch_config.fuzzy_comparison_limit else max(
+                        (SequenceMatcher(None, normalized, peer).ratio()
+                         for peer_index, peer in enumerate(group_texts)
+                         if peer_index != group_position),
+                        default=1.0,
+                    )
+                )
+                source_text = group_sources[group_position]
+                source_similarity = min(
+                    (SequenceMatcher(None, source_text, peer).ratio()
+                     for peer_index, peer in enumerate(group_sources)
+                     if peer_index in exemplar_indexes and peer_index != group_position
+                     and source_text and peer),
+                    default=1.0,
+                )
+                if (target_similarity - source_similarity
+                        < batch_config.boilerplate_source_similarity_gap):
+                    continue
+                candidates.append((item_index, target_similarity, source_similarity))
+            if len(candidates) < batch_config.boilerplate_min_group:
+                continue
+            for item_index, target_similarity, source_similarity in candidates:
+                signals[item_keys[item_index]].append(BatchSignal(
+                    FindingType.BATCH_BOILERPLATE,
+                    heading,
+                    target_similarity,
+                    f'{len(candidates)} 条译文散文高度重合；译文相似度 {target_similarity:.3f}，'
+                    f'最低源文相似度 {source_similarity:.3f}',
+                ))
+
+    for key, source, target in zip(item_keys, sources, translated):
+        source_length = len(_normalize_prose(source))
+        target_length = len(_normalize_prose(target))
+        if source_length:
+            ratio = target_length / source_length
+            if ratio < batch_config.length_ratio_min or ratio > batch_config.length_ratio_max:
+                signals[key].append(BatchSignal(
+                    FindingType.LENGTH_RATIO,
+                    '文档',
+                    ratio,
+                    f'散文长度比 {ratio:.3f}，默认合理区间 '
+                    f'[{batch_config.length_ratio_min:.3f}, {batch_config.length_ratio_max:.3f}]',
+                ))
+        missing_anchors = _missing_content_anchors(source, target, target_lang)
+        if missing_anchors:
+            signals[key].append(BatchSignal(
+                FindingType.CONTENT_ANCHOR_MISSING,
+                '文档',
+                float(len(missing_anchors)),
+                '缺少保守内容锚点：' + ', '.join(missing_anchors),
+            ))
+
+    weights = {
+        FindingType.BATCH_BOILERPLATE: batch_config.boilerplate_weight,
+        FindingType.LENGTH_RATIO: batch_config.length_weight,
+        FindingType.CONTENT_ANCHOR_MISSING: batch_config.anchor_weight,
+    }
+    findings: dict[str, list[Finding]] = {}
+    for key, item_signals in signals.items():
+        if sum(weights[signal.type] for signal in item_signals) < batch_config.block_score:
+            continue
+        findings[key] = [
+            Finding(
+                signal.type,
+                signal.section,
+                _excerpt(source_by_key[key]),
+                _excerpt(translated_by_key[key]),
+            )
+            for signal in item_signals
+        ]
+    return BatchReport(
+        findings=findings,
+        signals={key: value for key, value in signals.items() if value},
+    )
+
+
 def verify_directory(
     source_dir: str | Path,
     translated_dir: str | Path | None = None,
@@ -458,7 +804,6 @@ def verify_directory(
         raise FileNotFoundError(f'source directory does not exist: {source_root}')
     translated_root = Path(translated_dir) if translated_dir is not None else None
     failed_files = {}
-    counts: Counter[str] = Counter()
     source_pattern = pattern or ('*.md' if translated_root is not None else 'index.md')
     source_paths = sorted(path for path in source_root.rglob(source_pattern) if path.is_file())
     pairs = []
@@ -471,14 +816,23 @@ def verify_directory(
         if only_translated and not translated_path.is_file():
             continue
         pairs.append((source_path, relative, translated_path))
+    batch_sources = []
+    batch_translated = []
+    batch_keys = []
     for source_path, relative, translated_path in pairs:
         if translated_path.is_file():
+            source_text = source_path.read_text(encoding='utf-8')
+            translated_text = translated_path.read_text(encoding='utf-8')
             findings = verify_translation(
-                source_path.read_text(encoding='utf-8'),
-                translated_path.read_text(encoding='utf-8'),
+                source_text,
+                translated_text,
                 mode=mode,
                 target_lang=variant,
             )
+            if mode == 'translated':
+                batch_sources.append(source_text)
+                batch_translated.append(translated_text)
+                batch_keys.append(relative.as_posix())
         else:
             findings = [Finding(
                 FindingType.MISSING_TRANSLATION,
@@ -488,7 +842,19 @@ def verify_directory(
             )]
         if findings:
             failed_files[relative.as_posix()] = findings
-            counts.update(finding.type.value for finding in findings)
+    batch_report = verify_batch(
+        batch_sources,
+        batch_translated,
+        keys=batch_keys,
+        target_lang=variant,
+    )
+    for key, findings in batch_report.findings.items():
+        failed_files.setdefault(key, []).extend(findings)
+    counts: Counter[str] = Counter(
+        finding.type.value
+        for findings in failed_files.values()
+        for finding in findings
+    )
     failed = len(failed_files)
     return DirectoryReport(
         total=len(pairs),
