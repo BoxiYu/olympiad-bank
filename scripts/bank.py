@@ -1375,7 +1375,8 @@ def main():
     si.add_argument('--confirm', metavar='DST', help='确认与 DST 的关系，写入 data/similar/edges.jsonl')
     si.add_argument('--relation', choices=list(sp.RELATIONS))
     si.add_argument('--confidence', type=float, default=1.0)
-    si.add_argument('--evidence', default='manual', choices=['text', 'formula', 'solution', 'manual'])
+    si.add_argument('--evidence', help='--confirm 必填：确认依据自由文本，写明出处与判断方式，'
+                                       '如「AI双评审2026-08-06：均为根轴+圆幂引理链」')
     lg = sub.add_parser('log')
     lg.add_argument('--id', required=True)
     lg.add_argument('--result', required=True, choices=['ok', 'hard', 'fail'])

@@ -4,9 +4,12 @@
 2. 毕业连击（is_graduated）
 3. result 自动建议（_suggest_result）
 4. 题卡解析不含答案（split_sections / build_card 白名单制）
+5. 确认边台账必填出处（cmd_similar --confirm 的 --evidence 契约）
 
 运行：uv run --group dev pytest -q
 """
+import argparse
+import json
 import os
 import sys
 
@@ -164,3 +167,45 @@ class TestCardNoLeak:
     def test_missing_statement_rejected(self):
         with pytest.raises(ValueError, match='题面'):
             sp.split_sections('## 答案\n\nSECRET\n', 'T-001')
+
+
+# ---------------- 5. 确认边台账必填出处 ----------------
+
+EDGE_PROBLEMS = [{'fm': {'id': 'A-001'}}, {'fm': {'id': 'B-001'}}]
+
+
+def _confirm_args(**kw):
+    base = {'id': 'A-001', 'top': 20, 'confirm': 'B-001',
+            'relation': 'same_method', 'confidence': 1.0, 'evidence': None}
+    base.update(kw)
+    return argparse.Namespace(**base)
+
+
+class TestConfirmEdgeEvidence:
+    @pytest.fixture(autouse=True)
+    def _edges_in_tmp(self, tmp_path, monkeypatch):
+        self.edges = tmp_path / 'edges.jsonl'
+        monkeypatch.setattr(sp, 'EDGES_PATH', str(self.edges))
+
+    def test_missing_evidence_rejected(self):
+        with pytest.raises(SystemExit) as e:
+            sp.cmd_similar(EDGE_PROBLEMS, _confirm_args())
+        assert '--evidence' in str(e.value.code)
+        assert not self.edges.exists()
+
+    def test_blank_evidence_rejected(self):
+        with pytest.raises(SystemExit) as e:
+            sp.cmd_similar(EDGE_PROBLEMS, _confirm_args(evidence='  \t '))
+        assert '--evidence' in str(e.value.code)
+        assert not self.edges.exists()
+
+    def test_evidence_written_verbatim_after_strip(self, capsys):
+        raw = '  AI双评审2026-08-06：均为根轴+圆幂引理链 '
+        sp.cmd_similar(EDGE_PROBLEMS, _confirm_args(evidence=raw))
+        assert '已登记确认边' in capsys.readouterr().out
+        lines = self.edges.read_text(encoding='utf-8').splitlines()
+        assert len(lines) == 1
+        edge = json.loads(lines[0])
+        assert edge['evidence'] == raw.strip()   # 自由文本逐字落盘（仅去首尾空白）
+        assert edge['src'] == 'A-001' and edge['dst'] == 'B-001'
+        assert edge['relation'] == 'same_method' and edge['confirmed'] is True
