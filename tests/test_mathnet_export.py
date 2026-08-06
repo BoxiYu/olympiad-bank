@@ -46,6 +46,7 @@ def test_refresh_index_projects_translation_state_and_readme(tmp_path):
     out.mkdir()
     originals = {
         'en-source': '# en-source\n\n## 题面\n\nFind $x$.\n',
+        'translated-en': '# translated-en\n\n## 题面\n\nTrouver $x$.\n',
         'failed-en': '# failed-en\n\n## 题面\n\nHalla $x$.\n',
         'missing-meta': '# missing-meta\n\n## 题面\n\n求 $x$。\n',
     }
@@ -73,6 +74,14 @@ def test_refresh_index_projects_translation_state_and_readme(tmp_path):
             'en': {'mode': 'failed'},
         },
     }), encoding='utf-8')
+    (paths['translated-en'].parent / 'translation.json').write_text(json.dumps({
+        'mathnet_id': 'translated-en',
+        'source_sha256': _sha(originals['translated-en']),
+        'source_lang': 'fr',
+        'variants': {
+            'en': {'mode': 'translated'},
+        },
+    }), encoding='utf-8')
     me.write_index(str(out), rows)
 
     assert me.refresh_index(str(out)) == 0
@@ -84,6 +93,7 @@ def test_refresh_index_projects_translation_state_and_readme(tmp_path):
     assert projected['en-source']['source_lang'] == 'en'
     assert projected['en-source']['variants'] == {'en': 'passthrough', 'zh': 'translated'}
     assert projected['en-source']['translation_stale'] is False
+    assert projected['translated-en']['variants'] == {'en': 'translated', 'zh': 'missing'}
     assert projected['failed-en']['variants'] == {'en': 'failed', 'zh': 'missing'}
     assert projected['missing-meta']['source_lang'] == 'und'
     assert projected['missing-meta']['variants'] == {'en': 'missing', 'zh': 'missing'}
@@ -91,8 +101,9 @@ def test_refresh_index_projects_translation_state_and_readme(tmp_path):
     assert paths['en-source'].read_text(encoding='utf-8') == originals['en-source']
 
     readme = (out / 'README.md').read_text(encoding='utf-8')
-    assert '| en | 1 | 0 | 2 |' in readme
-    assert '| zh | 0 | 1 | 2 |' in readme
+    assert '| 语言 | passthrough | translated | failed | missing |' in readme
+    assert '| en | 1 | 1 | 1 | 1 |' in readme
+    assert '| zh | 0 | 1 | 0 | 3 |' in readme
     assert 'index.en.md' in readme
     assert 'index.zh.md' in readme
     assert 'translation.json' in readme

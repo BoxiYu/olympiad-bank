@@ -56,6 +56,16 @@ def corpus(tmp_path):
             'variants': {'en': {'mode': 'passthrough'}, 'zh': {'mode': 'passthrough'}},
             'translation_stale': False,
         },
+        {
+            'mathnet_id': '0004',
+            'path': 'by-topic/number-theory/整除/0004/index.md',
+            'category': 'number-theory',
+            'topics': ['整除'],
+            'difficulty_est': 5,
+            'country': 'Spain',
+            'variants': {'en': 'failed', 'zh': 'missing'},
+            'translation_stale': False,
+        },
     ]
     _write_problem(
         root, rows[0]['path'],
@@ -73,6 +83,10 @@ def corpus(tmp_path):
         '# 0003\n\nTHIRD_ORIG shared-token counting',
         '# 0003\n\nPASSTHROUGH_EN counting',
         '# 0003\n\n原文直通 计数',
+    )
+    _write_problem(
+        root, rows[3]['path'],
+        '# 0004\n\nFOURTH_ORIG failed translation',
     )
 
     # 同一题第二知识点只挂符号链接；索引还故意重复一行，锁定 mathnet_id 防御性去重。
@@ -129,6 +143,7 @@ def test_metadata_filters_compose(corpus):
     ('lang', 'coverage', 'expected', 'unexpected'),
     [('zh', 'translated', '0001', '0003'),
      ('en', 'passthrough', '0003', '0001'),
+     ('en', 'failed', '0004', '0002'),
      ('zh', 'stale', '0002', '0001')],
 )
 def test_coverage_filters(corpus, lang, coverage, expected, unexpected):
@@ -137,6 +152,16 @@ def test_coverage_filters(corpus, lang, coverage, expected, unexpected):
     assert result.returncode == 0
     assert f'{expected}  ' in result.stdout
     assert f'{unexpected}  ' not in result.stdout
+
+
+def test_failed_coverage_is_not_reported_as_missing(corpus):
+    result = _search(corpus, '--lang', 'en', '--coverage', 'failed')
+
+    assert result.returncode == 0
+    assert result.stdout.count('0004  ') == 1
+    assert '（en 译文校验失败）' in result.stdout
+    assert '版本缺失' not in result.stdout
+    assert '请生成：' not in result.stdout
 
 
 def test_missing_coverage_lists_expected_path_and_generation_hint(corpus):

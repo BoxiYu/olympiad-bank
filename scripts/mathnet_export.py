@@ -251,7 +251,7 @@ def write_readme(out, index_rows, n_topics):
         status[r['status']] += 1
         for code in VARIANT_LANGS:
             coverage_state = variant_status(r, code)
-            coverage[code]['missing' if coverage_state == 'failed' else coverage_state] += 1
+            coverage[code][coverage_state] += 1
         if r['n_images']:
             n_img += r['n_images']
             n_img_prob += 1
@@ -265,7 +265,7 @@ def write_readme(out, index_rows, n_topics):
 
     coverage_rows = '\n'.join(
         f"| {code} | {coverage[code]['passthrough']:,} | {coverage[code]['translated']:,} | "
-        f"{coverage[code]['missing']:,} |"
+        f"{coverage[code]['failed']:,} | {coverage[code]['missing']:,} |"
         for code in VARIANT_LANGS
     )
 
@@ -311,8 +311,8 @@ mathnet-full/
 
 ### 三语覆盖率
 
-| 语言 | passthrough | translated | missing |
-| --- | ---: | ---: | ---: |
+| 语言 | passthrough | translated | failed | missing |
+| --- | ---: | ---: | ---: | ---: |
 {coverage_rows}
 
 ### 板块

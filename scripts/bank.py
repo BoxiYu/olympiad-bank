@@ -200,6 +200,7 @@ def query(problems, args):
 
 MATHNET_REBUILD_CMD = 'uv run --group mathnet python scripts/mathnet_export.py'
 TRANSLATION_EXPORT_CMD = 'uv run python scripts/mathnet_translate.py export --out translations.todo.jsonl'
+MATHNET_VARIANT_STATES = ('passthrough', 'translated', 'failed', 'missing')
 
 
 def _mathnet_variant_path(source_path, lang):
@@ -218,7 +219,8 @@ def _mathnet_coverage(row, lang):
     value = variants.get(lang, 'missing') if isinstance(variants, dict) else 'missing'
     if isinstance(value, dict):
         value = value.get('mode', 'missing')
-    return str(value or 'missing')
+    value = str(value or 'missing')
+    return value if value in MATHNET_VARIANT_STATES else 'missing'
 
 
 def _mathnet_row_matches(row, args):
@@ -274,6 +276,7 @@ def mathnet_search(args):
     matches = []
     visited_ids = set()
     missing_language = 0
+    failed_language = 0
     invalid_rows = 0
     with open(index_path, encoding='utf-8') as fh:
         for line in fh:
@@ -296,6 +299,7 @@ def mathnet_search(args):
 
             rel_variant = _mathnet_variant_path(rel_source, args.lang)
             variant_path = os.path.abspath(os.path.join(corpus_root, rel_variant))
+            coverage_state = _mathnet_coverage(row, args.lang)
             try:
                 inside_corpus = os.path.commonpath([corpus_root, variant_path]) == corpus_root
             except ValueError:
@@ -304,11 +308,15 @@ def mathnet_search(args):
                 invalid_rows += 1
                 continue
             if not os.path.isfile(variant_path):
-                missing_language += 1
-                # 没有关键词时，coverage=missing 仍可作为待译清单使用。
-                if args.keyword or args.coverage != 'missing':
+                if coverage_state == 'failed':
+                    failed_language += 1
+                else:
+                    missing_language += 1
+                # 没有关键词时，missing/failed 均可作为状态清单使用；两档不可互相代替。
+                if args.keyword or args.coverage not in {'missing', 'failed'}:
                     continue
-                snippet = f'（{args.lang} 版本缺失）'
+                snippet = (f'（{args.lang} 译文校验失败）' if coverage_state == 'failed'
+                           else f'（{args.lang} 版本缺失）')
             else:
                 try:
                     with open(variant_path, encoding='utf-8') as variant_fh:
@@ -340,6 +348,9 @@ def mathnet_search(args):
             print(f'请重建：{MATHNET_REBUILD_CMD}')
         else:
             print(f'请生成：{TRANSLATION_EXPORT_CMD}')
+    if failed_language:
+        label = {'orig': '原文', 'en': '英文', 'zh': '中文'}[args.lang]
+        print(f'注意：筛选范围内有 {failed_language} 题{label}译文校验失败，未作为全文命中。')
     if invalid_rows:
         print(f'注意：index.jsonl 有 {invalid_rows} 行无效或路径越界；请重建：{MATHNET_REBUILD_CMD}')
     return 0
@@ -1078,7 +1089,7 @@ def main():
     ms.add_argument('--category', choices=CATEGORIES)
     ms.add_argument('--difficulty', type=int, choices=[1, 2, 3, 4, 5], help='difficulty_est')
     ms.add_argument('--country', help='国家/地区子串')
-    ms.add_argument('--coverage', choices=['missing', 'translated', 'passthrough', 'stale'])
+    ms.add_argument('--coverage', choices=[*MATHNET_VARIANT_STATES, 'stale'])
     ms.add_argument('--limit', type=int, default=20, help='最多显示多少题（默认 20）')
     ms.add_argument('--root', default=os.path.join(ROOT, 'mathnet-full'), help=argparse.SUPPRESS)
     sub.add_parser('stats')
