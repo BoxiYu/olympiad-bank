@@ -668,6 +668,23 @@ FAKE_COMPANION = r"""import fs from 'node:fs';
 import path from 'node:path';
 
 const args = process.argv.slice(2);
+const expectedEffort = process.env.FAKE_EXPECT_EFFORT || 'medium';
+const effortIndexes = args.flatMap((value, index) => value === '--effort' ? [index] : []);
+if (effortIndexes.length !== 1 || args[effortIndexes[0] + 1] !== expectedEffort) {
+  console.error(`expected exactly --effort ${expectedEffort}; got ${JSON.stringify(args)}`);
+  process.exit(64);
+}
+const expectedModel = process.env.FAKE_EXPECT_MODEL;
+const modelIndexes = args.flatMap((value, index) => value === '--model' ? [index] : []);
+if (expectedModel) {
+  if (modelIndexes.length !== 1 || args[modelIndexes[0] + 1] !== expectedModel) {
+    console.error(`expected exactly --model ${expectedModel}; got ${JSON.stringify(args)}`);
+    process.exit(64);
+  }
+} else if (modelIndexes.length !== 0) {
+  console.error(`expected --model to be omitted; got ${JSON.stringify(args)}`);
+  process.exit(64);
+}
 const cwd = args[args.indexOf('--cwd') + 1];
 const input = JSON.parse(fs.readFileSync(path.join(cwd, 'batch.json'), 'utf8'));
 const events = process.env.FAKE_EVENTS;
@@ -761,6 +778,7 @@ def test_run_end_to_end_concurrent_and_resume_skips_completed(
     assert mt.main(args) == 0
     output = capsys.readouterr().out
     assert "passthrough 1 份" in output and "真翻 5 份" in output and "并发 2" in output
+    assert "派单参数：effort medium；model 沿用全局配置（未传 --model）" in output
     assert maximum_fake_concurrency(events) == 2
     first_events = events.read_text(encoding="utf-8")
     for mathnet_id in ("eng1", "slv1", "mcq1"):
@@ -779,12 +797,53 @@ def test_run_end_to_end_concurrent_and_resume_skips_completed(
     assert {path: digest(path) for path in sources} == before
     progress = json.loads((work / ".translate-progress.json").read_text(encoding="utf-8"))
     assert progress["questions"] and progress["batches"]
+    for dispatch_path in work.glob("batches/*/dispatch.json"):
+        dispatch = json.loads(dispatch_path.read_text(encoding="utf-8"))
+        assert dispatch["effort"] == "medium"
+        assert dispatch["model"] is None
+        assert dispatch["model_source"] == "global-config"
+        assert dispatch["command"].count("--effort") == 1
+        assert dispatch["command"][dispatch["command"].index("--effort") + 1] == "medium"
+        assert "--model" not in dispatch["command"]
 
     assert mt.main(args) == 0
     resumed = capsys.readouterr().out
     assert "显式跳过 3 题" in resumed and "没有待处理译文" in resumed
     assert events.read_text(encoding="utf-8") == first_events
     assert {path: digest(path) for path in sources} == before
+
+
+def test_run_custom_effort_and_model_are_forwarded_and_recorded(
+    corpus: Path, tmp_path: Path, monkeypatch, capsys
+):
+    companion = fake_companion(tmp_path)
+    work = tmp_path / "run-custom-dispatch"
+    monkeypatch.setenv("FAKE_EXPECT_EFFORT", "xhigh")
+    monkeypatch.setenv("FAKE_EXPECT_MODEL", "foo")
+
+    assert mt.main(run_args(
+        corpus, work, companion,
+        "--only", "slv1", "--batch-size", "1", "--effort", "xhigh", "--model", "foo",
+    )) == 0
+    output = capsys.readouterr().out
+    assert "派单参数：effort xhigh；model foo" in output
+    dispatch_paths = list(work.glob("batches/*/dispatch.json"))
+    assert len(dispatch_paths) == 2
+    for dispatch_path in dispatch_paths:
+        dispatch = json.loads(dispatch_path.read_text(encoding="utf-8"))
+        assert dispatch["effort"] == "xhigh"
+        assert dispatch["model"] == "foo"
+        assert dispatch["model_source"] == "argument"
+        assert dispatch["command"][dispatch["command"].index("--model") + 1] == "foo"
+
+
+def test_run_rejects_unknown_effort_with_choices(capsys):
+    with pytest.raises(SystemExit):
+        mt.main(["run", "--effort", "turbo"])
+    error = capsys.readouterr().err
+    assert "invalid choice: 'turbo'" in error
+    for choice in mt.COMPANION_EFFORTS:
+        assert choice in error
 
 
 def test_run_no_reindex_leaves_index_bytes_unchanged(corpus: Path, tmp_path: Path):

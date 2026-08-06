@@ -34,6 +34,10 @@ ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CORPUS = ROOT / "mathnet-full"
 TARGET_LANGS = ("en", "zh")
 INDEX_TRANSLATION_FIELDS = ("source_lang", "variants", "translation_stale")
+COMPANION_EFFORTS = ("none", "minimal", "low", "medium", "high", "xhigh")
+# 100 题真实批次对照：high 运行 2.5 小时仍无产出；low 虽 4m31s 完成，但
+# 100/100 被退化门禁拦截；medium 13m16s 完成，302 个条目仅 6 个（约 2%）被拦。
+DEFAULT_TRANSLATION_EFFORT = "medium"
 
 # main() 在 apply/run 期间安装收集器。apply_record 只登记成功写回的题，命令退出前
 # 再合并成一次索引原子写；直接调用 apply_record 的库用户不会产生隐式副作用。
@@ -1038,6 +1042,10 @@ class BatchJob:
         return self.directory / "task.md"
 
     @property
+    def dispatch_path(self) -> Path:
+        return self.directory / "dispatch.json"
+
+    @property
     def output_path(self) -> Path:
         return self.directory / "translations.json"
 
@@ -1224,6 +1232,8 @@ class ProcessRegistry:
 def dispatch_batch(
     job: BatchJob,
     companion: Path,
+    effort: str,
+    model: str | None,
     timeout: float,
     retries: int,
     retry_backoff: float,
@@ -1248,19 +1258,30 @@ def dispatch_batch(
         # 自愈：companion 可能把 cwd 归一到仓库根；每次派单都重写含绝对路径的提示词。
         atomic_write(job.prompt_path, render_batch_prompt(job).encode())
         job.output_path.unlink(missing_ok=True)
+        command = [
+            "node",
+            str(companion),
+            "task",
+            "--prompt-file",
+            str(job.prompt_path),
+            "--cwd",
+            str(job.directory),
+            "--write",
+            "--json",
+            "--effort",
+            effort,
+        ]
+        if model is not None:
+            command.extend(("--model", model))
+        atomic_write(job.dispatch_path, json_bytes({
+            "effort": effort,
+            "model": model,
+            "model_source": "argument" if model is not None else "global-config",
+            "command": command,
+        }))
         try:
             process = subprocess.Popen(
-                [
-                    "node",
-                    str(companion),
-                    "task",
-                    "--prompt-file",
-                    str(job.prompt_path),
-                    "--cwd",
-                    str(job.directory),
-                    "--write",
-                    "--json",
-                ],
+                command,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
@@ -1442,6 +1463,8 @@ def run_records(args: argparse.Namespace) -> int:
         raise TranslateError(f"语料目录不存在: {root}")
     work_dir = Path(args.work_dir).resolve() if args.work_dir else root / ".mathnet-translate-run"
     work_dir.mkdir(parents=True, exist_ok=True)
+    model_summary = args.model if args.model is not None else "沿用全局配置（未传 --model）"
+    print(f"run: 派单参数：effort {args.effort}；model {model_summary}")
     language_map_path = work_dir / "source-lang-map.json"
     progress = ProgressStore(Path(args.progress).resolve() if args.progress else work_dir / ".translate-progress.json")
     failures = FailureLedger(Path(args.failures).resolve() if args.failures else work_dir / ".translate-failures.jsonl")
@@ -1555,6 +1578,8 @@ def run_records(args: argparse.Namespace) -> int:
                 dispatch_batch,
                 job,
                 companion,
+                args.effort,
+                args.model,
                 args.timeout,
                 args.retries,
                 args.retry_backoff,
@@ -1726,6 +1751,13 @@ def parser() -> argparse.ArgumentParser:
     )
     run_parser.add_argument("--strict", action="store_true", help="首个批次或题级失败即停止")
     run_parser.add_argument("--companion", help="显式 companion 路径（测试假桩；默认 find_companion）")
+    run_parser.add_argument(
+        "--effort",
+        choices=COMPANION_EFFORTS,
+        default=DEFAULT_TRANSLATION_EFFORT,
+        help="companion 推理档（默认 medium）",
+    )
+    run_parser.add_argument("--model", help="companion 模型；默认不传并沿用全局配置")
     run_parser.add_argument(
         "--no-reindex", action="store_true", help="运行结束后不自动增量刷新 index.jsonl"
     )
