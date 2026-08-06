@@ -31,6 +31,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `candidates/simindex/` → `uv run --group similar python scripts/similar_index.py build --bank-only`
 - `maps/` → `uv run python scripts/bank.py map`
 - `mathnet-full/`（全文导出，供人工检索选题）→ `uv run --group mathnet python scripts/mathnet_export.py`
+- `mathnet-full/` 三语译文与索引 → `docs/三语化SOP-mathnet-full.md`
 - `data/sessions/` 是 spar 运行态，**不要手动删**（会毁掉进行中的攻坚会话）
 
 `mathnet-full/` 是 gitignore 派生语料，`bank.py doclint` 明确不扫描该目录；本地存在全量语料

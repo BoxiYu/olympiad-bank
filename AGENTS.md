@@ -28,6 +28,7 @@ bash scripts/lint.sh
 | 你要做的事 | 去读 |
 | --- | --- |
 | 写题 / 入库 | `docs/入库SOP-MathNet.md` |
+| mathnet-full 三语化 | `docs/三语化SOP-mathnet-full.md` |
 | 补提示阶梯 | `scripts/hint_backfill.py`（batch → dispatch → apply） |
 | 训练（coach/spar/log/review/similar） | `docs/学生手册.md` + `docs/教练手册.md` |
 | 学生档案 / 能力图（student/assess/profile） | `docs/教练手册.md` 第 5 节 |
