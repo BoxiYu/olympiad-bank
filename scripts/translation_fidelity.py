@@ -10,11 +10,14 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import unicodedata
 from collections import Counter
 from dataclasses import asdict, dataclass
 from enum import Enum
 from itertools import zip_longest
 from pathlib import Path
+
+from source_lang import detect_source_lang
 
 
 class FindingType(str, Enum):
@@ -95,6 +98,7 @@ _PROTECTED_RE = re.compile(
     re.DOTALL,
 )
 _IMAGE_RE = re.compile(r'!\[\]\(attached_image_(\d+)\.png\)')
+_HAN_RE = re.compile(r'[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]')
 _WHOLE_FENCE_RE = re.compile(
     r'\A[ \t]*(```|~~~)[^\n]*\n(?P<body>.*)\n\1[ \t]*\Z',
     re.DOTALL,
@@ -237,7 +241,37 @@ def _has_translatable_prose(section: _Section) -> bool:
     return bool(re.search(r'[^\W\d_]', body, re.UNICODE))
 
 
-def _content_findings(source: str, translated: str, mode: str) -> list[Finding]:
+def _has_prose_outside_target_language(section: _Section, target_lang: str) -> bool:
+    """源小节是否仍含需要翻到目标语言的散文。
+
+    ``untranslated`` 只该拦截本应翻译却逐字照抄的内容。MathNet 生成器会把
+    已是中文的状态说明写进英文原文（例如证明题的答案占位）；这类文字在中文
+    variant 中原样保留是正确的，不能仅因“非空且相同”而告警。
+
+    中文可按 Unicode 文字脚本精确判断。英文与其他拉丁字母语言共享脚本，故
+    复用保守的源语言检测器；证据不足时仍视为需要翻译，避免放过真正的漏译。
+    数学、图片与纯符号内容仍由 ``_has_translatable_prose`` 先行排除。
+    """
+    if not _has_translatable_prose(section):
+        return False
+
+    body = _PROTECTED_RE.sub('', section.body)
+    body = _IMAGE_RE.sub('', body)
+    body = re.sub(r'<[^>]+>', '', body)
+    letters = [ch for ch in body if unicodedata.category(ch).startswith('L')]
+    if target_lang == 'zh':
+        return any(_HAN_RE.fullmatch(ch) is None for ch in letters)
+
+    language, confidence = detect_source_lang(body, {})
+    return language != target_lang or confidence == 'low'
+
+
+def _content_findings(
+    source: str,
+    translated: str,
+    mode: str,
+    target_lang: str,
+) -> list[Finding]:
     findings = []
     if not translated.strip():
         return [Finding(
@@ -267,7 +301,7 @@ def _content_findings(source: str, translated: str, mode: str) -> list[Finding]:
             if source_section.heading != translated_section.heading:
                 continue
             if (source_section.body == translated_section.body
-                    and _has_translatable_prose(source_section)):
+                    and _has_prose_outside_target_language(source_section, target_lang)):
                 findings.append(Finding(
                     FindingType.UNTRANSLATED,
                     source_section.heading,
@@ -311,7 +345,13 @@ def _leak_findings(source: str, translated: str) -> list[Finding]:
     return findings
 
 
-def verify_translation(source: str, translated: str, *, mode: str = 'translated') -> list[Finding]:
+def verify_translation(
+    source: str,
+    translated: str,
+    *,
+    mode: str = 'translated',
+    target_lang: str = 'zh',
+) -> list[Finding]:
     """校验一对 Markdown 字符串，返回全部可定位问题。
 
     ``mode='passthrough'`` 只关闭“正文未翻译”检查；数学、图片、骨架与泄漏检查
@@ -319,13 +359,15 @@ def verify_translation(source: str, translated: str, *, mode: str = 'translated'
     """
     if mode not in {'translated', 'passthrough', 'failed'}:
         raise ValueError(f'unsupported translation mode: {mode}')
+    if target_lang not in {'en', 'zh'}:
+        raise ValueError(f'unsupported target language: {target_lang}')
     findings = []
     findings.extend(_compare_occurrences(
         FindingType.MATH_MISMATCH, _protected(source), _protected(translated)))
     findings.extend(_compare_occurrences(
         FindingType.IMAGE_MISMATCH, _images(source), _images(translated)))
     findings.extend(_structure_findings(source, translated))
-    findings.extend(_content_findings(source, translated, mode))
+    findings.extend(_content_findings(source, translated, mode, target_lang))
     findings.extend(_leak_findings(source, translated))
     return findings
 
@@ -365,6 +407,7 @@ def verify_directory(
                 source_path.read_text(encoding='utf-8'),
                 translated_path.read_text(encoding='utf-8'),
                 mode=mode,
+                target_lang=variant,
             )
         else:
             findings = [Finding(

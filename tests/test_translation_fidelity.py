@@ -2,12 +2,16 @@
 import json
 import os
 import sys
+from pathlib import Path
 
 import pytest
 
 sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'scripts'))
 from translation_fidelity import FindingType, main, verify_directory, verify_translation  # noqa: E402
+
+
+FIXTURES = Path(__file__).parent / 'fixtures' / 'translation_fidelity'
 
 
 SOURCE = r'''# sample-001
@@ -163,6 +167,61 @@ def test_identical_translated_section_is_rejected_but_passthrough_is_allowed():
                                            'Find integers $x \\leq y$ such that `x + y` is even.')
     assert FindingType.UNTRANSLATED in types(translated=translated, mode='translated')
     assert verify_translation(SOURCE, SOURCE, mode='passthrough') == []
+
+
+def test_proof_placeholder_is_preserved_across_all_three_versions():
+    source = (FIXTURES / 'proof-source.md').read_text(encoding='utf-8')
+    english = (FIXTURES / 'proof-en.md').read_text(encoding='utf-8')
+    chinese = (FIXTURES / 'proof-zh.md').read_text(encoding='utf-8')
+
+    assert verify_translation(source, english, mode='passthrough', target_lang='en') == []
+    assert verify_translation(source, chinese, target_lang='zh') == []
+
+
+@pytest.mark.parametrize('answer', [
+    '（数据集未提供 / 证明题）',
+    '此题为证明题，未单列答案。',
+])
+def test_identical_chinese_source_section_needs_no_translation(answer):
+    source = SOURCE.replace('D\n', answer + '\n')
+    translated = VALID_TRANSLATION.replace('D\n', answer + '\n')
+
+    assert FindingType.UNTRANSLATED not in types(source, translated, target_lang='zh')
+
+
+def test_real_prose_left_identical_is_still_untranslated():
+    untranslated = VALID_TRANSLATION.replace(
+        '求整数 $x \\leq y$，使 `x + y` 为偶数。',
+        'Find integers $x \\leq y$ such that `x + y` is even.',
+    )
+
+    findings = verify_translation(SOURCE, untranslated, target_lang='zh')
+    assert any(finding.type == FindingType.UNTRANSLATED and finding.section == '题面'
+               for finding in findings)
+
+
+def test_passthrough_identical_document_has_zero_findings():
+    assert verify_translation(SOURCE, SOURCE, mode='passthrough', target_lang='en') == []
+
+
+def test_regression_inequality_reversal_is_rejected():
+    changed = VALID_TRANSLATION.replace(r'$x \leq y$', r'$x \geq y$')
+    assert FindingType.MATH_MISMATCH in types(translated=changed)
+
+
+def test_regression_image_number_drift_is_rejected():
+    changed = VALID_TRANSLATION.replace('attached_image_1', 'attached_image_2')
+    assert FindingType.IMAGE_MISMATCH in types(translated=changed)
+
+
+def test_regression_deleted_solution_two_is_rejected():
+    changed = VALID_TRANSLATION.replace('## 解法 2\n也可以使用 $y=6$。\n\n', '')
+    assert FindingType.STRUCTURE_MISMATCH in types(translated=changed)
+
+
+def test_regression_model_meta_leak_is_rejected():
+    changed = VALID_TRANSLATION.replace('求整数', '以下是翻译：\n求整数')
+    assert FindingType.MODEL_META_LEAK in types(translated=changed)
 
 
 @pytest.mark.parametrize('phrase', [
