@@ -11,7 +11,9 @@
 
 运行：uv run --group dev pytest -q
 """
+import json
 import os
+import re
 import sys
 
 import pytest
@@ -464,3 +466,83 @@ class TestSelfcheck:
         """防回归：selfcheck 必须把修正器语法一并验掉，坏 effect 要在读数据集之前就炸出来。"""
         with pytest.raises(ValueError, match='无法解析 modifier effect'):
             m.selfcheck(_mp(), _tr(modifiers=[{'pattern': 'x', 'effect': '定为 2'}]))
+
+    @pytest.mark.parametrize('search_in', ['problem', 'solutions', 'both'])
+    def test_keyword_rule_search_in_valid_values_accepted(self, fake_root, search_in):
+        """search_in 的三个合法值必须在不读取 MathNet 数据集的 selfcheck 中通过。"""
+        mp = _mp()
+        mp['keyword_rules'] = [
+            {'pattern': 'TOKEN', 'category': 'algebra', 'node': '不等式', 'search_in': search_in},
+        ]
+        assert m.selfcheck(mp, _tr()) == []
+
+    @pytest.mark.parametrize('search_in', ['statement', '', None, 1])
+    def test_keyword_rule_invalid_search_in_reported(self, fake_root, search_in):
+        """拼错、空值和错误类型必须在 load_dataset 前被表自洽校验拦下。"""
+        mp = _mp()
+        mp['keyword_rules'] = [
+            {'pattern': 'TOKEN', 'category': 'algebra', 'node': '不等式', 'search_in': search_in},
+        ]
+        assert m.selfcheck(mp, _tr()) == [f"keyword_rules[1] 非法 search_in: {search_in!r}"]
+
+
+# ---------------- 9. keyword_rules 匹配侧（合成数据，不读 HF） ----------------
+
+KEYWORD_PATTERN = r'(?i)choose the (?:largest|smallest)'
+
+
+def _keyword_rule(search_in_marker='missing'):
+    rule = {'pattern': KEYWORD_PATTERN, 'category': 'combinatorics', 'node': '极端原理'}
+    if search_in_marker != 'missing':
+        rule['search_in'] = search_in_marker
+    return m.compile_keyword_rules([rule])[0]
+
+
+class TestKeywordRuleSearchIn:
+    @pytest.mark.parametrize('search_in,problem,solutions,expect', [
+        ('problem', 'Choose the largest vertex.', ['No matching technique here.'], True),
+        ('problem', 'A plain graph problem.', ['Choose the smallest vertex.'], False),
+        ('solutions', 'Choose the largest vertex.', ['No matching technique here.'], False),
+        ('solutions', 'A plain graph problem.', ['Choose the smallest vertex.'], True),
+        ('both', 'Choose the largest vertex.', ['No matching technique here.'], True),
+        ('both', 'A plain graph problem.', ['Choose the smallest vertex.'], True),
+    ])
+    def test_three_search_sides_on_synthetic_rows(self, search_in, problem, solutions, expect):
+        """三种 search_in 在合成行上分别只搜索约定侧，不加载 datasets 包或 HF 数据。"""
+        row = {'problem_markdown': problem, 'solutions_markdown': solutions}
+        assert bool(m.keyword_rule_matches(_keyword_rule(search_in), row)) is expect
+
+    @pytest.mark.parametrize('solutions', [None, [], ['', None], 'Choose the smallest vertex.'])
+    def test_solution_side_handles_empty_list_and_string(self, solutions):
+        """MathNet 解答的空值/列表是正常输入；额外容忍单字符串，均不得抛异常。"""
+        row = {'problem_markdown': '', 'solutions_markdown': solutions}
+        expect = solutions == 'Choose the smallest vertex.'
+        assert bool(m.keyword_rule_matches(_keyword_rule('solutions'), row)) is expect
+
+    def test_missing_search_in_is_byte_identical_to_old_problem_expression(self):
+        """缺省规则必须逐字节复现旧版 `rx.search(problem or '')` 的命中向量。"""
+        rows = [
+            {'problem_markdown': 'Choose the largest vertex.',
+             'solutions_markdown': ['No matching technique here.']},
+            {'problem_markdown': 'A plain graph problem.',
+             'solutions_markdown': ['Choose the smallest vertex.']},
+            {'problem_markdown': None, 'solutions_markdown': ['Choose the largest vertex.']},
+        ]
+        old = [bool(re.search(KEYWORD_PATTERN, row['problem_markdown'] or '')) for row in rows]
+        new = [bool(m.keyword_rule_matches(_keyword_rule(), row)) for row in rows]
+        old_bytes = json.dumps(old, separators=(',', ':')).encode()
+        new_bytes = json.dumps(new, separators=(',', ':')).encode()
+        assert new_bytes == old_bytes == b'[true,false,false]'
+
+
+class TestRealKeywordRuleSides:
+    def test_reviewed_rules_use_the_intended_search_side(self):
+        """真表锁定本工单逐条侧别核查：技法双侧/解法侧显式标注，题面对象规则保持缺省。"""
+        mp = m.load_yaml(m.MAP_PATH)
+        sides = {rule['node']: rule.get('search_in', 'problem')
+                 for rule in mp['keyword_rules']}
+        assert sides['极端原理'] == 'solutions'
+        assert sides['Ramsey 型问题'] == 'both'
+        assert sides['p-adic 赋值与 LTE'] == 'both'
+        assert sides['勾股定理与直角三角形'] == 'problem'
+        assert sides['数字与进位制'] == 'problem'
