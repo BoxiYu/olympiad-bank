@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | --- | --- |
 | lint（唯一写法） | `bash scripts/lint.sh` |
 | 测试 | `uv run --group dev pytest -q` |
-| 读 MathNet 数据集的一切（ingest / import / review batch） | `uv run --group mathnet python ...` |
+| 读 MathNet 数据集的一切（ingest / import / export / review batch） | `uv run --group mathnet python ...` |
 | embedding 索引 | `uv run --group similar python scripts/similar_index.py ...` |
 | 候选池全量索引（两组叠加） | `uv run --group similar --group mathnet python ...` |
 | 重跑历史 `verify/` 核验脚本 | `uv run --with sympy python scripts/verify/...`（sympy 刻意不设组；`scripts/verify/` 仅为退役史料） |
@@ -30,7 +30,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 改过 `taxonomy/mathnet_map.yml` 的映射/召回规则，或 `taxonomy/contest_tiers.yml` 的赛名难度规则后必须重建候选池；排查实例正本见 `.claude/skills/ingest/SKILL.md`「实测坑」第 5 条
 - `candidates/simindex/` → `uv run --group similar python scripts/similar_index.py build --bank-only`
 - `maps/` → `uv run python scripts/bank.py map`
+- `mathnet-full/`（全文导出，供人工检索选题）→ `uv run --group mathnet python scripts/mathnet_export.py`
 - `data/sessions/` 是 spar 运行态，**不要手动删**（会毁掉进行中的攻坚会话）
+
+`mathnet-full/` 存在时 `bank.py doclint` 会连它一起扫（md 文件数 ~300 → ~28000，耗时 0.3s → 5s）。
+这是本地现象，CI 上该目录不存在故不受影响；嫌慢就删掉它，随时可重建。
 
 候选池缺失时**不要凭记忆或联网重建题目数据**——按 WORKFLOW.md 那是合法阻塞，如实上报即可。
 以上重建都依赖本地 HuggingFace 缓存里的 `ShadenA/MathNet`。
