@@ -147,18 +147,21 @@ uv run python scripts/bank.py mathnet-search --coverage stale --limit 20
 直到 `共 0 题`。若只需手动刷新个别 id 的视图，使用
 `uv run python scripts/mathnet_translate.py reindex --root mathnet-full --only <id>`；`--only` 可重复。
 
-不要为了刷新覆盖率运行 `mathnet_export.py`。它的职责是从 Hugging Face 数据集全量重铺语料目录，
-代价远高于只读取本地 `index.md` / `translation.json` 的 `reindex`。
+刷新 `mathnet-search --coverage ...` 视图只需上述 `reindex`；不要误跑未带 `--refresh-index` 的
+`mathnet_export.py`，普通 export 会从 Hugging Face 数据集全量重铺语料目录。`--refresh-index` 是
+例外：它不读数据集，只按现有 `index.md` / `translation.json` 刷新索引与 README，供第 7 节收尾使用。
 
 apply 也会拒绝写入原文哈希已经变化的旧批次；不要绕过拒绝，重新 export 才能得到当前输入。
 
 ## 7｜全量收尾与校验
 
-翻译结束时，正常 `run` 已自动增量刷新 `index.jsonl`。全量收尾仍显式重建一次索引视图，以覆盖
-曾被 kill、手工 apply 或断点恢复留下的任何投影缺口：
+翻译结束时，正常 `run` 已自动增量刷新 `index.jsonl`。全量收尾仍先显式重建一次索引视图，以覆盖
+曾被 kill、手工 apply 或断点恢复留下的任何投影缺口；再用 `--refresh-index` 快速路径同步 README
+中的三语覆盖率表。后一个命令不读 Hugging Face 数据集：
 
 ```bash
 uv run python scripts/mathnet_translate.py reindex --root mathnet-full --all
+uv run --group mathnet python scripts/mathnet_export.py --out mathnet-full --refresh-index
 ```
 
 当前全量是 27,817 题。用不小于该题数的样本上限执行全覆盖契约与保真检查，并确认输出中的
