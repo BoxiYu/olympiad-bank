@@ -7,8 +7,8 @@ through untranslated.
 
 Only the Python standard library is used.  The supported Latin-script language
 features reflect the sizeable MathNet groups (English, Spanish, Portuguese,
-French and Slovenian); unmistakable Cyrillic and CJK text is handled before
-Latin-language scoring.
+French and Slovenian).  Script evidence is used conservatively: shared Han and
+Cyrillic ranges are not treated as proof of one particular language.
 """
 
 from __future__ import annotations
@@ -41,7 +41,9 @@ _LATEX_COMMAND_RE = re.compile(r"\\[A-Za-z]+\*?(?:\[[^\]]*\])?")
 _HTML_TAG_RE = re.compile(r"<[^>]+>")
 _WORD_RE = re.compile(r"[^\W\d_]+", re.UNICODE)
 _CYRILLIC_RE = re.compile(r"[\u0400-\u052f]")
-_CJK_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\u3040-\u30ff\uac00-\ud7af]")
+_HAN_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff]")
+_KANA_RE = re.compile(r"[\u3040-\u30ff]")
+_HANGUL_RE = re.compile(r"[\uac00-\ud7af]")
 
 _LANGUAGE_NAMES = {
     "en": "en", "eng": "en", "english": "en", "anglais": "en", "ingles": "en",
@@ -99,6 +101,16 @@ _DISTINCTIVE_PHRASES = {
     "pt": ("tais que", "tal que", "numeros inteiros", "números inteiros"),
     "fr": ("tels que", "tel que", "nombres entiers", "pour tout"),
     "sl": ("tako da", "cela stevila", "cela števila", "naj bo"),
+}
+
+_ZH_MARKERS = (
+    "所有", "满足", "方程", "正整数", "证明", "条件", "每个", "答案",
+    "设", "其中", "存在", "性质", "下列", "所得", "必定",
+)
+_RU_FEATURE_WORDS = {
+    "все", "данное", "для", "докажите", "каждое", "которых", "натуральные",
+    "найдите", "положительных", "решения", "свойством", "существует", "указанным",
+    "уравнение", "целое", "целых", "чисел", "число", "что",
 }
 
 
@@ -166,18 +178,34 @@ def _normalise_meta_language(meta: dict) -> tuple[set[str], bool]:
 def _enough_language_text(text: str) -> bool:
     letters = _WORD_RE.findall(text)
     letter_count = sum(len(word) for word in letters)
-    # CJK languages do not normally use spaces, so four ideographs already
+    # East Asian languages do not normally use spaces, so four characters already
     # carry more linguistic signal than a four-letter Latin fragment.
-    return letter_count >= 12 or len(_CJK_RE.findall(text)) >= 4
+    east_asian = (
+        len(_HAN_RE.findall(text))
+        + len(_KANA_RE.findall(text))
+        + len(_HANGUL_RE.findall(text))
+    )
+    return letter_count >= 12 or east_asian >= 4
 
 
 def _script_evidence(text: str) -> tuple[str, str] | None:
-    cjk = len(_CJK_RE.findall(text))
+    han = len(_HAN_RE.findall(text))
+    kana = len(_KANA_RE.findall(text))
+    hangul = len(_HANGUL_RE.findall(text))
     cyrillic = len(_CYRILLIC_RE.findall(text))
-    if cjk >= 4 and cjk >= cyrillic * 2:
-        return "zh", "high"
-    if cyrillic >= 6 and cyrillic >= cjk * 2:
-        return "ru", "high"
+    if kana >= 2 or hangul >= 2:
+        # Japanese and Korean are safely non-English, but not currently among
+        # the detector's supported output languages.
+        return "und", "low"
+    if han >= 4 and han >= cyrillic * 2:
+        marker_hits = sum(marker in text for marker in _ZH_MARKERS)
+        return ("zh", "high") if marker_hits >= 2 else ("und", "low")
+    if cyrillic >= 6 and cyrillic >= han * 2:
+        words = Counter(word.casefold() for word in _WORD_RE.findall(text))
+        russian_hits = sum(min(words[word], 3) for word in _RU_FEATURE_WORDS)
+        if russian_hits >= 3:
+            return "ru", "high"
+        return "und", "low"
     return None
 
 
@@ -226,9 +254,11 @@ def detect_source_lang(body: str, meta: dict) -> tuple[str, str]:
     # An explicit multilingual label containing English means the source
     # already contains an English version, but can never justify high confidence.
     if multilingual and "en" in meta_langs:
-        if text_lang not in {"und", "en"}:
+        if text_lang == "und":
+            return "und", "low"
+        if text_lang != "en":
             return text_lang, "low"
-        return "en", "medium" if text_lang == "en" else "low"
+        return "en", "medium"
 
     if not meta_langs:
         return text_lang, text_conf
