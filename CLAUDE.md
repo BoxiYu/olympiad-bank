@@ -33,8 +33,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `mathnet-full/`（全文导出，供人工检索选题）→ `uv run --group mathnet python scripts/mathnet_export.py`
 - `data/sessions/` 是 spar 运行态，**不要手动删**（会毁掉进行中的攻坚会话）
 
-`mathnet-full/` 存在时 `bank.py doclint` 会连它一起扫（md 文件数 ~300 → ~28000，耗时 0.3s → 5s）。
-这是本地现象，CI 上该目录不存在故不受影响；嫌慢就删掉它，随时可重建。
+`mathnet-full/` 是 gitignore 派生语料，`bank.py doclint` 明确不扫描该目录；本地存在全量语料
+不会拖慢或污染唯一硬门槛，CI 的干净 clone 没有该目录时译文契约检查会明确报告 skipped。
 
 候选池缺失时**不要凭记忆或联网重建题目数据**——按 WORKFLOW.md 那是合法阻塞，如实上报即可。
 以上重建都依赖本地 HuggingFace 缓存里的 `ShadenA/MathNet`。

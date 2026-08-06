@@ -534,8 +534,10 @@ def gen_map(problems):
 
 
 # ---------------- 文档一致性校验 doclint ----------------
-# 扫描范围：全仓 .md（跳过 . 开头的隐藏目录与 node_modules）；docs/archive/ 为历史存档白名单（免禁词检查）。
+# 扫描范围：全仓 .md（跳过隐藏目录、依赖目录与 gitignore 派生语料 mathnet-full/）；
+# docs/archive/ 为历史存档白名单（免禁词检查）。
 DOCLINT_FORBIDDEN = ['origin/main', 'scripts/symphony-start.sh', 'docs/sources/']
+DOCLINT_EXCLUDED_DIRS = {'node_modules', 'mathnet-full'}
 TAXONOMY_BOARDS = {'algebra': 'algebra.md', 'combinatorics': 'combinatorics.md',
                    'geometry': 'geometry.md', 'number-theory': 'number-theory.md'}
 TRAINING_CONTRACT_DOCS = ('docs/学生手册.md', 'docs/教练手册.md')
@@ -543,11 +545,9 @@ TRAINING_CONTRACT_SECTIONS = ('intervals', 'time-limits', 'hint-cooldown', 'grad
 
 
 def _walk_md():
-    # mathnet-full/ 是 mathnet_export.py 的本地导出产物（gitignore，2.7 万题目目录）：
-    # 数据集原文不受本仓文档规范约束，扫进来会把 doclint 从 ~300 文件拖到 2.8 万
-    skip = {'node_modules', 'mathnet-full'}
     for dirpath, dirnames, filenames in os.walk(ROOT):
-        dirnames[:] = sorted(d for d in dirnames if not d.startswith('.') and d not in skip)
+        dirnames[:] = sorted(d for d in dirnames
+                            if not d.startswith('.') and d not in DOCLINT_EXCLUDED_DIRS)
         for fn in sorted(filenames):
             if fn.endswith('.md'):
                 yield os.path.join(dirpath, fn)

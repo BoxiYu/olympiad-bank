@@ -390,6 +390,14 @@ class TestDoclint:
         assert rc == 0
         assert 'DOCLINT OK' in out
 
+    def test_mathnet_full_is_not_scanned(self, repo, capsys):
+        """gitignore 派生语料含非中文与 LaTeX；即使存在，也不进入全仓文档检查。"""
+        _write(os.path.join(repo, 'mathnet-full', 'by-topic', 'x', 'index.md'),
+               '[缺的](missing.md)\n推到 origin/main 即可。\n')
+        rc, out = run_doclint(capsys)
+        assert rc == 0, out
+        assert 'DOCLINT OK' in out
+
     def test_training_contract_matches_source_passes(self, repo, capsys):
         """两手册四组标记值与 spar_session 正本一致时不得误报。"""
         rc, out = run_doclint(capsys)
