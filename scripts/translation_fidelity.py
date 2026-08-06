@@ -376,12 +376,14 @@ def verify_directory(
     mode: str = 'translated',
     pattern: str | None = None,
     variant: str = 'zh',
+    only_translated: bool = False,
 ) -> DirectoryReport:
     """校验目录并返回题数与各问题类型统计。
 
     只传 ``source_dir`` 时使用产物契约原生布局，递归配对同目录下的
     ``index.md`` 与 ``index.<variant>.md``。传入 ``translated_dir`` 时按两个
-    目录的相对路径配对，方便批次导出与 CI fixture。
+    目录的相对路径配对，方便批次导出与 CI fixture。默认把缺少译文的原文计为
+    ``missing_translation``，用于完整性审计；``only_translated`` 只检查已有译文。
     """
     if variant not in {'en', 'zh'}:
         raise ValueError(f'unsupported translation variant: {variant}')
@@ -393,12 +395,17 @@ def verify_directory(
     counts: Counter[str] = Counter()
     source_pattern = pattern or ('*.md' if translated_root is not None else 'index.md')
     source_paths = sorted(path for path in source_root.rglob(source_pattern) if path.is_file())
+    pairs = []
     for source_path in source_paths:
         relative = source_path.relative_to(source_root)
         translated_path = (
             translated_root / relative if translated_root is not None
             else source_path.with_name(f'index.{variant}.md')
         )
+        if only_translated and not translated_path.is_file():
+            continue
+        pairs.append((source_path, relative, translated_path))
+    for source_path, relative, translated_path in pairs:
         if translated_path.is_file():
             findings = verify_translation(
                 source_path.read_text(encoding='utf-8'),
@@ -418,8 +425,8 @@ def verify_directory(
             counts.update(finding.type.value for finding in findings)
     failed = len(failed_files)
     return DirectoryReport(
-        total=len(source_paths),
-        passed=len(source_paths) - failed,
+        total=len(pairs),
+        passed=len(pairs) - failed,
         failed=failed,
         finding_counts=dict(sorted(counts.items())),
         files=failed_files,
@@ -448,6 +455,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument('--mode', choices=('translated', 'passthrough', 'failed'), default='translated',
                         help='译文模式（由调用方从 translation.json 传入；默认 translated）')
     parser.add_argument('--glob', help='递归原文匹配模式（双目录默认 *.md；单目录默认 index.md）')
+    parser.add_argument('--only-translated', action='store_true',
+                        help='只检查已有目标 variant；默认也把缺少译文报告为 missing_translation')
     parser.add_argument('--json', action='store_true', help='输出机器可读 JSON')
     args = parser.parse_args(argv)
     report = verify_directory(
@@ -456,6 +465,7 @@ def main(argv: list[str] | None = None) -> int:
         mode=args.mode,
         pattern=args.glob,
         variant=args.variant,
+        only_translated=args.only_translated,
     )
     if args.json:
         print(json.dumps(report.to_dict(), ensure_ascii=False, indent=2))

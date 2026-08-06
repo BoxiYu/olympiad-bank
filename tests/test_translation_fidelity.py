@@ -276,6 +276,24 @@ def test_directory_reports_missing_translation(tmp_path):
     assert report.finding_counts == {FindingType.MISSING_TRANSLATION.value: 1}
 
 
+def test_only_translated_skips_missing_variants(tmp_path, capsys):
+    translated_problem = tmp_path / 'translated' / 'sample-001'
+    untranslated_problem = tmp_path / 'untranslated' / 'sample-002'
+    translated_problem.mkdir(parents=True)
+    untranslated_problem.mkdir(parents=True)
+    (translated_problem / 'index.md').write_text(SOURCE, encoding='utf-8')
+    (translated_problem / 'index.zh.md').write_text(VALID_TRANSLATION, encoding='utf-8')
+    (untranslated_problem / 'index.md').write_text(SOURCE, encoding='utf-8')
+
+    strict = verify_directory(tmp_path, variant='zh')
+    existing = verify_directory(tmp_path, variant='zh', only_translated=True)
+    assert (strict.total, strict.failed) == (2, 1)
+    assert strict.finding_counts == {FindingType.MISSING_TRANSLATION.value: 1}
+    assert (existing.total, existing.passed, existing.failed) == (1, 1, 0)
+    assert main([str(tmp_path), '--variant', 'zh', '--only-translated']) == 0
+    assert '共 1 题；通过 1；失败 0' in capsys.readouterr().out
+
+
 def test_directory_rejects_missing_source_root(tmp_path):
     with pytest.raises(FileNotFoundError, match='source directory does not exist'):
         verify_directory(tmp_path / 'absent')
