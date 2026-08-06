@@ -9,7 +9,8 @@
 - 会话目录 data/sessions/<session_id>/：statement.md（绝不含答案/要点/提示）、
   meta.json、hints/hint-N.md、solution.md
 - data/plan.json：{"week","target","seed","items"}
-- data/similar/edges.jsonl：确认边台账（不存 cluster_id，关系类型由人确认）
+- data/similar/edges.jsonl：确认边台账（不存 cluster_id，关系类型由人确认；
+  evidence 为自由文本出处，--confirm 时必填非空，记录「谁在何时凭什么确认」）
 """
 import datetime
 import json
@@ -724,12 +725,16 @@ def cmd_similar(problems, args):
         dst = args.confirm.strip()
         if not args.relation:
             sys.exit(f'--confirm 需要同时给 --relation（{"|".join(RELATIONS)}）')
+        evidence = (args.evidence or '').strip()
+        if not evidence:
+            sys.exit('--confirm 需要同时给 --evidence（自由文本出处，写明确认依据，'
+                     '如「AI双评审2026-08-06：均为根轴+圆幂引理链」）——确认边必须可追溯')
         if not 0.0 <= args.confidence <= 1.0:
             sys.exit(f'--confidence 必须在 0.0–1.0（契约区间），当前为 {args.confidence}')
         _check_confirm_dst(fmmap, args.id, dst)
         os.makedirs(os.path.dirname(EDGES_PATH), exist_ok=True)
         edge = {'src': args.id, 'dst': dst, 'relation': args.relation,
-                'confidence': args.confidence, 'evidence': args.evidence,
+                'confidence': args.confidence, 'evidence': evidence,
                 'confirmed': True, 'date': datetime.date.today().isoformat()}
         with open(EDGES_PATH, 'a', encoding='utf-8') as f:
             f.write(json.dumps(edge, ensure_ascii=False) + '\n')
@@ -749,7 +754,7 @@ def cmd_similar(problems, args):
             for d, rel in sorted(confirmed.items()):
                 print(f'  {d}  ✅ {rel}')
         print('scripts/similar_index.py 尚未就位（由相似检索模块提供）——索引就绪后重试；'
-              f'确认边可先手动登记：{CLI} similar {args.id} --confirm <DST> --relation <r>')
+              f'确认边可先手动登记：{CLI} similar {args.id} --confirm <DST> --relation <r> --evidence "<出处>"')
         sys.exit(2)
     proc = subprocess.run([sys.executable, SIMILAR_INDEX, 'query', args.id,
                            '--top', str(args.top)],
@@ -757,7 +762,7 @@ def cmd_similar(problems, args):
     if proc.returncode != 0:
         print('similar_index 查询失败（索引可能未建）：')
         print((proc.stderr or proc.stdout).strip())
-        print(f'建好索引后重试；确认边可先手动登记：{CLI} similar {args.id} --confirm <DST> --relation <r>')
+        print(f'建好索引后重试；确认边可先手动登记：{CLI} similar {args.id} --confirm <DST> --relation <r> --evidence "<出处>"')
         sys.exit(2)
     rows = []
     for line in proc.stdout.splitlines():
@@ -787,4 +792,5 @@ def cmd_similar(problems, args):
         print('已确认边（不在本次候选中）：')
         for d, rel in sorted(rest.items()):
             print(f'  {d}  ✅ {rel}')
-    print(f'确认关系：{CLI} similar {args.id} --confirm <DST> --relation <{"|".join(RELATIONS)}>')
+    print(f'确认关系：{CLI} similar {args.id} --confirm <DST> --relation <{"|".join(RELATIONS)}>'
+          ' --evidence "<出处>"')
