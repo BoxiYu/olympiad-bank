@@ -144,13 +144,27 @@ def test_pure_symbol_final_answer_must_be_identical(answer, replacement):
     assert FindingType.FINAL_ANSWER_MISMATCH in types(translated=changed)
 
 
-@pytest.mark.parametrize('answer', ['1', 'D', 'n ≡ 1 (mod 3)', r'$\frac{1}{2}$'])
+@pytest.mark.parametrize('answer', ['1', 'D', 'sqrt(5)/125', 'n ≡ 1 (mod 3)', r'$\frac{1}{2}$'])
 def test_unchanged_pure_symbol_answer_is_accepted(answer):
     source = SOURCE.rsplit('D\n', 1)[0] + answer + '\n'
     translated = VALID_TRANSLATION.rsplit('D\n', 1)[0] + answer + '\n'
     findings = verify_translation(source, translated)
     assert not any(finding.type in {FindingType.FINAL_ANSWER_MISMATCH, FindingType.UNTRANSLATED}
                    and finding.section == '最终答案' for finding in findings)
+
+
+@pytest.mark.parametrize('answer', ['sqrt(5)/125', 'D', '1'])
+@pytest.mark.parametrize(('target_lang', 'fixture'), [('en', 'mixed-en.md'), ('zh', 'mixed-zh.md')])
+def test_symbolic_final_answer_is_identical_across_three_versions(answer, target_lang, fixture):
+    prose_answer = 'Equality holds if and only if x equals y.'
+    source = (FIXTURES / 'mixed-source.md').read_text(encoding='utf-8').replace(
+        prose_answer, answer
+    )
+    translated = (FIXTURES / fixture).read_text(encoding='utf-8').replace(prose_answer, answer)
+
+    assert verify_translation(
+        source, translated, target_lang=target_lang, source_lang='fr'
+    ) == []
 
 
 def test_empty_section_and_empty_document_are_rejected():
@@ -189,6 +203,68 @@ def test_identical_chinese_source_section_needs_no_translation(answer):
     assert FindingType.UNTRANSLATED not in types(source, translated, target_lang='zh')
 
 
+def test_source_section_already_in_english_needs_no_translation():
+    source = (FIXTURES / 'mixed-source.md').read_text(encoding='utf-8')
+    translated = (FIXTURES / 'mixed-en.md').read_text(encoding='utf-8')
+
+    assert verify_translation(
+        source, translated, target_lang='en', source_lang='fr'
+    ) == []
+
+
+@pytest.mark.parametrize('answer', [
+    'No solutions.',
+    'Proof omitted.',
+    'The answer is 42.',
+])
+def test_short_english_answer_needs_no_translation(answer):
+    source = SOURCE.replace('D\n', answer + '\n')
+    translated = VALID_TRANSLATION.replace('D\n', answer + '\n')
+
+    findings = verify_translation(
+        source, translated, target_lang='en', source_lang='fr'
+    )
+
+    assert not any(
+        finding.type == FindingType.UNTRANSLATED and finding.section == '最终答案'
+        for finding in findings
+    )
+
+
+@pytest.mark.parametrize('answer', [
+    'Aucune solution.',
+    'Nessuna soluzione.',
+    'Keine Lösungen.',
+])
+def test_short_foreign_answer_is_not_trusted_as_english(answer):
+    source = SOURCE.replace('D\n', answer + '\n')
+    translated = VALID_TRANSLATION.replace('D\n', answer + '\n')
+
+    findings = verify_translation(
+        source, translated, target_lang='en', source_lang='en'
+    )
+
+    assert any(
+        finding.type == FindingType.UNTRANSLATED and finding.section == '最终答案'
+        for finding in findings
+    )
+
+
+def test_matching_file_language_does_not_exempt_mixed_language_section():
+    french_solution = "On compare les deux membres de l'égalité."
+    source = SOURCE.replace('Set $x=4$ and verify the equality.', french_solution)
+    translated = VALID_TRANSLATION.replace('令 $x=4$，并验证等式。', french_solution)
+
+    findings = verify_translation(
+        source, translated, target_lang='en', source_lang='en'
+    )
+
+    assert any(
+        finding.type == FindingType.UNTRANSLATED and finding.section == '解法 1'
+        for finding in findings
+    )
+
+
 def test_real_prose_left_identical_is_still_untranslated():
     untranslated = VALID_TRANSLATION.replace(
         '求整数 $x \\leq y$，使 `x + y` 为偶数。',
@@ -202,11 +278,27 @@ def test_real_prose_left_identical_is_still_untranslated():
 
 def test_passthrough_identical_document_has_zero_findings():
     assert verify_translation(SOURCE, SOURCE, mode='passthrough', target_lang='en') == []
-    assert FindingType.UNTRANSLATED in types(
+    assert verify_translation(
+        SOURCE,
         translated=SOURCE,
         mode='translated',
         target_lang='en',
+        source_lang='en',
+    ) == []
+
+
+def test_foreign_prose_left_identical_in_english_variant_is_untranslated():
+    source = (FIXTURES / 'mixed-source.md').read_text(encoding='utf-8')
+    translated = (FIXTURES / 'mixed-en.md').read_text(encoding='utf-8').replace(
+        'Find the real numbers $x$ and $y$ satisfying the equality.',
+        "Trouver les réels $x$ et $y$ satisfaisant l'égalité.",
     )
+
+    findings = verify_translation(
+        source, translated, target_lang='en', source_lang='fr'
+    )
+    assert any(finding.type == FindingType.UNTRANSLATED and finding.section == '题面'
+               for finding in findings)
 
 
 def test_regression_inequality_reversal_is_rejected():
@@ -227,6 +319,49 @@ def test_regression_deleted_solution_two_is_rejected():
 def test_regression_model_meta_leak_is_rejected():
     changed = VALID_TRANSLATION.replace('求整数', '以下是翻译：\n求整数')
     assert FindingType.MODEL_META_LEAK in types(translated=changed)
+
+
+def test_adversarial_detection_rates_remain_exact():
+    inequality_hits = 0
+    for index in range(58):
+        old = rf'$x_{{{index}}} \leq y_{{{index}}}$'
+        source = SOURCE.replace(r'$x \leq y$', old)
+        translated = VALID_TRANSLATION.replace(r'$x \leq y$', old)
+        changed = translated.replace(r'\leq', r'\geq', 1)
+        inequality_hits += any(
+            finding.type == FindingType.MATH_MISMATCH
+            for finding in verify_translation(source, changed)
+        )
+
+    image_hits = 0
+    for index in range(1, 95):
+        source = SOURCE.replace('attached_image_1', f'attached_image_{index}')
+        translated = VALID_TRANSLATION.replace('attached_image_1', f'attached_image_{index + 1}')
+        image_hits += any(
+            finding.type == FindingType.IMAGE_MISMATCH
+            for finding in verify_translation(source, translated)
+        )
+
+    skeleton_hits = 0
+    for index in range(33):
+        heading = f'解法 {index + 3}'
+        source = SOURCE.replace('解法 2', heading)
+        translated = VALID_TRANSLATION.replace('解法 2', heading)
+        changed = translated.replace(f'## {heading}\n也可以使用 $y=6$。\n\n', '')
+        skeleton_hits += any(
+            finding.type == FindingType.STRUCTURE_MISMATCH
+            for finding in verify_translation(source, changed)
+        )
+
+    leak_hits = 0
+    for index in range(500):
+        changed = VALID_TRANSLATION.replace('求整数', f'以下是翻译 {index}：求整数')
+        leak_hits += any(
+            finding.type == FindingType.MODEL_META_LEAK
+            for finding in verify_translation(SOURCE, changed)
+        )
+
+    assert (inequality_hits, image_hits, skeleton_hits, leak_hits) == (58, 94, 33, 500)
 
 
 @pytest.mark.parametrize('phrase', [

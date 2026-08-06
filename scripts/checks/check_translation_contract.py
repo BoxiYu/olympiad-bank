@@ -6,7 +6,7 @@
 ``docs/译文契约-mathnet-full.md`` 提供（CXB-495）；本模块只执行该契约。
 
 本模块从约定候选模块中寻找
-``verify_translation(source, translated, target_lang=lang)`` 并调用，
+``verify_translation(source, translated, target_lang=lang, source_lang=source_lang)`` 并调用，
 不在这里复制数学环境/图片引用的实现。只有候选文件确实不存在时才允许 skipped；
 文件存在却无法加载或缺少入口时必须让检查失败。
 """
@@ -244,6 +244,7 @@ def _check_one(contract_path, corpus, verifier):
                     source.decode('utf-8'),
                     body.decode('utf-8'),
                     target_lang=lang,
+                    source_lang=source_lang,
                 )
             except Exception as exc:
                 errors.append(f'{rel}: 保真校验器异常：index.{lang}.md（{exc!r}）')

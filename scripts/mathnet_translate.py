@@ -1239,6 +1239,7 @@ def apply_payload(root: Path, row: dict[str, Any], target: str, payload: dict[st
         target_bytes.decode("utf-8"),
         mode=payload["mode"],
         target_lang=target,
+        source_lang=row["source_lang"],
     )
     if findings:
         summary = "; ".join(

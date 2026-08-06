@@ -230,8 +230,8 @@ def test_cxb_497_hook_is_called_and_findings_fail(tmp_path):
     make_problem(corpus)
     calls = []
 
-    def verify(source, translated, *, target_lang):
-        calls.append((source, translated, target_lang))
+    def verify(source, translated, *, target_lang, source_lang):
+        calls.append((source, translated, target_lang, source_lang))
         return [] if source == translated else [{'kind': 'math_mismatch', 'section': '题面'}]
 
     result = tc.check_corpus(str(tmp_path), sample=10, fidelity_verifier=verify)
@@ -239,6 +239,49 @@ def test_cxb_497_hook_is_called_and_findings_fail(tmp_path):
     assert result.fidelity == 'enabled'
     assert any('保真校验失败' in error and 'math_mismatch' in error for error in result.errors)
     assert calls[0][2] == 'zh'
+    assert calls[0][3] == 'en'
+
+
+def test_en_medium_identical_translated_variant_passes_contract(tmp_path):
+    corpus = os.path.join(tmp_path, 'mathnet-full')
+    variants = {'en': {'mode': 'translated', 'sha256': _sha(SOURCE)}}
+    _problem, contract, payload = make_problem(
+        corpus, en=SOURCE, zh=False, variants=variants, source_lang='en'
+    )
+    payload['source_lang_confidence'] = 'medium'
+    _write_json(contract, payload)
+
+    result = tc.check_corpus(
+        str(tmp_path), sample=10, fidelity_verifier=verify_translation
+    )
+
+    assert result.status == 'ok', result.errors
+
+
+def test_matching_file_language_does_not_hide_mixed_section_in_contract(tmp_path):
+    corpus = os.path.join(tmp_path, 'mathnet-full')
+    source = (
+        '# 0abc\n\n## 题面\n\nFind $x$.\n\n'
+        "## 最终答案\n\nAucune solution.\n"
+    ).encode()
+    variants = {'en': {'mode': 'translated', 'sha256': _sha(source)}}
+    make_problem(
+        corpus,
+        source=source,
+        en=source,
+        zh=False,
+        variants=variants,
+        source_lang='en',
+    )
+
+    result = tc.check_corpus(
+        str(tmp_path), sample=10, fidelity_verifier=verify_translation
+    )
+
+    assert any(
+        'index.en.md' in error and str(FindingType.UNTRANSLATED) in error
+        for error in result.errors
+    )
 
 
 def test_english_translated_variant_uses_english_fidelity_rules(tmp_path):

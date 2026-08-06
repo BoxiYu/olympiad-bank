@@ -17,6 +17,8 @@ from enum import Enum
 from itertools import zip_longest
 from pathlib import Path
 
+from source_lang import detect_source_lang
+
 
 class FindingType(str, Enum):
     """稳定的问题类型；字符串值可直接写入 JSON/CI 台账。"""
@@ -97,6 +99,35 @@ _PROTECTED_RE = re.compile(
 )
 _IMAGE_RE = re.compile(r'!\[\]\(attached_image_(\d+)\.png\)')
 _HAN_RE = re.compile(r'[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]')
+_SYMBOL_WORDS = {
+    'bmod', 'cos', 'gcd', 'inf', 'lcm', 'ln', 'log', 'max', 'min', 'mod',
+    'pmod', 'sin', 'sqrt', 'sup', 'tan',
+}
+_SHORT_ENGLISH_PROSE_RE = re.compile(
+    r'\b(?:'
+    r'no[ \t]+solutions?'
+    r'|proof[ \t]+(?:is[ \t]+)?omitted'
+    r'|the[ \t]+answers?[ \t]+(?:is|are)'
+    r'|find\b'
+    r'|set\b'
+    r'|verify\b'
+    r'|alternatively[ \t]+use\b'
+    r')',
+    re.IGNORECASE,
+)
+_NON_ENGLISH_FRAGMENT_RE = re.compile(
+    r'\b(?:'
+    # Common concise-answer and instruction words from MathNet's major
+    # Latin-script source languages.  They are checked only when the
+    # conservative document detector returned ``und``.
+    r'aucun|aucune|trouver|demontrer|preuve|reponse|omis|omise|les|des|pour'
+    r'|nessun|nessuna|trovare|dimostrare|soluzione|risposta|omessa'
+    r'|kein|keine|finden|beweis|antwort|losung|losungen'
+    r'|ningun|ninguna|hallar|respuesta|prueba|omitida|soluciones'
+    r'|nenhum|nenhuma|encontrar|resposta|omitida|solucoes'
+    r'|poisci|dokazi|resitev'
+    r')\b'
+)
 _WHOLE_FENCE_RE = re.compile(
     r'\A[ \t]*(```|~~~)[^\n]*\n(?P<body>.*)\n\1[ \t]*\Z',
     re.DOTALL,
@@ -227,7 +258,7 @@ def _is_pure_symbol(value: str) -> bool:
         return False
     without_commands = re.sub(r'\\[A-Za-z]+', '', candidate)
     words = re.findall(r'[^\W\d_]+', without_commands, re.UNICODE)
-    return all(len(word) == 1 or word.casefold() in {'mod', 'pmod', 'bmod'} for word in words)
+    return all(len(word) == 1 or word.casefold() in _SYMBOL_WORDS for word in words)
 
 
 def _has_translatable_prose(section: _Section) -> bool:
@@ -239,17 +270,37 @@ def _has_translatable_prose(section: _Section) -> bool:
     return bool(re.search(r'[^\W\d_]', body, re.UNICODE))
 
 
-def _has_prose_outside_target_language(section: _Section, target_lang: str) -> bool:
+def _same_language_family(source_lang: str | None, target_lang: str) -> bool:
+    if not source_lang:
+        return False
+    family = re.split(r'[-_]', source_lang.casefold(), maxsplit=1)[0]
+    return family == target_lang
+
+
+def _ascii_fold(value: str) -> str:
+    return ''.join(
+        char for char in unicodedata.normalize('NFKD', value.casefold())
+        if not unicodedata.combining(char)
+    )
+
+
+def _has_prose_outside_target_language(
+    section: _Section,
+    target_lang: str,
+    source_lang: str | None,
+) -> bool:
     """源小节是否仍含需要翻到目标语言的散文。
 
     ``untranslated`` 只该拦截本应翻译却逐字照抄的内容。MathNet 生成器会把
     已是中文的状态说明写进英文原文（例如证明题的答案占位）；这类文字在中文
     variant 中原样保留是正确的，不能仅因“非空且相同”而告警。
 
-    中文可按 Unicode 文字脚本精确判断。英文原文到英文 variant 按契约必须走
-    ``passthrough``；英文 ``translated`` 模式还可能承载西语等同为拉丁脚本的
-    源文，因此继续保守告警，避免把共享文字脚本误当成已是目标语言。数学、
-    图片与纯符号内容仍由 ``_has_translatable_prose`` 先行排除。
+    中文可按 Unicode 文字脚本精确判断；英文先使用与派单相同的保守语言检测器，
+    再单独识别检测器因篇幅太短而返回 ``und`` 的常见英文答案。文件级
+    ``source_lang=en`` 只在小节完成语言扫描且没有任何外语证据后作为佐证，不能
+    再像整篇提前返回那样覆盖混合语言小节。``translated`` 仍表示内容确实经过
+    模型核验；``passthrough`` 继续只表示派单前的 ``en/high`` 直通。数学、图片与
+    纯符号内容仍由 ``_has_translatable_prose`` 先行排除。
     """
     if not _has_translatable_prose(section):
         return False
@@ -260,6 +311,17 @@ def _has_prose_outside_target_language(section: _Section, target_lang: str) -> b
     letters = [ch for ch in body if unicodedata.category(ch).startswith('L')]
     if target_lang == 'zh':
         return any(_HAN_RE.fullmatch(ch) is None for ch in letters)
+    if _NON_ENGLISH_FRAGMENT_RE.search(_ascii_fold(body)):
+        return True
+    detected_lang, _confidence = detect_source_lang(body, {})
+    if detected_lang == 'en':
+        return False
+    if detected_lang != 'und':
+        return True
+    if _SHORT_ENGLISH_PROSE_RE.search(body):
+        return False
+    if _same_language_family(source_lang, target_lang):
+        return False
     return True
 
 
@@ -268,6 +330,7 @@ def _content_findings(
     translated: str,
     mode: str,
     target_lang: str,
+    source_lang: str | None,
 ) -> list[Finding]:
     findings = []
     if not translated.strip():
@@ -298,7 +361,8 @@ def _content_findings(
             if source_section.heading != translated_section.heading:
                 continue
             if (source_section.body == translated_section.body
-                    and _has_prose_outside_target_language(source_section, target_lang)):
+                    and _has_prose_outside_target_language(
+                        source_section, target_lang, source_lang)):
                 findings.append(Finding(
                     FindingType.UNTRANSLATED,
                     source_section.heading,
@@ -348,11 +412,13 @@ def verify_translation(
     *,
     mode: str = 'translated',
     target_lang: str = 'zh',
+    source_lang: str | None = None,
 ) -> list[Finding]:
     """校验一对 Markdown 字符串，返回全部可定位问题。
 
     ``mode='passthrough'`` 只关闭“正文未翻译”检查；数学、图片、骨架与泄漏检查
     仍然执行。调用方可直接传入 ``translation.json`` 中对应 variant 的 mode。
+    ``source_lang`` 保留在调用契约中，但不能绕过混合语言文档的逐小节证据检查。
     """
     if mode not in {'translated', 'passthrough', 'failed'}:
         raise ValueError(f'unsupported translation mode: {mode}')
@@ -364,7 +430,7 @@ def verify_translation(
     findings.extend(_compare_occurrences(
         FindingType.IMAGE_MISMATCH, _images(source), _images(translated)))
     findings.extend(_structure_findings(source, translated))
-    findings.extend(_content_findings(source, translated, mode, target_lang))
+    findings.extend(_content_findings(source, translated, mode, target_lang, source_lang))
     findings.extend(_leak_findings(source, translated))
     return findings
 
