@@ -1,0 +1,23 @@
+[
+  {
+    "mathnet_id": "096f",
+    "source": "Să se arate că dacă numerele reale satisfac relațiile {{MNT_0001}}, atunci {{MNT_0002}}.",
+    "translated": "Prove that if the real numbers satisfy {{MNT_0001}}, then {{MNT_0002}}.",
+    "peer_source": "Să se arate că dacă numere reale satisfac relațiile {{MNT_0001}}, atunci {{MNT_0002}}.",
+    "outsider_source": "Bewijs dat als de reële getallen aan de relaties {{MNT_0001}} voldoen, dan {{MNT_0002}}."
+  },
+  {
+    "mathnet_id": "0a3h",
+    "source": "Zij {{MNT_0001}} een polynoom met gehele coëfficiënten van graad {{MNT_0002}} zodanig dat {{MNT_0003}}.",
+    "translated": "Let {{MNT_0001}} be a degree-{{MNT_0002}} polynomial with integer coefficients such that {{MNT_0003}}.",
+    "peer_source": "Zij {{MNT_0001}} een polynoom met gehele coëfficiënten en graad {{MNT_0002}} zodanig dat {{MNT_0003}}.",
+    "outsider_source": "Sea {{MNT_0001}} un polinomio de grado {{MNT_0002}} con coeficientes enteros tal que {{MNT_0003}}."
+  },
+  {
+    "mathnet_id": "097v",
+    "source": "Determinați toate valorile parametrului real pentru care ecuația are două soluții reale distincte.",
+    "translated": "Determine all real values of the parameter for which the equation has two distinct real solutions.",
+    "peer_source": "Determinați toate valorile parametrului real pentru care ecuația dată are două soluții reale distincte.",
+    "outsider_source": "Bepaal alle reële waarden van de parameter waarvoor de vergelijking twee verschillende reële oplossingen heeft."
+  }
+]

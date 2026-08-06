@@ -1,4 +1,6 @@
 """译文保真校验器的自造配对样本；不依赖 mathnet-full/，不触碰 problems/。"""
+import hashlib
+import inspect
 import json
 import os
 import sys
@@ -87,27 +89,54 @@ def test_legal_translation_has_zero_findings():
     assert verify_translation(SOURCE, VALID_TRANSLATION) == []
 
 
+def test_individual_verifier_public_signature_is_unchanged():
+    parameters = inspect.signature(verify_translation).parameters
+
+    assert tuple(parameters) == ('source', 'translated', 'mode', 'target_lang', 'source_lang')
+    assert parameters['mode'].kind is inspect.Parameter.KEYWORD_ONLY
+    assert parameters['mode'].default == 'translated'
+    assert parameters['target_lang'].default == 'zh'
+    assert parameters['source_lang'].default is None
+
+
 def degenerate_fixture():
     return json.loads((FIXTURES / 'degenerate-batch.json').read_text(encoding='utf-8'))
 
 
-def normal_batch(size=97):
-    objects = ('sum', 'product', 'remainder', 'perimeter', 'area', 'maximum', 'minimum',
-               'coefficient', 'root', 'divisor')
-    methods = ('factoring', 'induction', 'symmetry', 'counting', 'reflection', 'substitution',
-               'invariance', 'parity', 'recursion', 'comparison')
-    object_zh = ('和', '积', '余数', '周长', '面积', '最大值', '最小值', '系数', '根', '因数')
-    method_zh = ('因式分解', '归纳法', '对称性', '计数法', '反射法', '代换法',
-                 '不变量', '奇偶性', '递推法', '比较法')
+def genre_counterexamples():
+    return json.loads((FIXTURES / 'genre-counterexamples.json').read_text(encoding='utf-8'))
+
+
+def degenerate_batch(size=100):
+    """把 CXB-512 的已知退化样本扩成互不相干的 100 条源文。"""
+    fixture = degenerate_fixture()
     rows = []
     for index in range(size):
-        left, right = index % 10, index // 10
+        base = fixture[index % len(fixture)]
+        signature = hashlib.sha256(f'degenerate-{index}'.encode()).hexdigest()
+        rows.append({
+            'mathnet_id': f'degenerate-{index:03d}',
+            'source': f'{signature} {base["source"]}',
+            'translated': base['translated'],
+        })
+    return rows
+
+
+def normal_batch(size=97):
+    source_templates = (
+        'Determine all parameter values in case {number} for which the equation has two roots.',
+        'Determinați valorile parametrului în cazul {number} pentru care ecuația are două rădăcini.',
+        'Bepaal de parameterwaarden in geval {number} waarvoor de vergelijking twee wortels heeft.',
+        'Déterminez les valeurs du paramètre dans le cas {number} où l’équation a deux racines.',
+        'Bestimmen Sie im Fall {number} alle Parameterwerte, für die die Gleichung zwei Wurzeln hat.',
+    )
+    rows = []
+    for index in range(size):
+        number = index + 100
         rows.append({
             'mathnet_id': f'normal-{index:03d}',
-            'source': (f'Find the {objects[left]} using {methods[right]} in case '
-                       f'{index + 100}.'),
-            'translated': (f'在编号 {index + 100} 的情形中，用{method_zh[right]}'
-                           f'求{object_zh[left]}。'),
+            'source': source_templates[index % len(source_templates)].format(number=number),
+            'translated': f'求出编号 {number} 的方程参数，使它恰有两个不同实根。',
         })
     return rows
 
@@ -121,13 +150,13 @@ def batch_report(rows, **kwargs):
     )
 
 
-def test_real_degenerate_fixture_blocks_all_three_boilerplate_translations():
-    rows = degenerate_fixture()
+def test_cxb_512_hundred_item_regression_blocks_every_boilerplate_translation():
+    rows = degenerate_batch()
     report = batch_report(rows)
 
     assert set(report.findings) == {row['mathnet_id'] for row in rows}
     assert all(
-        {finding.type for finding in findings} == {FindingType.BATCH_BOILERPLATE}
+        FindingType.BATCH_BOILERPLATE in {finding.type for finding in findings}
         for findings in report.findings.values()
     )
 
@@ -143,6 +172,69 @@ def test_three_degenerate_items_in_one_hundred_only_block_those_three():
 
 def test_normal_batch_has_zero_findings():
     assert batch_report(normal_batch()).findings == {}
+
+
+@pytest.mark.parametrize('row', genre_counterexamples(), ids=lambda row: row['mathnet_id'])
+def test_real_genre_counterexamples_are_not_boilerplate(row):
+    rows = [
+        {'mathnet_id': row['mathnet_id'], 'source': row['source'],
+         'translated': row['translated']},
+        {'mathnet_id': row['mathnet_id'] + '-peer', 'source': row['peer_source'],
+         'translated': row['translated']},
+        {'mathnet_id': row['mathnet_id'] + '-outsider', 'source': row['outsider_source'],
+         'translated': row['translated']},
+    ]
+
+    assert batch_report(rows, target_lang='en').findings == {}
+
+
+def test_preserved_distinctive_entities_rescue_cross_language_genre_cluster():
+    rows = [
+        {
+            'mathnet_id': 'entity-1',
+            'source': 'Demonstrați că în configurația Euler 314 variabila p are proprietatea cerută.',
+            'translated': ('Prove that in the Euler configuration numbered 314, variable p has '
+                           'the required property under all stated conditions.'),
+        },
+        {
+            'mathnet_id': 'entity-2',
+            'source': 'Bewijs dat in de Fermat-configuratie 271 variabele q de vereiste eigenschap heeft.',
+            'translated': ('Prove that in the Fermat configuration numbered 271, variable q has '
+                           'the required property under all stated conditions.'),
+        },
+        {
+            'mathnet_id': 'entity-3',
+            'source': 'Demuestre que en la configuración Pascal 161 la variable r tiene la propiedad pedida.',
+            'translated': ('Prove that in the Pascal configuration numbered 161, variable r has '
+                           'the required property under all stated conditions.'),
+        },
+    ]
+
+    assert batch_report(rows, target_lang='en').findings == {}
+    without_entity_exemption = batch_report(
+        rows,
+        target_lang='en',
+        config=BatchConfig(boilerplate_min_unique_entities=10),
+    )
+    assert set(without_entity_exemption.findings) == {
+        'entity-1', 'entity-2', 'entity-3',
+    }
+
+
+def test_erased_distinctive_entities_do_not_rescue_boilerplate():
+    rows = [
+        {'mathnet_id': f'erased-{index}', 'source': row['source'],
+         'translated': 'Prove that the requested property follows from the stated conditions.'}
+        for index, row in enumerate([
+            {'source': 'Demonstrați proprietatea Euler 314 pentru variabila p.'},
+            {'source': 'Bewijs de Fermat-eigenschap 271 voor variabele q.'},
+            {'source': 'Demuestre la propiedad Pascal 161 para la variable r.'},
+        ], start=1)
+    ]
+
+    assert set(batch_report(rows, target_lang='en').findings) == {
+        'erased-1', 'erased-2', 'erased-3',
+    }
 
 
 def test_length_ratio_is_a_signal_but_never_blocks_alone():
@@ -163,50 +255,19 @@ def test_length_and_missing_anchor_block_as_separate_findings():
     }
 
 
-def test_chinese_source_hollow_english_translation_is_blocked():
-    source = '证明对于所有满足下列整除条件的正整数，欧拉方法给出的结论在 2024 年情形下成立。'
-    report = verify_batch([source], ['Answer.'], keys=['hollow-en'], target_lang='en')
-
-    assert {finding.type for finding in report.findings['hollow-en']} == {
-        FindingType.LENGTH_RATIO,
-        FindingType.CONTENT_ANCHOR_MISSING,
-    }
-    assert '证明' in report.signals['hollow-en'][1].detail
-
-
-def test_non_english_source_hollow_chinese_translation_is_blocked():
-    source = ('Démontrer que pour tous les entiers positifs satisfaisant les conditions données, '
-              "l'identité d'Euler reste valable en 2024.")
-    report = verify_batch([source], ['答案。'], keys=['hollow-zh'], target_lang='zh')
-
-    assert {finding.type for finding in report.findings['hollow-zh']} == {
-        FindingType.LENGTH_RATIO,
-        FindingType.CONTENT_ANCHOR_MISSING,
-    }
-    assert 'demontrer' in report.signals['hollow-zh'][1].detail
-
-
-@pytest.mark.parametrize(('source', 'translated', 'target_lang'), [
-    (
-        '证明欧拉方法给出的结论在 2024 年情形下成立。',
-        "Prove that Euler's method gives the claimed result in the 2024 case.",
-        'en',
-    ),
-    (
-        "Démontrer que l'identité d'Euler reste valable en 2024.",
-        '证明欧拉恒等式在 2024 年仍然成立。',
-        'zh',
-    ),
-])
-def test_cross_language_content_anchors_accept_normal_translations(
-    source, translated, target_lang
-):
-    assert verify_batch([source], [translated], target_lang=target_lang).findings == {}
-
-
 def test_batch_thresholds_are_configurable():
     report = batch_report(degenerate_fixture(), config=BatchConfig(boilerplate_min_group=4))
     assert report.findings == {}
+
+
+@pytest.mark.parametrize('config', [
+    BatchConfig(boilerplate_pair_similarity_tolerance=-0.1),
+    BatchConfig(boilerplate_entity_retention=1.1),
+    BatchConfig(boilerplate_min_unique_entities=0),
+])
+def test_new_batch_thresholds_are_validated(config):
+    with pytest.raises(ValueError):
+        batch_report(degenerate_fixture(), config=config)
 
 
 @pytest.mark.parametrize(('old', 'new'), [

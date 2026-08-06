@@ -82,7 +82,10 @@ class BatchConfig:
 
     默认 ``boilerplate_min_group=3`` 对应最小可行动重复簇：两条短题偶然同句很常见，
     三条不同原文却共用译文已足以复核。相似度 0.9 在剥离数学与标点后容忍少量虚词漂移；
-    译文相似度还须比源文相似度至少高 0.2，避免误伤同模板原文的忠实同模板翻译。
+    译文相似度还须比同一 peer 的源文相似度至少高 0.2，避免误伤同模板原文的忠实翻译；
+    译文相似度相差不超过 0.02 的 peer 视为并列，再选源文最相近者，避免两个极值错配。
+    若原文至少有一个批内特有的散文实体，且数字、变量名、专名保留率达到 0.8，
+    也不判套话；该保守阈值允许一个抽取噪声，但要求绝大多数特有实体仍在。
     少于 8 个文字/数字的短答案不参与套话聚类。长度比采用很宽的 0.25--4.0 区间，
     适配英中字符密度差；长度和锚点各权重 1，必须同时出现才达到默认阻断分 2，
     因而长度异常绝不会单独产生 Finding。套话权重 2，可独立阻断。
@@ -93,6 +96,9 @@ class BatchConfig:
     boilerplate_min_group: int = 3
     boilerplate_similarity: float = 0.9
     boilerplate_source_similarity_gap: float = 0.2
+    boilerplate_pair_similarity_tolerance: float = 0.02
+    boilerplate_entity_retention: float = 0.8
+    boilerplate_min_unique_entities: int = 1
     boilerplate_min_chars: int = 8
     length_ratio_min: float = 0.25
     length_ratio_max: float = 4.0
@@ -206,79 +212,17 @@ _MODEL_META_PATTERNS = (
     re.compile(r'\bas an AI\b', re.IGNORECASE),
     re.compile(r'\bI (?:have )?translated\b', re.IGNORECASE),
 )
-_TASK_ANCHORS = (
-    (
-        re.compile(
-            r'\b(?:prove|show|demonstrate|demostrar|demonstrar|demontrer|montrer|prouver|'
-            r'beweisen|zeig(?:e|en)|dimostrare|dokazi)\b|证明|证实|表明|докажите|доказать',
-            re.IGNORECASE,
-        ),
-        {
-            'en': re.compile(r'\b(?:prove|show|demonstrate|establish|verify)\b', re.IGNORECASE),
-            'zh': re.compile(r'证明|证实|说明|表明'),
-        },
-    ),
-    (
-        re.compile(
-            r'\b(?:find|determine|hallar|encontrar|determinar|trouver|determiner|finden|'
-            r'bestimmen|trovare|determinare|poisci|doloci)\b|求出|求得|找出|确定|'
-            r'найдите|определите',
-            re.IGNORECASE,
-        ),
-        {
-            'en': re.compile(r'\b(?:find|determine|identify|obtain)\b', re.IGNORECASE),
-            'zh': re.compile(r'求(?:出|得)?|找出|确定'),
-        },
-    ),
-    (
-        re.compile(
-            r'\b(?:calculate|compute|evaluate|calcular|calculer|berechnen|calcolare|'
-            r'izracunaj)\b|计算|вычислите',
-            re.IGNORECASE,
-        ),
-        {
-            'en': re.compile(r'\b(?:calculate|compute|evaluate)\b', re.IGNORECASE),
-            'zh': re.compile(r'计算|求(?:出|得)?'),
-        },
-    ),
-    (
-        re.compile(
-            r'\b(?:solve|resolver|resoudre|losen|risolvere|resi)\b|求解|解方程|解不等式|'
-            r'решите',
-            re.IGNORECASE,
-        ),
-        {
-            'en': re.compile(r'\bsolve\b', re.IGNORECASE),
-            'zh': re.compile(r'求解|解(?:出|方程|不等式)'),
-        },
-    ),
-    (
-        re.compile(
-            r'\b(?:construct|construir|construire|konstruieren|costruire|konstruiraj)\b|'
-            r'构造|作出|постройте',
-            re.IGNORECASE,
-        ),
-        {
-            'en': re.compile(r'\b(?:construct|draw)\b', re.IGNORECASE),
-            'zh': re.compile(r'构造|作出'),
-        },
-    ),
-    (
-        re.compile(r'\b(?:classif(?:y|ies)|clasificar|classer|klassifizieren)\b|分类|归类',
-                   re.IGNORECASE),
-        {
-            'en': re.compile(r'\b(?:classif(?:y|ies)|categorize)\b', re.IGNORECASE),
-            'zh': re.compile(r'分类|归类'),
-        },
-    ),
-    (
-        re.compile(r'\b(?:count|contar|compter|zahlen|contare|prestej)\b|计数|数出|сколько',
-                   re.IGNORECASE),
-        {
-            'en': re.compile(r'\b(?:count|how many|number of)\b', re.IGNORECASE),
-            'zh': re.compile(r'计数|数出|多少'),
-        },
-    ),
+_ZH_TASK_ANCHORS = (
+    (re.compile(r'\b(?:prove|show|demonstrate)\b', re.IGNORECASE),
+     re.compile(r'证明|证实|说明|表明')),
+    (re.compile(r'\b(?:find|determine)\b', re.IGNORECASE),
+     re.compile(r'求(?:出|得)?|找出|确定')),
+    (re.compile(r'\b(?:calculate|compute|evaluate)\b', re.IGNORECASE),
+     re.compile(r'计算|求(?:出|得)?')),
+    (re.compile(r'\bsolve\b', re.IGNORECASE), re.compile(r'求解|解(?:出|方程|不等式)')),
+    (re.compile(r'\bconstruct\b', re.IGNORECASE), re.compile(r'构造|作出')),
+    (re.compile(r'\bclassif(?:y|ies)\b', re.IGNORECASE), re.compile(r'分类|归类')),
+    (re.compile(r'\bcount\b', re.IGNORECASE), re.compile(r'计数|数出|多少')),
 )
 _ZH_NAME_ANCHORS = {
     'cauchy': re.compile(r'Cauchy|柯西', re.IGNORECASE),
@@ -294,19 +238,10 @@ _ZH_NAME_ANCHORS = {
     'vieta': re.compile(r'Vieta|韦达', re.IGNORECASE),
     'wilson': re.compile(r'Wilson|威尔逊', re.IGNORECASE),
 }
-_EN_NAME_ANCHORS = {
-    'cauchy': re.compile(r'\bCauchy\b', re.IGNORECASE),
-    'ceva': re.compile(r'\bCeva\b', re.IGNORECASE),
-    'euler': re.compile(r'\bEuler\b', re.IGNORECASE),
-    'fermat': re.compile(r'\bFermat\b', re.IGNORECASE),
-    'fibonacci': re.compile(r'\bFibonacci\b', re.IGNORECASE),
-    'jensen': re.compile(r'\bJensen\b', re.IGNORECASE),
-    'menelaus': re.compile(r'\bMenelaus\b', re.IGNORECASE),
-    'pascal': re.compile(r'\bPascal\b', re.IGNORECASE),
-    'pythagoras': re.compile(r'\bPythagoras|Pythagorean\b', re.IGNORECASE),
-    'schwarz': re.compile(r'\bSchwarz\b', re.IGNORECASE),
-    'vieta': re.compile(r'\bVieta\b', re.IGNORECASE),
-    'wilson': re.compile(r'\bWilson\b', re.IGNORECASE),
+_ENTITY_WORD_RE = re.compile(r"[^\W\d_][^\W_'-]*", re.UNICODE)
+_ENTITY_NAME_STOPWORDS = {
+    'calculate', 'classify', 'compute', 'construct', 'determine', 'find', 'let',
+    'problem', 'prove', 'show', 'solve', 'suppose',
 }
 
 
@@ -346,23 +281,21 @@ def _semantic_sections(value: str) -> list[tuple[str, str, str]]:
 
 def _missing_content_anchors(source: str, translated: str, target_lang: str) -> list[str]:
     """返回保守的缺失内容锚点；没有可靠跨语言映射时不猜。"""
+    if target_lang != 'zh':
+        return []
     missing = []
     source_plain = _plain_prose(source)
     translated_plain = _plain_prose(translated)
-    source_folded = _ascii_fold(source_plain)
-    translated_folded = _ascii_fold(translated_plain)
-    for source_pattern, target_patterns in _TASK_ANCHORS:
-        match = source_pattern.search(source_folded)
-        if match and not target_patterns[target_lang].search(translated_folded):
+    for source_pattern, target_pattern in _ZH_TASK_ANCHORS:
+        match = source_pattern.search(source_plain)
+        if match and not target_pattern.search(translated_plain):
             missing.append(match.group(0).casefold())
     # 只锚定至少两位的十进制数；个位数常是列表编号或被自然改写，误报风险更高。
     for number in sorted(set(re.findall(r'(?<!\w)\d{2,}(?!\w)', source_plain))):
         if number not in translated_plain:
             missing.append(number)
-    target_name_patterns = _ZH_NAME_ANCHORS if target_lang == 'zh' else _EN_NAME_ANCHORS
-    for name, source_pattern in _ZH_NAME_ANCHORS.items():
-        if (source_pattern.search(source_plain)
-                and not target_name_patterns[name].search(translated_plain)):
+    for name, target_pattern in _ZH_NAME_ANCHORS.items():
+        if target_pattern.search(source_plain) and not target_pattern.search(translated_plain):
             missing.append(name)
     # 仅检查明确独立出现的单字母变量，排除英文冠词 a 与代词 I；数学环境中的变量已被剥离。
     variables = set(re.findall(r'(?<![A-Za-z])[b-hj-zB-HJ-Z](?![A-Za-z])', source_plain))
@@ -372,6 +305,61 @@ def _missing_content_anchors(source: str, translated: str, target_lang: str) -> 
     return missing
 
 
+def _content_entities(value: str) -> set[tuple[str, str]]:
+    """抽取散文里的保守实体；受保护数学由逐题保真检查负责，不参与免拦。"""
+    plain = unicodedata.normalize('NFKC', _plain_prose(value))
+    entities = {
+        ('number', match.group(0))
+        for match in re.finditer(r'(?<!\w)\d+(?:[.,]\d+)?(?!\w)', plain)
+    }
+    entities.update(
+        ('variable', match.group(0))
+        for match in re.finditer(r'(?<![A-Za-z])[b-hj-zB-HJ-Z](?![A-Za-z])', plain)
+    )
+    for match in _ENTITY_WORD_RE.finditer(plain):
+        word = match.group(0)
+        folded = word.casefold()
+        if len(word) < 3 or not word[0].isupper() or folded in _ENTITY_NAME_STOPWORDS:
+            continue
+        prefix = plain[:match.start()]
+        sentence_start = not prefix.strip() or re.search(r'[.!?]\s*$', prefix) is not None
+        if sentence_start and folded not in _ZH_NAME_ANCHORS:
+            continue
+        entities.add(('name', folded))
+    return entities
+
+
+def _entity_is_preserved(entity: tuple[str, str], translated: str, target_lang: str) -> bool:
+    kind, value = entity
+    plain = unicodedata.normalize('NFKC', _plain_prose(translated))
+    if kind == 'number':
+        return re.search(rf'(?<!\w){re.escape(value)}(?!\w)', plain) is not None
+    if kind == 'variable':
+        return re.search(rf'(?<![A-Za-z]){re.escape(value)}(?![A-Za-z])', plain) is not None
+    if target_lang == 'zh' and value in _ZH_NAME_ANCHORS:
+        return _ZH_NAME_ANCHORS[value].search(plain) is not None
+    return re.search(rf'(?<!\w){re.escape(value)}(?!\w)', plain, re.IGNORECASE) is not None
+
+
+def _distinctive_entity_retention(
+    entity_sets: list[set[tuple[str, str]]],
+    frequencies: Counter[tuple[str, str]],
+    source_index: int,
+    translated: str,
+    target_lang: str,
+) -> tuple[int, int]:
+    """返回当前条目在簇内特有实体的 ``(保留数, 总数)``。"""
+    distinctive = {
+        entity for entity in entity_sets[source_index]
+        if frequencies[entity] == 1
+    }
+    preserved = sum(
+        _entity_is_preserved(entity, translated, target_lang)
+        for entity in distinctive
+    )
+    return preserved, len(distinctive)
+
+
 def _validate_batch_config(config: BatchConfig) -> None:
     if config.boilerplate_min_group < 2:
         raise ValueError('boilerplate_min_group must be at least 2')
@@ -379,6 +367,12 @@ def _validate_batch_config(config: BatchConfig) -> None:
         raise ValueError('boilerplate_similarity must be in (0, 1]')
     if not 0 <= config.boilerplate_source_similarity_gap <= 1:
         raise ValueError('boilerplate_source_similarity_gap must be in [0, 1]')
+    if not 0 <= config.boilerplate_pair_similarity_tolerance <= 1:
+        raise ValueError('boilerplate_pair_similarity_tolerance must be in [0, 1]')
+    if not 0 <= config.boilerplate_entity_retention <= 1:
+        raise ValueError('boilerplate_entity_retention must be in [0, 1]')
+    if config.boilerplate_min_unique_entities <= 0:
+        raise ValueError('boilerplate_min_unique_entities must be positive')
     if config.boilerplate_min_chars <= 0:
         raise ValueError('boilerplate_min_chars must be positive')
     if not 0 < config.length_ratio_min < config.length_ratio_max:
@@ -725,7 +719,8 @@ def verify_batch(
     translated_by_key = dict(zip(item_keys, translated))
 
     source_sections = [dict(
-        (heading, normalized) for heading, normalized, _plain in _semantic_sections(value)
+        (heading, (normalized, plain))
+        for heading, normalized, plain in _semantic_sections(value)
     ) for value in sources]
     translated_sections = [_semantic_sections(value) for value in translated]
     by_heading: dict[str, list[tuple[int, str, str]]] = {}
@@ -765,7 +760,16 @@ def verify_batch(
             if len(positions) < batch_config.boilerplate_min_group:
                 continue
             item_indexes = [entries[position][0] for position in positions]
-            group_sources = [source_sections[index].get(heading, '') for index in item_indexes]
+            group_source_sections = [
+                source_sections[index].get(heading, ('', ''))
+                for index in item_indexes
+            ]
+            group_sources = [normalized for normalized, _plain in group_source_sections]
+            group_source_plains = [plain for _normalized, plain in group_source_sections]
+            group_entity_sets = [_content_entities(source) for source in group_source_plains]
+            entity_frequencies = Counter(
+                entity for entities in group_entity_sets for entity in entities
+            )
             distinct_sources = set(group_sources) - {''}
             # 相同原文的合法重复翻译不构成退化；至少要看到两种不同源散文。
             if len(distinct_sources) < 2:
@@ -785,35 +789,67 @@ def verify_batch(
             candidates = []
             for group_position, position in enumerate(positions):
                 item_index, normalized, _plain = entries[position]
-                target_similarity = (
-                    1.0 if len(positions) > batch_config.fuzzy_comparison_limit else max(
-                        (SequenceMatcher(None, normalized, peer).ratio()
-                         for peer_index, peer in enumerate(group_texts)
-                         if peer_index != group_position),
-                        default=1.0,
-                    )
-                )
                 source_text = group_sources[group_position]
-                source_similarity = min(
-                    (SequenceMatcher(None, source_text, peer).ratio()
-                     for peer_index, peer in enumerate(group_sources)
-                     if peer_index in exemplar_indexes and peer_index != group_position
-                     and source_text and peer),
-                    default=1.0,
+                peer_scores = [
+                    (
+                        1.0 if len(positions) > batch_config.fuzzy_comparison_limit
+                        else SequenceMatcher(None, normalized, group_texts[peer_index]).ratio(),
+                        SequenceMatcher(None, source_text, group_sources[peer_index]).ratio(),
+                    )
+                    for peer_index in exemplar_indexes
+                    # 完全相同的源文不是独立的“体裁相近”证据；簇内另有不同源文时，
+                    # 应与不同源文成对比较。若整簇源文都相同，上面的 distinct_sources
+                    # 门槛已经让它作为合法重复直接退出。
+                    if (peer_index != group_position and source_text
+                        and group_sources[peer_index]
+                        and group_sources[peer_index] != source_text)
+                ]
+                if not peer_scores:
+                    continue
+                best_target_similarity = max(score[0] for score in peer_scores)
+                comparable_scores = [
+                    score for score in peer_scores
+                    if score[0] >= (
+                        best_target_similarity
+                        - batch_config.boilerplate_pair_similarity_tolerance
+                    )
+                ]
+                target_similarity, source_similarity = max(
+                    comparable_scores,
+                    key=lambda score: (score[1], score[0]),
                 )
                 if (target_similarity - source_similarity
                         < batch_config.boilerplate_source_similarity_gap):
                     continue
-                candidates.append((item_index, target_similarity, source_similarity))
+                preserved, distinctive = _distinctive_entity_retention(
+                    group_entity_sets,
+                    entity_frequencies,
+                    group_position,
+                    entries[position][2],
+                    target_lang,
+                )
+                if (distinctive >= batch_config.boilerplate_min_unique_entities
+                        and preserved / distinctive
+                        >= batch_config.boilerplate_entity_retention):
+                    continue
+                candidates.append((
+                    item_index,
+                    target_similarity,
+                    source_similarity,
+                    preserved,
+                    distinctive,
+                ))
             if len(candidates) < batch_config.boilerplate_min_group:
                 continue
-            for item_index, target_similarity, source_similarity in candidates:
+            for (item_index, target_similarity, source_similarity,
+                 preserved, distinctive) in candidates:
                 signals[item_keys[item_index]].append(BatchSignal(
                     FindingType.BATCH_BOILERPLATE,
                     heading,
                     target_similarity,
                     f'{len(candidates)} 条译文散文高度重合；译文相似度 {target_similarity:.3f}，'
-                    f'最低源文相似度 {source_similarity:.3f}',
+                    f'匹配源文相似度 {source_similarity:.3f}；'
+                    f'特有实体保留 {preserved}/{distinctive}',
                 ))
 
     for key, source, target in zip(item_keys, sources, translated):
