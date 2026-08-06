@@ -1,0 +1,180 @@
+[
+ {
+  "mathnet_id": "0ldh",
+  "est": 4,
+  "conf": "mid",
+  "category": "number-theory",
+  "topics": [
+   "素数与算术基本定理",
+   "数列与递推",
+   "p-adic 赋值与 LTE"
+  ],
+  "contest": "Vietnamese Team Selection Test for IMO",
+  "problem": "For every positive integer $n$, let $x_n = C_{2n}^n$.\n\n1. Show that if $\\frac{2017^k}{2} < n < 2017^k$ for some positive integer $k$ then $x_n$ is a multiple of $2017$.\n\n2. Find all positive integer $h > 1$ such that there exist positive integers $N, T$ such that for all $n > N$ then $(x_n)$ is a periodic sequence mod $h$ with period $T$.",
+  "solution_head": "1) We prove that the statement is true for all odd prime $p$ instead of $2017$. Suppose there exists a positive integer $k$ such that $\\frac{p^k}{2} < n < p^k$. We have\n$$\nv_p(x_n) = v_p(C_{2n}^n) = v_p((2n)!) - 2v_p(n!).\n$$\nBecause $\\frac{p^k}{2} < n < p^k$ so $p^k < 2n < 2p^k < p^{k+1}$, hence\n$$\nv_p((2n)!) = \\left\\lfloor \\frac{2n}{p} \\right\\rfloor + \\left\\lfloor \\frac{2n}{p^2} \\right\\rfloor + \\dots + \\left\\lfloor \\frac{2n}{p^k} \\right\\rfloor.\n$$\nOn the other hand, for every $x \\in \\mathbb{R}$, we have $\\lfloor 2x \\rfloor \\ge 2\\lfloor x \\rfloor$, the equality holds for $\\{x\\} < \\frac{1}{2}$. Combined with the condition $\\frac{p^k}{2} < n < p^k$, we have\n$$\nv_p((2n)!) > 2 \\left( \\left\\lfloor \\frac{n}{p} \\right\\rfloor + \\left\\lfloor \\frac{n}{p^2} \\right\\rfloor + \\dots + \\left\\lfloor \\frac{n}{p^k} \\right\\rfloor \\right) = 2v_p(n!),\n$$\nor $v_p(x_n) > 0$ so we conclude that $x_n$ is divisible by $p$.\n\n2) Suppose $h > 1$ is the number satisfying the problem requirement. For every odd prime number $p$ then $p \\mid h$, we have the remainders sequence $x_n$ modulo $p$ is also periodic. Using"
+ },
+ {
+  "mathnet_id": "0l5u",
+  "est": 3,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "最大公约数与欧几里得算法",
+   "阶与原根",
+   "多项式",
+   "p-adic 赋值与 LTE"
+  ],
+  "contest": "HMMT February",
+  "problem": "Problem:\nCompute the number of ordered pairs $(m, n)$ of odd positive integers both less than $80$ such that\n$$\\gcd (4^{m} + 2^{m} + 1, 4^{n} + 2^{n} + 1) > 1.$$",
+  "solution_head": "Solution:\nFirst, we characterize all ordered pairs of general (not necessarily odd) positive integers $(m, n)$ such that $\\gcd (4^{m} + 2^{m} + 1, 4^{n} + 2^{n} + 1) > 1$. We claim that $(m, n)$ works if and only if either\n- $m$ and $n$ are both even, or\n- $\\nu_{3}(m) = \\nu_{3}(n)$.\n\nProof of necessity. Suppose that $p$ is a prime that divides both $4^{m} + 2^{m} + 1$ and $4^{n} + 2^{n} + 1$. If $p = 3$, $m$ and $n$ must both be even. Henceforth assume that $p \\neq 3$. Let $d$ be the order of $2$ modulo $p$. Then, as $p \\mid 2^{3m} - 1$, we find that $d \\mid 3m$. Furthermore, we cannot have $p \\mid 2^{m} - 1$. Otherwise, by lifting the exponent (and $p \\neq 3$),\n$$\n\\nu_{p}(2^{3m} - 1) = \\nu_{p}(2^{m} - 1) + \\nu_{p}(3) = \\nu_{p}(2^{m} - 1) \\implies \\nu_{p}(4^{m} + 2^{m} + 1) = 0.\n$$\nThe previous two results imply $\\nu_{3}(d) = \\nu_{3}(m) + 1$. Similarly, $\\nu_{3}(d) = \\nu_{3}(n) + 1$, so $\\nu_{3}(m) = \\nu_{3}(n)$.\n\nProof of sufficiency. If $m$ and $n$ are both even, then $3$ divides both $4^{m} + 2^{m} + 1$ and $4^{n} + 2^{n} + 1$. If $\\nu_{3}(m) = \\nu_{3}(n) = k$, then we claim that "
+ },
+ {
+  "mathnet_id": "0gdy",
+  "est": 4,
+  "conf": "mid",
+  "category": "number-theory",
+  "topics": [
+   "素数与算术基本定理",
+   "最大公约数与欧几里得算法",
+   "整除与同余",
+   "计数与容斥",
+   "p-adic 赋值与 LTE"
+  ],
+  "contest": "2020 Taiwan IMO 3J",
+  "problem": "設 $a, b$ 為正整數。若對於所有 $an \\ge b$ 的正整數 $n$, $\\binom{an}{b} - 1$ 都可被 $an + 1$ 整除, 我們就稱 $b$ 為 $a$-好正整數。設 $b$ 是 $a$-好正整數但 $b + 2$ 不是。證明 $b + 1$ 是質數。\n\nLet $a$ be a positive integer. We say that a positive integer $b$ is $a$-good if $\\binom{an}{b} - 1$ is divisible by $an+1$ for all positive integers $n$ with $an \\ge b$. Suppose $b$ is a positive integer such that $b$ is $a$-good, but $b+2$ is not $a$-good. Prove that $b+1$ is prime.",
+  "solution_head": "We first show that $b$ is $a$-good iff $b$ is even and $p \\mid a$ for all primes $p \\le b$. Suppose there is a prime $p \\le b$ with $p \\nmid a$, take $t = v_p(b!)$. Then there exist positive integers $c$ such that $ac \\equiv 1 \\pmod{p^{t+1}}$. Take large enough $c$ (so that $an \\ge b$) and let $n = (p-1)c$, then $an \\equiv p-1 \\pmod{p^{t+1}}$. Let $X = an(an-1)(an-2)\\cdots(an-b+1)$. Since $p \\le b$, $(an - (p-1))$ divides $X$, so $v_p(X) \\ge t+1$, hence $v_p\\left(\\binom{an}{b}\\right) = v_p(X) - v_p(b!) \\ge 1$. Since $p \\mid an+1$, $an+1$ does not divide $\\binom{an}{b}-1$, thus $b$ is not $a$-good.\nOn the other hand, if $p \\mid a$ for all prime $p \\le b$, then $b!$ is coprime to $an+1$. $an+1$ divides $\\binom{an}{b}-1 = \\frac{X}{b!}-1$ iff $X \\equiv b! \\pmod{an+1}$. Easy to check that $X \\equiv (-1)^b b! \\pmod{an+1}$. Thus we know that $b$ is $a$-good iff $b$ is even.\nThis completes the claim.\n\nBack to the problem, suppose $b$ is $a$-good, then $b$ is even and $p \\mid a$ for all primes $p \\le b$. Since $b+2$ is not $a$-good, we must have $b+1$ is prime.\n\n---\n\nFirst, we show the only i"
+ },
+ {
+  "mathnet_id": "03ft",
+  "est": 3,
+  "conf": "mid",
+  "category": "number-theory",
+  "topics": [
+   "阶与原根",
+   "素数与算术基本定理",
+   "p-adic 赋值与 LTE"
+  ],
+  "contest": "Bulgarian National Olympiad - Final Round",
+  "problem": "Is it true that for any positive integer $n > 1$, there exists an infinite arithmetic progression $M_n$ of positive integers, such that for any $m \\in M_n$, the number $n^m - 1$ is not a perfect power (a positive integer is a perfect power if it is of the form $a^b$ for positive integers $a, b > 1$)?",
+  "solution_head": "(Victor Kostadinov) The answer is yes. Fix a positive integer $n$ and two large distinct primes $p, q > n$. Let $d_p = \\text{ord}_p(n)$, $d_q = \\text{ord}_q(n)$, $c_p = \\nu_p(n^{d_p} - 1)$, $c_q = \\nu_q(n^{d_q} - 1)$ and let $c = \\nu_p(d_q)$, $d = \\nu_q(d_p)$. Pick two sufficiently large constants $a, b$, and let $M := d_p d_q p^{(a-1)c_p + bc_q - c} q^{ac_p + (b-1)c_q + 1 - d}$ and finally choose $M_n$ to consist of $m = M(1 + iM)$ for $i = 1, 2, \\dots$.\n\nBy LTE, we have\n$$\n\\nu_p(n^m - 1) = \\nu_p(n^{d_p} - 1) + \\nu_p\\left(\\frac{m}{d_p}\\right) = c_p + c + (a-1)c_p + bc_q - c = ac_p + bc_q\n$$\n(we used that $\\text{gcd}(1 + iM, p) = 1$) and similarly $\\nu_q(n^m - 1) = ac_p + bc_q + 1$, which are consecutive, i.e. they can't have a common divisor greater than 1 and thus $n^m - 1$ can't be a perfect power. $\\square$"
+ },
+ {
+  "mathnet_id": "00ur",
+  "est": 3,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "素数与算术基本定理",
+   "二次剩余与平方数判别",
+   "p-adic 赋值与 LTE"
+  ],
+  "contest": "BMO 2023 Short List",
+  "problem": "For positive integers $a, b, c$ (not necessarily distinct), suppose that $a + bc$, $b + ca$, and $c + ab$ are all perfect squares. Prove that\n$$\na^2(b + c) + b^2(c + a) + c^2(a + b) + 2abc\n$$\ncan be written as the sum of two square numbers.",
+  "solution_head": "We denote $x^2 = a + bc$, $y^2 = b + ca$, $z^2 = c + ab$. We make use of the following well-known lemma:\n\n*Lemma.* A positive integer $n$ can be written as the sum of two squares if and only if for all primes $p \\equiv 3 \\pmod{4}$, $v_p(n)$ is even.\n\nNote that we can write the target expression as:\n$$\nS = a^2(b+c) + b^2(c+a) + c^2(a+b) + 2abc = (a+b)(b+c)(c+a)\n$$\nBy the Lemma, it is sufficient to prove $v_p(S)$ is even for all primes $p \\equiv 3 \\pmod{4}$. We claim the stronger statement that $v_p(a+b)$ is even (and cyclic variations) for all such primes.\n\nLet $p \\equiv 3 \\pmod{4}$ be prime with $v_p(a+b) > 0$. Then observe:\n$$\nx^2 + y^2 = (a+b)(c+1) \\equiv 0 \\pmod{p}\n$$\nAs $p \\equiv 3 \\pmod{4}$, $\\binom{-1}{p} = -1$, this means $p \\mid x, y$. We claim that $c \\not\\equiv -1 \\pmod{p}$. Indeed, if $c \\equiv -1 \\pmod{p}$ then by the above:\n$$\n0 \\equiv x^2 = a + bc \\equiv a - b \\pmod{p}\n$$\nAs $p \\mid a+b$, this means $p \\mid 2a$ and hence $p \\mid a$ (as $p \\neq 2$). But then we would have:\n$$\nz^2 = c + ab \\equiv c \\equiv -1 \\pmod{p}\n$$\nwhich cannot happen as $\\binom{-1}{p} = -1$. Thus $p"
+ },
+ {
+  "mathnet_id": "06yo",
+  "est": 3,
+  "conf": "mid",
+  "category": "number-theory",
+  "topics": [
+   "函数方程",
+   "素数与算术基本定理",
+   "最大公约数与欧几里得算法",
+   "p-adic 赋值与 LTE"
+  ],
+  "contest": "IMO2024 Shortlisted Problems",
+  "problem": "Let $\\mathbb{Z}_{>0}$ denote the set of positive integers. Let $f: \\mathbb{Z}_{>0} \\rightarrow \\mathbb{Z}_{>0}$ be a function satisfying the following property: for $m, n \\in \\mathbb{Z}_{>0}$, the equation\n$$\nf(m n)^2 = f\\left(m^2\\right) f(f(n)) f(m f(n))\n$$\nholds if and only if $m$ and $n$ are coprime.\nFor each positive integer $n$, determine all the possible values of $f(n)$.",
+  "solution_head": "- From $P(1,1)$, we have $f(1)^2 = f(1) f(f(1))^2$, so $f(1) = f(f(1))^2$.\n- From $P(1, f(1))$, we have $f(f(1))^2 = f(1) f(f(f(1))) f(f(f(1)))$, so $f(f(f(1))) = 1$.\n- From $P(1, f(f(1)))$, we have $f(f(f(1)))^2 = f(1) f(f(f(f(1)))) f(f(f(f(1))))$, which simplifies to $1 = f(1)^3$, so $f(1) = 1$.\n- From $P(1, n)$ we deduce $f(n) = f(f(n))$ for all $n$.\n- From $P(m, 1)$ we deduce $f(m) = f\\left(m^2\\right)$ for all $m$.\n- Simplifying $P(m, n)$, we have that\n$$\nf(m n)^2 = f(m) f(n) f(m f(n))\n$$\nif and only if $m$ and $n$ are coprime; refer to this as $Q(m, n)$.\n- From $Q(m, f(n))$, we have that $f(m f(n)) = f(m) f(n)$ if and only if $m$ and $f(n)$ are coprime; refer to this as $R(m, n)$.\n\nClaim. If $f(a) = 1$, then $a = 1$.\nProof. If $a \\neq 1$, then $Q(a, a)$ gives $f(a)^2 \\neq f(a)^2 f(a f(a))$. If $f(a) = 1$, then both sides simplify to 1, a contradiction.\n\nClaim. If $n \\neq 1$ then $\\operatorname{gcd}(n, f(n)) \\neq 1$.\nProof. If $\\operatorname{gcd}(n, f(n)) = 1$, then $Q(f(n), n)$ gives $f(n f(n))^2 = f(n)^3$, and $Q(n, f(n))$ gives $f(n f(n))^2 = f(n)^2 f(n f(n))$, which together "
+ },
+ {
+  "mathnet_id": "06um",
+  "est": 4,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "阶与原根",
+   "费马小定理与欧拉定理",
+   "素数与算术基本定理",
+   "p-adic 赋值与 LTE"
+  ],
+  "contest": "International Mathematical Olympiad",
+  "problem": "Call a rational number short if it has finitely many digits in its decimal expansion. For a positive integer $m$, we say that a positive integer $t$ is $m$-tastic if there exists a number $c \\in \\{1,2,3, \\ldots, 2017\\}$ such that $\\frac{10^{t}-1}{c \\cdot m}$ is short, and such that $\\frac{10^{k}-1}{c \\cdot m}$ is not short for any $1 \\leqslant k<t$. Let $S(m)$ be the set of $m$-tastic numbers. Consider $S(m)$ for $m=1,2, \\ldots$. What is the maximum number of elements in $S(m)$ ?",
+  "solution_head": "If $m=2^{a} \\cdot 5^{b} \\cdot s$, with $\\operatorname{gcd}(s, 10)=1$, then $\\frac{10^{t}-1}{m}$ is short if and only if $s$ divides $10^{t}-1$. So we may (and will) suppose without loss of generality that $\\operatorname{gcd}(m, 10)=1$. Define\n$$\nC=\\{1 \\leqslant c \\leqslant 2017: \\operatorname{gcd}(c, 10)=1\\} .\n$$\nThe $m$-tastic numbers are then precisely the smallest exponents $t>0$ such that $10^{t} \\equiv 1 \\pmod{c m}$ for some integer $c \\in C$, that is, the set of orders of $10$ modulo $c m$. In other words,\n$$\nS(m)=\\left\\{\\operatorname{ord}_{c m}(10): c \\in C\\right\\} .\n$$\nSince there are $4 \\cdot 201+3=807$ numbers $c$ with $1 \\leqslant c \\leqslant 2017$ and $\\operatorname{gcd}(c, 10)=1$, namely those such that $c \\equiv 1,3,7,9 \\pmod{10}$,\n$$\n|S(m)| \\leqslant |C|=807 .\n$$\nNow we find $m$ such that $|S(m)|=807$. Let\n$$\nP=\\{1<p \\leqslant 2017: p \\text{ is prime, } p \\neq 2,5\\}\n$$\nand choose a positive integer $\\alpha$ such that every $p \\in P$ divides $10^{\\alpha}-1$ (e.g. $\\alpha=\\varphi(T)$, $T$ being the product of all primes in $P$), and let $m=10^{\\alpha}-1$.\n\nClaim. For eve"
+ },
+ {
+  "mathnet_id": "09g3",
+  "est": 4,
+  "conf": "mid",
+  "category": "number-theory",
+  "topics": [
+   "最大公约数与欧几里得算法",
+   "素数与算术基本定理",
+   "整除与同余",
+   "p-adic 赋值与 LTE"
+  ],
+  "contest": "2015 Mongolian IMO Team Selection Tests",
+  "problem": "Let $a$ and $b$ be relatively prime positive integers such that $(a, b) \\ne (2, 1)$. Show that\n$$\n\\text{rad}(a^n + b^n) \\ne \\text{rad}(a^m + b^m),\n$$\nfor any distinct positive integers $m$ and $n$. Here $\\text{rad}(c)$ denotes the distinct primes dividing the integer $c$.",
+  "solution_head": "Assume that there is a quadruple $(a, b, n, m)$ such that\n$$\n\\mathrm{rad}(a^n + b^n) = \\mathrm{rad}(a^m + b^m).\n$$\nLet $d$ be the greatest common divisor of $a^n + b^n$ and $a^m + b^m$. We claim that\n$$\nd = \\begin{cases} a^{(n,m)} + b^{(n,m)}, & v_2(n) = v_2(m) \\\\ (a+b, 2), & v_2(n) \\neq v_2(m) \\end{cases}\n$$\nwhere $v_2(n)$ denotes the exponent of $2$ in the decomposition of $n$. We set\n$$\nk = \\frac{mn}{\\min\\{v_2(n), v_2(m)\\}}.\n$$\nSince $a^n \\equiv -b^n \\pmod d$ and $a^m \\equiv -b^m \\pmod d$, we get $a^k \\equiv b^k \\equiv -b^k \\pmod d$ if $v_2(n) \\neq v_2(m)$. Thus $d = (a+b, 2)$, since $a^2 \\equiv 0, 1 \\pmod 4$. If $v_2(n) = v_2(m)$ then we may assume that\n$n, m$ are odd and $(n, m) = 1$, i.e., $nu + mv = 1$ for some positive integers $u, v$. Hence the claim follows from $a \\equiv a^{nu+mv} \\equiv ((-b)^n)^u ((-b)^m)^v \\equiv -b \\pmod d$.\n\nSince $\\text{rad}(a^n + b^n) = \\text{rad}(d)$, it suffices to consider the case that $v_2(n) = v_2(m)$. In this case, without loss of generality, we may assume that $n$ is odd and $m = 1$. Then we can easily get a contradiction from the following "
+ },
+ {
+  "mathnet_id": "01ha",
+  "est": 3,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "中国剩余定理",
+   "素数与算术基本定理",
+   "数列与递推",
+   "p-adic 赋值与 LTE"
+  ],
+  "contest": "Baltic Way 2020",
+  "problem": "For a prime number $p$ and a positive integer $n$, denote by $f(p, n)$ the largest integer $k$ such that $p^k \\mid n!$. Let $p$ be a given prime number and let $m$ and $c$ be given positive integers. Prove that there exists infinitely many positive integers $n$ such that $f(p, n) - c$ is divisible by $m$.",
+  "solution_head": "We denote $v_p(n)$ for the largest power of $p$ dividing $n$.\nWe start with a lemma.\n**Lemma.** For any prime $q$ and modulus $m'$ not divisible by $q$, there exists infinitely many powers $q^n$ of $q$ such that $v_p(q^n!) \\equiv 1 \\pmod{m'}$.\n*Proof.* Define $a_k = v_q(q^k!)$. We then have $a_{k+1} = q a_k + 1$. This sequence is eventually periodic modulo $m'$. It must actually be periodic starting from $0$, as $a_i \\equiv a_{i+T} \\pmod{m'}$ implies $q a_{i-1} \\equiv q a_{i+T-1} \\pmod{m'}$ and therefore $a_{i-1} \\equiv a_{i+T-1} \\pmod{m'}$, since $q \\nmid m'$. Thus, for infinitely many $n$ we have $a_n \\equiv a_1 = 1 \\pmod{m'}$.\n\nWe now turn to solving the problem. Write $m = p^t m'$, where $p \\nmid m'$. The sequence $v_p(p!), v_p(p^2!), v_p(p^3!), \\dots$ is eventually constant modulo $p^t$. Denote this constant by $C$. Since $p \\nmid C$, by the Chinese remainder theorem there exists a positive integer $s$ such that $C s \\equiv c \\pmod{p^t}$ and $s \\equiv c \\pmod{m'}$. Now, choose\n$$\nn = p^{b_1} + p^{b_2} + \\dots + p^{b_s},\n$$\nwhere $b_i$ are distinct positive integers such that $v_"
+ },
+ {
+  "mathnet_id": "06bu",
+  "est": 4,
+  "conf": "high",
+  "category": "number-theory",
+  "topics": [
+   "素数与算术基本定理",
+   "费马小定理与欧拉定理",
+   "不定方程",
+   "p-adic 赋值与 LTE"
+  ],
+  "contest": "IMO HK TST",
+  "problem": "Prove that there are infinitely many positive integers $n$ such that $2^n + 1$ is divisible by $n$. Find all such $n$'s that are prime numbers.",
+  "solution_head": "All integers $n = 3^k$ with $k \\in \\mathbb{Z}^+$ satisfy $n \\mid 2^n + 1$. Indeed, since $3 \\mid 2 + 1$, by the lifting the exponent lemma, we have\n$$\nv_3(2^{3^k} + 1^{3^k}) = v_3(2 + 1) + v_3(3^k) = 1 + k.\n$$\nThis implies $3^{k+1} \\mid 2^n + 1$, and hence $n \\mid 2^n + 1$.\n\nThe only prime number $n$ satisfying $n \\mid 2^n + 1$ is $n = 3$. Indeed, let $n = p$ be a prime. By the Fermat little theorem, we have\n$$\n2^p + 1 \\equiv 2 + 1 = 3 \\pmod{p}.\n$$\nThis is congruent to $0$ modulo $p$ if and only if $p \\mid 3$, i.e. $p = 3$."
+ },
+ {
+  "mathnet_id": "0462",
+  "est": 4,
+  "conf": "mid",
+  "category": "number-theory",
+  "topics": [
+   "中国剩余定理",
+   "素数与算术基本定理",
+   "p-adic 赋值与 LTE"
+  ],
+  "contest": "2023 Chinese IMO National Team Selection Test",
+  "problem": "Given an integer $n > 1$ and an integer $a$ that is coprime with $n$. There is a country consisting of $n$ islands $D_1, D_2, \\dots, D_n$. For any two different islands $D_i$ and $D_j$, there is a one-way ferry from $D_i$ to $D_j$ if and only if $ij \\equiv ia \\pmod{n}$. A tourist hopes to visit as many islands as possible. He can first fly to any island he chooses to start the tour, and afterwards can only use the one-way ferry to tour freely between islands in this country. Find the maximum possible number of different islands that the tourist can visit.",
+  "solution_head": "Let $x(n) = \\sum_{v_p(n) \\ge 2} 1$ and $y(n) = \\sum_{v_p(n)=1} 1$. Let the maximum number of islands that can be visited be denoted as $k(n)$. Then we have:\n$$\nk(n) = \\begin{cases} 3x(n) + 2y(n) + 1, & v_2(n) \\neq 1, \\\\ 3x(n) + 2y(n), & v_2(n) = 1. \\end{cases}\n$$\nFor $x, y \\in \\mathbb{Z}$ and $m \\in \\mathbb{Z}_{>0}$, if $xy \\equiv xa \\pmod{m}$, we denote this as $x \\to y \\pmod{m}$. Let $p$ be a prime factor of $n$ and $p^\\alpha \\nmid n$. For a sequence $x_1 \\to x_2 \\to \\dots \\to x_k \\pmod{n}$, the same relation holds modulo $p^\\alpha$:\n$$\nx_1 \\to x_2 \\to \\dots \\to x_k \\pmod{p^\\alpha}.\n$$\n(1) If $x_i \\neq 0 \\pmod{p^\\alpha}$, then $x_{i+1}$ is coprime to $p$. This is because $p^\\alpha \\mid x_i(x_{i+1} - a)$, and $p^\\alpha \\nmid x_i$. Therefore, $p \\mid x_{i+1} - a$. Since $a$ is coprime to $n$, we have $p \\nmid a$, which implies $p \\nmid x_{i+1}$.\n(2) If $x_i$ is coprime to $p$, then $x_{i+1} \\equiv a \\pmod{p^\\alpha}$. This is because $p^\\alpha \\mid x_i(x_{i+1} - a)$, and since $p \\nmid x_i$, we have $p^\\alpha \\mid x_{i+1} - a$.\n(3) From (1) and (2), we can conclude that if $\\alpha \\ge"
+ },
+ {
+  "mathnet_id": "078l",
+  "est": 4,
+  "conf": "mid",
+  "category": "number-theory",
+  "topics": [
+   "费马小定理与欧拉定理",
+   "阶与原根",
+   "最大公约数与欧几里得算法",
+   "数论函数与阶乘估计",
+   "p-adic 赋值与 LTE"
+  ],
+  "contest": "IMO TST",
+  "problem": "* $a^{2n} - a$ is divisible by $n$,\n* $\\sum_{k=1}^{n} k^{2024} a^{2k}$ is not divisible by $n$.\nProve that $n$ has a prime factor *smaller* than $2024$.",
+  "solution_head": "Let $n$ be a positive integer. Call a positive integer $a$ *good* for $n$ if $n \\mid a^{2n} - a$.\nDefine $d_n(a) = d$ to be the smallest positive integer such that $n \\mid a^{2d} - a$. Then $a^{2d+k} \\equiv a^{2k} \\pmod{n}$ holds for $k \\ge 0 \\implies a^{2i} \\pmod{n}$ is periodic with period $d$. The minimality of $d$ implies that it is in fact the smallest period. Therefore $d \\mid n$. So $d \\mid n \\mid a^{2d} - a \\implies a$ is *good* for $d$ as well.\nAssume $n > 1$. If $\\gcd(a, n) > 1$, then the sequence $a^{2i} \\pmod{n}$ for $i = 1, 2, \\dots, n$ does not contain any residues relatively prime to $n$. Else the sequence doesn't contain the residue $0$. In any case the sequence cannot contain all distinct elements, so $d_n(a) < n$.\n\n**Lemma A1.** If $a$ is *good* for $n$, then the numbers $a^{2i} + i$ for $i = 1, \\dots, n$ form a complete residue system modulo $n$.\n*Proof.* We will prove this by induction on $n$. Base case $n = 1$ is true since there's only one number. Consider $n > 1$ for the induction step. Assume for the sake of contradiction that there exist distinct $i, j \\le n$"
+ }
+]
