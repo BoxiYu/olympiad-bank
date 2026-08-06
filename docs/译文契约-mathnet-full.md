@@ -68,13 +68,20 @@ by-topic/<板块>/<知识点>/<id>/
 
 `mode` 只有三种：
 
-- `passthrough`：原文就是目标语言。目标文件逐字复制 `index.md`，`model` 必须为 `null`；
+- `passthrough`：**唯一准入阈值**是 `source_lang == "en"`、
+  `source_lang_confidence == "high"` 且目标语言为 `en`。目标文件逐字复制 `index.md`，
+  `model` 必须为 `null`；
 - `translated`：由 `model` 指定的模型生成，必须有完整单元译文；
 - `failed`：本次生成失败，不写目标 Markdown。该 variant 记录 `model`、`generated_at`、`error`，
   不记录 `sha256`。
 
-`source_lang` 与 `source_lang_confidence` 在本阶段由外部映射传入或分别使用 `und`、`unknown`
-占位；源语言检测由后续模块提供，不在本契约骨架中猜测。
+任何其他组合，包括 `en/medium`、`en/low`、`und`、`en-US/high` 和所有非英文源语言，均不得写
+`mode=passthrough`，必须走翻译。代码判定的唯一入口是
+`scripts/source_lang.py::should_passthrough`；export、批量 run、apply 与契约 checks 只能复用该入口
+或消费它在 export 中生成的 `target_modes`，不得各自复制或放宽比较条件。
+
+`source_lang` 与 `source_lang_confidence` 由 `scripts/source_lang.py::detect_source_lang` 产生；批次
+也可通过外部映射传入既有检测结果。缺少检测结果时分别使用 `und`、`unknown` 占位，因此必定翻译。
 
 ## 4. export JSONL
 
@@ -101,7 +108,8 @@ uv run python scripts/mathnet_translate.py export \
       "translatable": true
     }
   ],
-  "targets": ["en", "zh"]
+  "targets": ["en", "zh"],
+  "target_modes": {"en": "translated", "zh": "translated"}
 }
 ```
 
@@ -112,6 +120,10 @@ uv run python scripts/mathnet_translate.py export \
 - variant 不存在或为 `failed`；
 - 目标 Markdown 不存在；
 - 目标 Markdown 的 SHA-256 与 variant 不符。
+
+`target_modes` 与 `targets` 键集合完全相同，由共享 passthrough 判定入口逐项生成。批量 `run` 必须
+直接消费该字段：只有值为 `passthrough` 时可逐字复制原文，其余值一律调用翻译，不得仅凭
+`source_lang == "en"` 自行判定。
 
 `--limit N` 限制题数，`--only ID` 可重复指定小批 id。`--source-lang-map FILE` 接受
 `{"id":"en"}`，也接受带 `source_lang`、`source_lang_confidence` 的对象值，给后续语言检测模块留接口。
@@ -157,10 +169,10 @@ apply 的写入纪律：
 
 - 先重算并核对 `source_sha256`，过期批次拒绝写回；
 - 先在内存中验证该题所有 variant、全部单元和占位，任一单元缺失时题目目录零写入；
-- `passthrough` 只允许目标语言等于源语言，且直接复制原文字节，不接收模型输出；
+- `passthrough` 只允许 `en/high` 原文直通到 `en`，且直接复制原文字节，不接收模型输出；
 - 每个文件均在目标同目录写临时文件、flush、fsync，再以 rename 原子替换；内容不变时不写；
 - 重复执行同一输入得到逐字相同的 Markdown 与 JSON；
 - 失败逐行写入 `<输入>.failures.jsonl`（可用 `--failures` 改路径），有失败时退出码为 1。
 
-本阶段不执行源语言检测、译文语义保真校验、`index.jsonl` 扩字段或并发模型调用；这些模块只消费或
-补充上述 JSONL，不得绕过原文哈希、完整单元与不可译占位三道校验。
+译文语义保真校验、`index.jsonl` 扩字段与并发模型调用由各自模块实现；它们只消费或补充上述
+JSONL，不得绕过 passthrough 阈值、原文哈希、完整单元与不可译占位四道校验。

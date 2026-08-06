@@ -98,6 +98,27 @@ def test_changed_passthrough_is_caught_even_with_matching_variant_hash(tmp_path)
     assert any('passthrough 内容与原文不一致' in error for error in result.errors)
 
 
+@pytest.mark.parametrize(
+    ("source_lang", "confidence", "lang"),
+    [("en", "medium", "en"), ("en", "low", "en"), ("it", "high", "en"),
+     ("und", "low", "en"), ("en", "high", "zh")],
+)
+def test_passthrough_below_en_high_is_a_contract_error(
+    tmp_path, source_lang, confidence, lang
+):
+    corpus = os.path.join(tmp_path, 'mathnet-full')
+    variants = {lang: {'mode': 'passthrough', 'sha256': _sha(SOURCE)}}
+    problem, contract, payload = make_problem(
+        corpus, en=SOURCE, zh=SOURCE, variants=variants
+    )
+    payload['source_lang'] = source_lang
+    payload['source_lang_confidence'] = confidence
+    _write_json(contract, payload)
+
+    result = tc.check_corpus(str(tmp_path), sample=10)
+    assert any('passthrough 阈值非法' in error for error in result.errors)
+
+
 def test_missing_variant_file_is_caught(tmp_path):
     corpus = os.path.join(tmp_path, 'mathnet-full')
     make_problem(corpus, zh=False, variants={

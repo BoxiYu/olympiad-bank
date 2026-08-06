@@ -22,6 +22,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from source_lang import should_passthrough
+
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CORPUS = ROOT / "mathnet-full"
 TARGET_LANGS = ("en", "zh")
@@ -336,6 +338,11 @@ def export_records(args: argparse.Namespace) -> int:
             "source_lang_confidence": confidence,
             "units": export_units(parse_document(text, relative)),
             "targets": targets,
+            "target_modes": {
+                target: "passthrough" if should_passthrough(lang, confidence, target)
+                else "translated"
+                for target in targets
+            },
         })
         if args.limit is not None and len(rows) >= args.limit:
             break
@@ -346,10 +353,6 @@ def export_records(args: argparse.Namespace) -> int:
     atomic_write(Path(args.out), payload)
     print(f"export: {len(rows)} 题 -> {args.out}")
     return 0
-
-
-def primary_language(value: str) -> str:
-    return value.lower().replace("_", "-").split("-", 1)[0]
 
 
 def validate_generated_at(value: Any, context: str) -> str:
@@ -389,8 +392,8 @@ def kept_variants(question_dir: Path, state: dict[str, Any] | None, mathnet_id: 
     }
 
 
-def prepare_variant(lang: str, payload: Any, source_lang: str, source_bytes: bytes,
-                    document: Document) -> tuple[bytes | None, dict[str, Any]]:
+def prepare_variant(lang: str, payload: Any, source_lang: str, confidence: str,
+                    source_bytes: bytes, document: Document) -> tuple[bytes | None, dict[str, Any]]:
     context = f"variants.{lang}"
     if lang not in TARGET_LANGS or not isinstance(payload, dict):
         raise TranslateError(f"{context}: 目标语言或记录格式非法")
@@ -411,8 +414,11 @@ def prepare_variant(lang: str, payload: Any, source_lang: str, source_bytes: byt
         }
 
     if mode == "passthrough":
-        if primary_language(source_lang) != lang:
-            raise TranslateError(f"{context}: source_lang={source_lang} 不能 passthrough 为 {lang}")
+        if not should_passthrough(source_lang, confidence, lang):
+            raise TranslateError(
+                f"{context}: 仅 source_lang=en 且 source_lang_confidence=high "
+                "可 passthrough 为 en"
+            )
         if payload.get("model") not in {None, ""}:
             raise TranslateError(f"{context}: passthrough 不得记录模型")
         target_bytes = source_bytes
@@ -469,7 +475,9 @@ def apply_record(root: Path, record: dict[str, Any]) -> None:
     prepared: dict[str, bytes | None] = {}
     metadata_updates: dict[str, Any] = {}
     for lang, payload in variants.items():
-        target_bytes, metadata = prepare_variant(lang, payload, source_lang, source_bytes, document)
+        target_bytes, metadata = prepare_variant(
+            lang, payload, source_lang, confidence, source_bytes, document
+        )
         prepared[lang] = target_bytes
         metadata_updates[lang] = metadata
 

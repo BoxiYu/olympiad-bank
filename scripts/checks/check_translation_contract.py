@@ -15,10 +15,16 @@ import importlib.util
 import json
 import os
 import re
+import sys
 import time
 from dataclasses import dataclass, field
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SCRIPTS_DIR = os.path.join(ROOT, 'scripts')
+if SCRIPTS_DIR not in sys.path:
+    sys.path.insert(0, SCRIPTS_DIR)
+from source_lang import should_passthrough
+
 DEFAULT_SAMPLE = 100
 VALID_MODES = {'passthrough', 'translated', 'failed'}
 VALID_LANGUAGES = {'en', 'zh'}
@@ -184,12 +190,19 @@ def _check_one(contract_path, corpus, verifier):
     variants = payload.get('variants')
     if not isinstance(variants, dict):
         return errors
+    source_lang = payload.get('source_lang')
+    confidence = payload.get('source_lang_confidence')
     for lang, variant in variants.items():
         if lang not in VALID_LANGUAGES or not isinstance(variant, dict):
             continue
         mode = variant.get('mode')
         if mode not in VALID_MODES or mode == 'failed':
             continue
+        if mode == 'passthrough' and not should_passthrough(source_lang, confidence, lang):
+            errors.append(
+                f'{rel}: passthrough 阈值非法：仅 source_lang=en 且 '
+                'source_lang_confidence=high 可 passthrough 为 en'
+            )
         variant_path = os.path.join(problem_dir, f'index.{lang}.md')
         try:
             body = open(variant_path, 'rb').read()

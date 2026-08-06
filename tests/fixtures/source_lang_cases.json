@@ -166,5 +166,53 @@
     "body": "Problem: $x+y=z$ `return x`",
     "meta": {"language": "Spanish"},
     "expected": ["und", "low"]
+  },
+  {
+    "id": "08cz",
+    "body": "Nel villaggio di Asip tutti gli abitanti appartengono ad uno dei due gruppi seguenti: i Cavalieri, che dicono s...",
+    "meta": {},
+    "expected": ["it", "high"]
+  },
+  {
+    "id": "089p",
+    "body": "In una variante del gioco della battaglia navale Anna posiziona una portaerei (che possiamo pensare come rettan...",
+    "meta": {},
+    "expected": ["it", "high"]
+  },
+  {
+    "id": "0ftx",
+    "body": "Beweise für alle die folgende Ungleichung und bestimme alle Fälle, in denen das Gleichheits...",
+    "meta": {},
+    "expected": ["de", "high"]
+  },
+  {
+    "id": "0fuo",
+    "body": "Seien und teilerfremde natürliche Zahlen. Zeige, dass dann auch die beiden Zahlen teilerfre...",
+    "meta": {},
+    "expected": ["de", "high"]
+  },
+  {
+    "id": "0fzq",
+    "body": "Sei eine natürliche Zahl. Was ist die maximale Anzahl Quadrate, die man in einem Quadr...",
+    "meta": {},
+    "expected": ["de", "high"]
+  },
+  {
+    "id": "0g1c",
+    "body": "Das Hauptgebäude der ETH Zürich ist ein in Einheitsquadrate unterteiltes Rechteck...",
+    "meta": {},
+    "expected": ["de", "high"]
+  },
+  {
+    "id": "08d2",
+    "body": "Annalisa, Bruna e Cecilia giocano a calcio: una di loro sta in porta e le altre in campo...",
+    "meta": {},
+    "expected": ["it", "high"]
+  },
+  {
+    "id": "026c",
+    "body": "Um trapézio - No trapézio da figura abaixo é paralelo a , e . Quanto mede o ângulo ?",
+    "meta": {},
+    "expected": ["pt", "medium"]
   }
 ]

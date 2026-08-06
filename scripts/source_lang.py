@@ -6,9 +6,9 @@ non-English statement must cost one translation call rather than silently pass
 through untranslated.
 
 Only the Python standard library is used.  The supported Latin-script language
-features reflect the sizeable MathNet groups (English, Spanish, Portuguese,
-French and Slovenian); unmistakable Cyrillic and CJK text is handled before
-Latin-language scoring.
+features reflect the sizeable MathNet groups (English, German, Italian,
+Spanish, Portuguese, French and Slovenian); unmistakable Cyrillic and CJK text
+is handled before Latin-language scoring.
 """
 
 from __future__ import annotations
@@ -71,14 +71,26 @@ _FEATURE_WORDS = {
         "que", "sea", "sean", "si", "tal", "todos", "una", "y",
     },
     "pt": {
-        "cada", "com", "de", "determinar", "demonstrar", "dos", "e", "em", "existe",
-        "inteiros", "numeros", "onde", "os", "para", "por", "positivos", "que", "se",
-        "seja", "sejam", "sao", "tal", "todos", "uma",
+        "ao", "aos", "as", "cada", "com", "da", "das", "de", "determinar", "demonstrar",
+        "do", "dos", "e", "em", "existe", "inteiros", "nas", "no", "numeros", "o", "onde",
+        "os", "para", "por", "positivos", "quanto", "que", "se", "seja", "sejam", "sao",
+        "tal", "todos", "um", "uma",
     },
     "fr": {
         "avec", "dans", "de", "des", "determiner", "entiers", "est", "existe", "les",
         "montrer", "nombres", "ou", "par", "pour", "positifs", "que", "quel", "si", "soit",
         "soient", "tel", "tous", "trouver", "un", "une",
+    },
+    "de": {
+        "alle", "auch", "das", "dass", "denen", "der", "die", "ein", "eine", "einem",
+        "einen", "einer", "es", "folgende", "fur", "in", "ist", "man", "mit", "oder",
+        "sei", "seien", "sind", "so", "und", "was", "wenn", "zeige",
+    },
+    "it": {
+        "a", "ad", "al", "alla", "altre", "che", "come", "con", "da", "dal", "dei",
+        "del", "della", "delle", "di", "e", "gli", "i", "il", "in", "la", "le", "loro",
+        "nei", "nel", "o", "per", "possiamo", "sia", "siano", "sono", "tra", "tutti",
+        "una", "uno",
     },
     "sl": {
         "bo", "cela", "ce", "da", "doloci", "dokazi", "in", "je", "ki", "lahko", "naj",
@@ -90,6 +102,8 @@ _DISTINCTIVE_CHARS = {
     "es": set("ñ¿¡"),
     "pt": set("ãõç"),
     "fr": set("œæëïÿ"),
+    "de": set("äöüß"),
+    "it": set("ìòù"),
     "sl": set("čšž"),
 }
 
@@ -98,6 +112,8 @@ _DISTINCTIVE_PHRASES = {
     "es": ("tal que", "numeros enteros", "números enteros", "para todo"),
     "pt": ("tais que", "tal que", "numeros inteiros", "números inteiros"),
     "fr": ("tels que", "tel que", "nombres entiers", "pour tout"),
+    "de": ("so dass", "in denen", "zeige dass", "fur alle", "für alle"),
+    "it": ("in cui", "tale che", "in modo che", "uno dei", "una delle"),
     "sl": ("tako da", "cela stevila", "cela števila", "naj bo"),
 }
 
@@ -254,4 +270,14 @@ def detect_source_lang(body: str, meta: dict) -> tuple[str, str]:
     return text_lang, "low"
 
 
-__all__ = ["detect_source_lang"]
+def should_passthrough(source_lang: str, confidence: str, target_lang: str) -> bool:
+    """Return whether the translation contract permits ``mode=passthrough``.
+
+    This is deliberately an exact comparison: metadata variants such as
+    ``en-US`` and every confidence below ``high`` must take the translation
+    path.  All producers and validators share this single policy gate.
+    """
+    return source_lang == "en" and confidence == "high" and target_lang == "en"
+
+
+__all__ = ["detect_source_lang", "should_passthrough"]
