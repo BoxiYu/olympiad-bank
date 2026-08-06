@@ -26,6 +26,11 @@ mathnet = ["datasets>=3.0", "pillow>=10"]
 # （候选池全量/子集 build 需读 HF 缓存，再叠加 --group mathnet）
 similar = ["sentence-transformers>=3"]
 
+[tool.pytest.ini_options]
+# 测试只住 tests/：不设此项 pytest 会全仓爬目录找用例，
+# mathnet-full/（mathnet_export.py 的 2.7 万题本地导出）会把收集阶段拖到 20 秒
+testpaths = ["tests"]
+
 [tool.ruff]
 line-length = 110          # 现有脚本的实际书写宽度
 target-version = "py311"
