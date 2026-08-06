@@ -50,8 +50,9 @@ lint 强制题号连号，事后删题就得重排编号——实测这一步会
 
 **4. 批次目录名一经 dispatch 就被 `review_ref` 永久引用，不要事后改名。**
 
-**5. 改映射或召回规则后不重建候选池，会把「规则没跑过」误判成「题源没有」。**
-`taxonomy/mathnet_map.yml` 变更后先执行：
+**5. 改候选池输入规则后不重建，会让查询继续使用旧映射或旧难度估计。**
+`taxonomy/mathnet_map.yml` 的映射/召回规则，或 `taxonomy/contest_tiers.yml` 的赛名难度规则变更后，
+先执行：
 
 ```bash
 uv run --group mathnet python scripts/mathnet_ingest.py

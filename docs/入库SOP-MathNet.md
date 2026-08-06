@@ -33,7 +33,7 @@ uv run --group mathnet python scripts/mathnet_ingest.py              # 全量重
 uv run --group mathnet python scripts/mathnet_ingest.py --selfcheck  # 只校验两张映射表自洽
 ```
 
-候选池有构建时点，映射与召回规则变更后的重建纪律、排查实例见
+候选池有构建时点，映射、召回或赛名难度规则变更后的重建纪律、排查实例见
 `.claude/skills/ingest/SKILL.md`「实测坑」第 5 条；这里不重复执行细节。
 
 筛选浏览走 `bank.py candidates`（默认排除带图题、置信度 ≥mid）：

@@ -182,7 +182,7 @@ source_url: https://huggingface.co/datasets/ShadenA/MathNet
 | 难度星级语义与锚点 | SPEC §4 | `taxonomy/contest_tiers.yml` 头注、`mathnet_review.py` 评审提示 |
 | 学段范围（初中+高中，★1 不入库） | SPEC §4（语义）+ `bank.py` `MIN_DIFFICULTY`（阈值）+ `bank.py apply_grade_floor`（过滤器） | 硬闸：`mathnet_import.py below_floor`（写盘前准入）、`mathnet_review.py batch`、`candidates --gaps`、`bank.py lint`（最终门槛）；`bank.py candidates` 只作默认值（浏览工具允许显式看低档）；`docs/入库SOP-MathNet.md`、`contest_tiers.yml` 头注为引用 |
 | 赛名→难度底档映射 | `taxonomy/contest_tiers.yml` | `mathnet_ingest.py` 估级管线 |
-| 候选池时效与 map 变更后的重建纪律 | `.claude/skills/ingest/SKILL.md`「实测坑」第 5 条 | `docs/入库SOP-MathNet.md` §1、`CLAUDE.md`「gitignore 与重建」 |
+| 候选池时效与输入规则变更后的重建纪律 | `.claude/skills/ingest/SKILL.md`「实测坑」第 5 条 | `docs/入库SOP-MathNet.md` §1、`CLAUDE.md`「gitignore 与重建」 |
 | 送审→入库转化率的排批校准 | `docs/入库SOP-MathNet.md` §2「排批量校准」 | `.claude/skills/ingest/SKILL.md`「实测坑」第 6 条 |
 | 规则估级在低星段的系统性偏差 | `docs/入库SOP-MathNet.md` §2「低星段估级偏差」 | `.claude/skills/ingest/SKILL.md`「实测坑」第 7 条 |
 | 知识点正名与别名 | `taxonomy/registry.yml`（含检索别名） | `bank.py lint` 告警、map/query |
