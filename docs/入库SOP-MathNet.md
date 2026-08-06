@@ -190,3 +190,9 @@ bash scripts/lint.sh
 ```
 
 `scripts/lint.sh` 是 lint 的唯一执行正本（本地与 CI 同一入口），必须输出 `LINT OK` 才算入库完成。
+
+## 8｜落边仪式：登记题-题关系边
+
+每批新题入库后逐题跑 `uv run python scripts/bank.py similar <ID> --top 3`，
+高分对经人工/评审确认关系后用 `--confirm <DST> --relation <关系>` 落账到
+`data/similar/edges.jsonl`（题-题关系边唯一正本，随仓库提交）。

@@ -189,6 +189,12 @@ source_url: https://huggingface.co/datasets/ShadenA/MathNet
 | 知识点前置依赖图（教学建议边） | `taxonomy/prereq.yml`（语义见其头注） | `bank.py doclint`（端点/DAG 校验）、`bank.py map`（指示图前置 chips）、`student_profile.gap_queue`（补齐队列按上游优先） |
 | 攻坚限时/提示冷却/复习间隔/毕业条件 | `spar_session.py` 契约常量（`TIME_LIMIT`/`HINT_COOLDOWN_MIN`/`INTERVALS`/`GRADUATE_STREAK`） | docs/ 两手册为方便两类读者而完整抄录，属刻意例外，由 `bank.py doclint` 数值校验兜底；`bank.py` coach/review、`web_app.py`（数值由服务端下发，前端不复制） |
 | 机器核验凭证（machine_check_ref 与台账保真） | `scripts/checks/run_checks.py` 头注 | `bank.py lint`（凭证覆盖校验）、CI「机器核验」步骤（重跑保真）、SPEC §2（字段语义指针）、`data/verify/` 台账（必须提交） |
+| 缺口周计划名额占比与证据下限 | `bank.py` 契约常量（`GAP_SHARE`/`GAPS_MIN_EVIDENCE`） | `bank.py` coach --from-gaps 执行；docs/教练手册.md（用法指针）；`tests/test_gaps_doctor.py` 锁定 |
+| 缺口台账 maps/gaps.json 契约（键空间与降级语义） | `bank.py` `cmd_gaps`（落盘） | `bank.py` `load_gap_picks`（只读消费，不重算掌握值）；`tests/test_gaps_doctor.py` 锁定 |
+| 生成产物新鲜度判据 | maps/：`bank.py` `doctor`；simindex：`similar_index.py` `freshness_issues` | `bank.py doctor`（汇报计数）、`similar_index.py` `ensure_index_fresh`（查询守卫，拒绝出结果）；`tests/test_gaps_doctor.py` 锁定 |
+| 题-题确认边台账（data/similar/edges.jsonl 唯一正本，必须提交） | `spar_session.py`（`EDGES_PATH`/`RELATIONS`，similar --confirm 落账） | CLAUDE.md「必须提交」节（指针）、docs/入库SOP-MathNet.md §8（落边仪式） |
+| in_bank 入库标记的时点快照口径 | `mathnet_ingest.py` `in_bank_snapshot` | `mathnet_export.py`（导出时点重扫）、mathnet-full README「已知口径」（引用） |
+| 译文产物契约（mathnet-full 三语文件布局与 translation.json 语义） | `docs/译文契约-mathnet-full.md` | `scripts/checks/check_translation_contract.py`（抽检执行，lint/CI 经 `run_checks.py` 调用）、`mathnet_translate.py` 与 `mathnet_export.py`（产出） |
 | 入库铁律 v2 | SPEC §5 | AGENTS.md（路由指针） |
 | 版权边界 | SPEC §6 | AGENTS.md（路由指针） |
 | lint 执行命令 | `scripts/lint.sh` | CI workflow、AGENTS.md |
