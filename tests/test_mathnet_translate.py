@@ -4,8 +4,11 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import signal
 import shutil
+import subprocess
 import sys
+import time
 from pathlib import Path
 import re
 
@@ -96,9 +99,10 @@ def test_export_covers_five_fixture_types_and_protects_content(corpus: Path, tmp
     assert "⚠️" in bad_source and by_id["bad1"]["source_lang"] == "fr"
 
 
-def test_only_and_limit_are_deterministic(corpus: Path, tmp_path: Path):
+def test_only_and_limit_are_deterministic(corpus: Path, tmp_path: Path, capsys):
     rows = export(corpus, tmp_path / "only.jsonl", "--only", "slv1", "--only", "eng1", "--limit", "1")
     assert len(rows) == 1 and rows[0]["mathnet_id"] in {"eng1", "slv1"}
+    assert "--limit 1 已截断" in capsys.readouterr().out
 
 
 def test_passthrough_is_exact_and_reapply_is_noop(corpus: Path, tmp_path: Path):
@@ -254,3 +258,251 @@ def test_apply_never_changes_any_fixture_index(corpus: Path, tmp_path: Path):
         original.rename(path)
         assert mt.main(["apply", "--root", str(corpus), "--in", str(path)]) == 0
     assert {path: digest(path) for path in sources} == before
+
+
+FAKE_COMPANION = r"""import fs from 'node:fs';
+import path from 'node:path';
+
+const args = process.argv.slice(2);
+const cwd = args[args.indexOf('--cwd') + 1];
+const input = JSON.parse(fs.readFileSync(path.join(cwd, 'batch.json'), 'utf8'));
+const events = process.env.FAKE_EVENTS;
+const sleepMs = Number(process.env.FAKE_SLEEP_MS || '100');
+const successSleepMs = Number(process.env.FAKE_SUCCESS_SLEEP_MS || '10');
+const mode = process.env.FAKE_MODE || 'success';
+const failId = process.env.FAKE_FAIL_ID || '';
+const failTarget = process.env.FAKE_FAIL_TARGET || '';
+const shouldFail = input.records.some((record) => record.mathnet_id === failId)
+  && (!failTarget || input.target_lang === failTarget);
+const attemptsPath = path.join(cwd, 'attempts.txt');
+const previous = fs.existsSync(attemptsPath) ? Number(fs.readFileSync(attemptsPath, 'utf8')) : 0;
+fs.writeFileSync(attemptsPath, String(previous + 1));
+if (events) fs.appendFileSync(events, `start ${process.pid} ${Date.now()} ${cwd}\n`);
+const sleep = (milliseconds) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, milliseconds);
+
+if (shouldFail && mode === 'timeout') sleep(sleepMs);
+if (shouldFail && mode === 'invalid') {
+  fs.writeFileSync(path.join(cwd, 'translations.json'), '{ definitely invalid');
+  if (events) fs.appendFileSync(events, `end ${process.pid} ${Date.now()} ${cwd}\n`);
+  process.exit(0);
+}
+if (shouldFail && mode === 'no-output') {
+  if (events) fs.appendFileSync(events, `end ${process.pid} ${Date.now()} ${cwd}\n`);
+  process.exit(0);
+}
+
+const translated = input.records.map((record) => ({
+  mathnet_id: record.mathnet_id,
+  units: Object.fromEntries(record.units.map((unit) => {
+    if (!unit.translatable) return [unit.id, unit.source];
+    const placeholders = unit.source.match(/\{\{MNT_\d{4}\}\}/g) || [];
+    const bad = shouldFail && mode === 'fidelity';
+    const prose = bad
+      ? (input.target_lang === 'zh' ? '作为一个 AI，以下是翻译' : 'As an AI, here is the translation')
+      : (input.target_lang === 'zh' ? '这是经过校验的数学译文' : 'This is a faithful mathematical translation');
+    return [unit.id, `${prose}${placeholders.length ? ' ' + placeholders.join(' ') : ''}`];
+  })),
+}));
+const output = {model: 'fake-codex', translations: translated};
+const temporary = path.join(cwd, `.translations.${process.pid}.tmp`);
+fs.writeFileSync(temporary, JSON.stringify(output));
+fs.renameSync(temporary, path.join(cwd, 'translations.json'));
+sleep(successSleepMs);
+if (events) fs.appendFileSync(events, `end ${process.pid} ${Date.now()} ${cwd}\n`);
+"""
+
+
+def fake_companion(tmp_path: Path) -> Path:
+    path = tmp_path / "fake-companion.mjs"
+    path.write_text(FAKE_COMPANION, encoding="utf-8")
+    return path
+
+
+def run_args(corpus: Path, work: Path, companion: Path, *extra: str) -> list[str]:
+    return [
+        "run", "--root", str(corpus), "--work-dir", str(work),
+        "--companion", str(companion), "--timeout", "2", "--retry-backoff", "0",
+        "--retry-backoff-max", "0", *extra,
+    ]
+
+
+def maximum_fake_concurrency(events: Path) -> int:
+    active = maximum = 0
+    parsed = []
+    for line in events.read_text(encoding="utf-8").splitlines():
+        kind, _pid, timestamp, _cwd = line.split(" ", 3)
+        parsed.append((int(timestamp), 0 if kind == "start" else 1, kind))
+    for _timestamp, _order, kind in sorted(parsed):
+        active += 1 if kind == "start" else -1
+        maximum = max(maximum, active)
+    return maximum
+
+
+def test_run_end_to_end_concurrent_and_resume_skips_completed(
+    corpus: Path, tmp_path: Path, monkeypatch, capsys
+):
+    companion = fake_companion(tmp_path)
+    work = tmp_path / "run"
+    events = tmp_path / "events.log"
+    monkeypatch.setenv("FAKE_EVENTS", str(events))
+    monkeypatch.setenv("FAKE_SUCCESS_SLEEP_MS", "150")
+    sources = list(corpus.rglob("index.md"))
+    before = {path: digest(path) for path in sources}
+    args = run_args(
+        corpus, work, companion,
+        "--only", "eng1", "--only", "slv1", "--only", "mcq1",
+        "--limit", "3", "--batch-size", "1", "--concurrency", "2",
+    )
+
+    assert mt.main(args) == 0
+    output = capsys.readouterr().out
+    assert "passthrough 1 份" in output and "真翻 5 份" in output and "并发 2" in output
+    assert maximum_fake_concurrency(events) == 2
+    first_events = events.read_text(encoding="utf-8")
+    for mathnet_id in ("eng1", "slv1", "mcq1"):
+        directory = next(path.parent for path in sources if path.parent.name == mathnet_id)
+        assert (directory / "index.en.md").is_file()
+        assert (directory / "index.zh.md").is_file()
+        state = json.loads((directory / "translation.json").read_text(encoding="utf-8"))
+        assert set(state["variants"]) == {"en", "zh"}
+    assert {path: digest(path) for path in sources} == before
+    progress = json.loads((work / ".translate-progress.json").read_text(encoding="utf-8"))
+    assert progress["questions"] and progress["batches"]
+
+    assert mt.main(args) == 0
+    resumed = capsys.readouterr().out
+    assert "显式跳过 3 题" in resumed and "没有待处理译文" in resumed
+    assert events.read_text(encoding="utf-8") == first_events
+    assert {path: digest(path) for path in sources} == before
+
+
+@pytest.mark.parametrize(
+    ("mode", "expected"),
+    [("timeout", "超时"), ("invalid", "非法"), ("no-output", "未产出")],
+)
+def test_run_retries_bad_batch_and_continues_other_batches(
+    corpus: Path, tmp_path: Path, monkeypatch, mode: str, expected: str
+):
+    companion = fake_companion(tmp_path)
+    work = tmp_path / f"run-{mode}"
+    monkeypatch.setenv("FAKE_MODE", mode)
+    monkeypatch.setenv("FAKE_FAIL_ID", "bad1")
+    monkeypatch.setenv("FAKE_SLEEP_MS", "250")
+    args = run_args(
+        corpus, work, companion,
+        "--only", "bad1", "--only", "eng1", "--batch-size", "1",
+        "--concurrency", "2", "--retries", "1",
+    )
+    if mode == "timeout":
+        args[args.index("--timeout") + 1] = "0.15"
+
+    assert mt.main(args) == 1
+    eng_dir = next(path.parent for path in corpus.rglob("index.md") if path.parent.name == "eng1")
+    bad_dir = next(path.parent for path in corpus.rglob("index.md") if path.parent.name == "bad1")
+    assert (eng_dir / "index.en.md").is_file() and (eng_dir / "index.zh.md").is_file()
+    assert not (bad_dir / "index.en.md").exists() and not (bad_dir / "index.zh.md").exists()
+    bad_attempts = []
+    for attempt_file in work.glob("batches/*/attempts.txt"):
+        batch = json.loads((attempt_file.parent / "batch.json").read_text(encoding="utf-8"))
+        if batch["records"][0]["mathnet_id"] == "bad1":
+            bad_attempts.append(int(attempt_file.read_text(encoding="utf-8")))
+    assert bad_attempts == [2, 2]
+    ledger = (work / ".translate-failures.jsonl").read_text(encoding="utf-8")
+    assert expected in ledger and '"scope":"batch"' in ledger
+
+
+def test_run_fidelity_failure_is_recorded_without_target_files(
+    corpus: Path, tmp_path: Path, monkeypatch
+):
+    companion = fake_companion(tmp_path)
+    work = tmp_path / "run-fidelity"
+    monkeypatch.setenv("FAKE_MODE", "fidelity")
+    monkeypatch.setenv("FAKE_FAIL_ID", "slv1")
+
+    assert mt.main(run_args(
+        corpus, work, companion, "--only", "slv1", "--batch-size", "1", "--concurrency", "2"
+    )) == 1
+    question = next(path.parent for path in corpus.rglob("index.md") if path.parent.name == "slv1")
+    assert not (question / "index.en.md").exists()
+    assert not (question / "index.zh.md").exists()
+    state = json.loads((question / "translation.json").read_text(encoding="utf-8"))
+    assert state["variants"]["en"]["mode"] == "failed"
+    assert state["variants"]["zh"]["mode"] == "failed"
+    ledger = (work / ".translate-failures.jsonl").read_text(encoding="utf-8")
+    assert "保真校验失败" in ledger
+
+
+def test_run_strict_stops_before_later_good_batch(corpus: Path, tmp_path: Path, monkeypatch):
+    companion = fake_companion(tmp_path)
+    work = tmp_path / "run-strict"
+    monkeypatch.setenv("FAKE_MODE", "invalid")
+    monkeypatch.setenv("FAKE_FAIL_ID", "bad1")
+    monkeypatch.setenv("FAKE_SLEEP_MS", "200")
+
+    assert mt.main(run_args(
+        corpus, work, companion,
+        "--only", "bad1", "--only", "eng1", "--batch-size", "1", "--concurrency", "1",
+        "--retries", "0", "--strict",
+    )) == 1
+    eng_dir = next(path.parent for path in corpus.rglob("index.md") if path.parent.name == "eng1")
+    assert (eng_dir / "index.en.md").is_file()  # passthrough happens before dispatch
+    assert not (eng_dir / "index.zh.md").exists()
+
+
+@pytest.mark.skipif(os.name != "posix", reason="process-group cleanup uses POSIX signals")
+def test_run_sigint_cleans_child_and_atomic_progress(corpus: Path, tmp_path: Path):
+    companion = fake_companion(tmp_path)
+    work = tmp_path / "run-interrupt"
+    events = tmp_path / "interrupt-events.log"
+    environment = os.environ.copy()
+    environment.update({
+        "FAKE_MODE": "timeout",
+        "FAKE_FAIL_ID": "slv1",
+        "FAKE_FAIL_TARGET": "zh",
+        "FAKE_SLEEP_MS": "5000",
+        "FAKE_EVENTS": str(events),
+    })
+    command = [
+        sys.executable, str(Path(mt.__file__)),
+        *run_args(
+            corpus, work, companion,
+            "--only", "slv1", "--batch-size", "1", "--concurrency", "1", "--timeout", "30",
+        ),
+    ]
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=environment)
+    deadline = time.monotonic() + 5
+    while time.monotonic() < deadline:
+        if events.is_file() and sum(
+            line.startswith("start ") for line in events.read_text(encoding="utf-8").splitlines()
+        ) >= 2:
+            break
+        time.sleep(0.02)
+    assert events.is_file(), process.communicate(timeout=2)
+    starts = [line for line in events.read_text(encoding="utf-8").splitlines() if line.startswith("start ")]
+    assert len(starts) >= 2, process.communicate(timeout=2)
+    child_pid = int(starts[-1].split()[1])
+
+    process.send_signal(signal.SIGINT)
+    stdout, stderr = process.communicate(timeout=8)
+    assert process.returncode == 130, (stdout, stderr)
+    with pytest.raises(ProcessLookupError):
+        os.kill(child_pid, 0)
+    json.loads((work / ".translate-progress.json").read_text(encoding="utf-8"))
+    assert not list(work.rglob(".*.tmp"))
+    interrupted = [
+        directory for directory in (work / "batches").iterdir()
+        if json.loads((directory / "batch.json").read_text(encoding="utf-8"))["target_lang"] == "zh"
+    ]
+    assert interrupted and not (interrupted[0] / "translations.json").exists()
+
+    resumed_environment = environment.copy()
+    resumed_environment.update({"FAKE_MODE": "success", "FAKE_FAIL_ID": "", "FAKE_FAIL_TARGET": ""})
+    resumed = subprocess.run(command, capture_output=True, text=True, env=resumed_environment, timeout=8)
+    assert resumed.returncode == 0, (resumed.stdout, resumed.stderr)
+    starts_after_resume = [
+        line for line in events.read_text(encoding="utf-8").splitlines() if line.startswith("start ")
+    ]
+    assert len(starts_after_resume) == 3  # 已完成的 en 批次未重复派单，只补中断的 zh 批次
+    question = next(path.parent for path in corpus.rglob("index.md") if path.parent.name == "slv1")
+    state = json.loads((question / "translation.json").read_text(encoding="utf-8"))
+    assert set(state["variants"]) == {"en", "zh"}
