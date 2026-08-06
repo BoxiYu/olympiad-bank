@@ -17,7 +17,9 @@ check_<batch>.py 契约：模块级 `CHECKS = {'A-005': callable}`，callable() 
 
 用法：
   uv run --with sympy python scripts/checks/run_checks.py                 # CI 模式：重跑 + 比对台账
+  uv run --with sympy python scripts/checks/run_checks.py --sample 100    # 同时抽检至多 100 题译文
   uv run --with sympy python scripts/checks/run_checks.py --write machine-01  # 全 pass 后写/更新台账
+  uv run python scripts/checks/run_checks.py --translations-only --sample 100 # lint：只抽检译文
 """
 import argparse
 import datetime
@@ -26,6 +28,14 @@ import json
 import os
 import re
 import sys
+
+_TRANSLATION_CHECK_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                       'check_translation_contract.py')
+_translation_spec = importlib.util.spec_from_file_location('check_translation_contract',
+                                                            _TRANSLATION_CHECK_PATH)
+translation_check = importlib.util.module_from_spec(_translation_spec)
+sys.modules[_translation_spec.name] = translation_check
+_translation_spec.loader.exec_module(translation_check)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 VERIFY_DIR = 'data/verify'
@@ -146,7 +156,16 @@ def write_mode(root, batch):
 def main():
     ap = argparse.ArgumentParser(description='持续机器核验（语义见模块 docstring）')
     ap.add_argument('--write', metavar='BATCH', help='全 pass 后写台账 data/verify/<BATCH>/results.json')
+    ap.add_argument('--sample', type=translation_check._positive_int,
+                    default=translation_check.DEFAULT_SAMPLE,
+                    help='译文契约最多抽检多少题（会显式报告覆盖；默认 100）')
+    ap.add_argument('--translations-only', action='store_true',
+                    help='只跑译文契约抽检（lint 使用；不加载答案核验及 sympy）')
     args = ap.parse_args()
+    if args.translations_only:
+        result = translation_check.check_corpus(ROOT, sample=args.sample)
+        translation_check.print_result(result)
+        sys.exit(1 if result.status == 'failed' else 0)
     errors = write_mode(ROOT, args.write) if args.write else verify_mode(ROOT)
     if errors:
         print('\n'.join(errors))
@@ -155,6 +174,10 @@ def main():
     if not args.write:
         checks, _ = discover_checks(ROOT)
         print(f'MACHINE CHECK OK: {len(checks)} 个核验全部通过且与台账一致')
+        result = translation_check.check_corpus(ROOT, sample=args.sample)
+        translation_check.print_result(result)
+        if result.status == 'failed':
+            sys.exit(1)
 
 
 if __name__ == '__main__':
