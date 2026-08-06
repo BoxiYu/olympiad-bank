@@ -183,6 +183,39 @@ def test_passthrough_is_exact_and_reapply_is_noop(corpus: Path, tmp_path: Path):
     assert state["variants"]["en"]["sha256"] == before
 
 
+def test_failed_retranslation_removes_obsolete_variant(corpus: Path, tmp_path: Path):
+    row = export(
+        corpus, tmp_path / "before.jsonl", "--only", "slv1",
+        "--source-lang", "sl", "--source-lang-confidence", "high",
+    )[0]
+    source = corpus / row["path"]
+    success = apply_input(tmp_path, row, {"en": translated_variant(row, "en")})
+    assert mt.main(["apply", "--root", str(corpus), "--in", str(success)]) == 0
+    target = source.with_name("index.en.md")
+    assert target.is_file()
+
+    source.write_bytes(source.read_bytes() + b"\n<!-- revised source -->\n")
+    revised_source = source.read_bytes()
+    revised = export(
+        corpus, tmp_path / "after.jsonl", "--only", "slv1",
+        "--source-lang", "sl", "--source-lang-confidence", "high",
+    )[0]
+    failed = apply_input(tmp_path, revised, {"en": {
+        "mode": "failed", "model": "test-model", "generated_at": NOW,
+        "error": "synthetic gate rejection",
+    }})
+
+    assert mt.main(["apply", "--root", str(corpus), "--in", str(failed)]) == 0
+    assert source.read_bytes() == revised_source
+    assert not target.exists()
+    state = json.loads((source.parent / "translation.json").read_text(encoding="utf-8"))
+    assert state["variants"]["en"]["mode"] == "failed"
+    result = search(corpus, "en", "failed")
+    assert result.returncode == 0
+    assert "slv1  " in result.stdout
+    assert "（en 译文校验失败）" in result.stdout
+
+
 def test_apply_immediately_refreshes_all_four_search_coverage_states(
     corpus: Path, tmp_path: Path
 ):

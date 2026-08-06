@@ -709,6 +709,9 @@ def apply_record(root: Path, record: dict[str, Any]) -> None:
         if target_bytes is not None:
             atomic_write(path.parent / f"index.{lang}.md", target_bytes)
     atomic_write(path.parent / "translation.json", json_bytes(state))
+    for lang, target_bytes in prepared.items():
+        if target_bytes is None:
+            (path.parent / f"index.{lang}.md").unlink(missing_ok=True)
     queue_reindex(root, mathnet_id)
 
 

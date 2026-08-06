@@ -164,6 +164,18 @@ def test_failed_coverage_is_not_reported_as_missing(corpus):
     assert '请生成：' not in result.stdout
 
 
+def test_failed_coverage_never_reads_obsolete_variant_file(corpus):
+    obsolete = corpus / 'by-topic/number-theory/整除/0004/index.en.md'
+    obsolete.write_text('# 0004\n\nOBSOLETE_TRANSLATION', encoding='utf-8')
+
+    result = _search(corpus, '--lang', 'en', '--coverage', 'failed')
+
+    assert result.returncode == 0
+    assert result.stdout.count('0004  ') == 1
+    assert '（en 译文校验失败）' in result.stdout
+    assert 'OBSOLETE_TRANSLATION' not in result.stdout
+
+
 def test_missing_coverage_lists_expected_path_and_generation_hint(corpus):
     result = _search(corpus, '--lang', 'en', '--coverage', 'missing')
 
