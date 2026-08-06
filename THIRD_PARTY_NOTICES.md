@@ -31,8 +31,7 @@ authors, contest organizers, and publishers.
 Files under `docs/archive/`, including official contest PDFs and historical
 source material, are excluded from the project software and content licenses.
 They remain subject to the rights of their respective owners and are retained
-for private provenance and verification unless a file-specific notice states
-otherwise.
+for provenance and verification unless a file-specific notice states otherwise.
 
 ## Software dependencies
 
