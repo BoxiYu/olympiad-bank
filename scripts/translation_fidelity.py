@@ -103,6 +103,31 @@ _SYMBOL_WORDS = {
     'bmod', 'cos', 'gcd', 'inf', 'lcm', 'ln', 'log', 'max', 'min', 'mod',
     'pmod', 'sin', 'sqrt', 'sup', 'tan',
 }
+_SHORT_ENGLISH_PROSE_RE = re.compile(
+    r'\b(?:'
+    r'no[ \t]+solutions?'
+    r'|proof[ \t]+(?:is[ \t]+)?omitted'
+    r'|the[ \t]+answers?[ \t]+(?:is|are)'
+    r'|find\b'
+    r'|set\b'
+    r'|verify\b'
+    r'|alternatively[ \t]+use\b'
+    r')',
+    re.IGNORECASE,
+)
+_NON_ENGLISH_FRAGMENT_RE = re.compile(
+    r'\b(?:'
+    # Common concise-answer and instruction words from MathNet's major
+    # Latin-script source languages.  They are checked only when the
+    # conservative document detector returned ``und``.
+    r'aucun|aucune|trouver|demontrer|preuve|reponse|omis|omise|les|des|pour'
+    r'|nessun|nessuna|trovare|dimostrare|soluzione|risposta|omessa'
+    r'|kein|keine|finden|beweis|antwort|losung|losungen'
+    r'|ningun|ninguna|hallar|respuesta|prueba|omitida|soluciones'
+    r'|nenhum|nenhuma|encontrar|resposta|omitida|solucoes'
+    r'|poisci|dokazi|resitev'
+    r')\b'
+)
 _WHOLE_FENCE_RE = re.compile(
     r'\A[ \t]*(```|~~~)[^\n]*\n(?P<body>.*)\n\1[ \t]*\Z',
     re.DOTALL,
@@ -252,6 +277,13 @@ def _same_language_family(source_lang: str | None, target_lang: str) -> bool:
     return family == target_lang
 
 
+def _ascii_fold(value: str) -> str:
+    return ''.join(
+        char for char in unicodedata.normalize('NFKD', value.casefold())
+        if not unicodedata.combining(char)
+    )
+
+
 def _has_prose_outside_target_language(
     section: _Section,
     target_lang: str,
@@ -263,15 +295,14 @@ def _has_prose_outside_target_language(
     已是中文的状态说明写进英文原文（例如证明题的答案占位）；这类文字在中文
     variant 中原样保留是正确的，不能仅因“非空且相同”而告警。
 
-    中文可按 Unicode 文字脚本精确判断；英文使用与派单相同的保守语言检测器，
-    不能把共享拉丁脚本直接视为英文。若派单元数据已经表明源语言与目标语言同族，
-    则 Codex 原样返回表示“核验后无需改动”：仍以 ``translated`` 落盘，因为它
-    确实经过了模型，而 ``passthrough`` 继续只表示派单前的 ``en/high`` 直通。
-    数学、图片与纯符号内容仍由 ``_has_translatable_prose`` 先行排除。
+    中文可按 Unicode 文字脚本精确判断；英文先使用与派单相同的保守语言检测器，
+    再单独识别检测器因篇幅太短而返回 ``und`` 的常见英文答案。文件级
+    ``source_lang=en`` 只在小节完成语言扫描且没有任何外语证据后作为佐证，不能
+    再像整篇提前返回那样覆盖混合语言小节。``translated`` 仍表示内容确实经过
+    模型核验；``passthrough`` 继续只表示派单前的 ``en/high`` 直通。数学、图片与
+    纯符号内容仍由 ``_has_translatable_prose`` 先行排除。
     """
     if not _has_translatable_prose(section):
-        return False
-    if _same_language_family(source_lang, target_lang):
         return False
 
     body = _PROTECTED_RE.sub('', section.body)
@@ -280,8 +311,18 @@ def _has_prose_outside_target_language(
     letters = [ch for ch in body if unicodedata.category(ch).startswith('L')]
     if target_lang == 'zh':
         return any(_HAN_RE.fullmatch(ch) is None for ch in letters)
+    if _NON_ENGLISH_FRAGMENT_RE.search(_ascii_fold(body)):
+        return True
     detected_lang, _confidence = detect_source_lang(body, {})
-    return detected_lang != 'en'
+    if detected_lang == 'en':
+        return False
+    if detected_lang != 'und':
+        return True
+    if _SHORT_ENGLISH_PROSE_RE.search(body):
+        return False
+    if _same_language_family(source_lang, target_lang):
+        return False
+    return True
 
 
 def _content_findings(
@@ -377,6 +418,7 @@ def verify_translation(
 
     ``mode='passthrough'`` 只关闭“正文未翻译”检查；数学、图片、骨架与泄漏检查
     仍然执行。调用方可直接传入 ``translation.json`` 中对应 variant 的 mode。
+    ``source_lang`` 保留在调用契约中，但不能绕过混合语言文档的逐小节证据检查。
     """
     if mode not in {'translated', 'passthrough', 'failed'}:
         raise ValueError(f'unsupported translation mode: {mode}')

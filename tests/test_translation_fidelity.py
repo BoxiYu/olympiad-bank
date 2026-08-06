@@ -212,6 +212,59 @@ def test_source_section_already_in_english_needs_no_translation():
     ) == []
 
 
+@pytest.mark.parametrize('answer', [
+    'No solutions.',
+    'Proof omitted.',
+    'The answer is 42.',
+])
+def test_short_english_answer_needs_no_translation(answer):
+    source = SOURCE.replace('D\n', answer + '\n')
+    translated = VALID_TRANSLATION.replace('D\n', answer + '\n')
+
+    findings = verify_translation(
+        source, translated, target_lang='en', source_lang='fr'
+    )
+
+    assert not any(
+        finding.type == FindingType.UNTRANSLATED and finding.section == '最终答案'
+        for finding in findings
+    )
+
+
+@pytest.mark.parametrize('answer', [
+    'Aucune solution.',
+    'Nessuna soluzione.',
+    'Keine Lösungen.',
+])
+def test_short_foreign_answer_is_not_trusted_as_english(answer):
+    source = SOURCE.replace('D\n', answer + '\n')
+    translated = VALID_TRANSLATION.replace('D\n', answer + '\n')
+
+    findings = verify_translation(
+        source, translated, target_lang='en', source_lang='en'
+    )
+
+    assert any(
+        finding.type == FindingType.UNTRANSLATED and finding.section == '最终答案'
+        for finding in findings
+    )
+
+
+def test_matching_file_language_does_not_exempt_mixed_language_section():
+    french_solution = "On compare les deux membres de l'égalité."
+    source = SOURCE.replace('Set $x=4$ and verify the equality.', french_solution)
+    translated = VALID_TRANSLATION.replace('令 $x=4$，并验证等式。', french_solution)
+
+    findings = verify_translation(
+        source, translated, target_lang='en', source_lang='en'
+    )
+
+    assert any(
+        finding.type == FindingType.UNTRANSLATED and finding.section == '解法 1'
+        for finding in findings
+    )
+
+
 def test_real_prose_left_identical_is_still_untranslated():
     untranslated = VALID_TRANSLATION.replace(
         '求整数 $x \\leq y$，使 `x + y` 为偶数。',

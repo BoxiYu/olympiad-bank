@@ -258,6 +258,32 @@ def test_en_medium_identical_translated_variant_passes_contract(tmp_path):
     assert result.status == 'ok', result.errors
 
 
+def test_matching_file_language_does_not_hide_mixed_section_in_contract(tmp_path):
+    corpus = os.path.join(tmp_path, 'mathnet-full')
+    source = (
+        '# 0abc\n\n## 题面\n\nFind $x$.\n\n'
+        "## 最终答案\n\nAucune solution.\n"
+    ).encode()
+    variants = {'en': {'mode': 'translated', 'sha256': _sha(source)}}
+    make_problem(
+        corpus,
+        source=source,
+        en=source,
+        zh=False,
+        variants=variants,
+        source_lang='en',
+    )
+
+    result = tc.check_corpus(
+        str(tmp_path), sample=10, fidelity_verifier=verify_translation
+    )
+
+    assert any(
+        'index.en.md' in error and str(FindingType.UNTRANSLATED) in error
+        for error in result.errors
+    )
+
+
 def test_english_translated_variant_uses_english_fidelity_rules(tmp_path):
     corpus = os.path.join(tmp_path, 'mathnet-full')
     chinese_source = '# 0abc\n\n## 题面\n\n求整数 $x$。\n'.encode()

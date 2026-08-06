@@ -186,6 +186,46 @@ def test_en_non_high_identical_model_result_is_translated_and_written(
     assert apply_path.with_suffix(".jsonl.failures.jsonl").read_text(encoding="utf-8") == ""
 
 
+def test_apply_payload_accepts_en_non_high_identical_model_result(
+    corpus: Path, tmp_path: Path
+):
+    row = export(
+        corpus, tmp_path / "batch.jsonl", "--only", "eng1",
+        "--source-lang", "en", "--source-lang-confidence", "medium",
+    )[0]
+
+    mt.apply_payload(corpus, row, "en", identical_translated_variant(row))
+
+    question = (corpus / row["path"]).parent
+    assert (question / "index.en.md").read_bytes() == (question / "index.md").read_bytes()
+    state = json.loads((question / "translation.json").read_text(encoding="utf-8"))
+    assert state["variants"]["en"]["mode"] == "translated"
+
+
+def test_apply_payload_rejects_mixed_section_despite_matching_file_language(
+    corpus: Path, tmp_path: Path
+):
+    source = next(path for path in corpus.rglob("index.md") if path.parent.name == "eng1")
+    source.write_text(
+        source.read_text(encoding="utf-8").replace(
+            "Factoring gives $x^2-1=(x-1)(x+1)=0$.", "Aucune solution."
+        ),
+        encoding="utf-8",
+    )
+    row = export(
+        corpus, tmp_path / "batch.jsonl", "--only", "eng1",
+        "--source-lang", "en", "--source-lang-confidence", "medium",
+    )[0]
+
+    with pytest.raises(mt.TranslateError, match="untranslated@解法 1"):
+        mt.apply_payload(
+            corpus, row, "en", identical_translated_variant(row)
+        )
+
+    assert not (source.parent / "index.en.md").exists()
+    assert not (source.parent / "translation.json").exists()
+
+
 def test_missing_unit_writes_nothing_to_question(corpus: Path, tmp_path: Path):
     row = export(corpus, tmp_path / "batch.jsonl", "--only", "slv1", "--source-lang", "sl")[0]
     variant = translated_variant(row)
