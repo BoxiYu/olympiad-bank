@@ -29,7 +29,7 @@ hooks:
     set -euo pipefail
     git fetch origin
 agent:
-  max_concurrent_agents: 4
+  max_concurrent_agents: 10
   max_turns: 20
 codex:
   command: codex --config shell_environment_policy.inherit=all app-server
