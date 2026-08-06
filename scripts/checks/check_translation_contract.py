@@ -5,9 +5,9 @@
 ``translation.json``，并显式报告抽样覆盖与耗时。文件布局与字段语义正本由
 ``docs/译文契约-mathnet-full.md`` 提供（CXB-495）；本模块只执行该契约。
 
-CXB-497 的保真校验器合入后，本模块会从约定候选模块中寻找
-``verify_translation(source, translated)`` 并调用；在此之前明确报告该项 skipped，
-不在这里复制数学环境/图片引用的实现。
+本模块从约定候选模块中寻找 ``verify_translation(source, translated)`` 并调用，
+不在这里复制数学环境/图片引用的实现。只有候选文件确实不存在时才允许 skipped；
+文件存在却无法加载或缺少入口时必须让检查失败。
 """
 import argparse
 import hashlib
@@ -15,6 +15,7 @@ import importlib.util
 import json
 import os
 import re
+import sys
 import time
 from dataclasses import dataclass, field
 
@@ -26,14 +27,20 @@ VALID_CONFIDENCE = {'high', 'medium', 'low'}
 SHA256_RE = re.compile(r'[0-9a-f]{64}')
 LANG_RE = re.compile(r'(?:[a-z]{2}|und)')
 
-# CXB-497 尚未合入时只保留调用点。候选名覆盖该工单最自然的独立模块名，
-# 以及校验器被暂时放进 mathnet_translate.py 的兼容情况。
+# 候选名覆盖独立保真校验模块，以及校验器被暂时放进
+# mathnet_translate.py 的兼容情况。
 FIDELITY_MODULE_CANDIDATES = (
     'scripts/mathnet_translation_verify.py',
     'scripts/translation_verify.py',
     'scripts/translation_fidelity.py',
     'scripts/mathnet_translate.py',
 )
+_FIDELITY_MODULE_NAME = '_translation_fidelity_hook'
+_MISSING_MODULE = object()
+
+
+class FidelityVerifierError(RuntimeError):
+    """候选校验器存在，但无法作为 lint 闸门执行。"""
 
 
 @dataclass
@@ -44,7 +51,7 @@ class CheckResult:
     elapsed: float = 0.0
     errors: list[str] = field(default_factory=list)
     fidelity: str = 'skipped'
-    fidelity_note: str = 'CXB-497 保真校验器尚未合入'
+    fidelity_note: str = '未发现保真校验器候选文件'
 
 
 def _sha256(data):
@@ -133,16 +140,29 @@ def _load_fidelity_verifier(root):
         path = os.path.join(root, *rel.split('/'))
         if not os.path.isfile(path):
             continue
-        spec = importlib.util.spec_from_file_location('_translation_fidelity_hook', path)
+        spec = importlib.util.spec_from_file_location(_FIDELITY_MODULE_NAME, path)
+        if spec is None or spec.loader is None:
+            raise FidelityVerifierError(f'{rel} 无法创建模块加载器')
         module = importlib.util.module_from_spec(spec)
+        previous = sys.modules.get(spec.name, _MISSING_MODULE)
+        sys.modules[spec.name] = module
         try:
             spec.loader.exec_module(module)
         except Exception as exc:
-            return None, f'{rel} 加载失败：{exc!r}'
+            if previous is _MISSING_MODULE:
+                sys.modules.pop(spec.name, None)
+            else:
+                sys.modules[spec.name] = previous
+            raise FidelityVerifierError(f'{rel} 加载失败：{exc!r}') from exc
         verifier = getattr(module, 'verify_translation', None)
-        if callable(verifier):
-            return verifier, rel
-    return None, 'CXB-497 保真校验器尚未合入'
+        if not callable(verifier):
+            if previous is _MISSING_MODULE:
+                sys.modules.pop(spec.name, None)
+            else:
+                sys.modules[spec.name] = previous
+            raise FidelityVerifierError(f'{rel} 缺少可调用的 verify_translation')
+        return verifier, rel
+    return None, '未发现保真校验器候选文件'
 
 
 def _format_finding(finding):
@@ -228,12 +248,18 @@ def check_corpus(root=ROOT, corpus=None, sample=DEFAULT_SAMPLE, fidelity_verifie
 
     contracts = discover_contracts(corpus)
     selected = _select_sample(contracts, corpus, sample)
+    errors = []
     if fidelity_verifier is None:
-        fidelity_verifier, fidelity_note = _load_fidelity_verifier(root)
-        fidelity = 'enabled' if fidelity_verifier is not None else 'skipped'
+        try:
+            fidelity_verifier, fidelity_note = _load_fidelity_verifier(root)
+        except FidelityVerifierError as exc:
+            fidelity_verifier = None
+            fidelity, fidelity_note = 'failed', str(exc)
+            errors.append(f'保真校验器不可用：{exc}')
+        else:
+            fidelity = 'enabled' if fidelity_verifier is not None else 'skipped'
     else:
         fidelity, fidelity_note = 'enabled', '显式注入 verify_translation'
-    errors = []
     for path in selected:
         errors.extend(_check_one(path, corpus, fidelity_verifier))
     return CheckResult(

@@ -3,11 +3,13 @@ import hashlib
 import importlib.util
 import json
 import os
+import sys
 
 import pytest
 
 _CHECKER = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                         'scripts', 'checks', 'check_translation_contract.py')
+_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _spec = importlib.util.spec_from_file_location('check_translation_contract_test', _CHECKER)
 tc = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(tc)
@@ -76,6 +78,48 @@ def test_valid_sample_runs_and_reports_size_and_time(tmp_path, capsys):
     assert '抽样 1/1 题' in out
     assert '保真校验 skipped' in out
     assert '耗时' in out
+
+
+def test_repository_fidelity_module_loads_and_runs(tmp_path, capsys):
+    corpus = os.path.join(tmp_path, 'mathnet-full')
+    make_problem(corpus)
+    result = tc.check_corpus(_ROOT, corpus=corpus, sample=10)
+    tc.print_result(result)
+    out = capsys.readouterr().out
+    assert result.status == 'ok', result.errors
+    assert result.fidelity == 'enabled'
+    assert result.fidelity_note == 'scripts/translation_fidelity.py'
+    assert '保真校验 enabled' in out
+    assert '保真校验 skipped' not in out
+
+
+def test_existing_broken_fidelity_module_fails_check_and_cleans_module(tmp_path, capsys):
+    corpus = os.path.join(tmp_path, 'mathnet-full')
+    make_problem(corpus)
+    stub = os.path.join(tmp_path, 'scripts', 'mathnet_translation_verify.py')
+    _write_bytes(stub, b"raise RuntimeError('broken stub')\n")
+    previous = sys.modules.get(tc._FIDELITY_MODULE_NAME)
+
+    result = tc.check_corpus(str(tmp_path), sample=10)
+    tc.print_result(result)
+    out = capsys.readouterr().out
+    assert result.status == 'failed'
+    assert result.fidelity == 'failed'
+    assert any('加载失败' in error and 'broken stub' in error for error in result.errors)
+    assert tc.main(['--root', str(tmp_path), '--sample', '10']) == 1
+    assert '保真校验 skipped' not in out
+    assert sys.modules.get(tc._FIDELITY_MODULE_NAME) is previous
+
+
+def test_existing_fidelity_module_without_entrypoint_fails_check(tmp_path):
+    corpus = os.path.join(tmp_path, 'mathnet-full')
+    make_problem(corpus)
+    stub = os.path.join(tmp_path, 'scripts', 'mathnet_translation_verify.py')
+    _write_bytes(stub, b'VALUE = 1\n')
+    result = tc.check_corpus(str(tmp_path), sample=10)
+    assert result.status == 'failed'
+    assert result.fidelity == 'failed'
+    assert any('缺少可调用的 verify_translation' in error for error in result.errors)
 
 
 def test_stale_source_is_caught(tmp_path):
