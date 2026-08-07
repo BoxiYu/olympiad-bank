@@ -1,0 +1,52 @@
+{
+  "fixture_kind": "audit record plus constructed full-pair regression examples",
+  "method": [
+    "Pair index.md with exactly one index.en.md or index.zh.md for the same record.",
+    "Review the statement, every solution section, and the final answer; any replaced section makes the record a true degeneration.",
+    "Report the denominator and provenance separately for detector hits and known-good pairs."
+  ],
+  "human_reaudit": {
+    "population": "the three records previously reported as false positives",
+    "sample_size": 3,
+    "false_positives": 0,
+    "true_degenerations": 3,
+    "false_positive_rate": 0.0,
+    "scope_note": "0/3 is the re-audited rate for the three disputed detector hits, not a corpus-wide estimate. CXB-513 identifies 096f, 0a3h, and 097v as true degenerations after all sections were checked."
+  },
+  "human_reported_exact_phrase_scan": {
+    "target_variant": "en/translated",
+    "population_size": 3139,
+    "hits": 17,
+    "hit_rate": 0.005,
+    "scope_note": "Human-reported production measurement from CXB-513; the ignored corpus is not reproduced by this fixture."
+  },
+  "constructed_normal_pairs": [
+    {
+      "fixture_id": "constructed-mixed-en",
+      "source_file": "mixed-source.md",
+      "translated_file": "mixed-en.md",
+      "target_lang": "en",
+      "reviewed_sections": ["题面", "解法 1", "最终答案"]
+    },
+    {
+      "fixture_id": "constructed-mixed-zh",
+      "source_file": "mixed-source.md",
+      "translated_file": "mixed-zh-complete-constructed.md",
+      "target_lang": "zh",
+      "reviewed_sections": ["题面", "解法 1", "最终答案"]
+    },
+    {
+      "fixture_id": "constructed-proof-zh",
+      "source_file": "proof-source.md",
+      "translated_file": "proof-zh.md",
+      "target_lang": "zh",
+      "reviewed_sections": ["题面", "解法 1", "解法 2", "最终答案"]
+    }
+  ],
+  "constructed_normal_false_positive_rate": {
+    "sample_size": 3,
+    "false_positives": 0,
+    "rate": 0.0,
+    "scope_note": "Regression-fixture rate only. These Sample Olympiad documents are constructed and must never be described as MathNet corpus samples."
+  }
+}

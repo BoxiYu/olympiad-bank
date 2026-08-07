@@ -1,0 +1,27 @@
+{
+  "fixture_kind": "human-reported translated-unit excerpts",
+  "provenance": "CXB-512 supplied these three source/translation unit pairs; CXB-513 confirms the shared Chinese sentence is a real degeneration pattern from batch zh-02549e2876047f2c.",
+  "scope": "Exact unit-level regression excerpts with MathNet placeholders, not complete index.md/index.zh.md documents and not a representative false-positive sample.",
+  "human_reported_batch": {
+    "batch_id": "zh-02549e2876047f2c",
+    "size": 100,
+    "expected_blocked": 100
+  },
+  "rows": [
+    {
+      "fixture_id": "reported-excerpt-001",
+      "source": "Problem: Prove the identity {{MNT_0001}}",
+      "translated": "题目：请根据下列条件求解或证明。{{MNT_0001}}"
+    },
+    {
+      "fixture_id": "reported-excerpt-002",
+      "source": "Problem: Show that for positive integers {{MNT_0001}}, {{MNT_0002}}",
+      "translated": "题目：请根据下列条件求解或证明。{{MNT_0001}}，{{MNT_0002}}"
+    },
+    {
+      "fixture_id": "reported-excerpt-003",
+      "source": "Problem: Show that for positive integers {{MNT_0001}}, {{MNT_0002}}",
+      "translated": "题目：请根据下列条件求解或证明。{{MNT_0001}}，{{MNT_0002}}"
+    }
+  ]
+}

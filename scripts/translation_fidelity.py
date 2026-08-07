@@ -82,7 +82,11 @@ class BatchConfig:
 
     默认 ``boilerplate_min_group=3`` 对应最小可行动重复簇：两条短题偶然同句很常见，
     三条不同原文却共用译文已足以复核。相似度 0.9 在剥离数学与标点后容忍少量虚词漂移；
-    译文相似度还须比源文相似度至少高 0.2，避免误伤同模板原文的忠实同模板翻译。
+    译文相似度还须比同一个 peer 的源文相似度至少高 0.2，避免把两个 peer 的
+    相似度极值错配后误伤忠实的同模板翻译。译文相似度相差不超过 0.02 的 peer
+    视为并列，并选择其中源文最接近者作保守比较。若同一译文簇里至少有两个
+    各由两种近似源文支撑、彼此却明显不同的模板子组，则保留簇级跨模板证据，
+    避免每条记录都借同组 peer 击穿检测。
     少于 8 个文字/数字的短答案不参与套话聚类。长度比采用很宽的 0.25--4.0 区间，
     适配英中字符密度差；长度和锚点各权重 1，必须同时出现才达到默认阻断分 2，
     因而长度异常绝不会单独产生 Finding。套话权重 2，可独立阻断。
@@ -93,6 +97,7 @@ class BatchConfig:
     boilerplate_min_group: int = 3
     boilerplate_similarity: float = 0.9
     boilerplate_source_similarity_gap: float = 0.2
+    boilerplate_pair_similarity_tolerance: float = 0.02
     boilerplate_min_chars: int = 8
     length_ratio_min: float = 0.25
     length_ratio_max: float = 4.0
@@ -379,6 +384,8 @@ def _validate_batch_config(config: BatchConfig) -> None:
         raise ValueError('boilerplate_similarity must be in (0, 1]')
     if not 0 <= config.boilerplate_source_similarity_gap <= 1:
         raise ValueError('boilerplate_source_similarity_gap must be in [0, 1]')
+    if not 0 <= config.boilerplate_pair_similarity_tolerance <= 1:
+        raise ValueError('boilerplate_pair_similarity_tolerance must be in [0, 1]')
     if config.boilerplate_min_chars <= 0:
         raise ValueError('boilerplate_min_chars must be positive')
     if not 0 < config.length_ratio_min < config.length_ratio_max:
@@ -401,6 +408,62 @@ def _cluster_union(parent: list[int], left: int, right: int) -> None:
     right_root = _cluster_find(parent, right)
     if left_root != right_root:
         parent[right_root] = left_root
+
+
+def _paired_source_template_witness(
+    sources: list[str],
+    targets: list[str],
+    config: BatchConfig,
+) -> tuple[float, float] | None:
+    """返回多个有独立支撑的源文模板子组之间的退化证据。
+
+    单个近似源文对子加一个 outsider 仍不足以阻断；但两个或更多子组各自包含
+    至少两种近似源文时，不能让每条记录只选择组内 peer 而丢掉跨组证据。
+    该补充检查只在模糊比较上限内运行，避免目录审计引入新的二次复杂度。
+    """
+    if len(sources) < 4 or len(sources) > config.fuzzy_comparison_limit:
+        return None
+
+    parent = list(range(len(sources)))
+    pair_scores: dict[tuple[int, int], tuple[float, float]] = {}
+    for left in range(len(sources)):
+        if not sources[left]:
+            continue
+        for right in range(left + 1, len(sources)):
+            if not sources[right]:
+                continue
+            target_similarity = SequenceMatcher(None, targets[left], targets[right]).ratio()
+            source_similarity = SequenceMatcher(None, sources[left], sources[right]).ratio()
+            pair_scores[(left, right)] = (target_similarity, source_similarity)
+            if (target_similarity >= config.boilerplate_similarity
+                    and target_similarity - source_similarity
+                    < config.boilerplate_source_similarity_gap):
+                _cluster_union(parent, left, right)
+
+    components: dict[int, list[int]] = {}
+    for index in range(len(sources)):
+        components.setdefault(_cluster_find(parent, index), []).append(index)
+    supported = [
+        indexes for indexes in components.values()
+        if len({sources[index] for index in indexes if sources[index]}) >= 2
+    ]
+    if len(supported) < 2:
+        return None
+
+    witnesses = []
+    for left_group in range(len(supported)):
+        for right_group in range(left_group + 1, len(supported)):
+            for left in supported[left_group]:
+                for right in supported[right_group]:
+                    pair = (min(left, right), max(left, right))
+                    target_similarity, source_similarity = pair_scores[pair]
+                    if (target_similarity >= config.boilerplate_similarity
+                            and target_similarity - source_similarity
+                            >= config.boilerplate_source_similarity_gap):
+                        witnesses.append((target_similarity, source_similarity))
+    if not witnesses:
+        return None
+    return max(witnesses, key=lambda score: (score[0] - score[1], score[0]))
 
 
 def _section_matches(text: str) -> list[re.Match[str]]:
@@ -785,35 +848,62 @@ def verify_batch(
             candidates = []
             for group_position, position in enumerate(positions):
                 item_index, normalized, _plain = entries[position]
-                target_similarity = (
-                    1.0 if len(positions) > batch_config.fuzzy_comparison_limit else max(
-                        (SequenceMatcher(None, normalized, peer).ratio()
-                         for peer_index, peer in enumerate(group_texts)
-                         if peer_index != group_position),
-                        default=1.0,
-                    )
-                )
                 source_text = group_sources[group_position]
-                source_similarity = min(
-                    (SequenceMatcher(None, source_text, peer).ratio()
-                     for peer_index, peer in enumerate(group_sources)
-                     if peer_index in exemplar_indexes and peer_index != group_position
-                     and source_text and peer),
-                    default=1.0,
+                peer_scores = [
+                    (
+                        1.0 if len(positions) > batch_config.fuzzy_comparison_limit
+                        else SequenceMatcher(None, normalized, group_texts[peer_index]).ratio(),
+                        SequenceMatcher(None, source_text, group_sources[peer_index]).ratio(),
+                    )
+                    for peer_index in exemplar_indexes
+                    # 完全相同的源文不是独立的体裁证据；整簇源文都相同的情形
+                    # 已由 distinct_sources 门槛作为合法重复提前退出。
+                    if (peer_index != group_position and source_text
+                        and group_sources[peer_index]
+                        and group_sources[peer_index] != source_text)
+                ]
+                if not peer_scores:
+                    continue
+                best_target_similarity = max(score[0] for score in peer_scores)
+                comparable_scores = [
+                    score for score in peer_scores
+                    if score[0] >= (
+                        best_target_similarity
+                        - batch_config.boilerplate_pair_similarity_tolerance
+                    )
+                ]
+                target_similarity, source_similarity = max(
+                    comparable_scores,
+                    key=lambda score: (score[1], score[0]),
                 )
                 if (target_similarity - source_similarity
                         < batch_config.boilerplate_source_similarity_gap):
                     continue
                 candidates.append((item_index, target_similarity, source_similarity))
+            cluster_witness = None
             if len(candidates) < batch_config.boilerplate_min_group:
-                continue
+                cluster_witness = _paired_source_template_witness(
+                    group_sources, group_texts, batch_config
+                )
+                if cluster_witness is None:
+                    continue
+                target_similarity, source_similarity = cluster_witness
+                candidates = [
+                    (entries[position][0], target_similarity, source_similarity)
+                    for position in positions
+                ]
             for item_index, target_similarity, source_similarity in candidates:
+                evidence = (
+                    '簇级跨模板源文相似度'
+                    if cluster_witness is not None
+                    else '匹配 peer 的源文相似度'
+                )
                 signals[item_keys[item_index]].append(BatchSignal(
                     FindingType.BATCH_BOILERPLATE,
                     heading,
                     target_similarity,
                     f'{len(candidates)} 条译文散文高度重合；译文相似度 {target_similarity:.3f}，'
-                    f'最低源文相似度 {source_similarity:.3f}',
+                    f'{evidence} {source_similarity:.3f}',
                 ))
 
     for key, source, target in zip(item_keys, sources, translated):

@@ -87,8 +87,23 @@ def test_legal_translation_has_zero_findings():
     assert verify_translation(SOURCE, VALID_TRANSLATION) == []
 
 
-def degenerate_fixture():
-    return json.loads((FIXTURES / 'degenerate-batch.json').read_text(encoding='utf-8'))
+def human_reported_degenerate_fixture():
+    payload = json.loads(
+        (FIXTURES / 'human-reported-degenerate-excerpts.json').read_text(encoding='utf-8')
+    )
+    assert payload['fixture_kind'] == 'human-reported translated-unit excerpts'
+    return payload
+
+
+def full_document_feature_fixture():
+    return json.loads(
+        (FIXTURES / 'cxb-513-human-reported-full-document-features.json')
+        .read_text(encoding='utf-8')
+    )
+
+
+def audit_fixture():
+    return json.loads((FIXTURES / 'full-pair-audit.json').read_text(encoding='utf-8'))
 
 
 def normal_batch(size=97):
@@ -116,33 +131,224 @@ def batch_report(rows, **kwargs):
     return verify_batch(
         [row['source'] for row in rows],
         [row['translated'] for row in rows],
-        keys=[row['mathnet_id'] for row in rows],
+        keys=[row.get('mathnet_id') or row['fixture_id'] for row in rows],
         **kwargs,
     )
 
 
-def test_real_degenerate_fixture_blocks_all_three_boilerplate_translations():
-    rows = degenerate_fixture()
+def test_human_reported_unit_excerpts_block_all_three_boilerplate_translations():
+    rows = human_reported_degenerate_fixture()['rows']
     report = batch_report(rows)
 
-    assert set(report.findings) == {row['mathnet_id'] for row in rows}
+    assert set(report.findings) == {row['fixture_id'] for row in rows}
     assert all(
         {finding.type for finding in findings} == {FindingType.BATCH_BOILERPLATE}
         for findings in report.findings.values()
     )
 
 
-def test_three_degenerate_items_in_one_hundred_only_block_those_three():
-    bad = degenerate_fixture()
+def test_three_reported_excerpts_in_constructed_hundred_only_block_those_three():
+    bad = human_reported_degenerate_fixture()['rows']
     rows = normal_batch() + bad
     report = batch_report(rows)
 
-    assert set(report.findings) == {row['mathnet_id'] for row in bad}
+    assert set(report.findings) == {row['fixture_id'] for row in bad}
     assert not (set(report.findings) & {row['mathnet_id'] for row in rows[:97]})
 
 
-def test_normal_batch_has_zero_findings():
+def test_constructed_normal_batch_has_zero_findings():
     assert batch_report(normal_batch()).findings == {}
+
+
+def test_constructed_proxy_for_reported_zh_batch_blocks_one_hundred_of_one_hundred():
+    """固定 100/100 能力；不把三条 excerpt 的机械扩展冒充实际 100 条语料。"""
+    fixture = human_reported_degenerate_fixture()
+    rows = []
+    for index in range(fixture['human_reported_batch']['size']):
+        exemplar = fixture['rows'][index % len(fixture['rows'])]
+        rows.append({
+            'mathnet_id': f'constructed-batch-proxy-{index:03d}',
+            'source': exemplar['source'],
+            'translated': exemplar['translated'],
+        })
+
+    report = batch_report(rows)
+
+    assert fixture['human_reported_batch']['expected_blocked'] == 100
+    assert len(report.findings) == 100
+    assert all(
+        FindingType.BATCH_BOILERPLATE in {finding.type for finding in findings}
+        for findings in report.findings.values()
+    )
+
+
+def _render_feature_documents(row, degraded_solution_text):
+    source_parts = [f"# {row['mathnet_id']}", '', '## 题面', row['source_statement_excerpt']]
+    target_parts = [
+        f"# {row['mathnet_id']}", '', '## 题面', row['translated_statement_excerpt']
+    ]
+    for section in row['solution_sections']:
+        source_parts.extend([
+            '',
+            f"## {section['heading']}",
+            section['detector_proxy_discriminator'] + ' ' + section['source_proxy'],
+        ])
+        target_parts.extend(['', f"## {section['heading']}", section['translated']])
+        assert section['translated'] == degraded_solution_text
+    source_parts.extend(['', '## 最终答案', '[NOT INCLUDED IN CXB-513 FIXTURE]'])
+    target_parts.extend(['', '## 最终答案', '[NOT INCLUDED IN CXB-513 FIXTURE]'])
+    return '\n'.join(source_parts) + '\n', '\n'.join(target_parts) + '\n'
+
+
+def test_cxb_513_human_reported_full_document_features_still_block_all_three():
+    fixture = full_document_feature_fixture()
+    assert fixture['fixture_kind'].startswith('constructed detector documents')
+    rows = []
+    for row in fixture['rows']:
+        source, translated = _render_feature_documents(
+            row, fixture['degraded_solution_text']
+        )
+        rows.append({
+            'mathnet_id': row['mathnet_id'],
+            'source': source,
+            'translated': translated,
+        })
+
+    report = batch_report(rows, target_lang='en')
+
+    assert set(report.findings) == {'096f', '0a3h', '097v'}
+    assert len(fixture['rows'][1]['solution_sections']) == 2
+    assert all(
+        FindingType.BATCH_BOILERPLATE in {finding.type for finding in findings}
+        for findings in report.findings.values()
+    )
+
+
+def test_full_pair_audit_records_denominators_and_constructed_normal_examples():
+    fixture = audit_fixture()
+    reaudit = fixture['human_reaudit']
+    assert reaudit['sample_size'] == 3
+    assert reaudit['false_positives'] == 0
+    assert reaudit['true_degenerations'] == 3
+    assert reaudit['false_positive_rate'] == 0.0
+    assert 'not a corpus-wide estimate' in reaudit['scope_note']
+
+    by_language = {}
+    individual_findings = {}
+    for row in fixture['constructed_normal_pairs']:
+        source = (FIXTURES / row['source_file']).read_text(encoding='utf-8')
+        translated = (FIXTURES / row['translated_file']).read_text(encoding='utf-8')
+        headings = [
+            line.removeprefix('## ') for line in source.splitlines()
+            if line.startswith('## ')
+        ]
+        assert headings == row['reviewed_sections']
+        individual_findings[row['fixture_id']] = verify_translation(
+            source,
+            translated,
+            target_lang=row['target_lang'],
+            source_lang='fr' if row['source_file'] == 'mixed-source.md' else 'en',
+        )
+        by_language.setdefault(row['target_lang'], []).append({
+            'mathnet_id': row['fixture_id'],
+            'source': source,
+            'translated': translated,
+        })
+    findings = {
+        key: finding
+        for target_lang, rows in by_language.items()
+        for key, finding in batch_report(rows, target_lang=target_lang).findings.items()
+    }
+    normal_rate = fixture['constructed_normal_false_positive_rate']
+    assert normal_rate['sample_size'] == 3
+    assert normal_rate['false_positives'] == 0
+    assert normal_rate['rate'] == 0.0
+    assert 'constructed' in normal_rate['scope_note'].casefold()
+    assert individual_findings == {
+        row['fixture_id']: [] for row in fixture['constructed_normal_pairs']
+    }
+    assert findings == {}
+
+
+def test_constructed_same_genre_cluster_compares_target_and_source_to_same_peer():
+    translated = 'Prove that if the real numbers satisfy the stated relations, the result follows.'
+    rows = [
+        {
+            'mathnet_id': 'constructed-near-1',
+            'source': 'Să se arate că dacă numerele reale satisfac relațiile date, concluzia rezultă.',
+            'translated': translated,
+        },
+        {
+            'mathnet_id': 'constructed-near-2',
+            'source': 'Să se arate că dacă numere reale satisfac relațiile date, atunci concluzia rezultă.',
+            'translated': translated,
+        },
+        {
+            'mathnet_id': 'constructed-outsider',
+            'source': 'Bewijs dat de gegeven meetkundige configuratie de vereiste eigenschap heeft.',
+            'translated': translated,
+        },
+    ]
+
+    assert batch_report(rows, target_lang='en').findings == {}
+
+
+def test_constructed_paired_source_templates_do_not_punch_through_boilerplate_cluster():
+    translated = 'The requested result follows from the stated conditions.'
+    sources = (
+        'Find the maximum value of the function under the stated algebraic constraints.',
+        'Find the minimum value of the function under the stated algebraic constraints.',
+        'Prove that the two circles in the stated geometric configuration are tangent.',
+        'Prove that the two circles in the stated geometric configuration are orthogonal.',
+    )
+    rows = [
+        {
+            'mathnet_id': f'constructed-paired-template-{index}',
+            'source': source,
+            'translated': translated,
+        }
+        for index, source in enumerate(sources, start=1)
+    ]
+
+    report = batch_report(rows, target_lang='en')
+
+    assert set(report.findings) == {row['mathnet_id'] for row in rows}
+    assert all(
+        FindingType.BATCH_BOILERPLATE in {finding.type for finding in findings}
+        for findings in report.findings.values()
+    )
+    assert all(
+        '簇级跨模板源文相似度' in report.signals[row['mathnet_id']][0].detail
+        for row in rows
+    )
+
+
+def test_echoing_one_distinctive_number_does_not_exempt_boilerplate_cluster():
+    sources = (
+        'Demonstrați teorema geometrică despre cercuri și tangente în cazul 101.',
+        'Bestimmen Sie alle ganzzahligen Lösungen des Teilbarkeitsproblems 202.',
+        'Calcolare il massimo della funzione soggetta ai vincoli del caso 303.',
+        'Trouver le nombre de colorations du graphe décrit dans le cas 404.',
+        'Poišči vse polinome, ki izpolnjujejo zahtevane pogoje v primeru 505.',
+    )
+    rows = [
+        {
+            'mathnet_id': f'constructed-entity-{index}',
+            'source': source,
+            'translated': f'The requested result follows from the stated conditions in case {number}.',
+        }
+        for index, (source, number) in enumerate(
+            zip(sources, ('101', '202', '303', '404', '505')), start=1
+        )
+    ]
+
+    report = batch_report(rows, target_lang='en')
+
+    assert set(report.findings) == {row['mathnet_id'] for row in rows}
+    assert all(
+        FindingType.BATCH_BOILERPLATE in {finding.type for finding in findings}
+        for findings in report.findings.values()
+    )
 
 
 def test_length_ratio_is_a_signal_but_never_blocks_alone():
@@ -186,6 +392,36 @@ def test_non_english_source_hollow_chinese_translation_is_blocked():
     assert 'demontrer' in report.signals['hollow-zh'][1].detail
 
 
+def test_content_anchor_axis_still_runs_for_english_targets():
+    report = verify_batch(
+        ['证明欧拉结论在 2024 年成立。'],
+        ['Answer.'],
+        keys=['en-anchor-axis'],
+        target_lang='en',
+        config=BatchConfig(length_weight=0, anchor_weight=2),
+    )
+
+    assert {finding.type for finding in report.findings['en-anchor-axis']} == {
+        FindingType.CONTENT_ANCHOR_MISSING,
+    }
+
+
+@pytest.mark.parametrize('source', [
+    'Démontrer que la propriété demandée vaut pour tous les entiers positifs.',
+    'Bestimmen Sie alle ganzen Zahlen, welche die angegebenen Bedingungen erfüllen.',
+    'Demostrar que la identidad dada es válida para todos los números reales.',
+    'Calcolare il valore massimo soggetto alle condizioni indicate.',
+    'Poišči vsa pozitivna cela števila, ki izpolnjujejo dane pogoje.',
+])
+def test_constructed_multilingual_task_anchor_regression_blocks_five_of_five(source):
+    report = verify_batch([source], ['答案。'], target_lang='zh')
+
+    assert {finding.type for finding in report.findings['0']} == {
+        FindingType.LENGTH_RATIO,
+        FindingType.CONTENT_ANCHOR_MISSING,
+    }
+
+
 @pytest.mark.parametrize(('source', 'translated', 'target_lang'), [
     (
         '证明欧拉方法给出的结论在 2024 年情形下成立。',
@@ -205,8 +441,15 @@ def test_cross_language_content_anchors_accept_normal_translations(
 
 
 def test_batch_thresholds_are_configurable():
-    report = batch_report(degenerate_fixture(), config=BatchConfig(boilerplate_min_group=4))
+    rows = human_reported_degenerate_fixture()['rows']
+    report = batch_report(rows, config=BatchConfig(boilerplate_min_group=4))
     assert report.findings == {}
+
+
+def test_pair_similarity_tolerance_is_validated():
+    rows = human_reported_degenerate_fixture()['rows']
+    with pytest.raises(ValueError, match='boilerplate_pair_similarity_tolerance'):
+        batch_report(rows, config=BatchConfig(boilerplate_pair_similarity_tolerance=-0.1))
 
 
 @pytest.mark.parametrize(('old', 'new'), [
