@@ -104,6 +104,42 @@ def test_repository_fidelity_module_loads_and_runs(tmp_path, capsys):
     assert '保真校验 skipped' not in out
 
 
+def test_contract_gate_reports_target_language_and_mojibake_reasons(tmp_path):
+    corpus = os.path.join(tmp_path, 'mathnet-full')
+    fixture_path = os.path.join(
+        _ROOT,
+        'tests',
+        'fixtures',
+        'translation_fidelity',
+        'target-language-cases.json',
+    )
+    with open(fixture_path, encoding='utf-8') as handle:
+        rows = {row['mathnet_id']: row for row in json.load(handle)['bad_zh']}
+    source = '# {pid}\n\n## 题面\n\nFind all values satisfying the condition.\n'
+    for pid in ('039x', '0k1z'):
+        translated = f"# {pid}\n\n## 题面\n\n{rows[pid]['translated']}\n".encode()
+        make_problem(
+            corpus,
+            pid=pid,
+            source=source.format(pid=pid).encode(),
+            en=False,
+            zh=translated,
+            variants={'zh': {'mode': 'translated', 'sha256': _sha(translated)}},
+        )
+
+    result = tc.check_corpus(_ROOT, corpus=corpus, sample=10)
+
+    language_errors = [error for error in result.errors if 'index.zh.md' in error]
+    assert any(
+        '039x' in error and str(FindingType.TARGET_LANGUAGE_MISMATCH) in error
+        for error in language_errors
+    )
+    assert any(
+        '0k1z' in error and str(FindingType.MOJIBAKE) in error
+        for error in language_errors
+    )
+
+
 def test_repository_batch_gate_rejects_real_boilerplate_fixture(tmp_path):
     corpus = os.path.join(tmp_path, 'mathnet-full')
     fixture_path = os.path.join(

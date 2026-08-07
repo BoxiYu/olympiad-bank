@@ -36,6 +36,8 @@ class FindingType(str, Enum):
     BATCH_BOILERPLATE = 'batch_boilerplate'
     LENGTH_RATIO = 'length_ratio'
     CONTENT_ANCHOR_MISSING = 'content_anchor_missing'
+    TARGET_LANGUAGE_MISMATCH = 'target_language_mismatch'
+    MOJIBAKE = 'mojibake'
 
 
 @dataclass(frozen=True)
@@ -104,6 +106,24 @@ class BatchConfig:
 
 
 @dataclass(frozen=True)
+class LanguageConfig:
+    """逐小节目标语言与乱码闸门的可配置阈值。
+
+    中文默认把剥离数学、图片与代码后的残留拉丁字母占比上限定为 0.35；这是全量
+    抽样中“半翻”分组的人工标注边界，而已知坏例 0cje/039x/0iz4 分别约为
+    0.59/0.75/0.87。至少 8 个未豁免拉丁字母才触发比例闸门，以容忍零散变量；
+    Title Case 人名/赛事名、全大写缩写和数学函数另行豁免。英文目标中，至少两个
+    非拉丁文字才构成残留文字系统，容忍公式外的单个符号。乱码默认需三个弱特征，
+    但高置信编码事故签名单个即可阻断。
+    """
+
+    zh_max_latin_ratio: float = 0.35
+    zh_min_latin_letters: int = 8
+    en_min_foreign_script_letters: int = 2
+    mojibake_min_markers: int = 3
+
+
+@dataclass(frozen=True)
 class BatchSignal:
     """一条独立批级信号；信号不等于阻断 Finding。"""
 
@@ -164,12 +184,30 @@ _PROTECTED_RE = re.compile(
     re.DOTALL,
 )
 _IMAGE_RE = re.compile(r'!\[\]\(attached_image_(\d+)\.png\)')
+_FENCED_CODE_RE = re.compile(r'(?ms)^[ \t]*(?:`{3}|~{3}).*?^[ \t]*(?:`{3}|~{3})[ \t]*$')
 _PLACEHOLDER_RE = re.compile(r'\{\{MNT_\d{4}\}\}')
 _HAN_RE = re.compile(r'[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]')
+_NON_ENGLISH_SCRIPT_RE = re.compile(
+    r'[\u0400-\u052f\u0370-\u03ff\u1f00-\u1fff\u0590-\u05ff'
+    r'\u0600-\u06ff\u0750-\u077f\u08a0-\u08ff\u3040-\u30ff'
+    r'\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uac00-\ud7af]'
+)
+_WORD_RE = re.compile(r'[^\W\d_]+', re.UNICODE)
+_MOJIBAKE_SIGNATURE_RE = re.compile(
+    r'(?:\u00c3[\u0080-\u00bf]|\u00c2(?:[\u0080-\u00bf]| )'
+    r'|\u00e2[\u0080-\u00bf]{1,2}|\u00f0[\u0080-\u00bf]{1,3}'
+    r'|\u00ef[\u00bc\u00bd\u00be])'
+)
+_MOJIBAKE_MARKER_RE = re.compile(r'[\u00c2-\u00ef][\u0080-\u00bf]')
 _SYMBOL_WORDS = {
     'bmod', 'cos', 'gcd', 'inf', 'lcm', 'ln', 'log', 'max', 'min', 'mod',
     'pmod', 'sin', 'sqrt', 'sup', 'tan',
 }
+_LATIN_PROSE_STARTERS = {
+    'answer', 'both', 'calculate', 'compute', 'determine', 'do', 'find', 'given',
+    'if', 'let', 'on', 'pour', 'prove', 'set', 'show', 'there', 'what', 'when',
+}
+_PROPER_NAME_CONNECTORS = {'and', 'de', 'der', 'of', 'the', 'van', 'von'}
 _SHORT_ENGLISH_PROSE_RE = re.compile(
     r'\b(?:'
     r'no[ \t]+solutions?'
@@ -179,6 +217,8 @@ _SHORT_ENGLISH_PROSE_RE = re.compile(
     r'|set\b'
     r'|verify\b'
     r'|alternatively[ \t]+use\b'
+    r'|this[ \t]+is\b'
+    r'|the\b[^\n.!?]{0,80}\b(?:follows|holds|is|are|uses|gives|satisfies)\b'
     r')',
     re.IGNORECASE,
 )
@@ -318,6 +358,7 @@ def _excerpt(value: str, limit: int = 160) -> str:
 
 def _plain_prose(value: str) -> str:
     """剥离数学、占位符、图片与 Markdown 标记，保留可比较的散文。"""
+    value = _FENCED_CODE_RE.sub(' ', value)
     value = _PROTECTED_RE.sub(' ', value)
     value = _PLACEHOLDER_RE.sub(' ', value)
     value = _IMAGE_RE.sub(' ', value)
@@ -387,6 +428,17 @@ def _validate_batch_config(config: BatchConfig) -> None:
         raise ValueError('signal weights must be non-negative')
     if config.block_score <= 0 or config.fuzzy_comparison_limit < 0:
         raise ValueError('block_score must be positive and fuzzy_comparison_limit non-negative')
+
+
+def _validate_language_config(config: LanguageConfig) -> None:
+    if not 0 <= config.zh_max_latin_ratio <= 1:
+        raise ValueError('zh_max_latin_ratio must be in [0, 1]')
+    if config.zh_min_latin_letters <= 0:
+        raise ValueError('zh_min_latin_letters must be positive')
+    if config.en_min_foreign_script_letters <= 0:
+        raise ValueError('en_min_foreign_script_letters must be positive')
+    if config.mojibake_min_markers <= 0:
+        raise ValueError('mojibake_min_markers must be positive')
 
 
 def _cluster_find(parent: list[int], index: int) -> int:
@@ -520,7 +572,8 @@ def _is_pure_symbol(value: str) -> bool:
 def _has_translatable_prose(section: _Section) -> bool:
     if section.heading == '最终答案' and _is_pure_symbol(section.body):
         return False
-    body = _PROTECTED_RE.sub('', section.body)
+    body = _FENCED_CODE_RE.sub('', section.body)
+    body = _PROTECTED_RE.sub('', body)
     body = _IMAGE_RE.sub('', body)
     body = re.sub(r'<[^>]+>', '', body)
     return bool(re.search(r'[^\W\d_]', body, re.UNICODE))
@@ -540,10 +593,127 @@ def _ascii_fold(value: str) -> str:
     )
 
 
+def _is_latin_word(word: str) -> bool:
+    return bool(word) and all(
+        unicodedata.category(char).startswith('L')
+        and 'LATIN' in unicodedata.name(char, '')
+        for char in word
+    )
+
+
+def _residual_latin_letters(body: str) -> int:
+    """统计中文散文中的非例外拉丁字母。"""
+    words = [match.group(0) for match in _WORD_RE.finditer(body)]
+    latin_words = [word for word in words if _is_latin_word(word)]
+    proper = []
+    for word in latin_words:
+        folded = _ascii_fold(word)
+        proper.append(
+            len(word) == 1
+            or folded in _SYMBOL_WORDS
+            or word.isupper()
+            or (word[0].isupper() and folded not in _LATIN_PROSE_STARTERS)
+        )
+    for index, word in enumerate(latin_words):
+        if (_ascii_fold(word) in _PROPER_NAME_CONNECTORS
+                and 0 < index < len(latin_words) - 1
+                and proper[index - 1] and proper[index + 1]):
+            proper[index] = True
+    return sum(
+        len(word)
+        for word, is_proper in zip(latin_words, proper)
+        if not is_proper
+    )
+
+
+def _has_latin_diacritic(body: str) -> bool:
+    return any(
+        ord(char) > 127
+        and unicodedata.category(char).startswith('L')
+        and 'LATIN' in unicodedata.name(char, '')
+        for char in body
+    )
+
+
+def _has_non_english_script_or_latin_diacritic(
+    body: str,
+    config: LanguageConfig,
+) -> bool:
+    """返回散文是否有明确的非英文文字证据；CXB-520 同文闸门也复用此处。"""
+    if len(_NON_ENGLISH_SCRIPT_RE.findall(body)) >= config.en_min_foreign_script_letters:
+        return True
+    return _has_latin_diacritic(body)
+
+
+def _und_prose_has_positive_english_evidence(
+    body: str,
+    config: LanguageConfig,
+) -> bool:
+    """只凭小节自身的英文正证据放行保守检测器返回的 ``und``。"""
+    if len(_NON_ENGLISH_SCRIPT_RE.findall(body)) >= config.en_min_foreign_script_letters:
+        return False
+    positive = bool(_SHORT_ENGLISH_PROSE_RE.search(body))
+    if _has_non_english_script_or_latin_diacritic(body, config) and not positive:
+        return False
+    return positive
+
+
+def _target_language_mismatch(
+    body: str,
+    target_lang: str,
+    source_lang: str | None,
+    config: LanguageConfig,
+) -> bool:
+    """目标语言唯一判据；覆盖率检查与 CXB-520 同文合法性共用。"""
+    prose = _plain_prose(body)
+    if not prose:
+        return False
+    if target_lang == 'zh':
+        foreign_script_letters = sum(
+            unicodedata.category(char).startswith('L')
+            and _HAN_RE.fullmatch(char) is None
+            and not _is_latin_word(char)
+            for char in prose
+        )
+        if foreign_script_letters >= config.en_min_foreign_script_letters:
+            return True
+        han_letters = len(_HAN_RE.findall(prose))
+        latin_letters = _residual_latin_letters(prose)
+        denominator = han_letters + latin_letters
+        ratio = latin_letters / denominator if denominator else 0.0
+        short_english = bool(_SHORT_ENGLISH_PROSE_RE.search(prose))
+        minimum = min(config.zh_min_latin_letters, 4) if short_english else config.zh_min_latin_letters
+        return latin_letters >= minimum and ratio > config.zh_max_latin_ratio
+
+    if len(_NON_ENGLISH_SCRIPT_RE.findall(prose)) >= config.en_min_foreign_script_letters:
+        return True
+    if _NON_ENGLISH_FRAGMENT_RE.search(_ascii_fold(prose)):
+        return True
+    detected_lang, _confidence = detect_source_lang(prose, {})
+    if detected_lang == 'en':
+        return False
+    if detected_lang != 'und':
+        return True
+    if _und_prose_has_positive_english_evidence(prose, config):
+        return False
+    if _same_language_family(source_lang, target_lang):
+        return False
+    latin_letters = sum(len(word) for word in _WORD_RE.findall(prose) if _is_latin_word(word))
+    return latin_letters >= 12
+
+
+def _looks_mojibake(body: str, config: LanguageConfig) -> bool:
+    prose = _plain_prose(body)
+    return bool(_MOJIBAKE_SIGNATURE_RE.search(prose)) or (
+        len(_MOJIBAKE_MARKER_RE.findall(prose)) >= config.mojibake_min_markers
+    )
+
+
 def _has_prose_outside_target_language(
     section: _Section,
     target_lang: str,
     source_lang: str | None,
+    config: LanguageConfig,
 ) -> bool:
     """源小节是否仍含需要翻到目标语言的散文。
 
@@ -560,25 +730,7 @@ def _has_prose_outside_target_language(
     """
     if not _has_translatable_prose(section):
         return False
-
-    body = _PROTECTED_RE.sub('', section.body)
-    body = _IMAGE_RE.sub('', body)
-    body = re.sub(r'<[^>]+>', '', body)
-    letters = [ch for ch in body if unicodedata.category(ch).startswith('L')]
-    if target_lang == 'zh':
-        return any(_HAN_RE.fullmatch(ch) is None for ch in letters)
-    if _NON_ENGLISH_FRAGMENT_RE.search(_ascii_fold(body)):
-        return True
-    detected_lang, _confidence = detect_source_lang(body, {})
-    if detected_lang == 'en':
-        return False
-    if detected_lang != 'und':
-        return True
-    if _SHORT_ENGLISH_PROSE_RE.search(body):
-        return False
-    if _same_language_family(source_lang, target_lang):
-        return False
-    return True
+    return _target_language_mismatch(section.body, target_lang, source_lang, config)
 
 
 def _content_findings(
@@ -587,6 +739,7 @@ def _content_findings(
     mode: str,
     target_lang: str,
     source_lang: str | None,
+    config: LanguageConfig,
 ) -> list[Finding]:
     findings = []
     if not translated.strip():
@@ -618,7 +771,7 @@ def _content_findings(
                 continue
             if (source_section.body == translated_section.body
                     and _has_prose_outside_target_language(
-                        source_section, target_lang, source_lang)):
+                        source_section, target_lang, source_lang, config)):
                 findings.append(Finding(
                     FindingType.UNTRANSLATED,
                     source_section.heading,
@@ -637,6 +790,38 @@ def _content_findings(
                 '最终答案',
                 _excerpt(source_answer),
                 _excerpt(translated_answer),
+            ))
+    return findings
+
+
+def _language_findings(
+    translated: str,
+    mode: str,
+    target_lang: str,
+    source_lang: str | None,
+    config: LanguageConfig,
+) -> list[Finding]:
+    """逐小节检查译文语言；乱码与语言覆盖率分别报告。"""
+    sections = _sections(translated) or [_Section('文档', translated)]
+    findings = []
+    for section in sections:
+        if not _has_translatable_prose(section):
+            continue
+        if _looks_mojibake(section.body, config):
+            findings.append(Finding(
+                FindingType.MOJIBAKE,
+                section.heading,
+                '',
+                _excerpt(_plain_prose(section.body)),
+            ))
+        if (mode == 'translated'
+                and _target_language_mismatch(
+                    section.body, target_lang, source_lang, config)):
+            findings.append(Finding(
+                FindingType.TARGET_LANGUAGE_MISMATCH,
+                section.heading,
+                '',
+                _excerpt(_plain_prose(section.body)),
             ))
     return findings
 
@@ -669,6 +854,7 @@ def verify_translation(
     mode: str = 'translated',
     target_lang: str = 'zh',
     source_lang: str | None = None,
+    language_config: LanguageConfig | None = None,
 ) -> list[Finding]:
     """校验一对 Markdown 字符串，返回全部可定位问题。
 
@@ -680,13 +866,18 @@ def verify_translation(
         raise ValueError(f'unsupported translation mode: {mode}')
     if target_lang not in {'en', 'zh'}:
         raise ValueError(f'unsupported target language: {target_lang}')
+    config = language_config or LanguageConfig()
+    _validate_language_config(config)
     findings = []
     findings.extend(_compare_occurrences(
         FindingType.MATH_MISMATCH, _protected(source), _protected(translated)))
     findings.extend(_compare_occurrences(
         FindingType.IMAGE_MISMATCH, _images(source), _images(translated)))
     findings.extend(_structure_findings(source, translated))
-    findings.extend(_content_findings(source, translated, mode, target_lang, source_lang))
+    findings.extend(_content_findings(
+        source, translated, mode, target_lang, source_lang, config))
+    findings.extend(_language_findings(
+        translated, mode, target_lang, source_lang, config))
     findings.extend(_leak_findings(source, translated))
     return findings
 

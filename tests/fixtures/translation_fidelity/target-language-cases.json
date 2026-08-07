@@ -1,0 +1,55 @@
+{
+  "bad_zh": [
+    {
+      "mathnet_id": "0cje",
+      "translated": "求出所有 pairs of twice 可微函数，使得两者 and are continuous，并且对所有实数成立。"
+    },
+    {
+      "mathnet_id": "01qt",
+      "translated": "Do there exist 函数s，使得这些条件成立，并且对所有实数都满足要求？"
+    },
+    {
+      "mathnet_id": "039x",
+      "translated": "求所有 values of the real parameter，使得 the 不等式 has a unique solution。"
+    },
+    {
+      "mathnet_id": "0iz4",
+      "translated": "题目：If the two quantities are equal, what is the value of their sum? 解答：Both quantities equal the same number, so the sums are equal as well."
+    },
+    {
+      "mathnet_id": "05lr",
+      "translated": "求所有函数，使得结果是 un 完全平方数。Pour simplifier, posons the first value. On peut donc ecrire the required identity."
+    },
+    {
+      "mathnet_id": "0k1z",
+      "translated": "\u00e9\u00a2\u00e7\u00ae\u00ef\u00bc A \u00e6\u00ad\u00e6\u00b9\u00e5\u00bd\u00a2 \u00e4\u00b8\u00e8\u00be\u00b9 of length \u00e4\u00b8\u00bagiven. \u00e6 many different ways to cut the square are possible."
+    }
+  ],
+  "valid_zh": [
+    "求出满足条件的所有正整数。",
+    "令 x 为正整数，再比较两边。",
+    "由 Euler 定理可知结论成立。",
+    "使用 Cauchy-Schwarz 不等式估计这个和。",
+    "这是 IMO 2024 的一道数论题。",
+    "该题选自 International Mathematical Olympiad。",
+    "在 Tournament of Towns 中，这个构造很常见。",
+    "Paul Erdős 曾研究过这一类问题。",
+    "连接点 A、B、C，并设直线 l 与圆相交。",
+    "分别计算 sin、cos 与 gcd 的值。",
+    "由 Ramanujan 的恒等式立刻得到答案。",
+    "比较 AB 与 CD 的长度，然后使用 Menelaus 定理。"
+  ],
+  "bad_en": [
+    "求出满足条件的所有正整数，并证明答案唯一。",
+    "Найдите все целые числа, удовлетворяющие условию.",
+    "Pour simplifier, posons la première valeur et comparons les deux membres.",
+    "Keine Lösungen erfüllen alle angegebenen Bedingungen."
+  ],
+  "valid_en": [
+    "Find all positive integers satisfying the stated condition.",
+    "By Erdős's theorem, the required estimate follows.",
+    "The International Mathematical Olympiad uses the same convention.",
+    "No solutions.",
+    "Set the two expressions equal and verify the result."
+  ]
+}
