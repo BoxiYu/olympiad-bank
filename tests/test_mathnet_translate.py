@@ -119,6 +119,13 @@ def cxb_525_fixture() -> dict:
     )
 
 
+def cxb_528_fixture() -> dict:
+    return json.loads(
+        (REPO_ROOT / "tests" / "fixtures" / "translation_fidelity"
+         / "cxb-528-mutation-boundaries.json").read_text(encoding="utf-8")
+    )
+
+
 def cxb_525_export(tmp_path: Path) -> tuple[Path, dict, dict]:
     fixture = cxb_525_fixture()
     source_unit = fixture["source_unit"]
@@ -569,6 +576,39 @@ def test_cxb_525_placeholder_multiset_damage_is_rejected(tmp_path: Path, damage:
     assert "缺失、重复或被篡改" in read_jsonl(
         apply_path.with_suffix(".jsonl.failures.jsonl")
     )[0]["error"]
+
+
+def test_cxb_528_runtime_rejects_a_pure_placeholder_duplicate():
+    row = next(
+        item for item in cxb_528_fixture()["constructed_cases"]
+        if item["fixture_id"]
+        == "constructed-cxb528-runtime-pure-placeholder-duplicate"
+    )
+    unit = {
+        "id": row["unit_id"],
+        "source": row["source_body"],
+        "protected": row["protected"],
+        "translatable": True,
+    }
+
+    with pytest.raises(mt.TranslateError, match="不可译占位缺失、重复或被篡改"):
+        mt.restore_translation(row["translated_body"], unit)
+
+
+def test_cxb_528_two_letter_word_keeps_final_answer_translatable():
+    row = next(
+        item for item in cxb_528_fixture()["real_final_answers"]
+        if item["case"] == "driver_two_letter_operator_answer"
+    )
+    document = mt.parse_document(
+        f"# {row['mathnet_id']}\n\n## 题面\n\nQuestion.\n\n"
+        f"## 最终答案\n\n{row['body']}\n"
+    )
+    final_answer = mt.export_units(document)[-1]
+
+    assert not mt.is_symbolic_answer(row["body"])
+    assert final_answer["translatable"] is True
+    assert final_answer["protected"] == {}
 
 
 def test_apply_keeps_image_placeholder_relative_order():

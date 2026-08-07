@@ -1,0 +1,34 @@
+{
+  "fixture_kind": "CXB-528 mutation-boundary unit excerpts",
+  "scope": "Two verbatim final answers from the frozen real-corpus fixtures plus one explicitly constructed runtime placeholder-damage case; these are not complete documents.",
+  "source_revision": "33e6b3bc",
+  "real_final_answers": [
+    {
+      "case": "zh_two_letter_final_answer",
+      "mathnet_id": "01vz",
+      "field": "final_answer",
+      "language": "en",
+      "body": "No",
+      "source_fixture": "translation_language_corpus/zh.json"
+    },
+    {
+      "case": "driver_two_letter_operator_answer",
+      "mathnet_id": "01cf",
+      "field": "final_answer",
+      "language": "en",
+      "body": "f(z) = 0 or f(z) = z^2",
+      "source_fixture": "translation_language_corpus/en.json"
+    }
+  ],
+  "constructed_cases": [
+    {
+      "fixture_id": "constructed-cxb528-runtime-pure-placeholder-duplicate",
+      "unit_id": "statement",
+      "source_body": "Compare {{MNT_0001}}.",
+      "translated_body": "比较 {{MNT_0001}} 与 {{MNT_0001}}。",
+      "protected": {
+        "{{MNT_0001}}": "$x+y$"
+      }
+    }
+  ]
+}
