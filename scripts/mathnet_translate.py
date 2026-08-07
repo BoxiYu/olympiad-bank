@@ -391,12 +391,16 @@ def json_object_value_spans(line: str) -> tuple[dict[str, tuple[int, int]], int]
         position = skip_space(position + 1)
 
 
-def update_index_line(line: str, projection: dict[str, Any]) -> str:
-    """只替换/追加三个投影字段，保留该行其余字节（含空白与字段顺序）。"""
+def update_index_line(line: str, projection: dict[str, Any],
+                      fields: tuple[str, ...] = INDEX_TRANSLATION_FIELDS) -> str:
+    """只替换/追加指定投影字段，保留该行其余字节（含空白与字段顺序）。
+
+    默认字段仍是三语索引契约；显式 ``fields`` 供其他索引投影复用这一个定点更新正本。
+    """
     spans, closing = json_object_value_spans(line)
     edits: list[tuple[int, int, str]] = []
     missing = []
-    for key in INDEX_TRANSLATION_FIELDS:
+    for key in fields:
         encoded = json.dumps(projection[key], ensure_ascii=False, separators=(",", ":"))
         if key in spans:
             start, end = spans[key]
