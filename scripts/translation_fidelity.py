@@ -18,7 +18,7 @@ from enum import Enum
 from itertools import zip_longest
 from pathlib import Path
 
-from source_lang import detect_source_lang
+from translation_english_language import english_target_mismatch
 from translation_language import (
     LanguageConfig,
     has_translatable_prose as _has_zh_translatable_prose,
@@ -184,31 +184,6 @@ _SYMBOL_WORDS = {
     'bmod', 'cos', 'gcd', 'inf', 'lcm', 'ln', 'log', 'max', 'min', 'mod',
     'pmod', 'sin', 'sqrt', 'sup', 'tan',
 }
-_SHORT_ENGLISH_PROSE_RE = re.compile(
-    r'\b(?:'
-    r'no[ \t]+solutions?'
-    r'|proof[ \t]+(?:is[ \t]+)?omitted'
-    r'|the[ \t]+answers?[ \t]+(?:is|are)'
-    r'|find\b'
-    r'|set\b'
-    r'|verify\b'
-    r'|alternatively[ \t]+use\b'
-    r')',
-    re.IGNORECASE,
-)
-_NON_ENGLISH_FRAGMENT_RE = re.compile(
-    r'\b(?:'
-    # Common concise-answer and instruction words from MathNet's major
-    # Latin-script source languages.  They are checked only when the
-    # conservative document detector returned ``und``.
-    r'aucun|aucune|trouver|demontrer|preuve|reponse|omis|omise|les|des|pour'
-    r'|nessun|nessuna|trovare|dimostrare|soluzione|risposta|omessa'
-    r'|kein|keine|finden|beweis|antwort|losung|losungen'
-    r'|ningun|ninguna|hallar|respuesta|prueba|omitida|soluciones'
-    r'|nenhum|nenhuma|encontrar|resposta|omitida|solucoes'
-    r'|poisci|dokazi|resitev'
-    r')\b'
-)
 _WHOLE_FENCE_RE = re.compile(
     r'\A[ \t]*(```|~~~)[^\n]*\n(?P<body>.*)\n\1[ \t]*\Z',
     re.DOTALL,
@@ -609,13 +584,6 @@ def _has_translatable_prose(section: _Section) -> bool:
     return bool(re.search(r'[^\W\d_]', body, re.UNICODE))
 
 
-def _same_language_family(source_lang: str | None, target_lang: str) -> bool:
-    if not source_lang:
-        return False
-    family = re.split(r'[-_]', source_lang.casefold(), maxsplit=1)[0]
-    return family == target_lang
-
-
 def _ascii_fold(value: str) -> str:
     return ''.join(
         char for char in unicodedata.normalize('NFKD', value.casefold())
@@ -654,18 +622,7 @@ def _has_prose_outside_target_language(
     body = _PROTECTED_RE.sub('', section.body)
     body = _IMAGE_RE.sub('', body)
     body = re.sub(r'<[^>]+>', '', body)
-    if _NON_ENGLISH_FRAGMENT_RE.search(_ascii_fold(body)):
-        return True
-    detected_lang, _confidence = detect_source_lang(body, {})
-    if detected_lang == 'en':
-        return False
-    if detected_lang != 'und':
-        return True
-    if _SHORT_ENGLISH_PROSE_RE.search(body):
-        return False
-    if _same_language_family(source_lang, target_lang):
-        return False
-    return True
+    return english_target_mismatch(body, source_lang)
 
 
 def _content_findings(

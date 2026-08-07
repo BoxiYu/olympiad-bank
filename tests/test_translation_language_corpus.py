@@ -9,8 +9,8 @@
 标注来源见 fixture 的 label_source：human-review-r1..r7 为七轮评审人工判定，
 gate-clean-random-sample 与 independent-latin-ratio 为独立判据 + 人工抽看。
 
-天花板 = 2026-08-07 当前检测器实测值（棘轮只紧不松）：
-  en: fp 0 / fn 4    —— CXB-520 修复 7 条短英文误伤后同步收紧
+天花板 = 2026-08-07 master 实测值（棘轮只紧不松）：
+  en: fp 0 / fn 0    —— CXB-523 已捕获全部 7 份 CJK 双语与荷兰语照抄
   zh: fp 0 / fn 3    —— CXB-522 中文侧闸门实测；3 份漏检为冻结语料已知边界
 改善后请把常量往下调并在提交信息里写明依据；调松必须给出与本文件同等级的实测证据。
 """
@@ -24,7 +24,7 @@ from translation_fidelity import verify_translation  # noqa: E402
 FIXDIR = pathlib.Path(__file__).parent / 'fixtures' / 'translation_language_corpus'
 
 CEILINGS = {
-    'en': {'fp': 0, 'fn': 4},
+    'en': {'fp': 0, 'fn': 0},
     'zh': {'fp': 0, 'fn': 3},
 }
 
