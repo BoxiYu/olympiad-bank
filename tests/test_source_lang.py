@@ -86,6 +86,8 @@ def test_en_high_relaxation_does_not_expand_zero_call_passthrough():
         "und_tiny_non_en_winner": ("und", "low"),
         "und_tiny_zero_margin_tie": ("und", "low"),
         "und_tiny_english_density_below_half": ("und", "low"),
+        "und_tiny_french_shared_on": ("und", "low"),
+        "und_tiny_dutch_shared_is": ("und", "low"),
     }
     selected = {case["id"]: case for case in CASES if case["id"] in expected}
     assert set(selected) == set(expected)
