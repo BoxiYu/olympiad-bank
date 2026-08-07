@@ -16,6 +16,14 @@ from translation_fidelity import (  # noqa: E402
     verify_directory,
     verify_translation,
 )
+import translation_language as language_rules  # noqa: E402
+from translation_language import (  # noqa: E402
+    LanguageConfig,
+    has_translatable_prose,
+    is_pure_symbol,
+    plain_prose,
+    target_language_mismatch,
+)
 
 
 FIXTURES = Path(__file__).parent / 'fixtures' / 'translation_fidelity'
@@ -104,6 +112,327 @@ def full_document_feature_fixture():
 
 def audit_fixture():
     return json.loads((FIXTURES / 'full-pair-audit.json').read_text(encoding='utf-8'))
+
+
+def target_language_fixture():
+    return json.loads(
+        (FIXTURES / 'target-language-cases.json').read_text(encoding='utf-8')
+    )
+
+
+def language_document(body):
+    return f'# language-case\n\n## 题面\n\n{body}\n'
+
+
+def test_real_id_language_fixture_has_only_verbatim_mathnet_excerpts():
+    fixture = target_language_fixture()
+    assert fixture['source']['revision'] == '33e6b3bc254e6f0f0c1479b4252f5e9dd551d56c'
+    real_rows = fixture['identical_foreign_sections']
+    constructed = fixture['constructed_changed_sections']
+    assert {row['mathnet_id'] for row in real_rows} >= {
+        '02qx', '05gq', '02nt', '02lc', '09x3',
+        '0cvq', '0cuh', '0ghx', '06ia',
+    }
+    assert all('body' in row and 'field' in row for row in real_rows)
+    assert all('mathnet_id' not in row for row in constructed)
+    assert all(row['fixture_id'].startswith('constructed-') for row in constructed)
+
+
+@pytest.mark.parametrize(
+    'row', target_language_fixture()['identical_foreign_sections'],
+    ids=lambda row: row['mathnet_id'],
+)
+def test_verbatim_foreign_mathnet_sections_are_untranslated(row):
+    document = language_document(row['body'])
+    findings = verify_translation(
+        document,
+        document,
+        target_lang='en',
+        source_lang=row['language'],
+    )
+    assert [finding.type for finding in findings] == [FindingType.UNTRANSLATED]
+
+
+def test_09x3_fixture_is_real_dutch_latin_script_not_hebrew():
+    row = next(
+        row for row in target_language_fixture()['identical_foreign_sections']
+        if row['mathnet_id'] == '09x3'
+    )
+    assert row['language'] == 'nl'
+    assert row['body'].startswith('Gegeven zijn twee positieve gehele getallen')
+    assert not any('\u0590' <= char <= '\u05ff' for char in row['body'])
+
+
+def test_0cvq_fixture_is_real_russian_solution_not_greek():
+    row = next(
+        row for row in target_language_fixture()['identical_foreign_sections']
+        if row['mathnet_id'] == '0cvq'
+    )
+    assert row['field'] == 'solutions_markdown[0]'
+    assert row['body'].startswith('Разобьём доску на')
+    assert not any('\u0370' <= char <= '\u03ff' for char in row['body'])
+
+
+@pytest.mark.parametrize(
+    'row', target_language_fixture()['constructed_changed_sections'],
+    ids=lambda row: row['fixture_id'],
+)
+def test_changed_english_sections_skip_all_language_heuristics(row):
+    source = language_document(row['source_body'])
+    translated = language_document(row['translated_body'])
+    language_types = {
+        FindingType.UNTRANSLATED,
+        FindingType.TARGET_LANGUAGE_MISMATCH,
+    }
+    assert not language_types.intersection(
+        finding.type
+        for finding in verify_translation(source, translated, target_lang='en')
+    )
+
+
+def test_changed_english_foreign_script_is_left_to_other_fidelity_signals():
+    source = language_document('Compare the two sides and conclude.')
+    translated = language_document('Сравните две стороны и сделайте вывод.')
+    findings = verify_translation(source, translated, target_lang='en')
+    assert not any(finding.type in {
+        FindingType.UNTRANSLATED,
+        FindingType.TARGET_LANGUAGE_MISMATCH,
+    } for finding in findings)
+
+
+def test_identical_chinese_section_has_one_untranslated_finding_not_two():
+    document = language_document('求出所有满足条件的正整数，并证明答案唯一。')
+    findings = verify_translation(document, document, target_lang='en')
+    assert [finding.type for finding in findings] == [FindingType.UNTRANSLATED]
+
+
+def test_identical_foreign_section_in_chinese_variant_has_no_duplicate_finding():
+    document = language_document('Find all positive integers satisfying the condition.')
+    findings = verify_translation(document, document, target_lang='zh')
+    assert [finding.type for finding in findings] == [FindingType.UNTRANSLATED]
+
+
+def test_changed_half_english_chinese_translation_uses_target_mismatch_only():
+    source = language_document('Find all positive integers satisfying the condition.')
+    translated = language_document('求出 all positive integers，并证明结论。')
+    findings = verify_translation(source, translated, target_lang='zh')
+    assert [finding.type for finding in findings] == [
+        FindingType.TARGET_LANGUAGE_MISMATCH,
+    ]
+
+
+def test_changed_cyrillic_chinese_translation_uses_hard_script_signal():
+    source = language_document('Find all positive integers satisfying the condition.')
+    translated = language_document('求出所有整数，затем докажите 唯一性。')
+    findings = verify_translation(source, translated, target_lang='zh')
+    assert [finding.type for finding in findings] == [
+        FindingType.TARGET_LANGUAGE_MISMATCH,
+    ]
+
+
+def test_plain_prose_keeps_colon_bullet_value_and_strips_markup():
+    body = '- Case 1: <span>**Pour** simplifier, comparons.</span> {{MNT_0001}} $x+y$ !!!'
+    assert plain_prose(body) == 'Pour simplifier, comparons. !!!'
+    document = language_document(body)
+    assert FindingType.UNTRANSLATED in types(
+        document, document, target_lang='en', source_lang='fr'
+    )
+
+
+def test_plain_prose_strips_fenced_code_but_not_following_prose():
+    body = '```text\nPour ignorer ce code.\n```\n\nComparer les deux membres.'
+    assert plain_prose(body) == 'Comparer les deux membres.'
+
+
+@pytest.mark.parametrize('answer', [
+    r'\sqrt{5}/125',
+    r'\Gamma_1',
+    r'n \equiv 1 \pmod 3',
+    'D',
+])
+def test_pure_symbol_recognizes_commands_and_symbol_word_whitelist(answer):
+    assert is_pure_symbol(answer)
+    assert not has_translatable_prose(answer, '最终答案')
+
+
+def test_empty_text_is_neither_symbol_nor_language_mismatch():
+    assert not is_pure_symbol('   ')
+    assert not target_language_mismatch('', 'en', None, LanguageConfig())
+
+
+def test_parenthesized_real_solution_is_not_a_generated_empty_placeholder():
+    body = '（将两边平方得到结论）'
+    assert has_translatable_prose(body, '解法 1')
+    document = language_document(body)
+    assert FindingType.UNTRANSLATED in types(
+        document, document, target_lang='en', source_lang='zh'
+    )
+
+
+@pytest.mark.parametrize('body', [
+    '（数据集未提供）',
+    '（数据集未提供 / 证明题）',
+])
+def test_only_known_generator_placeholders_are_empty(body):
+    assert not has_translatable_prose(body, '解法 1')
+
+
+def test_chinese_single_letters_and_name_connectors_are_exempt():
+    assert language_rules._residual_latin_letters('连接 A 与 B，并使用 gcd。') == 0
+    for connector in ('de', 'van', 'von'):
+        assert language_rules._residual_latin_letters(
+            f'由 Paul {connector} Erdős 的结论可知。'
+        ) == 0
+    assert language_rules._residual_latin_letters('把 regular polygon 分成三角形。') > 0
+    assert language_rules._residual_latin_letters('de regular') == len('deregular')
+
+
+@pytest.mark.parametrize('text', [
+    'αβ',
+    'БВ',
+    'אב',
+    'اب',
+    'かな',
+    '㐀㐁',
+    '中文',
+    '豈更',
+    '한글',
+])
+def test_each_foreign_script_range_has_live_same_script_evidence(text):
+    assert language_rules._has_foreign_script_prose(text, 2)
+
+
+def test_same_script_continuity_rejects_mixed_isolated_symbols():
+    assert not language_rules._has_foreign_script_prose('αБ', 2)
+    assert not target_language_mismatch(
+        'α Б', 'en', None, LanguageConfig(en_min_foreign_script_letters=2)
+    )
+    assert target_language_mismatch(
+        'αβ', 'en', None, LanguageConfig(en_min_foreign_script_letters=2)
+    )
+    assert not language_rules._has_foreign_script_prose('中文', 3)
+    assert language_rules._has_foreign_script_prose('中文句', 3)
+    assert not language_rules._has_foreign_script_prose('α α', 2)
+    assert language_rules._has_foreign_script_prose('α\u0301α', 2)
+
+
+@pytest.mark.parametrize('text', [
+    '\u0370\u0370', '\u03ff\u03ff', '\u1f00\u1f00', '\u1ffc\u1ffc',
+    '\u0400\u0400', '\u052f\u052f', '\u05d0\u05d0', '\u05f2\u05f2',
+    '\u0620\u0620', '\u06ff\u06ff', '\u0750\u0750', '\u077f\u077f',
+    '\u08a0\u08a0', '\u08c9\u08c9', '\u3041\u3041', '\u30ff\u30ff',
+    '\u3400\u3400', '\u4dbf\u4dbf', '\u4e00\u4e00', '\u9fff\u9fff',
+    '\uf900\uf900', '\ufad9\ufad9', '\uac00\uac00', '\ud7a3\ud7a3',
+])
+def test_foreign_script_range_endpoints_are_live(text):
+    assert language_rules._has_foreign_script_prose(text, 2)
+
+
+@pytest.mark.parametrize('text', [
+    '\u036f\u036f', '\u0530\u0530', '\u058f\u058f', '\u0780\u0780',
+    '\u089f\u089f', '\u0900\u0900', '\u303f\u303f', '\u3100\u3100',
+    '\u33ff\u33ff', '\u4dc0\u4dc0', '\u4e00\u33ff', '\uf8ff\uf8ff',
+    '\ufb00\ufb00', '\uabff\uabff', '\ud7b0\ud7b0',
+])
+def test_neighbouring_unicode_ranges_are_not_foreign_script_prose(text):
+    assert not language_rules._has_foreign_script_prose(text, 2)
+
+
+@pytest.mark.parametrize('text', [
+    '\u0375\u0375',
+    '\u0591\u0591',
+    '\u0660\u0660',
+    '\u30fb\u30fb',
+])
+def test_nonletters_inside_supported_script_blocks_do_not_count(text):
+    assert not language_rules._has_foreign_script_prose(text, 2)
+
+
+def test_fragment_branch_is_independently_live(monkeypatch):
+    monkeypatch.setattr(language_rules, 'detect_source_lang', lambda *_: ('en', 'high'))
+    assert target_language_mismatch(
+        'Pour simplifier, comparons les membres.', 'en', None, LanguageConfig()
+    )
+
+
+def test_latin_diacritic_branch_is_independently_live(monkeypatch):
+    monkeypatch.setattr(language_rules, 'detect_source_lang', lambda *_: ('en', 'high'))
+    assert target_language_mismatch('Cláudia', 'en', None, LanguageConfig())
+
+
+def test_concrete_detected_language_branch_is_independently_live(monkeypatch):
+    monkeypatch.setattr(language_rules, 'detect_source_lang', lambda *_: ('nl', 'high'))
+    assert target_language_mismatch(
+        'Gegeven twee gehele getallen', 'en', 'en-US', LanguageConfig()
+    )
+
+
+def test_foreign_script_branch_precedes_english_detector(monkeypatch):
+    monkeypatch.setattr(language_rules, 'detect_source_lang', lambda *_: ('en', 'high'))
+    assert target_language_mismatch('中文', 'en', None, LanguageConfig())
+
+
+def test_und_fallback_branch_is_independently_live(monkeypatch):
+    monkeypatch.setattr(language_rules, 'detect_source_lang', lambda *_: ('und', 'low'))
+    assert target_language_mismatch(
+        'Zorgvuldig vergelijken wij beide leden', 'en', None, LanguageConfig()
+    )
+
+
+def test_english_detection_and_source_family_exemptions_are_live(monkeypatch):
+    monkeypatch.setattr(language_rules, 'detect_source_lang', lambda *_: ('en', 'high'))
+    assert not target_language_mismatch(
+        'Find all positive integers', 'en', None, LanguageConfig()
+    )
+    monkeypatch.setattr(language_rules, 'detect_source_lang', lambda *_: ('und', 'low'))
+    assert not target_language_mismatch(
+        'Zorgvuldig vergelijken wij beide leden', 'en', 'en-US', LanguageConfig()
+    )
+
+
+def test_mojibake_remains_independent_on_changed_english_section():
+    source = language_document('Compare the two quantities.')
+    translated = language_document('Compare the two quantitiÃ©s.')
+    finding_types = [
+        finding.type for finding in verify_translation(
+            source, translated, target_lang='en'
+        )
+    ]
+    assert finding_types == [FindingType.MOJIBAKE]
+
+
+def test_mojibake_marker_threshold_boundary_is_live():
+    markers = 'Ç\u0080È\u0081É\u0082'
+    assert not language_rules.looks_mojibake(markers[:4], LanguageConfig())
+    assert language_rules.looks_mojibake(markers, LanguageConfig())
+
+
+def test_language_config_accepts_documented_boundaries():
+    for ratio in (0.0, 1.0):
+        verify_translation(
+            SOURCE,
+            VALID_TRANSLATION,
+            language_config=LanguageConfig(zh_max_latin_ratio=ratio),
+        )
+
+
+def test_chinese_ratio_and_short_english_threshold_branches_are_live():
+    config = LanguageConfig()
+    assert not target_language_mismatch('!!!', 'zh', None, config)
+    assert target_language_mismatch('求 find', 'zh', None, config)
+    assert not target_language_mismatch('求 abcdef', 'zh', None, config)
+
+
+@pytest.mark.parametrize('kwargs', [
+    {'zh_max_latin_ratio': -0.01},
+    {'zh_max_latin_ratio': 1.01},
+    {'zh_min_latin_letters': 0},
+    {'en_min_foreign_script_letters': 0},
+    {'mojibake_min_markers': 0},
+])
+def test_language_config_rejects_dead_thresholds(kwargs):
+    with pytest.raises(ValueError):
+        verify_translation(SOURCE, VALID_TRANSLATION, language_config=LanguageConfig(**kwargs))
 
 
 def normal_batch(size=97):

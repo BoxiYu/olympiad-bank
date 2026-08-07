@@ -1,0 +1,116 @@
+{
+  "fixture_kind": "verbatim MathNet field excerpts plus explicitly constructed changed-section regressions",
+  "source": {
+    "dataset": "ShadenA/MathNet",
+    "revision": "33e6b3bc254e6f0f0c1479b4252f5e9dd551d56c",
+    "policy": "Every row with mathnet_id contains a verbatim excerpt from that row's named field. Constructed text uses only a constructed-* fixture_id and never a mathnet_id."
+  },
+  "identical_foreign_sections": [
+    {
+      "mathnet_id": "02qx",
+      "field": "problem_markdown",
+      "language": "pt",
+      "body": "Um polígono convexo é elegante quando ele pode ser decomposto em triângulos equiláteros, quadrados ou ambos, todos com lados de mesmo comprimento. Abaixo, mostramos alguns polígonos elegantes, indicando para cada um deles uma decomposição e o número de lados."
+    },
+    {
+      "mathnet_id": "05gq",
+      "field": "problem_markdown",
+      "language": "fr",
+      "body": "Soit $ABC$ un triangle, $H$ le pied de la hauteur issue de $A$, $L$ le pied de la bissectrice issue de $B$ et $M$ le milieu de $[AB]$. On suppose que dans le triangle $HLM$ on a les deux propriétés : $(AH)$ est une hauteur et $(BL)$ est une bissectrice. Montrer que $(CM)$ est une médiane."
+    },
+    {
+      "mathnet_id": "02nt",
+      "field": "problem_markdown",
+      "language": "pt",
+      "body": "Uma companhia de eletricidade instalou um poste num terreno plano. Para fixar bem o poste, foram presos cabos no poste, a uma altura de $1{,}4$ metros do solo e a $2$ metros de distância do poste, sendo que um dos cabos mede $2{,}5$ metros, conforme a figura."
+    },
+    {
+      "mathnet_id": "02lc",
+      "field": "problem_markdown",
+      "language": "pt",
+      "body": "Um jardim retangular - O retângulo $ABCD$ representa um terreno retangular cuja largura é $3/5$ do comprimento. O retângulo $ABEF$ representa um jardim retangular cuja largura é também $3/5$ do comprimento. Qual a razão entre a área do jardim e a área total do terreno?"
+    },
+    {
+      "mathnet_id": "09x3",
+      "field": "problem_markdown",
+      "language": "nl",
+      "body": "Gegeven zijn twee positieve gehele getallen $k$ en $n$ met $k \\leq n \\leq 2k-1$. Julian heeft een grote stapel rechthoekige $k \\times 1$-tegels. Merlijn noemt een positief geheel getal $m$ en ontvangt van Julian $m$ tegels om op een $n \\times n$-bord te plaatsen. Op elke tegel schrijft Julian eerst of het een horizontale of een verticale tegel moet worden. Tegels mogen op het bord niet overlappen en ze mogen ook niet uitsteken."
+    },
+    {
+      "mathnet_id": "0cvq",
+      "field": "solutions_markdown[0]",
+      "language": "ru",
+      "body": "Разобьём доску на $9$ квадратов $30 \\times 30$, $6$ прямоугольников $10 \\times 30$ и один квадрат $10 \\times 10$ (см. рис. 10)."
+    },
+    {
+      "mathnet_id": "0cuh",
+      "field": "solutions_markdown[1]",
+      "language": "ru",
+      "body": "10.7. См. задачу 9.7."
+    },
+    {
+      "mathnet_id": "0ghx",
+      "field": "problem_markdown",
+      "language": "zh",
+      "body": "泓江的兩岸各有 $n$ 座城市。江上有若干條雙向渡輪航班，每一條都連接左岸的一座城市與右岸的一座城市。我們稱一座城市是**便利的**，若且唯若該城市有通往對岸所有城市的航班。我們稱泓江是**暢通的**，若且唯若我們可以找到 $n$ 條航班，使得其兩端點的城市恰包含全部 $2n$ 座城市。"
+    },
+    {
+      "mathnet_id": "06ia",
+      "field": "problem_markdown",
+      "language": "zh",
+      "body": "設 $f(x)=ax+b$，其中 $a$、$b$ 為整數。若 $f(f(0))=0$ 而 $f(f(f(4)))=9$，求 $f(f(f(f(1))))+f(f(f(f(2))))+\\cdots+f(f(f(f(2014))))$ 的值。"
+    }
+  ],
+  "constructed_changed_sections": [
+    {
+      "fixture_id": "constructed-02lh-percentage-shape",
+      "source_body": "Qual foi o erro percentual cometido por Julia?",
+      "translated_body": "What percentage error did Julia make?"
+    },
+    {
+      "fixture_id": "constructed-0dvz-short-instruction-shape",
+      "source_body": "Problema: Simplifique:",
+      "translated_body": "Problem: Simplify:"
+    },
+    {
+      "fixture_id": "constructed-022q-accented-name-shape",
+      "source_body": "Solution: Cláudia e Bruno.",
+      "translated_body": "Solution: Cláudia and Bruno."
+    },
+    {
+      "fixture_id": "constructed-025j-accented-names-shape",
+      "source_body": "João, Jorge, José e Jânio recebem os prêmios.",
+      "translated_body": "João, Jorge, José, and Jânio receive the prizes."
+    },
+    {
+      "fixture_id": "constructed-024s-english-pour-shape",
+      "source_body": "Use o copo menor para despejar no jarro de João.",
+      "translated_body": "Use the smaller cup to pour into Joao's pitcher."
+    },
+    {
+      "fixture_id": "constructed-02ss-surname-shape",
+      "source_body": "Guimarães obteve a igualdade necessária.",
+      "translated_body": "Guimarães obtained the required equality."
+    },
+    {
+      "fixture_id": "constructed-02ag-school-students-shape",
+      "source_body": "120 alunos do ensino fundamental participaram.",
+      "translated_body": "120 elementary-school students entered the contest."
+    },
+    {
+      "fixture_id": "constructed-02id-person-name-shape",
+      "source_body": "Joãozinho escreve a resposta no quadro.",
+      "translated_body": "Joãozinho writes the answer on the board."
+    },
+    {
+      "fixture_id": "constructed-02ig-choice-shape",
+      "source_body": "Qual das alternativas está correta?",
+      "translated_body": "Which of the following choices is correct?"
+    },
+    {
+      "fixture_id": "constructed-latin-diacritic-names-shape",
+      "source_body": "Patrícia, Heloísa e Cláudia venceram.",
+      "translated_body": "The winners are Patrícia, Heloísa, and Cláudia."
+    }
+  ]
+}
