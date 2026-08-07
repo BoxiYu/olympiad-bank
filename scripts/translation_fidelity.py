@@ -630,12 +630,18 @@ def _has_prose_outside_target_language(
     letters = [ch for ch in body if unicodedata.category(ch).startswith('L')]
     if target_lang == 'zh':
         return any(_HAN_RE.fullmatch(ch) is None for ch in letters)
+    # ``und`` must never prove that unchanged prose is already English.  True
+    # English documents are promoted to en/high by the source detector before
+    # dispatch; keeping this boundary closed prevents stale/weak detections
+    # from authorizing an unchanged model echo.
+    if not source_lang or _same_language_family(source_lang, 'und'):
+        return True
     if _NON_ENGLISH_FRAGMENT_RE.search(_ascii_fold(body)):
         return True
-    detected_lang, _confidence = detect_source_lang(body, {})
-    if detected_lang == 'en':
+    detected_lang, confidence = detect_source_lang(body, {})
+    if detected_lang == 'en' and confidence == 'high':
         return False
-    if detected_lang != 'und':
+    if detected_lang not in {'en', 'und'}:
         return True
     if _SHORT_ENGLISH_PROSE_RE.search(body):
         return False

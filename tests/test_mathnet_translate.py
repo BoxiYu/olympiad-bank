@@ -165,6 +165,44 @@ def test_only_and_limit_are_deterministic(corpus: Path, tmp_path: Path, capsys):
     assert "--limit 1 已截断" in capsys.readouterr().out
 
 
+def test_source_language_map_invalidates_old_detector_cache_and_reuses_current(
+    corpus: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    destination = tmp_path / "source-lang-map.json"
+    source = next(path for path in corpus.rglob("index.md") if path.parent.name == "eng1")
+    destination.write_text(json.dumps({
+        "eng1": {
+            "source_lang": "und",
+            "source_lang_confidence": "low",
+            "source_sha256": digest(source),
+        }
+    }), encoding="utf-8")
+    calls = []
+
+    def detect(_text: str, _meta: dict) -> tuple[str, str]:
+        calls.append("eng1")
+        return "en", "high"
+
+    monkeypatch.setattr(mt, "detect_source_lang", detect)
+    result, _hashes = mt.build_source_language_map(corpus, destination, {"eng1"})
+
+    assert calls == ["eng1"]
+    assert result["eng1"] == {
+        "detector_version": mt.DETECTOR_VERSION,
+        "source_lang": "en",
+        "source_lang_confidence": "high",
+        "source_sha256": digest(source),
+    }
+
+    monkeypatch.setattr(
+        mt,
+        "detect_source_lang",
+        lambda _text, _meta: pytest.fail("current detector result should be reused"),
+    )
+    reused, _hashes = mt.build_source_language_map(corpus, destination, {"eng1"})
+    assert reused == result
+
+
 def test_passthrough_is_exact_and_reapply_is_noop(corpus: Path, tmp_path: Path):
     row = export(
         corpus, tmp_path / "batch.jsonl", "--only", "eng1", "--source-lang", "en",
@@ -455,6 +493,22 @@ def test_apply_payload_accepts_en_non_high_identical_model_result(
     assert (question / "index.en.md").read_bytes() == (question / "index.md").read_bytes()
     state = json.loads((question / "translation.json").read_text(encoding="utf-8"))
     assert state["variants"]["en"]["mode"] == "translated"
+
+
+def test_apply_payload_rejects_und_identical_model_result(
+    corpus: Path, tmp_path: Path
+):
+    row = export(
+        corpus, tmp_path / "batch.jsonl", "--only", "eng1",
+        "--source-lang", "und", "--source-lang-confidence", "low",
+    )[0]
+
+    with pytest.raises(mt.TranslateError, match="untranslated"):
+        mt.apply_payload(corpus, row, "en", identical_translated_variant(row))
+
+    question = (corpus / row["path"]).parent
+    assert not (question / "index.en.md").exists()
+    assert not (question / "translation.json").exists()
 
 
 def test_apply_payload_rejects_mixed_section_despite_matching_file_language(

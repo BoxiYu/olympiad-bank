@@ -23,10 +23,23 @@ def test_fixture_has_required_coverage():
     ids = {case["id"] for case in CASES}
     languages = {case["expected"][0] for case in CASES}
     assert len(CASES) >= 20
-    assert {"en", "de", "it", "es", "pt", "fr", "sl", "ru", "zh", "und"} <= languages
+    assert {
+        "en", "de", "it", "es", "pt", "fr", "nl", "ro", "sl", "ru",
+        "mn", "mk", "el", "zh", "und",
+    } <= languages
     assert any("conflict" in ident for ident in ids)
     assert any("problem_prefix" in ident or "problem_solution_prefix" in ident for ident in ids)
     assert any(ident.startswith("und_") for ident in ids)
+
+    expected_by_id = {case["id"]: case["expected"] for case in CASES}
+    assert {
+        ident: expected_by_id[ident][0]
+        for ident in ("08cz", "089p", "0ftx", "0fuo", "0fzq", "0g1c", "026c")
+    } == {
+        "08cz": "it", "089p": "it", "0ftx": "de", "0fuo": "de",
+        "0fzq": "de", "0g1c": "de", "026c": "pt",
+    }
+    assert {"nl_shared_english_words", "nl_short_math"} <= ids
 
 
 def test_english_high_confidence_recall_is_at_least_ninety_percent():
@@ -35,6 +48,11 @@ def test_english_high_confidence_recall_is_at_least_ninety_percent():
     english = [case for case in CASES if case["expected"] == ["en", "high"]]
     high = sum(detect_source_lang(case["body"], case["meta"]) == ("en", "high") for case in english)
     assert high / len(english) >= 0.9
+
+
+def test_short_english_recall_depends_on_dense_function_words():
+    assert detect_source_lang("Find $x$.", {}) == ("en", "high")
+    assert detect_source_lang("Problem $x$.", {}) == ("und", "low")
 
 
 def test_no_non_english_fixture_is_misclassified_as_english():

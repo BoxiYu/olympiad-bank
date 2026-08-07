@@ -244,5 +244,71 @@
     "body": "Um trapézio - No trapézio da figura abaixo é paralelo a , e . Quanto mede o ângulo ?",
     "meta": {},
     "expected": ["pt", "medium"]
+  },
+  {
+    "id": "en_short_find_math",
+    "body": "Find $x$.",
+    "meta": {},
+    "expected": ["en", "high"]
+  },
+  {
+    "id": "en_short_dense_prompt",
+    "body": "Determine all positive integers.",
+    "meta": {},
+    "expected": ["en", "high"]
+  },
+  {
+    "id": "en_holder_diacritic",
+    "body": "Prove that Hölder's inequality holds for all positive real numbers.",
+    "meta": {},
+    "expected": ["en", "high"]
+  },
+  {
+    "id": "en_names_with_diacritics",
+    "body": "Let Patrícia and João be positive integers and determine all possible values.",
+    "meta": {},
+    "expected": ["en", "high"]
+  },
+  {
+    "id": "en_bare_greek_math_symbols",
+    "body": "Let π, α, β and γ be positive real numbers.",
+    "meta": {},
+    "expected": ["en", "high"]
+  },
+  {
+    "id": "nl_shared_english_words",
+    "body": "Gegeven is een driehoek. Bewijs dat in deze driehoek de som van de hoeken gelijk is aan 180 graden.",
+    "meta": {},
+    "expected": ["nl", "high"]
+  },
+  {
+    "id": "nl_short_math",
+    "body": "Bepaal het getal $x$.",
+    "meta": {},
+    "expected": ["nl", "high"]
+  },
+  {
+    "id": "ro_short_math",
+    "body": "Determinați numărul $x$.",
+    "meta": {},
+    "expected": ["ro", "high"]
+  },
+  {
+    "id": "mn_short_math",
+    "body": "Бүх шийдийг ол.",
+    "meta": {},
+    "expected": ["mn", "high"]
+  },
+  {
+    "id": "mk_short_math",
+    "body": "Најди го бројот $x$.",
+    "meta": {},
+    "expected": ["mk", "high"]
+  },
+  {
+    "id": "el_short_math",
+    "body": "Βρείτε τον αριθμό $x$.",
+    "meta": {},
+    "expected": ["el", "high"]
   }
 ]

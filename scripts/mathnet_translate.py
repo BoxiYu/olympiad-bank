@@ -27,7 +27,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from source_lang import detect_source_lang, should_passthrough
+from source_lang import DETECTOR_VERSION, detect_source_lang, should_passthrough
 from translation_fidelity import verify_batch, verify_translation
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -883,7 +883,9 @@ def build_source_language_map(
         source_sha = sha256_bytes(source_bytes)
         source_hashes[mathnet_id] = source_sha
         previous = cached.get(mathnet_id)
-        if isinstance(previous, dict) and previous.get("source_sha256") == source_sha:
+        if (isinstance(previous, dict)
+                and previous.get("source_sha256") == source_sha
+                and previous.get("detector_version") == DETECTOR_VERSION):
             lang = previous.get("source_lang")
             confidence = previous.get("source_lang_confidence")
             if isinstance(lang, str) and isinstance(confidence, str):
@@ -896,6 +898,7 @@ def build_source_language_map(
             raise TranslateError(f"{path}: index.md 不是 UTF-8") from exc
         lang, confidence = detect_source_lang(text, source_meta(text))
         result[mathnet_id] = {
+            "detector_version": DETECTOR_VERSION,
             "source_lang": lang,
             "source_lang_confidence": confidence,
             "source_sha256": source_sha,

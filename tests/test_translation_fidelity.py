@@ -8,6 +8,7 @@ import pytest
 
 sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'scripts'))
+import translation_fidelity as fidelity  # noqa: E402
 from translation_fidelity import (  # noqa: E402
     BatchConfig,
     FindingType,
@@ -582,6 +583,40 @@ def test_source_section_already_in_english_needs_no_translation():
     assert verify_translation(
         source, translated, target_lang='en', source_lang='fr'
     ) == []
+
+
+@pytest.mark.parametrize('detected_confidence', ['high', 'medium'])
+def test_english_section_detection_cannot_authorize_und_identical(
+    monkeypatch: pytest.MonkeyPatch,
+    detected_confidence: str,
+):
+    monkeypatch.setattr(
+        fidelity,
+        'detect_source_lang',
+        lambda _body, _meta: ('en', detected_confidence),
+    )
+    source = '# sample\n\n## 题面\n\nThe number is positive and even.\n'
+
+    findings = verify_translation(
+        source, source, target_lang='en', source_lang='und'
+    )
+
+    assert FindingType.UNTRANSLATED in {finding.type for finding in findings}
+
+
+def test_medium_english_section_detection_is_not_high_confidence_evidence(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setattr(
+        fidelity, 'detect_source_lang', lambda _body, _meta: ('en', 'medium')
+    )
+    source = '# sample\n\n## 题面\n\nThe number is positive and even.\n'
+
+    findings = verify_translation(
+        source, source, target_lang='en', source_lang='fr'
+    )
+
+    assert FindingType.UNTRANSLATED in {finding.type for finding in findings}
 
 
 @pytest.mark.parametrize('answer', [
