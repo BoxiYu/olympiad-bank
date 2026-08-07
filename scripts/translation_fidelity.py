@@ -180,6 +180,7 @@ _NON_ENGLISH_SCRIPT_RE = re.compile(
 )
 _GREEK_CHAR_RE = re.compile(r'[\u0370-\u03ff\u1f00-\u1fff]')
 _GREEK_PROSE_RE = re.compile(r'[\u0370-\u03ff\u1f00-\u1fff]{2,}')
+_CYRILLIC_PROSE_RE = re.compile(r'[\u0400-\u052f]{2,}')
 _SYMBOL_WORDS = {
     'bmod', 'cos', 'gcd', 'inf', 'lcm', 'ln', 'log', 'max', 'min', 'mod',
     'pmod', 'sin', 'sqrt', 'sup', 'tan',
@@ -665,12 +666,14 @@ def _has_prose_outside_target_language(
     letters = [ch for ch in body if unicodedata.category(ch).startswith('L')]
     if target_lang == 'zh':
         return any(_HAN_RE.fullmatch(ch) is None for ch in letters)
+    if (_NON_ENGLISH_FRAGMENT_RE.search(_ascii_fold(body))
+            or _GREEK_PROSE_RE.search(body)
+            or _CYRILLIC_PROSE_RE.search(body)):
+        return True
     detected_lang, _confidence = detect_source_lang(body, {})
     if detected_lang == 'en':
         return False
     if detected_lang != 'und':
-        return True
-    if _NON_ENGLISH_FRAGMENT_RE.search(_ascii_fold(body)):
         return True
     if _has_non_english_script_or_latin_diacritic(body):
         return True

@@ -115,7 +115,7 @@ mathnet-full/.mathnet-translate-run/.translate-failures.jsonl
 清除对应记录。
 
 逐字相同不再天然等于失败。纯符号最终答案必须原样保留；源小节已经是目标语言时无需改写；
-`en/*` 源生成英文目标且模型判定无需改动时，也可按已核验的 `translated` 结果落盘。只有派单前
+`en/*` 源生成英文目标且模型判定无需改动时，apply 可派生 `verified_identical` 落盘。只有派单前
 满足译文契约直通条件的英文版本才记为 `passthrough`。混合语言小节中仍残留非目标语言散文，
 则仍属于真正的 `untranslated`，不能用整篇源语言标签绕过。
 

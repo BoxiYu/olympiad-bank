@@ -66,17 +66,19 @@ by-topic/<板块>/<知识点>/<id>/
 }
 ```
 
-`mode` 只有三种：
+`mode` 只有四种：
 
 - `passthrough`：**唯一准入阈值**是 `source_lang == "en"`、
   `source_lang_confidence == "high"` 且目标语言为 `en`。目标文件逐字复制 `index.md`，
   `model` 必须为 `null`；
 - `translated`：由 `model` 指定的模型生成，必须有完整单元译文；
+- `verified_identical`：模型按 `translated` 提交完整单元后，apply 发现目标文件与原文逐字相同，
+  并通过目标语言保真校验时派生。必须保留非空 `model`；apply 输入不得自行声明此状态；
 - `failed`：本次生成失败，不写目标 Markdown。该 variant 记录 `model`、`generated_at`、`error`，
   不记录 `sha256`。
 
 任何其他组合，包括 `en/medium`、`en/low`、`und`、`en-US/high` 和所有非英文源语言，均不得写
-`mode=passthrough`，必须走翻译。代码判定的唯一入口是
+`mode=passthrough`，必须以 `mode=translated` 进入翻译与 apply。代码判定的唯一入口是
 `scripts/source_lang.py::should_passthrough`；export、批量 run、apply 与契约 checks 只能复用该入口
 或消费它在 export 中生成的 `target_modes`，不得各自复制或放宽比较条件。
 
@@ -169,6 +171,7 @@ apply 的写入纪律：
 
 - 先重算并核对 `source_sha256`，过期批次拒绝写回；
 - 先在内存中验证该题所有 variant、全部单元和占位，任一单元缺失时题目目录零写入；
+- apply 输入只接受 `passthrough` / `translated` / `failed`；`verified_identical` 只能由 apply 派生；
 - `passthrough` 只允许 `en/high` 原文直通到 `en`，且直接复制原文字节，不接收模型输出；
 - 每个文件均在目标同目录写临时文件、flush、fsync，再以 rename 原子替换；内容不变时不写；
 - 重复执行同一输入得到逐字相同的 Markdown 与 JSON；

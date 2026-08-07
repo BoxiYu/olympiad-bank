@@ -679,6 +679,29 @@ def test_foreign_sentence_with_one_short_english_keyword_is_rejected(body):
     assert any(finding.type == FindingType.UNTRANSLATED for finding in findings)
 
 
+@pytest.mark.parametrize(
+    'residue',
+    [
+        'Aucune solution.',
+        'Βρείτε τους ακεραίους.',
+    ],
+    ids=['known-french-fragment', 'greek-sentence'],
+)
+def test_strong_foreign_sentence_survives_aggregate_english_detection(residue):
+    body = f'Find all positive integers x such that x is even. {residue}'
+    source = f'# mixed-positive\n\n## 题面\n\n{body}\n'
+
+    findings = verify_translation(
+        source,
+        source,
+        mode='verified_identical',
+        target_lang='en',
+        source_lang='und',
+    )
+
+    assert any(finding.type == FindingType.UNTRANSLATED for finding in findings)
+
+
 def test_real_prose_left_identical_is_still_untranslated():
     untranslated = VALID_TRANSLATION.replace(
         '求整数 $x \\leq y$，使 `x + y` 为偶数。',
