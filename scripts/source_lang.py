@@ -1,15 +1,16 @@
 """Conservative source-language detection for MathNet problem statements.
 
-The detector deliberately optimizes against false English results: ``en`` is
-used by the translation pipeline as a passthrough decision, so an uncertain
+The detector deliberately optimizes against false English results: ``en/high``
+is used by the translation pipeline as a passthrough decision, so an uncertain
 non-English statement must cost one translation call rather than silently pass
 through untranslated.
 
 Only the Python standard library is used.  The supported Latin-script language
 features reflect the sizeable MathNet groups (English, German, Italian,
-Spanish, Portuguese, French and Slovenian).  Script evidence is used
-conservatively: shared Han and Cyrillic ranges are not treated as proof of one
-particular language.
+Spanish, Portuguese, French, Dutch, Romanian and Slovenian).  Script evidence
+is used conservatively: shared Han and Cyrillic ranges are not treated as proof
+of one particular language without matching function words or distinctive
+letters.
 """
 
 from __future__ import annotations
@@ -42,6 +43,7 @@ _LATEX_COMMAND_RE = re.compile(r"\\[A-Za-z]+\*?(?:\[[^\]]*\])?")
 _HTML_TAG_RE = re.compile(r"<[^>]+>")
 _WORD_RE = re.compile(r"[^\W\d_]+", re.UNICODE)
 _CYRILLIC_RE = re.compile(r"[\u0400-\u052f]")
+_GREEK_WORD_RE = re.compile(r"[\u0370-\u03ff\u1f00-\u1fff]{2,}")
 _HAN_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff]")
 _KANA_RE = re.compile(r"[\u3040-\u30ff]")
 _HANGUL_RE = re.compile(r"[\uac00-\ud7af]")
@@ -56,6 +58,11 @@ _LANGUAGE_NAMES = {
     "zh": "zh", "zho": "zh", "chi": "zh", "chinese": "zh", "mandarin": "zh",
     "de": "de", "deu": "de", "ger": "de", "german": "de", "deutsch": "de",
     "it": "it", "ita": "it", "italian": "it", "italiano": "it",
+    "nl": "nl", "nld": "nl", "dut": "nl", "dutch": "nl", "nederlands": "nl",
+    "ro": "ro", "ron": "ro", "rum": "ro", "romanian": "ro", "romana": "ro",
+    "el": "el", "ell": "el", "gre": "el", "greek": "el", "ellinika": "el",
+    "mn": "mn", "mon": "mn", "mongolian": "mn", "mongol": "mn",
+    "mk": "mk", "mkd": "mk", "macedonian": "mk", "makedonski": "mk",
     "ar": "ar", "ara": "ar", "arabic": "ar",
 }
 
@@ -64,9 +71,9 @@ _LANGUAGE_NAMES = {
 _FEATURE_WORDS = {
     "en": {
         "a", "all", "an", "and", "are", "be", "by", "determine", "each", "every",
-        "find", "for", "from", "given", "has", "if", "in", "integers", "is", "let",
-        "numbers", "of", "on", "positive", "prove", "such", "that", "the", "then",
-        "there", "to", "which", "with",
+        "equality", "equals", "find", "for", "from", "given", "has", "holds", "if", "in",
+        "integers", "is", "let", "numbers", "of", "on", "only", "positive", "prove", "such",
+        "that", "the", "then", "there", "to", "which", "with",
     },
     "es": {
         "cada", "con", "cual", "de", "del", "demostrar", "determine", "donde", "enteros",
@@ -95,6 +102,20 @@ _FEATURE_WORDS = {
         "nei", "nel", "o", "per", "possiamo", "sia", "siano", "sono", "tra", "tutti",
         "una", "uno",
     },
+    # ``en/in/is/of`` are valid Dutch words but are deliberately omitted: in
+    # short English mathematical sections they erase the English score margin
+    # and produced seven measured false positives in the frozen corpus.
+    "nl": {
+        "als", "alle", "bepaal", "bewijs", "dat", "de", "deze", "dit", "door",
+        "een", "elk", "er", "gegeven", "gehele", "getal", "getallen", "heeft",
+        "het", "met", "niet", "op", "positieve", "voor", "waar",
+        "waarvoor", "wordt", "zijn", "zodat",
+    },
+    "ro": {
+        "aratati", "avem", "ca", "cand", "care", "cu", "daca", "demonstrati",
+        "determinati", "este", "exista", "fie", "fiecare", "gasiti", "numar", "numarul",
+        "numere", "pentru", "pozitive", "sunt", "toate", "toti", "un", "unei",
+    },
     "sl": {
         "bo", "cela", "ce", "da", "doloci", "dokazi", "in", "je", "ki", "lahko", "naj",
         "obstaja", "poisci", "pozitivna", "stevila", "tako", "ter", "vsak", "za",
@@ -107,16 +128,24 @@ _DISTINCTIVE_CHARS = {
     "fr": set("œæëïÿ"),
     "de": set("äöüß"),
     "it": set("ìòù"),
+    "nl": set("ĳ"),
+    # ``â`` is deliberately absent: Portuguese uses it in common geometry
+    # words such as "ângulo" and "triângulo".  Counting it as Romanian was the
+    # cause of the Portuguese and bilingual false positives measured in the
+    # Brazil/JBMO groups for CXB-520.
+    "ro": set("ăîșț"),
     "sl": set("čšž"),
 }
 
 _DISTINCTIVE_PHRASES = {
     "en": ("such that", "positive integers", "prove that", "let us"),
     "es": ("tal que", "numeros enteros", "números enteros", "para todo"),
-    "pt": ("tais que", "tal que", "numeros inteiros", "números inteiros"),
+    "pt": ("tais que", "tal que", "numeros inteiros", "números inteiros", "quanto mede"),
     "fr": ("tels que", "tel que", "nombres entiers", "pour tout"),
     "de": ("so dass", "in denen", "zeige dass", "fur alle", "für alle"),
     "it": ("in cui", "tale che", "in modo che", "uno dei", "una delle"),
+    "nl": ("zodat", "voor alle", "gehele getallen", "bepaal alle", "bewijs dat"),
+    "ro": ("astfel incat", "pentru toate", "numere intregi", "sa se arate"),
     "sl": ("tako da", "cela stevila", "cela števila", "naj bo"),
 }
 
@@ -129,6 +158,18 @@ _RU_FEATURE_WORDS = {
     "найдите", "положительных", "решения", "свойством", "существует", "указанным",
     "уравнение", "целое", "целых", "чисел", "число", "что",
 }
+_MN_FEATURE_WORDS = {
+    "ав", "бүх", "бүхэл", "гэж", "натурал", "нотол", "олго", "ол", "тоо",
+    "тоонууд", "шийд", "шийдийг", "эерэг",
+}
+_MK_FEATURE_WORDS = {
+    "број", "броеви", "бројот", "го", "докажи", "докажете", "за", "кои",
+    "најди", "најдете", "позитивни", "сите", "цели", "дека", "земе", "земи",
+}
+_MN_DISTINCTIVE_RE = re.compile(r"[ӨөҮү]")
+# Serbian shares Ј/Љ/Њ/Џ with Macedonian.  Only Ѓ/Ѕ/Ќ are safe positive
+# Macedonian evidence; otherwise shared Cyrillic prose remains und/low.
+_MK_DISTINCTIVE_RE = re.compile(r"[ЃѓЅѕЌќ]")
 
 
 def _ascii_fold(value: str) -> str:
@@ -202,7 +243,10 @@ def _enough_language_text(text: str) -> bool:
         + len(_KANA_RE.findall(text))
         + len(_HANGUL_RE.findall(text))
     )
-    return letter_count >= 12 or east_asian >= 4
+    # Short olympiad prompts such as "Find x." still contain dense language
+    # evidence.  The scorer below must establish that density; this gate only
+    # rejects empty/symbol-only fragments before scoring.
+    return letter_count >= 4 or east_asian >= 4
 
 
 def _script_evidence(text: str) -> tuple[str, str] | None:
@@ -210,6 +254,7 @@ def _script_evidence(text: str) -> tuple[str, str] | None:
     kana = len(_KANA_RE.findall(text))
     hangul = len(_HANGUL_RE.findall(text))
     cyrillic = len(_CYRILLIC_RE.findall(text))
+    greek_words = _GREEK_WORD_RE.findall(text)
     if kana >= 2 or hangul >= 2:
         # Japanese and Korean are safely non-English, but not currently among
         # the detector's supported output languages.
@@ -217,9 +262,20 @@ def _script_evidence(text: str) -> tuple[str, str] | None:
     if han >= 4 and han >= cyrillic * 2:
         marker_hits = sum(marker in text for marker in _ZH_MARKERS)
         return ("zh", "high") if marker_hits >= 2 else ("und", "low")
+    # Greek mathematical variables embedded in English are often bare
+    # one-letter symbols.  Require multiple Greek words, not merely a count of
+    # Greek code points, before identifying prose as Greek.
+    if len(greek_words) >= 2 and sum(map(len, greek_words)) >= 6:
+        return "el", "high"
     if cyrillic >= 6 and cyrillic >= han * 2:
         words = Counter(word.casefold() for word in _WORD_RE.findall(text))
+        mn_hits = sum(min(words[word], 3) for word in _MN_FEATURE_WORDS)
+        mk_hits = sum(min(words[word], 3) for word in _MK_FEATURE_WORDS)
         russian_hits = sum(min(words[word], 3) for word in _RU_FEATURE_WORDS)
+        if mn_hits >= 2 and _MN_DISTINCTIVE_RE.search(text):
+            return "mn", "high"
+        if mk_hits >= 2 and _MK_DISTINCTIVE_RE.search(text):
+            return "mk", "high"
         if russian_hits >= 3:
             return "ru", "high"
         return "und", "low"
@@ -231,8 +287,11 @@ def _latin_evidence(text: str) -> tuple[str, str]:
     words = _WORD_RE.findall(folded)
     counts = Counter(words)
     scores: dict[str, int] = {}
+    feature_hits: dict[str, int] = {}
     for lang, features in _FEATURE_WORDS.items():
-        score = sum(min(counts[word], 3) for word in features)
+        hits = sum(min(counts[word], 3) for word in features)
+        feature_hits[lang] = hits
+        score = hits
         score += 2 * sum(folded.count(_ascii_fold(phrase)) for phrase in _DISTINCTIVE_PHRASES[lang])
         score += 2 * sum(text.casefold().count(ch) for ch in _DISTINCTIVE_CHARS.get(lang, set()))
         scores[lang] = score
@@ -240,10 +299,24 @@ def _latin_evidence(text: str) -> tuple[str, str]:
     ranked = sorted(scores.items(), key=lambda item: item[1], reverse=True)
     (winner, best), (_, second) = ranked[:2]
     margin = best - second
+    density = feature_hits[winner] / max(len(words), 1)
     # English passthrough needs several independent function-word hits and a
     # clear lead.  Ambiguous Latin prose becomes und, never optimistic English.
     if best < 3 or margin < 2:
+        # A one-word mathematical imperative plus symbols is legitimate prose
+        # after math stripping (for example "Find $x$.").  Only English gets
+        # this tiny-text exception, and only with a clear lead and at least
+        # half of the remaining words drawn from its function-word set.
+        if (winner == "en" and len(words) <= 3 and best >= 1
+                and margin >= 1 and density >= 0.5):
+            return "en", "high"
         return "und", "low"
+    # Long prose still needs the established absolute evidence threshold.
+    # Short mathematical prompts can instead earn high confidence from dense,
+    # independent function words and a clear lead over every other language.
+    density_threshold = 0.4 if winner == "en" else 0.5
+    if density >= density_threshold and margin >= 2:
+        return winner, "high"
     if best >= 7 and margin >= 4:
         return winner, "high"
     return winner, "medium"
@@ -266,6 +339,11 @@ def detect_source_lang(body: str, meta: dict) -> tuple[str, str]:
         return "und", "low"
 
     text_lang, text_conf = _text_evidence(clean)
+    if text_lang == "und" and sum(len(word) for word in _WORD_RE.findall(clean)) < 12:
+        # A tiny uninformative prefix must not become a language claim from
+        # metadata alone.  Dense prompts such as "Find x." have already earned
+        # explicit text evidence above and therefore do not take this branch.
+        return "und", "low"
     meta_langs, multilingual = _normalise_meta_language(meta)
 
     # An explicit multilingual label containing English means the source
