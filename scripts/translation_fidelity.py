@@ -97,11 +97,13 @@ class BatchConfig:
     视为并列，并选择其中源文最接近者作保守比较。若同一译文簇里至少有两个
     各由两种近似源文支撑、彼此却明显不同的模板子组，则保留簇级跨模板证据，
     避免每条记录都借同组 peer 击穿检测。
-    少于 8 个文字/数字的短答案不参与套话聚类。长度比按目标语言分别标定：中文下限
-    以 438 份已通过译文的实测最小值 0.224 为基准再留 20% 余量；英文上限取该下限
-    的倒数，覆盖中文到英文的反向膨胀。英文下限与中文上限沿用原门禁强度。长度和
-    锚点各权重 1，必须同时出现才达到默认阻断分 2，因而长度异常绝不会单独产生
-    Finding。套话权重 2，可独立阻断。
+    源文和译文都少于 20 个文字/数字的极短小节不参与套话聚类：全量 27,817 题中源文
+    位于该尾部的有 373 题，而放宽到 40 会排除 1,707 题；取前者可覆盖单动词计算题，
+    同时保留其余 1,334 题的套话检测面。只要求双侧都短，确保完整源文被压成短套话时
+    仍会拦截。长度比按目标语言分别标定：中文下限以 438 份已通过译文的实测最小值
+    0.224 为基准再留 20% 余量；英文上限取该下限的倒数，覆盖中文到英文的反向膨胀。
+    英文下限与中文上限沿用原门禁强度。长度和锚点各权重 1，必须同时出现才达到默认
+    阻断分 2，因而长度异常绝不会单独产生 Finding。套话权重 2，可独立阻断。
     超过 500 条时只做线性精确聚类，避免目录审计退化成二次复杂度；生产翻译批次默认 25，
     SOP 最大 100，仍会执行高重合模糊比较。
     """
@@ -110,7 +112,7 @@ class BatchConfig:
     boilerplate_similarity: float = 0.9
     boilerplate_source_similarity_gap: float = 0.2
     boilerplate_pair_similarity_tolerance: float = 0.02
-    boilerplate_min_chars: int = 8
+    boilerplate_min_chars: int = 20
     zh_length_ratio_min: float = 0.18
     zh_length_ratio_max: float = 4.0
     en_length_ratio_min: float = 0.25
@@ -867,7 +869,9 @@ def verify_batch(
     by_heading: dict[str, list[tuple[int, str, str]]] = {}
     for index, sections in enumerate(translated_sections):
         for heading, normalized, plain in sections:
-            if len(normalized) >= batch_config.boilerplate_min_chars:
+            source_normalized = source_sections[index].get(heading, '')
+            if (len(normalized) >= batch_config.boilerplate_min_chars
+                    or len(source_normalized) >= batch_config.boilerplate_min_chars):
                 by_heading.setdefault(heading, []).append((index, normalized, plain))
 
     for heading, entries in by_heading.items():

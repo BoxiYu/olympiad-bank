@@ -1,0 +1,58 @@
+{
+  "fixture_kind": "constructed detector documents from CXB-532 issue-reported short prose",
+  "provenance": "CXB-532 reports the exact stripped source prose for 096h, 0hzg, 0i77, 0iev, and 0j6x; companion rows are explicitly constructed multilingual peers that make each legal one-verb translation form a minimum-size cluster.",
+  "scope": "The ignored mathnet-full corpus is unavailable. Only the five named source-prose excerpts are issue-reported; document framing, protected placeholders, translated prose, and companion rows are detector fixtures, not corpus transcriptions.",
+  "measured_distribution": {
+    "total": 27817,
+    "under_20_chars": 373,
+    "under_40_chars": 1707
+  },
+  "counterfactual_old_min_chars": 8,
+  "rows": [
+    {
+      "mathnet_id": "096h",
+      "source_prose": "Calculați:",
+      "translated_prose": "Evaluate:"
+    },
+    {
+      "mathnet_id": "0i77",
+      "source_prose": "Evaluate",
+      "translated_prose": "Evaluate:"
+    },
+    {
+      "mathnet_id": "0j6x",
+      "source_prose": "Evaluate",
+      "translated_prose": "Evaluate:"
+    },
+    {
+      "mathnet_id": "0hzg",
+      "source_prose": "Find",
+      "translated_prose": "Find"
+    },
+    {
+      "mathnet_id": "constructed-find-es",
+      "source_prose": "Hallar",
+      "translated_prose": "Find"
+    },
+    {
+      "mathnet_id": "constructed-find-fr",
+      "source_prose": "Trouver",
+      "translated_prose": "Find"
+    },
+    {
+      "mathnet_id": "0iev",
+      "source_prose": "Compute",
+      "translated_prose": "Compute"
+    },
+    {
+      "mathnet_id": "constructed-compute-fr",
+      "source_prose": "Calculer",
+      "translated_prose": "Compute"
+    },
+    {
+      "mathnet_id": "constructed-compute-de",
+      "source_prose": "Berechnen",
+      "translated_prose": "Compute"
+    }
+  ]
+}

@@ -137,6 +137,12 @@ def cxb_528_mutation_boundary_fixture():
     )
 
 
+def cxb_532_short_computation_fixture():
+    return json.loads(
+        (FIXTURES / 'cxb-532-short-computation-prose.json').read_text(encoding='utf-8')
+    )
+
+
 def placeholder_reordering_documents():
     fixture = placeholder_reordering_fixture()
     source_unit = fixture['source_unit']
@@ -701,6 +707,65 @@ def batch_report(rows, **kwargs):
         [row['translated'] for row in rows],
         keys=[row.get('mathnet_id') or row['fixture_id'] for row in rows],
         **kwargs,
+    )
+
+
+def _render_short_computation_documents(row):
+    source = (
+        f"# {row['mathnet_id']}\n\n"
+        f"## 题面\n\nProblem:\n\n{row['source_prose']} {{{{MNT_0001}}}}\n\n"
+        "## 最终答案\n\n{{MNT_0002}}\n"
+    )
+    translated = (
+        f"# {row['mathnet_id']}\n\n"
+        f"## 题面\n\nProblem:\n\n{row['translated_prose']} {{{{MNT_0001}}}}\n\n"
+        "## 最终答案\n\n{{MNT_0002}}\n"
+    )
+    return source, translated
+
+
+def test_cxb_532_short_computation_prose_does_not_form_boilerplate_clusters():
+    fixture = cxb_532_short_computation_fixture()
+    assert fixture['fixture_kind'].startswith('constructed detector documents')
+    assert fixture['measured_distribution'] == {
+        'total': 27817,
+        'under_20_chars': 373,
+        'under_40_chars': 1707,
+    }
+    rows = []
+    source_lengths = []
+    target_lengths = []
+    for row in fixture['rows']:
+        source, translated = _render_short_computation_documents(row)
+        rows.append({
+            'mathnet_id': row['mathnet_id'],
+            'source': source,
+            'translated': translated,
+        })
+        source_lengths.append(len(_normalize_prose(source.split('## 最终答案')[0])))
+        target_lengths.append(len(_normalize_prose(translated.split('## 最终答案')[0])))
+
+    assert max(source_lengths) < BatchConfig().boilerplate_min_chars
+    assert max(target_lengths) < BatchConfig().boilerplate_min_chars
+    report = batch_report(rows, target_lang='en')
+    assert report.findings == {}
+    assert all(
+        signal.type is not FindingType.BATCH_BOILERPLATE
+        for signals in report.signals.values()
+        for signal in signals
+    )
+
+    old_report = batch_report(
+        rows,
+        target_lang='en',
+        config=BatchConfig(
+            boilerplate_min_chars=fixture['counterfactual_old_min_chars']
+        ),
+    )
+    assert set(old_report.findings) == {row['mathnet_id'] for row in rows}
+    assert all(
+        {finding.type for finding in findings} == {FindingType.BATCH_BOILERPLATE}
+        for findings in old_report.findings.values()
     )
 
 
