@@ -516,7 +516,21 @@ def test_fragment_branch_is_independently_live(monkeypatch):
 
 def test_latin_diacritic_branch_is_independently_live(monkeypatch):
     monkeypatch.setattr(english_rules, 'detect_source_lang', lambda *_: ('en', 'high'))
-    assert english_target_mismatch('Cláudia', None)
+    assert english_target_mismatch('één', None)
+
+
+def test_identical_english_section_with_diacritic_names_is_not_untranslated():
+    document = language_document(
+        'Elza on the 1st floor, Sueli on the 2nd floor, Patrícia on the 3rd '
+        'floor, Heloísa on the 4th floor, and Cláudia on the 5th floor.',
+        '最终答案',
+    )
+    assert FindingType.UNTRANSLATED not in {
+        finding.type
+        for finding in verify_translation(
+            document, document, target_lang='en', source_lang='pt'
+        )
+    }
 
 
 def test_concrete_detected_language_branch_is_independently_live(monkeypatch):

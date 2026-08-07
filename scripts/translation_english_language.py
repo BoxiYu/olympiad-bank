@@ -93,7 +93,9 @@ def _is_latin_diacritic(body: str) -> bool:
         ord(char) > 127
         and unicodedata.category(char).startswith('L')
         and 'LATIN' in unicodedata.name(char, '')
-        for char in body
+        for word in _WORD_RE.findall(body)
+        if not word[0].isupper()
+        for char in word
     )
 
 
