@@ -688,6 +688,7 @@ if (expectedModel) {
 const cwd = args[args.indexOf('--cwd') + 1];
 const input = JSON.parse(fs.readFileSync(path.join(cwd, 'batch.json'), 'utf8'));
 const events = process.env.FAKE_EVENTS;
+const concurrencyBarrier = Number(process.env.FAKE_CONCURRENCY_BARRIER || '0');
 const sleepMs = Number(process.env.FAKE_SLEEP_MS || '100');
 const successSleepMs = Number(process.env.FAKE_SUCCESS_SLEEP_MS || '10');
 const mode = process.env.FAKE_MODE || 'success';
@@ -698,8 +699,16 @@ const shouldFail = input.records.some((record) => record.mathnet_id === failId)
 const attemptsPath = path.join(cwd, 'attempts.txt');
 const previous = fs.existsSync(attemptsPath) ? Number(fs.readFileSync(attemptsPath, 'utf8')) : 0;
 fs.writeFileSync(attemptsPath, String(previous + 1));
-if (events) fs.appendFileSync(events, `start ${process.pid} ${Date.now()} ${cwd}\n`);
 const sleep = (milliseconds) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, milliseconds);
+if (events) fs.appendFileSync(events, `start ${process.pid} ${Date.now()} ${cwd}\n`);
+if (events && concurrencyBarrier > 0) {
+  const deadline = Date.now() + 10000;
+  while (Date.now() < deadline) {
+    const starts = fs.readFileSync(events, 'utf8').split('\n').filter((line) => line.startsWith('start '));
+    if (starts.length >= concurrencyBarrier) break;
+    sleep(5);
+  }
+}
 
 if (shouldFail && mode === 'timeout') sleep(sleepMs);
 if (shouldFail && mode === 'invalid') {
@@ -766,7 +775,7 @@ def test_run_end_to_end_concurrent_and_resume_skips_completed(
     work = tmp_path / "run"
     events = tmp_path / "events.log"
     monkeypatch.setenv("FAKE_EVENTS", str(events))
-    monkeypatch.setenv("FAKE_SUCCESS_SLEEP_MS", "150")
+    monkeypatch.setenv("FAKE_CONCURRENCY_BARRIER", "2")
     sources = list(corpus.rglob("index.md"))
     before = {path: digest(path) for path in sources}
     args = run_args(
@@ -774,6 +783,10 @@ def test_run_end_to_end_concurrent_and_resume_skips_completed(
         "--only", "eng1", "--only", "slv1", "--only", "mcq1",
         "--limit", "3", "--batch-size", "1", "--concurrency", "2",
     )
+    # 此用例只验证并发与断点续跑，不验证超时。移除测试 helper 的 2s 墙钟预算，
+    # 避免把 node 冷启动和 runner 调度速度误当成被测语义；超时行为由专门用例覆盖。
+    timeout_index = args.index("--timeout")
+    del args[timeout_index:timeout_index + 2]
 
     assert mt.main(args) == 0
     output = capsys.readouterr().out
