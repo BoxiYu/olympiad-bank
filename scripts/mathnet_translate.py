@@ -1155,6 +1155,14 @@ def render_batch_prompt(job: BatchJob) -> str:
 {examples}
 5. 输出文件必须是 UTF-8 编码。
 
+## 译文必须由你自己产出（硬性）
+
+**禁止把翻译外包给任何外部设施。**具体禁止：写/编译/运行 Swift、C、Python 等程序去调用
+Apple Translation 框架（`import Translation`、`LanguageAvailability`）、本机 ollama / llama、
+任何在线翻译 API 或机器翻译服务；禁止 `xcrun swift`、`swift -e`、起子进程做翻译。
+这些调用在本环境会永久挂起、拖垮整机并使本批次超时作废——已实测。
+你要做的只有三件事：读 batch.json、自己逐题译好、写出 translations.json。
+
 ## 结构约束
 
 所有 {{{{MNT_NNNN}}}} 占位必须各出现一次，不得增删或改写占位符本身。可按目标语言语法调整数学
