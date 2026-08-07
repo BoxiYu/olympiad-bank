@@ -124,6 +124,12 @@ def placeholder_reordering_fixture():
     )
 
 
+def mutation_boundary_fixture():
+    return json.loads(
+        (FIXTURES / 'cxb-527-mutation-boundaries.json').read_text(encoding='utf-8')
+    )
+
+
 def placeholder_reordering_documents():
     fixture = placeholder_reordering_fixture()
     source_unit = fixture['source_unit']
@@ -373,6 +379,38 @@ def test_real_id_language_fixture_has_only_verbatim_mathnet_excerpts():
     assert all(row['fixture_id'].startswith('constructed-') for row in constructed)
 
 
+def test_cxb_527_two_letter_fragment_is_a_verbatim_real_id_excerpt():
+    fixture = mutation_boundary_fixture()
+    row = fixture['real_symbolic_fragment']
+    source_fixture = target_language_fixture()
+    source_row = next(
+        item for item in source_fixture['identical_foreign_sections']
+        if item['mathnet_id'] == row['mathnet_id']
+    )
+
+    assert fixture['fixture_kind'] == 'CXB-527 mutation-boundary unit excerpts'
+    assert row['source_revision'] == source_fixture['source']['revision']
+    assert row['field'] == source_row['field']
+    assert source_row['body'].startswith(row['body'] + ' ')
+    assert all(
+        item['fixture_id'].startswith('constructed-cxb527-')
+        for item in fixture['constructed_cases']
+    )
+
+
+def test_cxb_527_two_letter_foreign_fragment_is_not_a_symbolic_answer():
+    row = mutation_boundary_fixture()['real_symbolic_fragment']
+    document = language_document(row['body'], '最终答案')
+    findings = verify_translation(
+        document,
+        document,
+        target_lang='en',
+        source_lang=row['language'],
+    )
+
+    assert [finding.type for finding in findings] == [FindingType.UNTRANSLATED]
+
+
 @pytest.mark.parametrize(
     'row', target_language_fixture()['identical_foreign_sections'],
     ids=lambda row: row['mathnet_id'],
@@ -439,6 +477,21 @@ def test_changed_english_foreign_script_is_left_to_other_fidelity_signals():
 def test_generator_placeholders_are_not_marked_in_identical_english_sections(placeholder):
     document = language_document(placeholder, '最终答案')
     assert is_known_generator_placeholder(placeholder)
+    assert FindingType.UNTRANSLATED not in {
+        finding.type
+        for finding in verify_translation(document, document, target_lang='en')
+    }
+
+
+def test_cxb_527_sentence_final_period_keeps_generator_placeholder_semantics():
+    row = next(
+        item for item in mutation_boundary_fixture()['constructed_cases']
+        if item['fixture_id'] == 'constructed-cxb527-dotted-generator-placeholder'
+    )
+    document = language_document(row['body'], '最终答案')
+
+    # The period is generator/formatting punctuation, not user-authored prose.
+    assert is_known_generator_placeholder(row['body'])
     assert FindingType.UNTRANSLATED not in {
         finding.type
         for finding in verify_translation(document, document, target_lang='en')
@@ -958,6 +1011,28 @@ def test_cxb_525_placeholder_pipeline_allows_math_multiset_reordering_only():
     assert FindingType.MATH_MISMATCH in types(
         source,
         changed,
+        placeholder_pipeline=True,
+    )
+
+
+def test_cxb_527_placeholder_pipeline_rejects_a_pure_duplicate():
+    row = next(
+        item for item in mutation_boundary_fixture()['constructed_cases']
+        if item['fixture_id'] == 'constructed-cxb527-pure-placeholder-duplicate'
+    )
+    source_body = row['source_body']
+    translated_body = row['translated_body']
+    for placeholder, original in row['protected'].items():
+        source_body = source_body.replace(placeholder, original)
+        translated_body = translated_body.replace(placeholder, original)
+    source = language_document(source_body)
+    translated = language_document(translated_body)
+
+    assert FindingType.MATH_MISMATCH in types(
+        source,
+        translated,
+        target_lang='zh',
+        source_lang='en',
         placeholder_pipeline=True,
     )
 
