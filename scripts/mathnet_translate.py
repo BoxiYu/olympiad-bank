@@ -38,6 +38,9 @@ COMPANION_EFFORTS = ("none", "minimal", "low", "medium", "high", "xhigh")
 # 100 题真实批次对照：high 运行 2.5 小时仍无产出；low 虽 4m31s 完成，但
 # 100/100 被退化门禁拦截；medium 13m16s 完成，302 个条目仅 6 个（约 2%）被拦。
 DEFAULT_TRANSLATION_EFFORT = "medium"
+# 同一批真题的 medium A/B 实测：新提示词批 100 会让长解法退化，批 25 时
+# 0/77 unit 被门禁拦截、0/25 题中招。默认 25 控制单次输出预算；仍可显式调大。
+DEFAULT_TRANSLATION_BATCH_SIZE = 25
 
 # main() 在 apply/run 期间安装收集器。apply_record 只登记成功写回的题，命令退出前
 # 再合并成一次索引原子写；直接调用 apply_record 的库用户不会产生隐式副作用。
@@ -1100,13 +1103,42 @@ def make_batch_jobs(rows: list[dict[str, Any]], batch_size: int, work_dir: Path)
 
 
 def render_batch_prompt(job: BatchJob) -> str:
-    return f"""你是奥数题库的三语翻译执行 agent。当前目标语言：{job.target_lang}。
+    target_language = {"en": "英文", "zh": "中文"}[job.target_lang]
+    examples = {
+        "zh": """3. 反例（这种输出是废品，绝对不许）：
+   原文: Find all pairs of twice differentiable functions {{MNT_0001}}, such that {{MNT_0002}}
+   废品: 求出所有 pairs of twice 可微函数 {{MNT_0001}}, 使得 {{MNT_0002}}
+   正确: 求所有二阶可导的函数对 {{MNT_0001}}，使得 {{MNT_0002}}
+4. 正例：
+   原文: Prove that if {{MNT_0001}} then the inequality {{MNT_0002}} holds.
+   正确: 证明：若 {{MNT_0001}}，则不等式 {{MNT_0002}} 成立。""",
+        "en": """3. 反例（这种输出是废品，绝对不许）：
+   原文: 求所有二阶可导的函数对 {{MNT_0001}}，使得 {{MNT_0002}}
+   废品: Find 所有 pairs of twice differentiable 函数 {{MNT_0001}}, such that {{MNT_0002}}
+   正确: Find all pairs of twice differentiable functions {{MNT_0001}}, such that {{MNT_0002}}
+4. 正例：
+   原文: 证明：若 {{MNT_0001}}，则不等式 {{MNT_0002}} 成立。
+   正确: Prove that if {{MNT_0001}}, then the inequality {{MNT_0002}} holds.""",
+    }[job.target_lang]
+    return f"""你是奥数题库的专业数学译者。任务：把每道题的自然语言散文翻译成**通顺、地道的{target_language}**。
 批次目录的显式绝对路径：{job.directory.resolve()}
 输入文件：{job.input_path.resolve()}
 输出文件：{job.output_path.resolve()}
 
-读取 batch.json 的全部 records。只翻译每个 unit 的 source 自然语言；所有 {{{{MNT_NNNN}}}}
-占位必须各出现一次且顺序不变，不得改写。不得修改 index.md 或语料目录里的任何文件。
+读取 batch.json 的全部 records，逐题翻译每个 unit 的 source。
+
+## 翻译质量要求（最重要）
+
+1. **整句重写成自然的{target_language}数学语言，绝不逐词替换。** 译文读起来必须像{target_language}数学教材上的句子，
+   不能是原文句子结构里嵌几个{target_language}词。
+2. **散文部分不得残留任何源语言单词或短语。** 数学占位符 {{{{MNT_NNNN}}}} 原样保留，不算残留；
+   人名与赛事专名可保留原拼写（如 Euler、IMO）。
+{examples}
+5. 输出文件必须是 UTF-8 编码。
+
+## 结构约束
+
+所有 {{{{MNT_NNNN}}}} 占位必须各出现一次，不得增删或改写占位符本身。不得修改语料目录里的任何文件。
 
 把结果写成一个 JSON 对象到 translations.json，严格形如：
 {{"model":"实际模型标识","translations":[
@@ -1741,7 +1773,12 @@ def parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--failures", help="失败清单（默认 <work-dir>/.translate-failures.jsonl）")
     run_parser.add_argument("--limit", type=int, help="最多导出多少题，直接透传 export")
     run_parser.add_argument("--only", action="append", metavar="ID", help="只跑指定 id；可重复")
-    run_parser.add_argument("--batch-size", type=int, default=25, help="每个目标语言每批题数（默认 25）")
+    run_parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=DEFAULT_TRANSLATION_BATCH_SIZE,
+        help=f"每个目标语言每批题数（默认 {DEFAULT_TRANSLATION_BATCH_SIZE}）",
+    )
     run_parser.add_argument("--concurrency", type=int, default=4, help="并行 companion 子进程数（默认 4）")
     run_parser.add_argument("--timeout", type=float, default=1200, help="单次派单超时秒数（默认 1200）")
     run_parser.add_argument("--retries", type=int, default=3, help="失败后的最大重试次数（默认 3）")

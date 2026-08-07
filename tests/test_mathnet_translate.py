@@ -599,6 +599,46 @@ def test_batch_output_rejects_human_reported_boilerplate_excerpts(tmp_path: Path
         mt.validate_batch_output(job)
 
 
+@pytest.mark.parametrize(
+    ("target", "target_phrase", "example"),
+    [
+        (
+            "zh",
+            "翻译成**通顺、地道的中文**",
+            "正确: 求所有二阶可导的函数对 {{MNT_0001}}，使得 {{MNT_0002}}",
+        ),
+        (
+            "en",
+            "翻译成**通顺、地道的英文**",
+            "正确: Find all pairs of twice differentiable functions {{MNT_0001}}, such that {{MNT_0002}}",
+        ),
+    ],
+)
+def test_batch_prompt_renders_new_quality_template_and_absolute_paths(
+    tmp_path: Path, target: str, target_phrase: str, example: str
+):
+    job = mt.BatchJob(f"{target}-fixture", target, (), tmp_path / "batches" / target)
+
+    prompt = mt.render_batch_prompt(job)
+
+    assert target_phrase in prompt
+    assert "读取 batch.json 的全部 records，逐题翻译每个 unit 的 source。" in prompt
+    assert "整句重写成自然的" in prompt and "绝不逐词替换" in prompt
+    assert "散文部分不得残留任何源语言单词或短语" in prompt
+    assert example in prompt
+    assert "所有 {{MNT_NNNN}} 占位必须各出现一次，不得增删或改写占位符本身" in prompt
+    assert f"批次目录的显式绝对路径：{job.directory.resolve()}" in prompt
+    assert f"输入文件：{job.input_path.resolve()}" in prompt
+    assert f"输出文件：{job.output_path.resolve()}" in prompt
+
+
+def test_run_batch_size_defaults_to_25_and_allows_explicit_override():
+    argument_parser = mt.parser()
+
+    assert argument_parser.parse_args(["run"]).batch_size == 25
+    assert argument_parser.parse_args(["run", "--batch-size", "100"]).batch_size == 100
+
+
 def test_apply_preflight_rejects_only_human_reported_boilerplate_excerpts(tmp_path: Path):
     fixture = json.loads(
         (REPO_ROOT / "tests" / "fixtures" / "translation_fidelity"
@@ -689,6 +729,24 @@ if (expectedModel) {
 }
 const cwd = args[args.indexOf('--cwd') + 1];
 const input = JSON.parse(fs.readFileSync(path.join(cwd, 'batch.json'), 'utf8'));
+const promptPath = args[args.indexOf('--prompt-file') + 1];
+const prompt = fs.readFileSync(promptPath, 'utf8');
+const targetLanguage = input.target_lang === 'zh' ? '中文' : '英文';
+const absoluteCwd = path.resolve(cwd);
+const expectedPromptParts = [
+  `翻译成**通顺、地道的${targetLanguage}**`,
+  '读取 batch.json 的全部 records，逐题翻译每个 unit 的 source。',
+  '绝不逐词替换',
+  '散文部分不得残留任何源语言单词或短语',
+  `批次目录的显式绝对路径：${absoluteCwd}`,
+  `输入文件：${path.join(absoluteCwd, 'batch.json')}`,
+  `输出文件：${path.join(absoluteCwd, 'translations.json')}`,
+];
+const missingPromptPart = expectedPromptParts.find((part) => !prompt.includes(part));
+if (missingPromptPart) {
+  console.error(`task.md missing expected prompt part: ${missingPromptPart}`);
+  process.exit(65);
+}
 const events = process.env.FAKE_EVENTS;
 const concurrencyBarrier = Number(process.env.FAKE_CONCURRENCY_BARRIER || '0');
 const sleepMs = Number(process.env.FAKE_SLEEP_MS || '100');
