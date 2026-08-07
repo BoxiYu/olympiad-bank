@@ -748,6 +748,15 @@ def test_batch_prompt_renders_new_quality_template_and_absolute_paths(
     assert "所有 {{MNT_NNNN}} 占位必须各出现一次，不得增删或改写占位符本身" in prompt
     assert "可按目标语言语法调整数学\n占位符语序" in prompt
     assert "图片占位之间的相对顺序不得改变" in prompt
+    assert "## 译文必须由你自己产出（硬性）" in prompt
+    assert "禁止把翻译外包给任何外部设施" in prompt
+    assert "Apple Translation 框架" in prompt
+    assert "import Translation" in prompt
+    assert "LanguageAvailability" in prompt
+    assert "本机 ollama / llama" in prompt
+    assert "任何在线翻译 API 或机器翻译服务" in prompt
+    assert "禁止 `xcrun swift`、`swift -e`、起子进程做翻译" in prompt
+    assert "读 batch.json、自己逐题译好、写出 translations.json" in prompt
     assert f"批次目录的显式绝对路径：{job.directory.resolve()}" in prompt
     assert f"输入文件：{job.input_path.resolve()}" in prompt
     assert f"输出文件：{job.output_path.resolve()}" in prompt
