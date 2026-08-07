@@ -394,6 +394,48 @@ def test_matching_file_language_does_not_exempt_mixed_language_section():
     )
 
 
+@pytest.mark.parametrize(
+    'case',
+    json.loads((FIXTURES / 'english-positive-sections.json').read_text(encoding='utf-8')),
+    ids=lambda case: case['mathnet_id'],
+)
+def test_english_positive_evidence_overrides_fallback_script_guard(case):
+    source = f"# {case['mathnet_id']}\n\n## {case['section']}\n\n{case['body']}\n"
+
+    findings = verify_translation(
+        source,
+        source,
+        mode='verified_identical',
+        target_lang='en',
+        source_lang='und',
+    )
+
+    assert not any(finding.type == FindingType.UNTRANSLATED for finding in findings)
+
+
+@pytest.mark.parametrize(
+    'body',
+    [
+        'Βρείτε τους ακέραιους. Find $n$.',
+        'Найдите целые числа. Verify $n$.',
+        'Determinați numerele întregi. Set $n=1$.',
+    ],
+    ids=['greek-find', 'russian-verify', 'romanian-set'],
+)
+def test_foreign_sentence_with_one_short_english_keyword_is_rejected(body):
+    source = f'# keyword-gap\n\n## 题面\n\n{body}\n'
+
+    findings = verify_translation(
+        source,
+        source,
+        mode='verified_identical',
+        target_lang='en',
+        source_lang='und',
+    )
+
+    assert any(finding.type == FindingType.UNTRANSLATED for finding in findings)
+
+
 def test_real_prose_left_identical_is_still_untranslated():
     untranslated = VALID_TRANSLATION.replace(
         '求整数 $x \\leq y$，使 `x + y` 为偶数。',
