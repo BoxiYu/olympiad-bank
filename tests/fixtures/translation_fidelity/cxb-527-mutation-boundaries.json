@@ -1,0 +1,27 @@
+{
+  "fixture_kind": "CXB-527 mutation-boundary unit excerpts",
+  "scope": "One verbatim MathNet excerpt linked to an existing frozen fixture plus explicitly constructed placeholder cases; these are not complete documents.",
+  "real_symbolic_fragment": {
+    "mathnet_id": "02qx",
+    "field": "problem_markdown",
+    "language": "pt",
+    "body": "Um",
+    "source_fixture": "target-language-cases.json",
+    "source_revision": "33e6b3bc254e6f0f0c1479b4252f5e9dd551d56c"
+  },
+  "constructed_cases": [
+    {
+      "fixture_id": "constructed-cxb527-pure-placeholder-duplicate",
+      "source_body": "Compare {{MNT_0001}}.",
+      "translated_body": "比较 {{MNT_0001}} 与 {{MNT_0001}}。",
+      "protected": {
+        "{{MNT_0001}}": "$x+y$"
+      }
+    },
+    {
+      "fixture_id": "constructed-cxb527-dotted-generator-placeholder",
+      "body": "Not provided in the dataset.",
+      "rationale": "A sentence-final period is formatting punctuation and must not turn a known generated status marker into translatable prose."
+    }
+  ]
+}
