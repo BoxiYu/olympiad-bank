@@ -457,6 +457,35 @@ def test_apply_payload_accepts_en_non_high_identical_model_result(
     assert state["variants"]["en"]["mode"] == "translated"
 
 
+def test_apply_payload_accepts_generated_english_proof_placeholder(
+    corpus: Path, tmp_path: Path
+):
+    source = next(
+        path for path in corpus.rglob("index.md") if path.parent.name == "eng1"
+    )
+    source.write_text(
+        source.read_text(encoding="utf-8").replace(
+            "$x\\in\\{-1,1\\}$", "（数据集未提供 / 证明题）"
+        ),
+        encoding="utf-8",
+    )
+    row = export(
+        corpus, tmp_path / "batch.jsonl", "--only", "eng1",
+        "--source-lang", "en", "--source-lang-confidence", "medium",
+    )[0]
+    payload = identical_translated_variant(row)
+    payload["units"]["final_answer"] = (
+        "Not provided in the dataset / proof problem"
+    )
+
+    mt.apply_payload(corpus, row, "en", payload)
+
+    target = source.with_name("index.en.md").read_text(encoding="utf-8")
+    assert target.rstrip().endswith(
+        "## 最终答案\n\nNot provided in the dataset / proof problem"
+    )
+
+
 def test_apply_payload_rejects_mixed_section_despite_matching_file_language(
     corpus: Path, tmp_path: Path
 ):

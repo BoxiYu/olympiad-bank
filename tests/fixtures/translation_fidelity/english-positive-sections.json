@@ -1,0 +1,27 @@
+[
+  {
+    "mathnet_id": "0g41",
+    "section": "解法 1",
+    "body": "By Hölder we have the following inequality, which proves the required estimate."
+  },
+  {
+    "mathnet_id": "02jp",
+    "section": "最终答案",
+    "body": "The winners are Patrícia, Heloísa, and Cláudia."
+  },
+  {
+    "mathnet_id": "051y",
+    "section": "最终答案",
+    "body": "All pairs are (kπ, kπ) for any integer k."
+  },
+  {
+    "mathnet_id": "01cx",
+    "section": "最终答案",
+    "body": "x = y = π/4 + nπ"
+  },
+  {
+    "mathnet_id": "06wc",
+    "section": "最终答案",
+    "body": "f(x)=αx+β, where α∈{−1,0,1} and β∈ℝ."
+  }
+]
