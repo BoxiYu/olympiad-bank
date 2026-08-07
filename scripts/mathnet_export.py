@@ -19,11 +19,14 @@
 配图作为 index.md 的兄弟文件落盘（详见 README 的「目录结构」）。
 """
 import argparse
+import atexit
 import glob
 import hashlib
 import json
 import os
 import re
+import shlex
+import signal
 import shutil
 import sys
 import tempfile
@@ -31,6 +34,13 @@ import unicodedata
 from collections import Counter
 
 from mathnet_ingest import in_bank_snapshot
+from mathnet_translation_assets import (
+    EXPORT_RECOVERY_MARKER,
+    TRANSLATION_RUN_DIRNAME,
+    TRANSLATION_STASH_ARCHIVE_DIRNAME,
+    TRANSLATION_STASH_PREFIX,
+)
+from mathnet_translate import update_index_line
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 POOL_PATH = os.path.join(ROOT, 'candidates', 'mathnet.jsonl')
@@ -43,6 +53,7 @@ UNCLASSIFIED = '_未分类'   # 候选池判定 out_of_scope、无板块的题
 UNSPECIFIED = '_未细分'    # 有板块但候选池没判出知识点的题
 VARIANT_LANGS = ('en', 'zh')
 VARIANT_STATES = ('passthrough', 'translated', 'verified_identical', 'failed', 'missing')
+INDEX_EXPORT_METADATA_FIELDS = ('topics_flat', 'difficulty_conf', 'in_bank')
 
 
 def die(msg):
@@ -154,26 +165,149 @@ def render(rec, meta_row):
 TRANSLATION_ARTIFACTS = ('translation.json',) + tuple(f'index.{lang}.md' for lang in VARIANT_LANGS)
 
 
-def stash_translations(out):
-    """重导出前把译文产物挪进 out 的临时兄弟目录暂存：机器译文是付费产物，不得随原文树
-    一起销毁。原文若有变动靠 translation.json 的 source_sha256 判定失效（契约见
-    docs/译文契约-mathnet-full.md），这里不做预判。返回 (mathnet_id → 暂存子目录, 暂存根目录)。"""
-    stash, stash_root = {}, None
+def translation_count(path):
+    """统计暂存树中的 translation.json 数量，供恢复提示给出可核对的资产数。"""
+    return sum('translation.json' in filenames for _root, _dirs, filenames in os.walk(path))
+
+
+def translation_stash_roots(out):
+    """同时发现新版内置暂存与旧版兄弟暂存，便于升级后主动认领历史现场。"""
+    internal = [os.path.join(out, name) for name in os.listdir(out)
+                if name.startswith(TRANSLATION_STASH_PREFIX)
+                and name != TRANSLATION_STASH_ARCHIVE_DIRNAME
+                and os.path.isdir(os.path.join(out, name))]
+    legacy = [path for path in glob.glob(out + TRANSLATION_STASH_PREFIX + '*')
+              if os.path.isdir(path)]
+    return sorted(internal + legacy)
+
+
+def describe_stashes(roots):
+    details = []
+    for root in roots:
+        notes = []
+        if os.path.isdir(os.path.join(root, TRANSLATION_RUN_DIRNAME)):
+            notes.append('含翻译续跑账本')
+        if os.path.isfile(os.path.join(root, EXPORT_RECOVERY_MARKER)):
+            notes.append('含导出恢复标记')
+        note = f'，{"、".join(notes)}' if notes else ''
+        details.append(f'{root}（{translation_count(root)} 份 translation.json{note}）')
+    return '；'.join(details)
+
+
+def _prefer_live_command(out):
+    return ('uv run --group mathnet python scripts/mathnet_export.py '
+            f'--out {shlex.quote(out)} --prefer-live-translations')
+
+
+def _archive_stashed_path(out, path, label):
+    """显式采用当前产物前，先把旧暂存版本移进 checker 会跳过的永久备份区。"""
+    archive_root = os.path.join(out, TRANSLATION_STASH_ARCHIVE_DIRNAME)
+    os.makedirs(archive_root, exist_ok=True)
+    backup = tempfile.mkdtemp(prefix=f'{safe(label)}-', dir=archive_root)
+    archived = os.path.join(backup, 'stashed')
+    os.replace(path, archived)
+    return archived
+
+
+def stash_translations(out, prefer_live_translations=False):
+    """重导出前暂存译文，并主动认领上次中断留下的暂存目录。
+
+    暂存目录刻意放在 ``out/.translations-*``：默认 out 是已被 .gitignore 覆盖的
+    mathnet-full/，所以 git clean -fd 不会删它；清空原文树时也显式跳过它。这样即使
+    SIGKILL 绕过 finally/atexit，付费译文仍在同盘、被忽略且可由下一次运行认领。
+    """
+    roots = translation_stash_roots(out)
+    if len(roots) > 1:
+        die(f'发现多个译文暂存目录，无法判断应认领哪一个：{describe_stashes(roots)}；'
+            '未删除任何暂存，请先核对')
+
+    stash_root = roots[0] if roots else None
+    if stash_root is not None and os.path.dirname(stash_root) != out:
+        suffix = os.path.basename(stash_root).split('.translations-', 1)[-1]
+        protected_root = os.path.join(out, TRANSLATION_STASH_PREFIX + suffix)
+        os.replace(stash_root, protected_root)
+        print(f'  主动认领旧版译文暂存：{stash_root} -> {protected_root}')
+        stash_root = protected_root
+
+    live = []
     for dirpath, dirnames, filenames in os.walk(os.path.join(out, 'by-topic')):
         dirnames[:] = [d for d in dirnames if not os.path.islink(os.path.join(dirpath, d))]
         present = [fn for fn in filenames if fn in TRANSLATION_ARTIFACTS]
         if not present:
             continue
-        if stash_root is None:   # 与 out 同层同盘，os.replace 不跨文件系统
-            stash_root = tempfile.mkdtemp(prefix=os.path.basename(out) + '.translations-',
-                                          dir=os.path.dirname(out))
         mid = os.path.basename(dirpath)
+        live.append((mid, dirpath, present))
+
+    live_run = os.path.join(out, TRANSLATION_RUN_DIRNAME)
+    if stash_root is None:
+        # 每次 destructive prepare 都先落持久恢复标记；即使最后一份译文已经 restore，
+        # 新 index.jsonl 提交前的 SIGKILL 也仍能证明残留树是可恢复的本脚本产物。
+        stash_root = tempfile.mkdtemp(prefix=TRANSLATION_STASH_PREFIX, dir=out)
+    marker = os.path.join(stash_root, EXPORT_RECOVERY_MARKER)
+    with open(marker, 'a', encoding='utf-8'):
+        pass
+
+    conflicting_mids = []
+    run_conflict = False
+    if stash_root is not None:
+        for mid, _dirpath, present in live:
+            dest = os.path.join(stash_root, mid)
+            if any(os.path.exists(os.path.join(dest, fn)) for fn in present):
+                conflicting_mids.append(mid)
+        run_conflict = (os.path.isdir(live_run)
+                        and os.path.exists(os.path.join(stash_root, TRANSLATION_RUN_DIRNAME)))
+
+    if conflicting_mids or run_conflict:
+        conflict_items = [f'{mid} 的译文产物' for mid in conflicting_mids]
+        if run_conflict:
+            conflict_items.append(TRANSLATION_RUN_DIRNAME)
+        if not prefer_live_translations:
+            die('译文暂存冲突：当前语料与中断恢复暂存同时含有 '
+                f'{"、".join(conflict_items)}；未覆盖或删除任何文件。若这些当前产物是中断后补跑的'
+                '新译文，请核对后执行：\n  '
+                f'{_prefer_live_command(out)}\n'
+                f'该开关会采用当前产物，并把旧暂存版本永久备份到 '
+                f'{os.path.join(out, TRANSLATION_STASH_ARCHIVE_DIRNAME)}/')
+        for mid in conflicting_mids:
+            dest = os.path.join(stash_root, mid)
+            archived = _archive_stashed_path(out, dest, mid)
+            print(f'  已采用当前译文；旧暂存版本保留在 {archived}')
+        if run_conflict:
+            stashed_run = os.path.join(stash_root, TRANSLATION_RUN_DIRNAME)
+            archived = _archive_stashed_path(out, stashed_run, 'translate-run')
+            print(f'  已采用当前续跑账本；旧暂存版本保留在 {archived}')
+
+    if stash_root is not None and os.path.isdir(live_run):
+        os.replace(live_run, os.path.join(stash_root, TRANSLATION_RUN_DIRNAME))
+
+    for mid, dirpath, present in live:
         dest = os.path.join(stash_root, mid)
         os.makedirs(dest, exist_ok=True)
         for fn in present:
-            os.replace(os.path.join(dirpath, fn), os.path.join(dest, fn))
-        stash[mid] = dest
+            source = os.path.join(dirpath, fn)
+            target = os.path.join(dest, fn)
+            os.replace(source, target)
+
+    stash = {}
+    if stash_root is not None:
+        for name in os.listdir(stash_root):
+            path = os.path.join(stash_root, name)
+            if name != TRANSLATION_RUN_DIRNAME and os.path.isdir(path):
+                stash[name] = path
+        print(f'  主动认领中断遗留暂存 {stash_root}：{translation_count(stash_root)} 份译文')
     return stash, stash_root
+
+
+def restore_translation_run(out, stash_root):
+    """清空派生树后立即放回续跑账本；SIGKILL 前若未走到这里，账本仍安全留在暂存。"""
+    if stash_root is None:
+        return
+    source = os.path.join(stash_root, TRANSLATION_RUN_DIRNAME)
+    if not os.path.isdir(source):
+        return
+    target = os.path.join(out, TRANSLATION_RUN_DIRNAME)
+    os.replace(source, target)
+    print(f'  已恢复翻译续跑账本 {target}')
 
 
 def restore_translations(stash, mid, pdir):
@@ -186,21 +320,96 @@ def restore_translations(stash, mid, pdir):
     os.rmdir(src)
 
 
-def prepare_out(out):
+def prepare_out(out, prefer_live_translations=False):
     """清空输出目录（译文产物先暂存后回填，不随树销毁）。只肯删自己产出的目录，
     避免 --out 指错把别人的东西删了。"""
     if not os.path.exists(out):
         os.makedirs(out)
-        return {}, None
     if not os.path.isdir(out):
         die(f'{out} 不是目录')
+
+    roots = translation_stash_roots(out)
+    if len(roots) > 1:
+        die(f'发现多个译文暂存目录，拒绝清理输出：{describe_stashes(roots)}；'
+            '未删除任何暂存，请先核对')
     entries = set(os.listdir(out))
-    if entries and 'index.jsonl' not in entries:
-        die(f'{out} 非空且不像本脚本的产物（没有 index.jsonl），拒绝删除；请换个 --out 或手动清理')
-    stash, stash_root = stash_translations(out)
-    shutil.rmtree(out)
-    os.makedirs(out)
+    internal_roots = {os.path.basename(root) for root in roots if os.path.dirname(root) == out}
+    protected_entries = internal_roots | {TRANSLATION_STASH_ARCHIVE_DIRNAME}
+    ordinary_entries = entries - protected_entries
+    recoverable = bool(roots and (
+        translation_count(roots[0])
+        or os.path.isdir(os.path.join(roots[0], TRANSLATION_RUN_DIRNAME))
+        or os.path.isfile(os.path.join(roots[0], EXPORT_RECOVERY_MARKER))))
+    if ordinary_entries and 'index.jsonl' not in ordinary_entries and not recoverable:
+        recovery = describe_stashes(roots) if roots else '未发现译文暂存目录（0 份译文）'
+        die(f'{out} 非空且不像本脚本的产物（没有 index.jsonl），拒绝删除；{recovery}；'
+            '请换个 --out 或核对上述现场，切勿盲目清理')
+    if ordinary_entries and 'index.jsonl' not in ordinary_entries:
+        print(f'  检测到上次导出中断的残留输出；将认领 {describe_stashes(roots)} 并重建')
+
+    stash, stash_root = stash_translations(
+        out, prefer_live_translations=prefer_live_translations)
+    # 不 rmtree(out)：内置暂存必须跨 SIGKILL 存活。只清理已验证的输出内容，明确跳过暂存根。
+    for name in os.listdir(out):
+        path = os.path.join(out, name)
+        if ((stash_root is not None and os.path.abspath(path) == os.path.abspath(stash_root))
+                or name == TRANSLATION_STASH_ARCHIVE_DIRNAME):
+            continue
+        if os.path.isdir(path) and not os.path.islink(path):
+            shutil.rmtree(path)
+        else:
+            os.unlink(path)
+    restore_translation_run(out, stash_root)
     return stash, stash_root
+
+
+def report_recovery_stashes(out):
+    """退出兜底：明确点名仍存活的暂存位置与译文数。"""
+    roots = translation_stash_roots(out) if os.path.isdir(out) else []
+    if roots:
+        print(f'  ⚠️ 译文恢复暂存仍在：{describe_stashes(roots)}；下次重跑会主动认领',
+              file=sys.stderr)
+
+
+def finish_translation_stash(stash, stash_root, export_completed=True):
+    """finally 收尾；未认领题继续留在持久暂存，空暂存才删除。"""
+    if stash_root is None or not os.path.isdir(stash_root):
+        return
+    if stash:
+        print(f'  ⚠️ {len(stash)} 题的译文产物尚未回填，保留在 {stash_root}（'
+              f'{translation_count(stash_root)} 份译文）；下次重跑会主动认领', file=sys.stderr)
+        return
+    marker = os.path.join(stash_root, EXPORT_RECOVERY_MARKER)
+    if not export_completed:
+        print(f'  ⚠️ 导出尚未提交新索引；恢复标记保留在 {marker}，下次重跑会主动认领',
+              file=sys.stderr)
+        return
+    try:
+        if os.path.isfile(marker):
+            os.unlink(marker)
+        os.rmdir(stash_root)
+    except OSError as exc:
+        print(f'  ⚠️ 空暂存目录 {stash_root} 无法移除：{exc}', file=sys.stderr)
+
+
+def install_interrupt_handlers():
+    """把常见终止信号转成异常，让 export 的 finally 有机会运行；SIGKILL 由持久暂存兜底。"""
+    previous = {}
+
+    def interrupt(signum, _frame):
+        raise KeyboardInterrupt(f'收到 {signal.Signals(signum).name}')
+
+    for name in ('SIGINT', 'SIGTERM', 'SIGHUP'):
+        signum = getattr(signal, name, None)
+        if signum is not None:
+            previous[signum] = signal.getsignal(signum)
+            signal.signal(signum, interrupt)
+    return previous
+
+
+def restore_interrupt_handlers(previous):
+    for signum, handler in previous.items():
+        signal.signal(signum, handler)
 
 
 def sha256_file(path):
@@ -249,7 +458,27 @@ def translation_projection(source_path):
     for lang in VARIANT_LANGS:
         item = variants_meta.get(lang)
         mode = item.get('mode') if isinstance(item, dict) else item
-        variants[lang] = mode if mode in VARIANT_STATES else 'missing'
+        if mode == 'failed':
+            variants[lang] = mode
+            continue
+        if mode not in ('passthrough', 'translated', 'verified_identical'):
+            variants[lang] = 'missing'
+            continue
+        target_path = os.path.join(os.path.dirname(source_path), f'index.{lang}.md')
+        expected_sha = item.get('sha256') if isinstance(item, dict) else None
+        try:
+            actual_sha = sha256_file(target_path)
+        except OSError as exc:
+            variants[lang] = 'missing'
+            print(f'  ⚠️ {target_path} 缺失或不可读（translation.json 声称 {mode}）：{exc}；'
+                  '索引写 missing', file=sys.stderr)
+            continue
+        if not isinstance(expected_sha, str) or actual_sha != expected_sha:
+            variants[lang] = 'missing'
+            print(f'  ⚠️ {target_path} sha256 与 translation.json 不一致；索引写 missing',
+                  file=sys.stderr)
+            continue
+        variants[lang] = mode
 
     return {
         'source_lang': source_lang,
@@ -325,6 +554,8 @@ def write_readme(out, index_rows, n_topics):
 - 分类不另立一套：板块与知识点取自 `candidates/mathnet.jsonl`，
   知识点的板块归属查 `taxonomy/registry.yml`。
 - 译文落盘后运行 `uv run python scripts/mathnet_export.py --refresh-index`，即可只刷新索引与本说明。
+- 旧索引缺少导出元数据时运行 `--backfill-index-metadata`，只定点回填
+  `topics_flat` / `difficulty_conf` / `in_bank`，无需重导全文。
 
 ## 目录结构
 
@@ -460,17 +691,84 @@ def refresh_index(out):
     return 0
 
 
-def export(out, with_images):
+def topics_flat_from_exported_source(out, row, line_number):
+    """从旧导出 index.md 的元数据区还原 topics_flat；只读，不触碰原文文件。"""
+    relative = row.get('path')
+    if not isinstance(relative, str) or not relative:
+        die(f'index.jsonl 第 {line_number} 行缺少 path')
+    source_path = os.path.abspath(os.path.join(out, relative))
+    try:
+        if os.path.commonpath([os.path.abspath(out), source_path]) != os.path.abspath(out):
+            die(f'index.jsonl 第 {line_number} 行 path 越出导出目录：{relative}')
+    except ValueError:
+        die(f'index.jsonl 第 {line_number} 行 path 非法：{relative}')
+    try:
+        with open(source_path, encoding='utf-8') as fh:
+            header = fh.read().split('\n## 题面\n', 1)[0]
+    except OSError as exc:
+        die(f'无法读取原文 {source_path}：{exc}')
+    prefix = '- MathNet 原始标签：'
+    values = [line[len(prefix):] for line in header.splitlines() if line.startswith(prefix)]
+    if len(values) != 1:
+        die(f'{source_path} 的元数据区应恰有一行“MathNet 原始标签”，实际 {len(values)} 行')
+    return [] if values[0] == '（无）' else values[0].split('; ')
+
+
+def backfill_index_metadata(out):
+    """只定点回填三个导出元数据键；不访问全文语料，也不重写该行其他字节。"""
+    index_path = os.path.join(out, 'index.jsonl')
+    if not os.path.exists(index_path):
+        die(f'{index_path} 不存在；--backfill-index-metadata 只能用于已有导出目录')
+    meta = load_pool()
+    bank_marks = in_bank_snapshot()
+    try:
+        with open(index_path, 'rb') as fh:
+            original = fh.read()
+        text = original.decode('utf-8')
+    except (OSError, UnicodeDecodeError) as exc:
+        die(f'无法读取 {index_path}：{exc}')
+
+    output = []
+    updated = 0
+    for line_number, complete_line in enumerate(text.splitlines(keepends=True), 1):
+        ending = complete_line[len(complete_line.rstrip('\r\n')):]
+        line = complete_line[:-len(ending)] if ending else complete_line
+        if not line.strip():
+            output.append(complete_line)
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError as exc:
+            die(f'{index_path} 第 {line_number} 行无法解析：{exc}')
+        mid = row.get('mathnet_id') if isinstance(row, dict) else None
+        if not isinstance(mid, str) or not mid:
+            die(f'{index_path} 第 {line_number} 行缺少 mathnet_id')
+        meta_row = meta.get(mid)
+        if meta_row is None:
+            die(f'{index_path} 第 {line_number} 行的 {mid} 在候选池中不存在；未写回任何内容')
+        projection = {
+            'topics_flat': topics_flat_from_exported_source(out, row, line_number),
+            'difficulty_conf': meta_row.get('difficulty_conf'),
+            'in_bank': bank_marks.get(mid),
+        }
+        output.append(update_index_line(
+            line, projection, fields=INDEX_EXPORT_METADATA_FIELDS) + ending)
+        updated += 1
+
+    data = ''.join(output).encode('utf-8')
+    with tempfile.NamedTemporaryFile('wb', dir=out, delete=False) as fh:
+        tmp_path = fh.name
+        fh.write(data)
+    os.replace(tmp_path, index_path)
+    print(f'{os.path.relpath(out, ROOT)}/ 索引元数据已定点回填：{updated} 题（仅 '
+          f'{" / ".join(INDEX_EXPORT_METADATA_FIELDS)}）')
+    return 0
+
+
+def export_prepared(out, with_images, node_cat, meta, bank_marks, shards, stash):
+    """在已清空且译文已暂存的 out 中生成新树；生命周期保护由 export 统一负责。"""
     import pyarrow.parquet as pq
 
-    node_cat = load_node_category()
-    meta = load_pool()
-    bank_marks = in_bank_snapshot()   # 导出时点重扫，不沿用候选池建池时的旧快照
-    shards = sorted(glob.glob(os.path.join(snapshot_dir(), 'data', 'all', '*.parquet')))
-    if not shards:
-        die('快照里没有 data/all/*.parquet，缓存可能不完整')
-
-    stash, stash_root = prepare_out(out)
     cols = ['id', 'problem_markdown', 'solutions_markdown', 'country', 'competition',
             'topics_flat', 'language', 'problem_type', 'final_answer']
     stat = Counter()
@@ -547,13 +845,6 @@ def export(out, with_images):
     write_index(out, index_rows)
     write_readme(out, index_rows, len({t for r in index_rows for t in r['topics']}))
 
-    if stash_root is not None:
-        if stash:
-            print(f'  ⚠️ {len(stash)} 题的译文产物在本次导出中找不到归属（数据集里已无此题？），'
-                  f'保留在 {stash_root} 未删，请人工处置')
-        else:
-            shutil.rmtree(stash_root)
-
     rel = os.path.relpath(out, ROOT)
     print(f'{rel}/ 已生成：{stat["problems"]} 题、{stat["images"]} 张配图')
     print(f'  符号链接: 知识点 {stat["links_topic"]}、赛事 {stat["links_contest"]}')
@@ -563,15 +854,55 @@ def export(out, with_images):
     return 0
 
 
+def export(out, with_images, prefer_live_translations=False):
+    node_cat = load_node_category()
+    meta = load_pool()
+    bank_marks = in_bank_snapshot()   # 导出时点重扫，不沿用候选池建池时的旧快照
+    shards = sorted(glob.glob(os.path.join(snapshot_dir(), 'data', 'all', '*.parquet')))
+    if not shards:
+        die('快照里没有 data/all/*.parquet，缓存可能不完整')
+
+    previous_handlers = install_interrupt_handlers()
+    stash, stash_root = {}, None
+    export_completed = False
+    exit_notice = lambda: report_recovery_stashes(out)
+    atexit.register(exit_notice)
+    try:
+        # stash → 清理 → 逐题 restore 的整个窗口必须受 finally 保护；信号会转成异常走这里。
+        stash, stash_root = prepare_out(
+            out, prefer_live_translations=prefer_live_translations)
+        result = export_prepared(out, with_images, node_cat, meta, bank_marks, shards, stash)
+        export_completed = True
+        return result
+    finally:
+        finish_translation_stash(stash, stash_root, export_completed=export_completed)
+        report_recovery_stashes(out)
+        atexit.unregister(exit_notice)
+        restore_interrupt_handlers(previous_handlers)
+
+
 def main():
     ap = argparse.ArgumentParser(description='把 MathNet 全量导出成板块 × 知识点的 markdown 树')
     ap.add_argument('--out', default=DEFAULT_OUT, help=f'输出目录（默认 {os.path.relpath(DEFAULT_OUT, ROOT)}/）')
     ap.add_argument('--no-images', action='store_true', help='不导配图，只出文本')
-    ap.add_argument('--refresh-index', action='store_true',
-                    help='不读数据集，只按已有 index.md / translation.json 刷新索引与 README')
+    ap.add_argument('--prefer-live-translations', action='store_true',
+                    help=f'解决中断暂存冲突：采用当前补跑产物，旧版本移入 '
+                         f'{TRANSLATION_STASH_ARCHIVE_DIRNAME}/')
+    mode = ap.add_mutually_exclusive_group()
+    mode.add_argument('--refresh-index', action='store_true',
+                      help='不读数据集，只按已有 index.md / translation.json 刷新索引与 README')
+    mode.add_argument('--backfill-index-metadata', action='store_true',
+                      help='不重导全文，只定点回填 topics_flat / difficulty_conf / in_bank')
     args = ap.parse_args()
     out = os.path.abspath(args.out)
-    sys.exit(refresh_index(out) if args.refresh_index else export(out, with_images=not args.no_images))
+    if args.refresh_index:
+        result = refresh_index(out)
+    elif args.backfill_index_metadata:
+        result = backfill_index_metadata(out)
+    else:
+        result = export(out, with_images=not args.no_images,
+                        prefer_live_translations=args.prefer_live_translations)
+    sys.exit(result)
 
 
 if __name__ == '__main__':

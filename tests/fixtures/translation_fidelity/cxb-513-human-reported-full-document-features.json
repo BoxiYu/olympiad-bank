@@ -1,0 +1,53 @@
+{
+  "fixture_kind": "constructed detector documents from human-reported full-document features",
+  "provenance": "Linear issue CXB-513 and the statement excerpts retained in closed PR #53.",
+  "scope": "The issue reports the section inventory and exact degraded English sentence, but the ignored mathnet-full corpus is unavailable. Source solution bodies below are explicitly marked detector proxies; this file must not be cited as an exact corpus transcription or a normal-pair false-positive sample.",
+  "degraded_solution_text": "Solution:\nThe argument proceeds through the following steps and expressions:",
+  "rows": [
+    {
+      "mathnet_id": "096f",
+      "source_statement_excerpt": "Să se arate că dacă numerele reale satisfac relațiile {{MNT_0001}}, atunci {{MNT_0002}}.",
+      "translated_statement_excerpt": "Prove that if the real numbers satisfy {{MNT_0001}}, then {{MNT_0002}}.",
+      "solution_sections": [
+        {
+          "heading": "解法 1",
+          "detector_proxy_discriminator": "096f-5f5eb8c72b3c44b59c2a7d1e812c9a14",
+          "source_proxy": "[CONSTRUCTED DETECTOR PROXY] Notăm ... Atunci din condițile problemei obținem ...; CXB-513 reports that a complete Romanian derivation continues here.",
+          "translated": "Solution:\nThe argument proceeds through the following steps and expressions:"
+        }
+      ]
+    },
+    {
+      "mathnet_id": "0a3h",
+      "source_statement_excerpt": "Zij {{MNT_0001}} een polynoom met gehele coëfficiënten van graad {{MNT_0002}} zodanig dat {{MNT_0003}}.",
+      "translated_statement_excerpt": "Let {{MNT_0001}} be a degree-{{MNT_0002}} polynomial with integer coefficients such that {{MNT_0003}}.",
+      "solution_sections": [
+        {
+          "heading": "解法 1",
+          "detector_proxy_discriminator": "0a3h-8e13d77a0c4f49b69f525824dcab7831",
+          "source_proxy": "[CONSTRUCTED DETECTOR PROXY] CXB-513 reports that solution 1 contains a complete non-English derivation.",
+          "translated": "Solution:\nThe argument proceeds through the following steps and expressions:"
+        },
+        {
+          "heading": "解法 2",
+          "detector_proxy_discriminator": "0a3h-f47da69110ee4e918177bbf4e24f9a32",
+          "source_proxy": "[CONSTRUCTED DETECTOR PROXY] CXB-513 reports that solution 2 contains another complete non-English derivation.",
+          "translated": "Solution:\nThe argument proceeds through the following steps and expressions:"
+        }
+      ]
+    },
+    {
+      "mathnet_id": "097v",
+      "source_statement_excerpt": "Determinați toate valorile parametrului real pentru care ecuația are două soluții reale distincte.",
+      "translated_statement_excerpt": "Determine all real values of the parameter for which the equation has two distinct real solutions.",
+      "solution_sections": [
+        {
+          "heading": "解法 1",
+          "detector_proxy_discriminator": "097v-c69224c1085642b19d5567848235a67e",
+          "source_proxy": "[CONSTRUCTED DETECTOR PROXY] CXB-513 reports that this section contains a complete Romanian derivation.",
+          "translated": "Solution:\nThe argument proceeds through the following steps and expressions:"
+        }
+      ]
+    }
+  ]
+}

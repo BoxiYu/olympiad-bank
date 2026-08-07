@@ -3,6 +3,8 @@ import hashlib
 import importlib.util
 import json
 import os
+import shutil
+import subprocess
 import sys
 
 import pytest
@@ -91,6 +93,49 @@ def test_valid_sample_runs_and_reports_size_and_time(tmp_path, capsys):
     assert '耗时' in out
 
 
+def test_interrupted_export_stash_is_not_discovered_as_corpus(tmp_path):
+    corpus = os.path.join(tmp_path, 'mathnet-full')
+    _problem, live_contract, _payload = make_problem(corpus)
+    stash_contract = os.path.join(
+        corpus, f'{tc.TRANSLATION_STASH_PREFIX}interrupted', 'paid-translation',
+        'translation.json')
+    _write_json(stash_contract, {'mathnet_id': 'paid-translation'})
+
+    contracts = tc.discover_contracts(corpus)
+    result = tc.check_corpus(str(tmp_path), sample=100)
+
+    assert contracts == [live_contract]
+    assert result.status == 'ok', result.errors
+    assert result.discovered == result.checked == 1
+
+
+def test_lint_hard_gate_passes_with_interrupted_export_stash(tmp_path):
+    """真跑唯一硬门槛；仓库与语料都复制到临时沙箱，绝不接触本机真实语料。"""
+    repo = tmp_path / 'repo'
+    shutil.copytree(
+        _ROOT,
+        repo,
+        ignore=shutil.ignore_patterns(
+            '.git', '.git-cxb-514', '.venv', '.pytest_cache', '__pycache__', '*.pyc',
+            'mathnet-full'),
+    )
+    corpus = repo / 'mathnet-full'
+    make_problem(str(corpus))
+    stash_contract = (
+        corpus / f'{tc.TRANSLATION_STASH_PREFIX}interrupted' / 'paid-translation'
+        / 'translation.json'
+    )
+    _write_json(str(stash_contract), {'mathnet_id': 'paid-translation'})
+
+    completed = subprocess.run(
+        ['bash', 'scripts/lint.sh'], cwd=repo, text=True, capture_output=True, check=False,
+    )
+
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert 'TRANSLATION CHECK OK: 抽样 1/1 题' in completed.stdout
+    assert 'LINT OK:' in completed.stdout
+
+
 def test_repository_fidelity_module_loads_and_runs(tmp_path, capsys):
     corpus = os.path.join(tmp_path, 'mathnet-full')
     make_problem(corpus)
@@ -104,20 +149,21 @@ def test_repository_fidelity_module_loads_and_runs(tmp_path, capsys):
     assert '保真校验 skipped' not in out
 
 
-def test_repository_batch_gate_rejects_real_boilerplate_fixture(tmp_path):
+def test_repository_batch_gate_rejects_human_reported_boilerplate_excerpts(tmp_path):
     corpus = os.path.join(tmp_path, 'mathnet-full')
     fixture_path = os.path.join(
-        _ROOT, 'tests', 'fixtures', 'translation_fidelity', 'degenerate-batch.json'
+        _ROOT, 'tests', 'fixtures', 'translation_fidelity',
+        'human-reported-degenerate-excerpts.json'
     )
     with open(fixture_path, encoding='utf-8') as handle:
-        fixture = json.load(handle)
+        fixture = json.load(handle)['rows']
     for row in fixture:
-        heading = f"# {row['mathnet_id']}\n\n## 题面\n\n"
+        heading = f"# {row['fixture_id']}\n\n## 题面\n\n"
         source = (heading + row['source'] + '\n').encode()
         translated = (heading + row['translated'] + '\n').encode()
         make_problem(
             corpus,
-            pid=row['mathnet_id'],
+            pid=row['fixture_id'],
             source=source,
             en=False,
             zh=translated,
