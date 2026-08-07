@@ -1,5 +1,6 @@
 """Fixture-driven contract tests for conservative MathNet language detection."""
 
+import hashlib
 import json
 import os
 import sys
@@ -23,10 +24,36 @@ def test_fixture_has_required_coverage():
     ids = {case["id"] for case in CASES}
     languages = {case["expected"][0] for case in CASES}
     assert len(CASES) >= 20
-    assert {"en", "de", "it", "es", "pt", "fr", "sl", "ru", "zh", "und"} <= languages
+    assert {
+        "en", "de", "it", "es", "pt", "fr", "nl", "ro", "sl", "ru",
+        "mn", "mk", "el", "zh", "und",
+    } <= languages
     assert any("conflict" in ident for ident in ids)
     assert any("problem_prefix" in ident or "problem_solution_prefix" in ident for ident in ids)
     assert any(ident.startswith("und_") for ident in ids)
+
+
+def test_real_mathnet_source_fixtures_are_verbatim_and_traceable():
+    real_cases = [case for case in CASES if "provenance" in case]
+    assert {case["provenance"]["row_id"] for case in real_cases} == {
+        "026c", "027k", "08im", "0dmb", "0aeo",
+    }
+    for case in real_cases:
+        provenance = case["provenance"]
+        assert provenance["dataset"] == "ShadenA/MathNet"
+        assert provenance["revision"] == "33e6b3bc254e6f0f0c1479b4252f5e9dd551d56c"
+        assert hashlib.sha256(case["body"].encode()).hexdigest() == (
+            provenance["problem_markdown_sha256"]
+        )
+
+
+def test_026c_uses_the_complete_real_problem_text():
+    case = next(case for case in CASES if case["id"] == "026c")
+    assert case["provenance"]["row_id"] == "026c"
+    assert "$AD = AB = BC = 1~\\mathrm{cm}$" in case["body"]
+    assert "(E) $120^\\circ$" in case["body"]
+    assert "..." not in case["body"]
+    assert detect_source_lang(case["body"], case["meta"])[0] == "pt"
 
 
 def test_english_high_confidence_recall_is_at_least_ninety_percent():
@@ -35,6 +62,57 @@ def test_english_high_confidence_recall_is_at_least_ninety_percent():
     english = [case for case in CASES if case["expected"] == ["en", "high"]]
     high = sum(detect_source_lang(case["body"], case["meta"]) == ("en", "high") for case in english)
     assert high / len(english) >= 0.9
+
+
+def test_detector_threshold_boundaries_are_observable():
+    assert detect_source_lang(
+        "Prove that Fibonacci recursion terminates.", {}
+    ) == ("en", "high")
+    assert detect_source_lang(
+        "Let παραλληλόγραμμο be the name of this figure.", {}
+    ) == ("en", "high")
+    assert detect_source_lang(
+        "Let αβ and γδ be positive real numbers.", {}
+    ) == ("en", "high")
+    assert detect_source_lang("In Ĳmuiden en Ĳlst.", {}) == ("nl", "medium")
+
+
+def test_en_high_relaxation_does_not_expand_zero_call_passthrough():
+    """Every case is just outside one en/high shortcut's safe boundary."""
+    expected = {
+        "en_density_between_point_three_and_point_four_a": ("en", "medium"),
+        "en_density_between_point_three_and_point_four_b": ("en", "medium"),
+        "und_four_word_dense_english": ("und", "low"),
+        "und_tiny_non_en_winner": ("und", "low"),
+        "und_tiny_zero_margin_tie": ("und", "low"),
+        "und_tiny_english_density_below_half": ("und", "low"),
+        "und_tiny_french_shared_on": ("und", "low"),
+        "und_tiny_dutch_shared_is": ("und", "low"),
+        "und_tiny_portuguese_determine_cognate": ("und", "low"),
+        "en_medium_repeated_french_shared_features": ("en", "medium"),
+        "nl_density_below_point_five": ("nl", "medium"),
+        "und_three_letter_english_marker": ("und", "low"),
+    }
+    selected = {case["id"]: case for case in CASES if case["id"] in expected}
+    assert set(selected) == set(expected)
+    for case_id, result in expected.items():
+        case = selected[case_id]
+        assert detect_source_lang(case["body"], case["meta"]) == result
+        assert should_passthrough(*result, "en") is False
+
+
+def test_representative_minor_lexicon_boundaries_are_observable():
+    expected = {
+        "nl_short_math": ("nl", "high"),
+        "ro_three_feature_word_boundary": ("ro", "high"),
+        "mn_two_feature_word_boundary": ("mn", "high"),
+        "mk_two_feature_word_boundary": ("mk", "high"),
+    }
+    selected = {case["id"]: case for case in CASES if case["id"] in expected}
+    assert set(selected) == set(expected)
+    for case_id, result in expected.items():
+        case = selected[case_id]
+        assert detect_source_lang(case["body"], case["meta"]) == result
 
 
 def test_no_non_english_fixture_is_misclassified_as_english():

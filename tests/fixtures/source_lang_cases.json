@@ -241,8 +241,252 @@
   },
   {
     "id": "026c",
-    "body": "Um trapézio - No trapézio da figura abaixo é paralelo a , e . Quanto mede o ângulo ?",
+    "body": "Problem:\n\nUm trapézio - No trapézio da figura abaixo $AB$ é paralelo a $CD$, $AD = AB = BC = 1~\\mathrm{cm}$ e $DC = 2~\\mathrm{cm}$. Quanto mede o ângulo $C \\hat{A} D$?\n\n(A) $30^\\circ$\n(B) $45^\\circ$\n(C) $60^\\circ$\n(D) $90^\\circ$\n(E) $120^\\circ$\n\n![](attached_image_1.png)",
     "meta": {},
-    "expected": ["pt", "medium"]
+    "expected": ["pt", "medium"],
+    "provenance": {
+      "dataset": "ShadenA/MathNet",
+      "revision": "33e6b3bc254e6f0f0c1479b4252f5e9dd551d56c",
+      "config": "Brazil",
+      "row_id": "026c",
+      "problem_markdown_sha256": "e2645de2b0cede48d2352478203b17238ee9e953a8e313bd624d4dffafc6c9fe",
+      "selection": "human-reported regression id"
+    }
+  },
+  {
+    "id": "en_short_find_math",
+    "body": "Find $x$.",
+    "meta": {},
+    "expected": ["en", "high"]
+  },
+  {
+    "id": "en_short_dense_prompt",
+    "body": "Determine all positive integers.",
+    "meta": {},
+    "expected": ["en", "high"]
+  },
+  {
+    "id": "en_density_exactly_point_four",
+    "body": "Prove that Fibonacci recursion terminates.",
+    "meta": {},
+    "expected": ["en", "high"]
+  },
+  {
+    "id": "en_density_between_point_three_and_point_four_a",
+    "body": "Find the value for this Fibonacci recursion sequence today.",
+    "meta": {},
+    "expected": ["en", "medium"]
+  },
+  {
+    "id": "en_density_between_point_three_and_point_four_b",
+    "body": "Prove that Euler recursion reaches a terminal state eventually.",
+    "meta": {},
+    "expected": ["en", "medium"]
+  },
+  {
+    "id": "und_four_word_dense_english",
+    "body": "Find Fibonacci recursion numbers.",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
+    "id": "und_tiny_non_en_winner",
+    "body": "Bepaal find getal.",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
+    "id": "und_tiny_zero_margin_tie",
+    "body": "Find bepaal.",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
+    "id": "und_tiny_english_density_below_half",
+    "body": "Find Fibonacci recursion.",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
+    "id": "und_tiny_french_shared_on",
+    "body": "On cherche $x$.",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
+    "id": "und_tiny_dutch_shared_is",
+    "body": "Is $x$ positief?",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
+    "id": "und_tiny_portuguese_determine_cognate",
+    "body": "Determine a soma.",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
+    "id": "en_medium_repeated_french_shared_features",
+    "body": "On a deux nombres. On a trois nombres.",
+    "meta": {},
+    "expected": ["en", "medium"]
+  },
+  {
+    "id": "nl_density_below_point_five",
+    "body": "Bepaal het getal Fibonacci recursion vandaag morgen.",
+    "meta": {},
+    "expected": ["nl", "medium"]
+  },
+  {
+    "id": "und_three_letter_english_marker",
+    "body": "Let",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
+    "id": "en_holder_diacritic",
+    "body": "Prove that Hölder's inequality holds for all positive real numbers.",
+    "meta": {},
+    "expected": ["en", "high"]
+  },
+  {
+    "id": "en_names_with_diacritics",
+    "body": "Let Patrícia and João be positive integers and determine all possible values.",
+    "meta": {},
+    "expected": ["en", "high"]
+  },
+  {
+    "id": "en_bare_greek_math_symbols",
+    "body": "Let π, α, β and γ be positive real numbers.",
+    "meta": {},
+    "expected": ["en", "high"]
+  },
+  {
+    "id": "en_single_long_greek_word",
+    "body": "Let παραλληλόγραμμο be the name of this figure.",
+    "meta": {},
+    "expected": ["en", "high"]
+  },
+  {
+    "id": "en_two_short_greek_words",
+    "body": "Let αβ and γδ be positive real numbers.",
+    "meta": {},
+    "expected": ["en", "high"]
+  },
+  {
+    "id": "nl_shared_english_words",
+    "body": "Gegeven is een driehoek. Bewijs dat in deze driehoek de som van de hoeken gelijk is aan 180 graden.",
+    "meta": {},
+    "expected": ["nl", "high"]
+  },
+  {
+    "id": "nl_short_math",
+    "body": "Bepaal het getal $x$.",
+    "meta": {},
+    "expected": ["nl", "high"]
+  },
+  {
+    "id": "nl_ligature_boundary",
+    "body": "In Ĳmuiden en Ĳlst.",
+    "meta": {},
+    "expected": ["nl", "medium"]
+  },
+  {
+    "id": "ro_short_math",
+    "body": "Determinați numărul $x$.",
+    "meta": {},
+    "expected": ["ro", "high"]
+  },
+  {
+    "id": "ro_three_feature_word_boundary",
+    "body": "Fie numere pentru $x$.",
+    "meta": {},
+    "expected": ["ro", "high"]
+  },
+  {
+    "id": "mn_short_math",
+    "body": "Бүх шийдийг ол.",
+    "meta": {},
+    "expected": ["mn", "high"]
+  },
+  {
+    "id": "mn_two_feature_word_boundary",
+    "body": "Бүх шийдийг тэмдэглэ.",
+    "meta": {},
+    "expected": ["mn", "high"]
+  },
+  {
+    "id": "mk_short_math",
+    "body": "Најди го бројот $x$.",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
+    "id": "mk_two_feature_word_boundary",
+    "body": "Најди бројот Ѓорѓи.",
+    "meta": {},
+    "expected": ["mk", "high"]
+  },
+  {
+    "id": "el_short_math",
+    "body": "Βρείτε τον αριθμό $x$.",
+    "meta": {},
+    "expected": ["el", "high"]
+  },
+  {
+    "id": "027k_portuguese_shared_circumflex",
+    "body": "Problem:\n\nA seguinte figura mostra um triângulo $ABC$ que foi dividido em 3 triângulos isósceles.\n![](attached_image_1.png)\n\na) Mostre que todo triângulo retângulo pode ser dividido em 2 triângulos isósceles.\n\nb) Mostre que qualquer triângulo pode ser dividido em 4 triângulos isósceles.\n\nc) Mostre que qualquer triângulo pode ser dividido em 5 triângulos isósceles.",
+    "meta": {},
+    "expected": ["pt", "high"],
+    "provenance": {
+      "dataset": "ShadenA/MathNet",
+      "revision": "33e6b3bc254e6f0f0c1479b4252f5e9dd551d56c",
+      "config": "Brazil",
+      "row_id": "027k",
+      "problem_markdown_sha256": "1bfdb46ca6c85e616af0fc3e371c907a69426ea18cb12b2f32fe636456f3f631",
+      "selection": "old detector classified ro because Portuguese â was shared"
+    }
+  },
+  {
+    "id": "08im_english_romanian_bilingual",
+    "body": "Problem:\nLet $a, b, c$ be real numbers such that $a^{2} + b^{2} + c^{2} = 1$. Prove that $P = ab + bc + ca - 2(a + b + c) \\geq -\\frac{5}{2}$. Are there values of $a, b, c$ such that $P = -\\frac{5}{2}$?\n\nProblem:\nFie $a, b, c$ numere reale astfel încât $a^{2} + b^{2} + c^{2} = 1$. Demonstrați că $P = ab + bc + ca - 2(a + b + c) \\geq -5 / 2$. Există valori pentru $a, b, c$ încât $P = -5 / 2$?",
+    "meta": {},
+    "expected": ["und", "low"],
+    "provenance": {
+      "dataset": "ShadenA/MathNet",
+      "revision": "33e6b3bc254e6f0f0c1479b4252f5e9dd551d56c",
+      "config": "JBMO",
+      "row_id": "08im",
+      "problem_markdown_sha256": "dd921a799d17dec30d06d64bfe5101a0b8e2d70ad0baed91463b3edfb56ef8cf",
+      "selection": "old detector classified ro; bilingual text must not reach en/high"
+    }
+  },
+  {
+    "id": "0dmb_serbian_shared_cyrillic",
+    "body": "Problem:\n\nНека је $k$ природан број. За сваку функцију $f: \\mathbb{N} \\rightarrow \\mathbb{N}$, нека је низ функција $\\left(f_{m}\\right)_{m \\geqslant 1}$ дефинисан са $f_{1}=f$ и $f_{m+1}=f \\circ f_{m}$ за $m \\geqslant 1$. Функција $f$ је $k$-фина уколико за све $n \\in \\mathbb{N}$ важи\n$$\nf_{k}(n)=f(n)^{k}\n$$\n\na) За које $k$ постоји $1$-$1$ $k$-фина функција $f$?\n\nб) За које $k$ постоји на $k$-фина функција $f$?",
+    "meta": {},
+    "expected": ["und", "low"],
+    "provenance": {
+      "dataset": "ShadenA/MathNet",
+      "revision": "33e6b3bc254e6f0f0c1479b4252f5e9dd551d56c",
+      "config": "Serbia",
+      "row_id": "0dmb",
+      "problem_markdown_sha256": "5a57efe8dc3803efa3df63a3e2d88cab2f01dd1932de09a1b333921fc4796a11",
+      "selection": "old detector classified mk from Serbian-shared letters"
+    }
+  },
+  {
+    "id": "0aeo_macedonian_distinctive_letter",
+    "body": "Човек и пол, за два и пол дена јаде три и пол леба. Колку леба ќе изедат 100 луѓе за 45 дена?",
+    "meta": {},
+    "expected": ["mk", "high"],
+    "provenance": {
+      "dataset": "ShadenA/MathNet",
+      "revision": "33e6b3bc254e6f0f0c1479b4252f5e9dd551d56c",
+      "config": "North_Macedonia",
+      "row_id": "0aeo",
+      "problem_markdown_sha256": "95a7d4c74a53e70e897324abe7c83c6389267e881dffa8298ab22f54b9c2afc1",
+      "selection": "real Macedonian positive with distinctive ќ"
+    }
   }
 ]
