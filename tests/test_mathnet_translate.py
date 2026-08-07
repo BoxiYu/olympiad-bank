@@ -112,6 +112,38 @@ def apply_records_input(tmp_path: Path, records: list[dict]) -> Path:
     return path
 
 
+def cxb_525_fixture() -> dict:
+    return json.loads(
+        (REPO_ROOT / "tests" / "fixtures" / "translation_fidelity"
+         / "cxb-525-placeholder-reordering.json").read_text(encoding="utf-8")
+    )
+
+
+def cxb_525_export(tmp_path: Path) -> tuple[Path, dict, dict]:
+    fixture = cxb_525_fixture()
+    source_unit = fixture["source_unit"]
+    for placeholder, original in fixture["protected"].items():
+        source_unit = source_unit.replace(placeholder, original)
+    root = tmp_path / "mathnet-full-cxb-525"
+    question = root / "by-topic" / "algebra" / "方程与设元" / "cxb525"
+    question.mkdir(parents=True)
+    (question / "index.md").write_text(
+        f"# cxb525\n\n## 题面\n\n{source_unit}\n\n## 最终答案\n\nD\n",
+        encoding="utf-8",
+    )
+    write_corpus_index(root)
+    row = export(
+        root,
+        tmp_path / "cxb-525-export.jsonl",
+        "--only", "cxb525",
+        "--source-lang", "en",
+        "--source-lang-confidence", "medium",
+    )[0]
+    statement = next(unit for unit in row["units"] if unit["id"] == "statement")
+    assert statement["source"] == fixture["source_unit"]
+    return root, row, fixture
+
+
 def search(corpus: Path, lang: str, coverage: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [
@@ -497,18 +529,65 @@ def test_missing_unit_writes_nothing_to_question(corpus: Path, tmp_path: Path):
     assert failures[0]["mathnet_id"] == "slv1" and "final_answer" in failures[0]["error"]
 
 
-def test_reordered_protected_tokens_are_rejected(corpus: Path, tmp_path: Path):
-    row = export(corpus, tmp_path / "batch.jsonl", "--only", "eng1", "--source-lang", "en")[0]
+def test_cxb_525_reordered_math_placeholders_apply_and_fidelity_pass(tmp_path: Path):
+    root, row, fixture = cxb_525_export(tmp_path)
     variant = translated_variant(row)
-    statement = next(unit for unit in row["units"] if unit["id"] == "statement")
-    reversed_tokens = iter(reversed(list(statement["protected"])))
-    variant["units"]["statement"] = re.sub(mt.PLACEHOLDER_RE, lambda _: next(reversed_tokens), statement["source"])
+    variant["units"]["statement"] = fixture["translated_unit"]
     apply_path = apply_input(tmp_path, row, {"zh": variant})
-    question = (corpus / row["path"]).parent
+    question = (root / row["path"]).parent
 
-    assert mt.main(["apply", "--root", str(corpus), "--in", str(apply_path)]) == 1
+    assert mt.main(["apply", "--root", str(root), "--in", str(apply_path)]) == 0
+    source = (question / "index.md").read_text(encoding="utf-8")
+    translated = (question / "index.zh.md").read_text(encoding="utf-8")
+    assert mt.verify_translation(
+        source,
+        translated,
+        target_lang="zh",
+        source_lang="en",
+        placeholder_pipeline=True,
+    ) == []
+
+
+@pytest.mark.parametrize("damage", ["missing", "duplicate", "tampered"])
+def test_cxb_525_placeholder_multiset_damage_is_rejected(tmp_path: Path, damage: str):
+    root, row, fixture = cxb_525_export(tmp_path)
+    variant = translated_variant(row)
+    statement = fixture["translated_unit"]
+    if damage == "missing":
+        statement = statement.replace("{{MNT_0004}}", "")
+    elif damage == "duplicate":
+        statement = statement.replace("{{MNT_0004}}", "{{MNT_0003}}")
+    else:
+        statement = statement.replace("{{MNT_0004}}", "{{MNT_9999}}")
+    variant["units"]["statement"] = statement
+    apply_path = apply_input(tmp_path, row, {"zh": variant})
+    question = (root / row["path"]).parent
+
+    assert mt.main(["apply", "--root", str(root), "--in", str(apply_path)]) == 1
     assert not (question / "index.zh.md").exists()
     assert not (question / "translation.json").exists()
+    assert "缺失、重复或被篡改" in read_jsonl(
+        apply_path.with_suffix(".jsonl.failures.jsonl")
+    )[0]["error"]
+
+
+def test_apply_keeps_image_placeholder_relative_order():
+    document = mt.parse_document(
+        "# images\n\n## 题面\n\nCompare ![](attached_image_1.png) with "
+        "![](attached_image_2.png).\n\n## 最终答案\n\nD\n"
+    )
+    expected = mt.unit_index(document)
+    translations = {unit_id: unit["source"] for unit_id, (_section, unit) in expected.items()}
+    statement = expected["statement"][1]
+    placeholders = list(statement["protected"])
+    assert mt.placeholder_multisets_match(placeholders, list(reversed(placeholders)))
+    replacements = iter(reversed(placeholders))
+    translations["statement"] = re.sub(
+        mt.PLACEHOLDER_RE, lambda _match: next(replacements), statement["source"]
+    )
+
+    with pytest.raises(mt.TranslateError, match="图片占位顺序被改动"):
+        mt.render_variant(document, translations)
 
 
 def test_source_hash_change_triggers_retranslation(corpus: Path, tmp_path: Path):
@@ -626,7 +705,9 @@ def test_batch_prompt_renders_new_quality_template_and_absolute_paths(
     assert "整句重写成自然的" in prompt and "绝不逐词替换" in prompt
     assert "散文部分不得残留任何源语言单词或短语" in prompt
     assert example in prompt
-    assert "所有 {{MNT_NNNN}} 占位必须各出现一次且顺序不变，不得增删或改写占位符本身" in prompt
+    assert "所有 {{MNT_NNNN}} 占位必须各出现一次，不得增删或改写占位符本身" in prompt
+    assert "可按目标语言语法调整数学\n占位符语序" in prompt
+    assert "图片占位之间的相对顺序不得改变" in prompt
     assert f"批次目录的显式绝对路径：{job.directory.resolve()}" in prompt
     assert f"输入文件：{job.input_path.resolve()}" in prompt
     assert f"输出文件：{job.output_path.resolve()}" in prompt
@@ -738,7 +819,9 @@ const expectedPromptParts = [
   '读取 batch.json 的全部 records，逐题翻译每个 unit 的 source。',
   '绝不逐词替换',
   '散文部分不得残留任何源语言单词或短语',
-  '所有 {{MNT_NNNN}} 占位必须各出现一次且顺序不变',
+  '所有 {{MNT_NNNN}} 占位必须各出现一次，不得增删或改写占位符本身',
+  '可按目标语言语法调整数学\n占位符语序',
+  '图片占位之间的相对顺序不得改变',
   `批次目录的显式绝对路径：${absoluteCwd}`,
   `输入文件：${path.join(absoluteCwd, 'batch.json')}`,
   `输出文件：${path.join(absoluteCwd, 'translations.json')}`,

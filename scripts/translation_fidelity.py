@@ -528,6 +528,17 @@ def _compare_occurrences(
     return findings
 
 
+def _compare_occurrence_multisets(
+    finding_type: FindingType,
+    source: list[_Occurrence],
+    translated: list[_Occurrence],
+) -> list[Finding]:
+    """按小节比较逐字内容的多重集；只放宽出现顺序，不放宽字节、数量或所属小节。"""
+    if Counter(source) == Counter(translated):
+        return []
+    return _compare_occurrences(finding_type, source, translated)
+
+
 def _structure_findings(source: str, translated: str) -> list[Finding]:
     findings = []
     source_h1 = [match.group(0) for match in _H1_RE.finditer(source)]
@@ -732,19 +743,27 @@ def verify_translation(
     mode: str = 'translated',
     target_lang: str = 'zh',
     source_lang: str | None = None,
+    placeholder_pipeline: bool = False,
 ) -> list[Finding]:
     """校验一对 Markdown 字符串，返回全部可定位问题。
 
     ``mode='passthrough'`` 只关闭“正文未翻译”检查；数学、图片、骨架与泄漏检查
     仍然执行。调用方可直接传入 ``translation.json`` 中对应 variant 的 mode。
     ``source_lang`` 保留在调用契约中，但不能绕过混合语言文档的逐小节证据检查。
+    ``placeholder_pipeline`` 仅供已逐单元验证占位符多重集的 translated 管线使用：
+    数学/代码逐字内容仍须多重集一致，但允许在同一小节内因目标语言语法调整顺序。
     """
     if mode not in {'translated', 'passthrough', 'failed'}:
         raise ValueError(f'unsupported translation mode: {mode}')
     if target_lang not in {'en', 'zh'}:
         raise ValueError(f'unsupported target language: {target_lang}')
     findings = []
-    findings.extend(_compare_occurrences(
+    compare_math = (
+        _compare_occurrence_multisets
+        if placeholder_pipeline and mode == 'translated'
+        else _compare_occurrences
+    )
+    findings.extend(compare_math(
         FindingType.MATH_MISMATCH, _protected(source), _protected(translated)))
     findings.extend(_compare_occurrences(
         FindingType.IMAGE_MISMATCH, _images(source), _images(translated)))

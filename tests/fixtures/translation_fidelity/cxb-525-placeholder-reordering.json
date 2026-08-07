@@ -1,0 +1,13 @@
+{
+  "fixture_kind": "human-reported grammatical placeholder reordering",
+  "reported_source_excerpt": "for fixed integers {{MNT_0003}} with nonzero sum {{MNT_0004}}",
+  "reported_translation_excerpt": "对和非零的固定整数 {{MNT_0003}}，即满足 {{MNT_0004}} 的整数",
+  "source_unit": "Given {{MNT_0001}} and {{MNT_0002}}, for fixed integers {{MNT_0003}} with nonzero sum {{MNT_0004}}.",
+  "translated_unit": "给定 {{MNT_0001}} 和 {{MNT_0002}}，考虑总和非零（即满足 {{MNT_0004}}）的固定整数 {{MNT_0003}}。",
+  "protected": {
+    "{{MNT_0001}}": "$n$",
+    "{{MNT_0002}}": "$S$",
+    "{{MNT_0003}}": "$a_1,\\ldots,a_n$",
+    "{{MNT_0004}}": "$a_1+\\cdots+a_n \\ne 0$"
+  }
+}

@@ -22,6 +22,7 @@ import sys
 import tempfile
 import threading
 import time
+from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -191,13 +192,31 @@ def unit_index(document: Document) -> dict[str, tuple[Section, dict[str, Any]]]:
     return {unit["id"]: (section, unit) for section, unit in zip(document.sections, exported)}
 
 
+def placeholder_multisets_match(expected: list[str], found: list[str]) -> bool:
+    """占位 id 与出现次数必须完全一致；语法性重排不影响按 id 回填。"""
+    return Counter(expected) == Counter(found)
+
+
+def image_placeholder_sequence(protected: dict[str, str], placeholders: list[str]) -> list[str]:
+    """图片是位置式引用；只提取其占位 id，以保留图片之间的相对顺序。"""
+    image_ids = {
+        placeholder
+        for placeholder, original in protected.items()
+        if (match := PROTECTED_RE.fullmatch(original)) is not None and match.lastgroup == "image"
+    }
+    return [placeholder for placeholder in placeholders if placeholder in image_ids]
+
+
 def restore_translation(text: str, unit: dict[str, Any]) -> str:
     if not isinstance(text, str):
         raise TranslateError(f"单元 {unit['id']} 的译文不是字符串")
     protected = unit["protected"]
     found = PLACEHOLDER_RE.findall(text)
-    if found != list(protected):
+    expected = list(protected)
+    if not placeholder_multisets_match(expected, found):
         raise TranslateError(f"单元 {unit['id']} 的不可译占位缺失、重复或被篡改")
+    if image_placeholder_sequence(protected, found) != image_placeholder_sequence(protected, expected):
+        raise TranslateError(f"单元 {unit['id']} 的图片占位顺序被改动")
     if not unit["translatable"] and text != unit["source"]:
         raise TranslateError(f"单元 {unit['id']} 是纯符号/空单元，内容必须逐字保留")
     restored = text
@@ -1138,7 +1157,8 @@ def render_batch_prompt(job: BatchJob) -> str:
 
 ## 结构约束
 
-所有 {{{{MNT_NNNN}}}} 占位必须各出现一次且顺序不变，不得增删或改写占位符本身。不得修改语料目录里的任何文件。
+所有 {{{{MNT_NNNN}}}} 占位必须各出现一次，不得增删或改写占位符本身。可按目标语言语法调整数学
+占位符语序，但图片占位之间的相对顺序不得改变。不得修改语料目录里的任何文件。
 
 把结果写成一个 JSON 对象到 translations.json，严格形如：
 {{"model":"实际模型标识","translations":[
@@ -1392,6 +1412,7 @@ def apply_payload(root: Path, row: dict[str, Any], target: str, payload: dict[st
         mode=payload["mode"],
         target_lang=target,
         source_lang=row["source_lang"],
+        placeholder_pipeline=payload["mode"] == "translated",
     )
     if findings:
         summary = "; ".join(

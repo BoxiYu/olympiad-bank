@@ -253,6 +253,7 @@ def _check_one(contract_path, corpus, verifier):
                     body.decode('utf-8'),
                     target_lang=lang,
                     source_lang=source_lang,
+                    placeholder_pipeline=True,
                 )
             except Exception as exc:
                 errors.append(f'{rel}: 保真校验器异常：index.{lang}.md（{exc!r}）')
