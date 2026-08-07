@@ -979,6 +979,7 @@ def verify_directory(
     pattern: str | None = None,
     variant: str = 'zh',
     only_translated: bool = False,
+    placeholder_pipeline: bool = False,
 ) -> DirectoryReport:
     """校验目录并返回题数与各问题类型统计。
 
@@ -986,6 +987,7 @@ def verify_directory(
     ``index.md`` 与 ``index.<variant>.md``。传入 ``translated_dir`` 时按两个
     目录的相对路径配对，方便批次导出与 CI fixture。默认把缺少译文的原文计为
     ``missing_translation``，用于完整性审计；``only_translated`` 只检查已有译文。
+    ``placeholder_pipeline`` 透传给逐题校验，仅放宽同小节内数学/代码的出现顺序。
     """
     if variant not in {'en', 'zh'}:
         raise ValueError(f'unsupported translation variant: {variant}')
@@ -1018,6 +1020,7 @@ def verify_directory(
                 translated_text,
                 mode=mode,
                 target_lang=variant,
+                placeholder_pipeline=placeholder_pipeline,
             )
             if mode == 'translated':
                 batch_sources.append(source_text)
@@ -1079,6 +1082,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument('--glob', help='递归原文匹配模式（双目录默认 *.md；单目录默认 index.md）')
     parser.add_argument('--only-translated', action='store_true',
                         help='只检查已有目标 variant；默认也把缺少译文报告为 missing_translation')
+    parser.add_argument('--placeholder-pipeline', action='store_true',
+                        help='按占位符管线语义比较数学/代码多重集，允许同小节内调整顺序')
     parser.add_argument('--json', action='store_true', help='输出机器可读 JSON')
     args = parser.parse_args(argv)
     report = verify_directory(
@@ -1088,6 +1093,7 @@ def main(argv: list[str] | None = None) -> int:
         pattern=args.glob,
         variant=args.variant,
         only_translated=args.only_translated,
+        placeholder_pipeline=args.placeholder_pipeline,
     )
     if args.json:
         print(json.dumps(report.to_dict(), ensure_ascii=False, indent=2))
