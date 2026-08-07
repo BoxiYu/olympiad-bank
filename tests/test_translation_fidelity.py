@@ -130,6 +130,12 @@ def mutation_boundary_fixture():
     )
 
 
+def cxb_528_mutation_boundary_fixture():
+    return json.loads(
+        (FIXTURES / 'cxb-528-mutation-boundaries.json').read_text(encoding='utf-8')
+    )
+
+
 def placeholder_reordering_documents():
     fixture = placeholder_reordering_fixture()
     source_unit = fixture['source_unit']
@@ -409,6 +415,41 @@ def test_cxb_527_two_letter_foreign_fragment_is_not_a_symbolic_answer():
     )
 
     assert [finding.type for finding in findings] == [FindingType.UNTRANSLATED]
+
+
+def test_cxb_528_fixture_real_answers_match_frozen_corpus():
+    fixture = cxb_528_mutation_boundary_fixture()
+
+    assert fixture['fixture_kind'] == 'CXB-528 mutation-boundary unit excerpts'
+    assert fixture['source_revision'] == '33e6b3bc'
+    for row in fixture['real_final_answers']:
+        corpus = json.loads(
+            (Path(__file__).parent / 'fixtures' / row['source_fixture'])
+            .read_text(encoding='utf-8')
+        )
+        source_row = next(
+            item for item in corpus['cases']
+            if item['mathnet_id'] == row['mathnet_id']
+        )
+        source_answer = f"## 最终答案\n\n{row['body']}\n"
+
+        assert '逐字照录' in corpus['_provenance']
+        assert row['field'] == 'final_answer'
+        assert source_answer in source_row['source']
+    assert all(
+        row['fixture_id'].startswith('constructed-cxb528-')
+        for row in fixture['constructed_cases']
+    )
+
+
+def test_cxb_528_zh_two_letter_final_answer_is_translatable_prose():
+    row = next(
+        item for item in cxb_528_mutation_boundary_fixture()['real_final_answers']
+        if item['case'] == 'zh_two_letter_final_answer'
+    )
+
+    assert not is_pure_symbol(row['body'])
+    assert has_translatable_prose(row['body'], '最终答案')
 
 
 @pytest.mark.parametrize(
