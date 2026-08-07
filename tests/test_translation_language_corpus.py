@@ -66,3 +66,12 @@ def test_fixture_pairs_are_real_corpus_text():
             assert c['label'] in ('acceptable', 'degraded')
             assert c['label_source']
             assert c['source'].strip() and c['translated'].strip()
+
+
+def test_en_fixture_keeps_the_seven_short_english_regressions():
+    data = json.loads((FIXDIR / 'en.json').read_text(encoding='utf-8'))
+    labels = {case['mathnet_id']: case['label'] for case in data['cases']}
+    ids = {'004a', '02ov', '0956', '0afy', '0bpp', '0fig', '0foj'}
+    assert {mathnet_id: labels.get(mathnet_id) for mathnet_id in ids} == {
+        mathnet_id: 'acceptable' for mathnet_id in ids
+    }
