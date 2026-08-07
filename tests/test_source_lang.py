@@ -88,6 +88,8 @@ def test_en_high_relaxation_does_not_expand_zero_call_passthrough():
         "und_tiny_english_density_below_half": ("und", "low"),
         "und_tiny_french_shared_on": ("und", "low"),
         "und_tiny_dutch_shared_is": ("und", "low"),
+        "und_tiny_portuguese_determine_cognate": ("und", "low"),
+        "en_medium_repeated_french_shared_features": ("en", "medium"),
         "nl_density_below_point_five": ("nl", "medium"),
         "und_three_letter_english_marker": ("und", "low"),
     }

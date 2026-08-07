@@ -124,8 +124,10 @@ _FEATURE_WORDS = {
 
 # A single shared function word (for example French ``on`` or Dutch ``is``)
 # must never authorize zero-call English passthrough.  The tiny-text rescue is
-# limited to unambiguous olympiad prompt markers already scored as English.
-_EN_TINY_MARKERS = {"determine", "find", "let", "prove"}
+# limited to olympiad prompt markers that occur only in the English feature
+# lexicon.  In particular, ``determine`` is also Spanish and a Portuguese
+# cognate, so it cannot establish English by itself.
+_EN_TINY_MARKERS = {"find", "let", "prove"}
 
 _DISTINCTIVE_CHARS = {
     "es": set("ñ¿¡"),
@@ -292,10 +294,12 @@ def _latin_evidence(text: str) -> tuple[str, str]:
     words = _WORD_RE.findall(folded)
     counts = Counter(words)
     scores: dict[str, int] = {}
-    feature_hits: dict[str, int] = {}
+    distinct_feature_hits: dict[str, int] = {}
     for lang, features in _FEATURE_WORDS.items():
         hits = sum(min(counts[word], 3) for word in features)
-        feature_hits[lang] = hits
+        # Repetition remains useful for ordinary language scoring, but it is
+        # not independent evidence for a density-based zero-call passthrough.
+        distinct_feature_hits[lang] = sum(counts[word] > 0 for word in features)
         score = hits
         score += 2 * sum(folded.count(_ascii_fold(phrase)) for phrase in _DISTINCTIVE_PHRASES[lang])
         score += 2 * sum(text.casefold().count(ch) for ch in _DISTINCTIVE_CHARS.get(lang, set()))
@@ -304,7 +308,7 @@ def _latin_evidence(text: str) -> tuple[str, str]:
     ranked = sorted(scores.items(), key=lambda item: item[1], reverse=True)
     (winner, best), (_, second) = ranked[:2]
     margin = best - second
-    density = feature_hits[winner] / max(len(words), 1)
+    density = distinct_feature_hits[winner] / max(len(words), 1)
     # English passthrough needs several independent function-word hits and a
     # clear lead.  Ambiguous Latin prose becomes und, never optimistic English.
     if best < 3 or margin < 2:
