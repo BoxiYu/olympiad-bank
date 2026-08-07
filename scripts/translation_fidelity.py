@@ -97,9 +97,11 @@ class BatchConfig:
     视为并列，并选择其中源文最接近者作保守比较。若同一译文簇里至少有两个
     各由两种近似源文支撑、彼此却明显不同的模板子组，则保留簇级跨模板证据，
     避免每条记录都借同组 peer 击穿检测。
-    少于 8 个文字/数字的短答案不参与套话聚类。长度比采用很宽的 0.25--4.0 区间，
-    适配英中字符密度差；长度和锚点各权重 1，必须同时出现才达到默认阻断分 2，
-    因而长度异常绝不会单独产生 Finding。套话权重 2，可独立阻断。
+    少于 8 个文字/数字的短答案不参与套话聚类。长度比按目标语言分别标定：中文下限
+    以 438 份已通过译文的实测最小值 0.224 为基准再留 20% 余量；英文上限取该下限
+    的倒数，覆盖中文到英文的反向膨胀。英文下限与中文上限沿用原门禁强度。长度和
+    锚点各权重 1，必须同时出现才达到默认阻断分 2，因而长度异常绝不会单独产生
+    Finding。套话权重 2，可独立阻断。
     超过 500 条时只做线性精确聚类，避免目录审计退化成二次复杂度；生产翻译批次默认 25，
     SOP 最大 100，仍会执行高重合模糊比较。
     """
@@ -109,8 +111,13 @@ class BatchConfig:
     boilerplate_source_similarity_gap: float = 0.2
     boilerplate_pair_similarity_tolerance: float = 0.02
     boilerplate_min_chars: int = 8
-    length_ratio_min: float = 0.25
-    length_ratio_max: float = 4.0
+    zh_length_ratio_min: float = 0.18
+    zh_length_ratio_max: float = 4.0
+    en_length_ratio_min: float = 0.25
+    en_length_ratio_max: float = 1 / 0.18
+    # 兼容既有调用方的全语言显式覆盖；默认 None 时使用上面的目标语言标定值。
+    length_ratio_min: float | None = None
+    length_ratio_max: float | None = None
     boilerplate_weight: int = 2
     length_weight: int = 1
     anchor_weight: int = 1
@@ -372,12 +379,30 @@ def _validate_batch_config(config: BatchConfig) -> None:
         raise ValueError('boilerplate_pair_similarity_tolerance must be in [0, 1]')
     if config.boilerplate_min_chars <= 0:
         raise ValueError('boilerplate_min_chars must be positive')
-    if not 0 < config.length_ratio_min < config.length_ratio_max:
-        raise ValueError('length ratio thresholds must satisfy 0 < min < max')
+    for target_lang in ('en', 'zh'):
+        minimum, maximum = _length_ratio_bounds(config, target_lang)
+        if not 0 < minimum < maximum:
+            raise ValueError(
+                f'{target_lang} length ratio thresholds must satisfy 0 < min < max'
+            )
     if min(config.boilerplate_weight, config.length_weight, config.anchor_weight) < 0:
         raise ValueError('signal weights must be non-negative')
     if config.block_score <= 0 or config.fuzzy_comparison_limit < 0:
         raise ValueError('block_score must be positive and fuzzy_comparison_limit non-negative')
+
+
+def _length_ratio_bounds(config: BatchConfig, target_lang: str) -> tuple[float, float]:
+    minimum = (
+        config.length_ratio_min
+        if config.length_ratio_min is not None
+        else getattr(config, f'{target_lang}_length_ratio_min')
+    )
+    maximum = (
+        config.length_ratio_max
+        if config.length_ratio_max is not None
+        else getattr(config, f'{target_lang}_length_ratio_max')
+    )
+    return minimum, maximum
 
 
 def _cluster_find(parent: list[int], index: int) -> int:
@@ -830,6 +855,7 @@ def verify_batch(
 
     batch_config = config or BatchConfig()
     _validate_batch_config(batch_config)
+    length_ratio_min, length_ratio_max = _length_ratio_bounds(batch_config, target_lang)
     signals: dict[str, list[BatchSignal]] = {key: [] for key in item_keys}
     source_by_key = dict(zip(item_keys, sources))
     translated_by_key = dict(zip(item_keys, translated))
@@ -958,13 +984,13 @@ def verify_batch(
         target_length = len(_normalize_prose(target))
         if source_length:
             ratio = target_length / source_length
-            if ratio < batch_config.length_ratio_min or ratio > batch_config.length_ratio_max:
+            if ratio < length_ratio_min or ratio > length_ratio_max:
                 signals[key].append(BatchSignal(
                     FindingType.LENGTH_RATIO,
                     '文档',
                     ratio,
                     f'散文长度比 {ratio:.3f}，默认合理区间 '
-                    f'[{batch_config.length_ratio_min:.3f}, {batch_config.length_ratio_max:.3f}]',
+                    f'[{length_ratio_min:.3f}, {length_ratio_max:.3f}]',
                 ))
         missing_anchors = _missing_content_anchors(source, target, target_lang)
         if missing_anchors:

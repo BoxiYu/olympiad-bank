@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.join(
 from translation_fidelity import (  # noqa: E402
     BatchConfig,
     FindingType,
+    _normalize_prose,
     main,
     verify_batch,
     verify_directory,
@@ -933,6 +934,51 @@ def test_length_and_missing_anchor_block_as_separate_findings():
     assert {finding.type for finding in report.findings['hollow']} == {
         FindingType.LENGTH_RATIO,
         FindingType.CONTENT_ANCHOR_MISSING,
+    }
+
+
+def test_zh_empirical_compression_accepts_complete_text_but_still_blocks_truncation():
+    source = (
+        'Find all positive integers satisfying the given divisibility conditions and give '
+        'a complete justification for the answer.'
+    )
+    complete = '给出所有满足下列整除条件的正整数，并完整说明答案。'
+    truncated = '答案。'
+    compression_ratio = len(_normalize_prose(complete)) / len(_normalize_prose(source))
+
+    assert 0.220 < compression_ratio < 0.224
+    complete_report = verify_batch(
+        [source], [complete], keys=['complete'], target_lang='zh'
+    )
+    assert complete_report.findings == {}
+    assert [signal.type for signal in complete_report.signals['complete']] == [
+        FindingType.CONTENT_ANCHOR_MISSING
+    ]
+
+    truncated_report = verify_batch(
+        [source], [truncated], keys=['truncated'], target_lang='zh'
+    )
+    assert {finding.type for finding in truncated_report.findings['truncated']} == {
+        FindingType.LENGTH_RATIO,
+        FindingType.CONTENT_ANCHOR_MISSING,
+    }
+
+
+def test_en_reverse_length_bound_covers_frozen_acceptable_zh_source_pair():
+    corpus = json.loads(
+        (Path(__file__).parent / 'fixtures' / 'translation_language_corpus' / 'en.json')
+        .read_text(encoding='utf-8')
+    )['cases']
+    case = next(row for row in corpus if row['mathnet_id'] == '0gfj')
+    ratio = len(_normalize_prose(case['translated'])) / len(_normalize_prose(case['source']))
+
+    assert case['label'] == 'acceptable'
+    assert ratio > 4.0
+    report = verify_batch(
+        [case['source']], [case['translated']], keys=['0gfj'], target_lang='en'
+    )
+    assert FindingType.LENGTH_RATIO not in {
+        signal.type for signal in report.signals.get('0gfj', [])
     }
 
 
