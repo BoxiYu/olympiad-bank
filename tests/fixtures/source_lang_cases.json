@@ -272,6 +272,42 @@
     "expected": ["en", "high"]
   },
   {
+    "id": "en_density_between_point_three_and_point_four_a",
+    "body": "Find the value for this Fibonacci recursion sequence today.",
+    "meta": {},
+    "expected": ["en", "medium"]
+  },
+  {
+    "id": "en_density_between_point_three_and_point_four_b",
+    "body": "Prove that Euler recursion reaches a terminal state eventually.",
+    "meta": {},
+    "expected": ["en", "medium"]
+  },
+  {
+    "id": "und_four_word_dense_english",
+    "body": "Find Fibonacci recursion numbers.",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
+    "id": "und_tiny_non_en_winner",
+    "body": "Bepaal gehele waarden.",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
+    "id": "und_tiny_zero_margin_tie",
+    "body": "Find bepaal.",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
+    "id": "und_tiny_english_density_below_half",
+    "body": "Find Fibonacci recursion.",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
     "id": "en_holder_diacritic",
     "body": "Prove that Hölder's inequality holds for all positive real numbers.",
     "meta": {},
@@ -326,8 +362,20 @@
     "expected": ["ro", "high"]
   },
   {
+    "id": "ro_three_feature_word_boundary",
+    "body": "Fie numere pentru $x$.",
+    "meta": {},
+    "expected": ["ro", "high"]
+  },
+  {
     "id": "mn_short_math",
     "body": "Бүх шийдийг ол.",
+    "meta": {},
+    "expected": ["mn", "high"]
+  },
+  {
+    "id": "mn_two_feature_word_boundary",
+    "body": "Бүх шийдийг тэмдэглэ.",
     "meta": {},
     "expected": ["mn", "high"]
   },
@@ -336,6 +384,12 @@
     "body": "Најди го бројот $x$.",
     "meta": {},
     "expected": ["und", "low"]
+  },
+  {
+    "id": "mk_two_feature_word_boundary",
+    "body": "Најди бројот Ѓорѓи.",
+    "meta": {},
+    "expected": ["mk", "high"]
   },
   {
     "id": "el_short_math",
