@@ -9,8 +9,8 @@
 标注来源见 fixture 的 label_source：human-review-r1..r7 为七轮评审人工判定，
 gate-clean-random-sample 与 independent-latin-ratio 为独立判据 + 人工抽看。
 
-天花板 = 2026-08-07 master 实测值（棘轮只紧不松）：
-  en: fp 0 / fn 7    —— fn 7 是 CJK 双语与部分荷兰语照抄，CXB-523 落地时应收紧
+天花板 = 2026-08-07 当前检测器实测值（棘轮只紧不松）：
+  en: fp 0 / fn 4    —— CXB-520 修复 7 条短英文误伤后同步收紧
   zh: fp 0 / fn 139  —— master 尚无中文语言闸门；CXB-522 中文侧落地时应收紧到个位数
 改善后请把常量往下调并在提交信息里写明依据；调松必须给出与本文件同等级的实测证据。
 """
@@ -24,7 +24,7 @@ from translation_fidelity import verify_translation  # noqa: E402
 FIXDIR = pathlib.Path(__file__).parent / 'fixtures' / 'translation_language_corpus'
 
 CEILINGS = {
-    'en': {'fp': 0, 'fn': 7},
+    'en': {'fp': 0, 'fn': 4},
     'zh': {'fp': 0, 'fn': 139},
 }
 
@@ -66,3 +66,12 @@ def test_fixture_pairs_are_real_corpus_text():
             assert c['label'] in ('acceptable', 'degraded')
             assert c['label_source']
             assert c['source'].strip() and c['translated'].strip()
+
+
+def test_en_fixture_keeps_the_seven_short_english_regressions():
+    data = json.loads((FIXDIR / 'en.json').read_text(encoding='utf-8'))
+    labels = {case['mathnet_id']: case['label'] for case in data['cases']}
+    ids = {'004a', '02ov', '0956', '0afy', '0bpp', '0fig', '0foj'}
+    assert {mathnet_id: labels.get(mathnet_id) for mathnet_id in ids} == {
+        mathnet_id: 'acceptable' for mathnet_id in ids
+    }
