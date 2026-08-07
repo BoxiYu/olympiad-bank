@@ -626,7 +626,7 @@ def test_batch_prompt_renders_new_quality_template_and_absolute_paths(
     assert "整句重写成自然的" in prompt and "绝不逐词替换" in prompt
     assert "散文部分不得残留任何源语言单词或短语" in prompt
     assert example in prompt
-    assert "所有 {{MNT_NNNN}} 占位必须各出现一次，不得增删或改写占位符本身" in prompt
+    assert "所有 {{MNT_NNNN}} 占位必须各出现一次且顺序不变，不得增删或改写占位符本身" in prompt
     assert f"批次目录的显式绝对路径：{job.directory.resolve()}" in prompt
     assert f"输入文件：{job.input_path.resolve()}" in prompt
     assert f"输出文件：{job.output_path.resolve()}" in prompt
@@ -738,6 +738,7 @@ const expectedPromptParts = [
   '读取 batch.json 的全部 records，逐题翻译每个 unit 的 source。',
   '绝不逐词替换',
   '散文部分不得残留任何源语言单词或短语',
+  '所有 {{MNT_NNNN}} 占位必须各出现一次且顺序不变',
   `批次目录的显式绝对路径：${absoluteCwd}`,
   `输入文件：${path.join(absoluteCwd, 'batch.json')}`,
   `输出文件：${path.join(absoluteCwd, 'translations.json')}`,

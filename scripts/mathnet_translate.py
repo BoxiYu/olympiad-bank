@@ -1138,7 +1138,7 @@ def render_batch_prompt(job: BatchJob) -> str:
 
 ## 结构约束
 
-所有 {{{{MNT_NNNN}}}} 占位必须各出现一次，不得增删或改写占位符本身。不得修改语料目录里的任何文件。
+所有 {{{{MNT_NNNN}}}} 占位必须各出现一次且顺序不变，不得增删或改写占位符本身。不得修改语料目录里的任何文件。
 
 把结果写成一个 JSON 对象到 translations.json，严格形如：
 {{"model":"实际模型标识","translations":[
