@@ -149,6 +149,42 @@ def test_repository_fidelity_module_loads_and_runs(tmp_path, capsys):
     assert '保真校验 skipped' not in out
 
 
+def test_contract_gate_reports_target_language_and_mojibake_reasons(tmp_path):
+    corpus = os.path.join(tmp_path, 'mathnet-full')
+    fixture_path = os.path.join(
+        _ROOT,
+        'tests',
+        'fixtures',
+        'translation_fidelity',
+        'target-language-cases.json',
+    )
+    with open(fixture_path, encoding='utf-8') as handle:
+        rows = {row['mathnet_id']: row for row in json.load(handle)['bad_zh']}
+    source = '# {pid}\n\n## 题面\n\nFind all values satisfying the condition.\n'
+    for pid in ('039x', '0k1z'):
+        translated = f"# {pid}\n\n## 题面\n\n{rows[pid]['translated']}\n".encode()
+        make_problem(
+            corpus,
+            pid=pid,
+            source=source.format(pid=pid).encode(),
+            en=False,
+            zh=translated,
+            variants={'zh': {'mode': 'translated', 'sha256': _sha(translated)}},
+        )
+
+    result = tc.check_corpus(_ROOT, corpus=corpus, sample=10)
+
+    language_errors = [error for error in result.errors if 'index.zh.md' in error]
+    assert any(
+        '039x' in error and str(FindingType.TARGET_LANGUAGE_MISMATCH) in error
+        for error in language_errors
+    )
+    assert any(
+        '0k1z' in error and str(FindingType.MOJIBAKE) in error
+        for error in language_errors
+    )
+
+
 def test_repository_batch_gate_rejects_human_reported_boilerplate_excerpts(tmp_path):
     corpus = os.path.join(tmp_path, 'mathnet-full')
     fixture_path = os.path.join(
@@ -331,11 +367,34 @@ def test_en_medium_identical_translated_variant_passes_contract(tmp_path):
     assert result.status == 'ok', result.errors
 
 
-def test_matching_file_language_does_not_hide_mixed_section_in_contract(tmp_path):
+def test_contract_accepts_latin_only_low_signal_section(tmp_path):
     corpus = os.path.join(tmp_path, 'mathnet-full')
     source = (
         '# 0abc\n\n## 题面\n\nFind $x$.\n\n'
         "## 最终答案\n\nAucune solution.\n"
+    ).encode()
+    variants = {'en': {'mode': 'translated', 'sha256': _sha(source)}}
+    make_problem(
+        corpus,
+        source=source,
+        en=source,
+        zh=False,
+        variants=variants,
+        source_lang='en',
+    )
+
+    result = tc.check_corpus(
+        str(tmp_path), sample=10, fidelity_verifier=verify_translation
+    )
+
+    assert result.status == 'ok', result.errors
+
+
+def test_contract_rejects_cyrillic_despite_matching_file_language(tmp_path):
+    corpus = os.path.join(tmp_path, 'mathnet-full')
+    source = (
+        '# 0abc\n\n## 题面\n\nFind $x$.\n\n'
+        '## 最终答案\n\nНет решений.\n'
     ).encode()
     variants = {'en': {'mode': 'translated', 'sha256': _sha(source)}}
     make_problem(

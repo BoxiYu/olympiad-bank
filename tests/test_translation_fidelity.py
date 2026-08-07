@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.join(
 from translation_fidelity import (  # noqa: E402
     BatchConfig,
     FindingType,
+    LanguageConfig,
     main,
     verify_batch,
     verify_directory,
@@ -104,6 +105,420 @@ def full_document_feature_fixture():
 
 def audit_fixture():
     return json.loads((FIXTURES / 'full-pair-audit.json').read_text(encoding='utf-8'))
+
+
+def target_language_fixture():
+    return json.loads(
+        (FIXTURES / 'target-language-cases.json').read_text(encoding='utf-8')
+    )
+
+
+def language_document(body):
+    return f'# target-language\n\n## 题面\n\n{body}\n'
+
+
+LANGUAGE_SOURCE = language_document(
+    'Determine every value satisfying all of the stated conditions.'
+)
+
+
+@pytest.mark.parametrize(
+    'row',
+    target_language_fixture()['bad_zh'],
+    ids=lambda row: row['mathnet_id'],
+)
+def test_reported_and_constructed_half_translated_chinese_fixtures_are_blocked(row):
+    findings = verify_translation(
+        LANGUAGE_SOURCE,
+        language_document(row['translated']),
+        target_lang='zh',
+    )
+
+    assert any(
+        finding.type == FindingType.TARGET_LANGUAGE_MISMATCH
+        and finding.section == '题面'
+        for finding in findings
+    )
+
+
+def test_05lr_fixture_is_explicitly_constructed_not_a_verbatim_statement():
+    row = next(
+        row for row in target_language_fixture()['bad_zh']
+        if row['mathnet_id'] == '05lr'
+    )
+
+    assert row['fixture_kind'].startswith('constructed-05lr-solution-pattern')
+
+
+def test_mojibake_has_an_independent_reason_from_language_coverage():
+    row = next(
+        row for row in target_language_fixture()['bad_zh']
+        if row['mathnet_id'] == '0k1z'
+    )
+    finding_types = {
+        finding.type
+        for finding in verify_translation(
+            LANGUAGE_SOURCE,
+            language_document(row['translated']),
+            target_lang='zh',
+        )
+    }
+
+    assert FindingType.MOJIBAKE in finding_types
+    assert FindingType.TARGET_LANGUAGE_MISMATCH in finding_types
+
+
+def test_normal_chinese_fixture_false_positive_rate_is_zero():
+    samples = target_language_fixture()['valid_zh']
+    false_positives = [
+        text for text in samples
+        if verify_translation(
+            LANGUAGE_SOURCE,
+            language_document(text),
+            target_lang='zh',
+        )
+    ]
+
+    assert (len(false_positives), len(samples)) == (0, 13)
+
+
+def test_m6_medium_latin_ratio_valid_chinese_locks_threshold_lower_bound():
+    translated = next(
+        text for text in target_language_fixture()['valid_zh']
+        if 'regular polygon' in text
+    )
+    document = language_document(translated)
+
+    assert FindingType.TARGET_LANGUAGE_MISMATCH not in {
+        finding.type for finding in verify_translation(LANGUAGE_SOURCE, document)
+    }
+    assert FindingType.TARGET_LANGUAGE_MISMATCH in {
+        finding.type for finding in verify_translation(
+            LANGUAGE_SOURCE,
+            document,
+            language_config=LanguageConfig(zh_max_latin_ratio=0.0),
+        )
+    }
+
+
+def test_chinese_minimum_latin_letters_boundary_is_independent_of_ratio():
+    seven_letters = language_document('中 abcdefg')
+    eight_letters = language_document('中 abcdefgh')
+
+    assert verify_translation(LANGUAGE_SOURCE, seven_letters, target_lang='zh') == []
+    assert FindingType.TARGET_LANGUAGE_MISMATCH in {
+        finding.type
+        for finding in verify_translation(LANGUAGE_SOURCE, eight_letters, target_lang='zh')
+    }
+
+
+def test_chinese_short_english_phrase_uses_the_verified_four_letter_minimum():
+    translated = language_document('中 find')
+
+    assert FindingType.TARGET_LANGUAGE_MISMATCH in {
+        finding.type
+        for finding in verify_translation(LANGUAGE_SOURCE, translated, target_lang='zh')
+    }
+
+
+def test_chinese_latin_ratio_boundary_is_strictly_greater_than_threshold():
+    latin = 'abcdefghijklmn'
+    at_boundary = language_document('中' * 26 + ' ' + latin)
+    above_boundary = language_document('中' * 25 + ' ' + latin)
+
+    assert verify_translation(LANGUAGE_SOURCE, at_boundary, target_lang='zh') == []
+    assert FindingType.TARGET_LANGUAGE_MISMATCH in {
+        finding.type
+        for finding in verify_translation(LANGUAGE_SOURCE, above_boundary, target_lang='zh')
+    }
+
+
+def test_chinese_foreign_script_hard_signal_does_not_depend_on_latin_ratio():
+    translated = language_document('这是中文说明，Ελληνικά。')
+
+    assert FindingType.TARGET_LANGUAGE_MISMATCH in {
+        finding.type for finding in verify_translation(
+            LANGUAGE_SOURCE,
+            translated,
+            target_lang='zh',
+            language_config=LanguageConfig(zh_max_latin_ratio=1.0),
+        )
+    }
+
+
+def test_chinese_foreign_script_threshold_boundary_is_configurable():
+    translated = language_document('正常中文 αβ')
+
+    assert FindingType.TARGET_LANGUAGE_MISMATCH in {
+        finding.type
+        for finding in verify_translation(LANGUAGE_SOURCE, translated, target_lang='zh')
+    }
+    assert FindingType.TARGET_LANGUAGE_MISMATCH not in {
+        finding.type for finding in verify_translation(
+            LANGUAGE_SOURCE,
+            translated,
+            target_lang='zh',
+            language_config=LanguageConfig(en_min_foreign_script_letters=3),
+        )
+    }
+
+
+def test_mojibake_marker_threshold_has_its_own_fixture():
+    three_markers = language_document('正常中文 ' + ('Ñ\x80 ' * 3))
+
+    assert FindingType.MOJIBAKE in {
+        finding.type
+        for finding in verify_translation(LANGUAGE_SOURCE, three_markers, target_lang='zh')
+    }
+    assert FindingType.MOJIBAKE not in {
+        finding.type for finding in verify_translation(
+            LANGUAGE_SOURCE,
+            three_markers,
+            target_lang='zh',
+            language_config=LanguageConfig(mojibake_min_markers=4),
+        )
+    }
+
+
+def test_single_mojibake_signature_does_not_need_marker_threshold():
+    signature = language_document('正常中文 Ã©')
+
+    assert FindingType.MOJIBAKE in {
+        finding.type for finding in verify_translation(
+            LANGUAGE_SOURCE,
+            signature,
+            target_lang='zh',
+            language_config=LanguageConfig(mojibake_min_markers=99),
+        )
+    }
+
+
+@pytest.mark.parametrize(
+    'case',
+    target_language_fixture()['bad_en'],
+    ids=lambda case: case['mathnet_id'],
+)
+def test_english_target_rejects_each_high_signal_script_independently(case):
+    findings = verify_translation(
+        language_document('求出所有满足条件的正整数。'),
+        language_document(case['translated']),
+        target_lang='en',
+        source_lang='zh',
+    )
+
+    assert {
+        finding.type for finding in findings
+        if finding.type in {FindingType.UNTRANSLATED, FindingType.TARGET_LANGUAGE_MISMATCH}
+    } == {
+        FindingType.TARGET_LANGUAGE_MISMATCH,
+    }
+
+
+@pytest.mark.parametrize('mathnet_id', ['0ghx', '06ia'])
+def test_english_script_evidence_precedes_embedded_english_phrase(mathnet_id):
+    case = next(
+        case for case in target_language_fixture()['bad_en']
+        if case['mathnet_id'] == mathnet_id
+    )
+    document = language_document(case['translated'])
+
+    findings = verify_translation(
+        document, document, target_lang='en', source_lang='und'
+    )
+
+    assert {
+        finding.type for finding in findings
+        if finding.type in {FindingType.UNTRANSLATED, FindingType.TARGET_LANGUAGE_MISMATCH}
+    } == {
+        FindingType.UNTRANSLATED,
+    }
+
+
+def test_normal_english_fixture_false_positive_rate_is_zero():
+    samples = target_language_fixture()['valid_en']
+    false_positives = [
+        case['mathnet_id'] for case in samples
+        if verify_translation(
+            language_document('求出所有满足条件的正整数。'),
+            language_document(case['translated']),
+            target_lang='en',
+            source_lang='zh',
+        )
+    ]
+
+    assert (false_positives, len(samples)) == ([], 12)
+
+
+@pytest.mark.parametrize('source_lang', ['en', 'pt', 'und', None])
+def test_source_language_family_never_changes_english_script_decision(source_lang):
+    bad = next(
+        case['translated'] for case in target_language_fixture()['bad_en']
+        if case['script'] == 'cyrillic'
+    )
+    valid = next(
+        case['translated'] for case in target_language_fixture()['valid_en']
+        if case['mathnet_id'] == 'constructed-french-latin-only'
+    )
+
+    bad_types = {
+        finding.type for finding in verify_translation(
+            LANGUAGE_SOURCE,
+            language_document(bad),
+            target_lang='en',
+            source_lang=source_lang,
+        )
+    }
+    assert FindingType.TARGET_LANGUAGE_MISMATCH in bad_types
+    assert verify_translation(
+        LANGUAGE_SOURCE,
+        language_document(valid),
+        target_lang='en',
+        source_lang=source_lang,
+    ) == []
+
+
+def test_english_foreign_script_threshold_requires_a_prose_run():
+    one_symbol = language_document('The label 中 is used for this case.')
+    two_letters = language_document('The note 中文 remains in the statement.')
+
+    assert verify_translation(LANGUAGE_SOURCE, one_symbol, target_lang='en') == []
+    assert FindingType.TARGET_LANGUAGE_MISMATCH in {
+        finding.type
+        for finding in verify_translation(LANGUAGE_SOURCE, two_letters, target_lang='en')
+    }
+    assert FindingType.TARGET_LANGUAGE_MISMATCH not in {
+        finding.type for finding in verify_translation(
+            LANGUAGE_SOURCE,
+            two_letters,
+            target_lang='en',
+            language_config=LanguageConfig(en_min_foreign_script_letters=3),
+        )
+    }
+
+
+def test_foreign_scripts_inside_math_and_code_are_not_english_prose():
+    source = language_document(
+        '求满足 $αβ=1$ 的值，并检查 `未翻譯的識別字`。'
+    )
+    translated = language_document(
+        'Let $αβ=1$ and inspect `未翻譯的識別字` before concluding.'
+    )
+
+    assert verify_translation(source, translated, target_lang='en') == []
+
+
+@pytest.mark.parametrize(
+    'case',
+    json.loads(
+        (FIXTURES / 'english-positive-sections.json').read_text(encoding='utf-8')
+    ),
+    ids=lambda case: case['mathnet_id'],
+)
+def test_cxb520_english_positive_sections_use_shared_language_judgment(case):
+    document = (
+        f"# {case['mathnet_id']}\n\n## {case['section']}\n\n"
+        f"{case['body']}\n"
+    )
+
+    findings = verify_translation(
+        document, document, target_lang='en', source_lang='und'
+    )
+
+    assert not {FindingType.UNTRANSLATED, FindingType.TARGET_LANGUAGE_MISMATCH} & {
+        finding.type for finding in findings
+    }
+
+
+def test_generated_english_proof_placeholder_is_not_language_checked():
+    case = target_language_fixture()['empty_source_sections'][0]
+    source = (
+        f"# {case['fixture_id']}\n\n## {case['heading']}\n\n"
+        f"{case['source']}\n"
+    )
+    translated = (
+        f"# {case['fixture_id']}\n\n## {case['heading']}\n\n"
+        f"{case['translated']}\n"
+    )
+
+    findings = verify_translation(
+        source, translated, target_lang='en', source_lang='und'
+    )
+
+    assert FindingType.TARGET_LANGUAGE_MISMATCH not in {
+        finding.type for finding in findings
+    }
+    assert FindingType.UNTRANSLATED not in {finding.type for finding in findings}
+
+
+def test_identical_generated_proof_placeholder_is_allowed_in_english_variant():
+    placeholder = '# generated-proof\n\n## 最终答案\n\n（数据集未提供 / 证明题）\n'
+
+    assert verify_translation(
+        placeholder,
+        placeholder,
+        target_lang='en',
+        source_lang='und',
+    ) == []
+
+
+def test_nonempty_source_section_does_not_exempt_foreign_english_target():
+    source = '# foreign-answer\n\n## 最终答案\n\n给出完整证明。\n'
+    translated = (
+        '# foreign-answer\n\n## 最终答案\n\n'
+        'Βρείτε όλους τους ακεραίους που ικανοποιούν τη συνθήκη.\n'
+    )
+
+    findings = verify_translation(
+        source, translated, target_lang='en', source_lang='zh'
+    )
+
+    assert FindingType.TARGET_LANGUAGE_MISMATCH in {
+        finding.type for finding in findings
+    }
+
+
+def test_target_language_threshold_is_configurable():
+    translated = language_document('求值 abcdefgh。')
+    assert FindingType.TARGET_LANGUAGE_MISMATCH in {
+        finding.type for finding in verify_translation(LANGUAGE_SOURCE, translated)
+    }
+    assert FindingType.TARGET_LANGUAGE_MISMATCH not in {
+        finding.type for finding in verify_translation(
+            LANGUAGE_SOURCE,
+            translated,
+            language_config=LanguageConfig(zh_max_latin_ratio=0.9),
+        )
+    }
+
+
+def test_math_images_and_code_do_not_count_as_foreign_prose():
+    source = language_document(
+        'Find $x$ and inspect `english_identifier`.\n\n'
+        '```text\nEnglish code should be ignored.\n```\n\n'
+        '![](attached_image_1.png)'
+    )
+    translated = language_document(
+        '求 $x$，并检查 `english_identifier`。\n\n'
+        '```text\nEnglish code should be ignored.\n```\n\n'
+        '![](attached_image_1.png)'
+    )
+
+    assert verify_translation(source, translated, target_lang='zh') == []
+
+
+@pytest.mark.parametrize('kwargs', [
+    {'zh_max_latin_ratio': 1.1},
+    {'zh_min_latin_letters': 0},
+    {'en_min_foreign_script_letters': 0},
+    {'mojibake_min_markers': 0},
+])
+def test_invalid_language_thresholds_are_rejected(kwargs):
+    with pytest.raises(ValueError):
+        verify_translation(
+            LANGUAGE_SOURCE,
+            language_document('正常中文译文。'),
+            language_config=LanguageConfig(**kwargs),
+        )
 
 
 def normal_batch(size=97):
@@ -525,6 +940,18 @@ def test_unchanged_pure_symbol_answer_is_accepted(answer):
                    and finding.section == '最终答案' for finding in findings)
 
 
+def test_translated_prose_final_answer_is_not_treated_as_a_pure_symbol():
+    source = SOURCE.rsplit('D\n', 1)[0] + 'Equality holds exactly when x equals y.\n'
+    translated = (
+        VALID_TRANSLATION.rsplit('D\n', 1)[0]
+        + '当且仅当 x 等于 y 时等号成立。\n'
+    )
+
+    assert FindingType.FINAL_ANSWER_MISMATCH not in {
+        finding.type for finding in verify_translation(source, translated, target_lang='zh')
+    }
+
+
 @pytest.mark.parametrize('answer', ['sqrt(5)/125', 'D', '1'])
 @pytest.mark.parametrize(('target_lang', 'fixture'), [('en', 'mixed-en.md'), ('zh', 'mixed-zh.md')])
 def test_symbolic_final_answer_is_identical_across_three_versions(answer, target_lang, fixture):
@@ -608,24 +1035,23 @@ def test_short_english_answer_needs_no_translation(answer):
     'Nessuna soluzione.',
     'Keine Lösungen.',
 ])
-def test_short_foreign_answer_is_not_trusted_as_english(answer):
-    source = SOURCE.replace('D\n', answer + '\n')
-    translated = VALID_TRANSLATION.replace('D\n', answer + '\n')
+def test_short_latin_script_answer_is_not_high_signal_for_english(answer):
+    source = f'# short-answer\n\n## 最终答案\n\n{answer}\n'
 
     findings = verify_translation(
-        source, translated, target_lang='en', source_lang='en'
+        source, source, target_lang='en', source_lang='en'
     )
 
-    assert any(
-        finding.type == FindingType.UNTRANSLATED and finding.section == '最终答案'
-        for finding in findings
-    )
+    assert not {
+        FindingType.UNTRANSLATED,
+        FindingType.TARGET_LANGUAGE_MISMATCH,
+    } & {finding.type for finding in findings}
 
 
-def test_matching_file_language_does_not_exempt_mixed_language_section():
-    french_solution = "On compare les deux membres de l'égalité."
-    source = SOURCE.replace('Set $x=4$ and verify the equality.', french_solution)
-    translated = VALID_TRANSLATION.replace('令 $x=4$，并验证等式。', french_solution)
+def test_matching_file_language_does_not_exempt_cyrillic_section():
+    cyrillic_solution = 'Сравните две стороны равенства.'
+    source = SOURCE.replace('Set $x=4$ and verify the equality.', cyrillic_solution)
+    translated = VALID_TRANSLATION.replace('令 $x=4$，并验证等式。', cyrillic_solution)
 
     findings = verify_translation(
         source, translated, target_lang='en', source_lang='en'
@@ -659,17 +1085,18 @@ def test_passthrough_identical_document_has_zero_findings():
     ) == []
 
 
-def test_foreign_prose_left_identical_in_english_variant_is_untranslated():
+def test_cyrillic_prose_in_english_variant_is_target_language_mismatch():
     source = (FIXTURES / 'mixed-source.md').read_text(encoding='utf-8')
     translated = (FIXTURES / 'mixed-en.md').read_text(encoding='utf-8').replace(
         'Find the real numbers $x$ and $y$ satisfying the equality.',
-        "Trouver les réels $x$ et $y$ satisfaisant l'égalité.",
+        'Найдите действительные числа $x$ и $y$, удовлетворяющие равенству.',
     )
 
     findings = verify_translation(
         source, translated, target_lang='en', source_lang='fr'
     )
-    assert any(finding.type == FindingType.UNTRANSLATED and finding.section == '题面'
+    assert any(finding.type == FindingType.TARGET_LANGUAGE_MISMATCH
+               and finding.section == '题面'
                for finding in findings)
 
 

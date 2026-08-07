@@ -1,0 +1,135 @@
+{
+  "fixture_scope": "constructed regression text derived from reported failure patterns; not verbatim MathNet corpus excerpts",
+  "bad_zh": [
+    {
+      "mathnet_id": "0cje",
+      "translated": "求出所有 pairs of twice 可微函数，使得两者 and are continuous，并且对所有实数成立。"
+    },
+    {
+      "mathnet_id": "01qt",
+      "translated": "Do there exist 函数s，使得这些条件成立，并且对所有实数都满足要求？"
+    },
+    {
+      "mathnet_id": "039x",
+      "translated": "求所有 values of the real parameter，使得 the 不等式 has a unique solution。"
+    },
+    {
+      "mathnet_id": "0iz4",
+      "translated": "题目：If the two quantities are equal, what is the value of their sum? 解答：Both quantities equal the same number, so the sums are equal as well."
+    },
+    {
+      "mathnet_id": "05lr",
+      "fixture_kind": "constructed-05lr-solution-pattern; the real statement was not blocked",
+      "translated": "求所有函数，使得结果是 un 完全平方数。Pour simplifier, posons the first value. On peut donc ecrire the required identity."
+    },
+    {
+      "mathnet_id": "0k1z",
+      "translated": "\u00e9\u00a2\u00e7\u00ae\u00ef\u00bc A \u00e6\u00ad\u00e6\u00b9\u00e5\u00bd\u00a2 \u00e4\u00b8\u00e8\u00be\u00b9 of length \u00e4\u00b8\u00bagiven. \u00e6 many different ways to cut the square are possible."
+    }
+  ],
+  "valid_zh": [
+    "求出满足条件的所有正整数。",
+    "令 x 为正整数，再比较两边。",
+    "由 Euler 定理可知结论成立。",
+    "使用 Cauchy-Schwarz 不等式估计这个和。",
+    "这是 IMO 2024 的一道数论题。",
+    "该题选自 International Mathematical Olympiad。",
+    "在 Tournament of Towns 中，这个构造很常见。",
+    "Paul Erdős 曾研究过这一类问题。",
+    "连接点 A、B、C，并设直线 l 与圆相交。",
+    "分别计算 sin、cos 与 gcd 的值。",
+    "由 Ramanujan 的恒等式立刻得到答案。",
+    "比较 AB 与 CD 的长度，然后使用 Menelaus 定理。",
+    "把 regular polygon 的各条边依次连接起来，再将所得图形分成若干个全等三角形并比较每一部分的面积。"
+  ],
+  "bad_en": [
+    {
+      "mathnet_id": "0ghx",
+      "script": "cjk",
+      "translated": "Find all values satisfying the condition. 以下繁體中文題面尚未翻譯，請證明結論成立。"
+    },
+    {
+      "mathnet_id": "06ia",
+      "script": "cjk",
+      "translated": "Determine the required number, then 求出所有滿足條件的整數並證明答案唯一。"
+    },
+    {
+      "mathnet_id": "0cuh",
+      "script": "cyrillic",
+      "translated": "Найдите все целые числа, удовлетворяющие условию."
+    },
+    {
+      "mathnet_id": "0cvq",
+      "script": "greek",
+      "translated": "Βρείτε όλους τους ακεραίους που ικανοποιούν τη συνθήκη."
+    },
+    {
+      "mathnet_id": "09x3",
+      "script": "hebrew",
+      "translated": "מצאו את כל המספרים השלמים המקיימים את התנאי."
+    },
+    {
+      "mathnet_id": "constructed-arabic-script",
+      "script": "arabic",
+      "translated": "أوجد جميع الأعداد الصحيحة التي تحقق الشرط."
+    }
+  ],
+  "valid_en": [
+    {
+      "mathnet_id": "02lh",
+      "translated": "What percentage error did Julia make?"
+    },
+    {
+      "mathnet_id": "0dvz",
+      "translated": "Problem: Simplify:"
+    },
+    {
+      "mathnet_id": "02ag",
+      "translated": "120 elementary-school students entered the contest."
+    },
+    {
+      "mathnet_id": "022q",
+      "translated": "Solution: Cláudia and Bruno."
+    },
+    {
+      "mathnet_id": "025j",
+      "translated": "João, José, and Jânio receive the prizes."
+    },
+    {
+      "mathnet_id": "02id",
+      "translated": "Joãozinho writes the answer on the board."
+    },
+    {
+      "mathnet_id": "024s",
+      "translated": "Use the smaller cup to pour into Joao's pitcher."
+    },
+    {
+      "mathnet_id": "02ig",
+      "translated": "Which of the following choices is correct?"
+    },
+    {
+      "mathnet_id": "02ss",
+      "translated": "Guimarães obtained the required equality."
+    },
+    {
+      "mathnet_id": "constructed-french-latin-only",
+      "translated": "Pour simplifier, posons la première valeur et comparons les deux membres."
+    },
+    {
+      "mathnet_id": "constructed-german-latin-only",
+      "translated": "Keine Lösungen erfüllen alle angegebenen Bedingungen."
+    },
+    {
+      "mathnet_id": "constructed-isolated-greek-symbols",
+      "translated": "Let α and β be the two roots, where α + β = 3."
+    }
+  ],
+  "empty_source_sections": [
+    {
+      "fixture_id": "generated-proof-final-answer",
+      "heading": "最终答案",
+      "source": "（数据集未提供 / 证明题）",
+      "translated": "Not provided in the dataset / proof problem"
+    }
+  ]
+}

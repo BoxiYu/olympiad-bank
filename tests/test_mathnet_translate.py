@@ -457,7 +457,36 @@ def test_apply_payload_accepts_en_non_high_identical_model_result(
     assert state["variants"]["en"]["mode"] == "translated"
 
 
-def test_apply_payload_rejects_mixed_section_despite_matching_file_language(
+def test_apply_payload_accepts_generated_english_proof_placeholder(
+    corpus: Path, tmp_path: Path
+):
+    source = next(
+        path for path in corpus.rglob("index.md") if path.parent.name == "eng1"
+    )
+    source.write_text(
+        source.read_text(encoding="utf-8").replace(
+            "$x\\in\\{-1,1\\}$", "（数据集未提供 / 证明题）"
+        ),
+        encoding="utf-8",
+    )
+    row = export(
+        corpus, tmp_path / "batch.jsonl", "--only", "eng1",
+        "--source-lang", "en", "--source-lang-confidence", "medium",
+    )[0]
+    payload = identical_translated_variant(row)
+    payload["units"]["final_answer"] = (
+        "Not provided in the dataset / proof problem"
+    )
+
+    mt.apply_payload(corpus, row, "en", payload)
+
+    target = source.with_name("index.en.md").read_text(encoding="utf-8")
+    assert target.rstrip().endswith(
+        "## 最终答案\n\nNot provided in the dataset / proof problem"
+    )
+
+
+def test_apply_payload_accepts_latin_only_low_signal_section(
     corpus: Path, tmp_path: Path
 ):
     source = next(path for path in corpus.rglob("index.md") if path.parent.name == "eng1")
@@ -472,10 +501,30 @@ def test_apply_payload_rejects_mixed_section_despite_matching_file_language(
         "--source-lang", "en", "--source-lang-confidence", "medium",
     )[0]
 
+    mt.apply_payload(corpus, row, "en", identical_translated_variant(row))
+
+    assert (source.parent / "index.en.md").exists()
+    assert (source.parent / "translation.json").exists()
+
+
+def test_apply_payload_rejects_cyrillic_despite_matching_file_language(
+    corpus: Path, tmp_path: Path
+):
+    source = next(path for path in corpus.rglob("index.md") if path.parent.name == "eng1")
+    source.write_text(
+        source.read_text(encoding="utf-8").replace(
+            "Factoring gives $x^2-1=(x-1)(x+1)=0$.",
+            "Сравните две стороны равенства.",
+        ),
+        encoding="utf-8",
+    )
+    row = export(
+        corpus, tmp_path / "batch.jsonl", "--only", "eng1",
+        "--source-lang", "en", "--source-lang-confidence", "medium",
+    )[0]
+
     with pytest.raises(mt.TranslateError, match="untranslated@解法 1"):
-        mt.apply_payload(
-            corpus, row, "en", identical_translated_variant(row)
-        )
+        mt.apply_payload(corpus, row, "en", identical_translated_variant(row))
 
     assert not (source.parent / "index.en.md").exists()
     assert not (source.parent / "translation.json").exists()
