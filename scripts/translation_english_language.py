@@ -44,9 +44,8 @@ _SYMBOL_WORDS = {
 }
 _SHORT_ENGLISH_PROSE_RE = re.compile(
     r'\b(?:no[ \t]+solutions?|proof[ \t]+(?:is[ \t]+)?omitted'
-    r'|the[ \t]+answers?[ \t]+(?:is|are)|find\b|set\b|verify\b|where\b'
-    r'|alternatively[ \t]+use\b|this[ \t]+is\b'
-    r'|the\b[^\n.!?]{0,80}\b(?:follows|holds|is|are|uses|gives|satisfies)\b)',
+    r'|the[ \t]+answers?[ \t]+(?:is|are)|find\b|set\b|verify\b'
+    r'|alternatively[ \t]+use\b)',
     re.IGNORECASE,
 )
 _NON_ENGLISH_FRAGMENT_RE = re.compile(

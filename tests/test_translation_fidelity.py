@@ -552,10 +552,19 @@ def test_english_detection_short_prose_and_source_family_exemptions_are_live(mon
     monkeypatch.setattr(english_rules, 'detect_source_lang', lambda *_: ('en', 'high'))
     assert not english_target_mismatch('Find all positive integers', None)
     monkeypatch.setattr(english_rules, 'detect_source_lang', lambda *_: ('und', 'low'))
-    assert not english_target_mismatch('The desired result follows.', None)
+    assert not english_target_mismatch('Proof omitted.', None)
     assert not english_target_mismatch(
         'Zorgvuldig vergelijken wij beide leden', 'en-US'
     )
+
+
+@pytest.mark.parametrize('text', [
+    'This is geen oplossing.',
+    'The antwoord is correct.',
+])
+def test_short_english_prefix_does_not_exempt_mixed_dutch_residue(monkeypatch, text):
+    monkeypatch.setattr(english_rules, 'detect_source_lang', lambda *_: ('und', 'low'))
+    assert english_target_mismatch(text, 'nl')
 
 
 def test_symbolic_and_empty_fragments_are_not_foreign_prose():
