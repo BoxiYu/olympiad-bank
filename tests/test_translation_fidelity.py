@@ -102,6 +102,24 @@ def full_document_feature_fixture():
     )
 
 
+def placeholder_reordering_fixture():
+    return json.loads(
+        (FIXTURES / 'cxb-525-placeholder-reordering.json').read_text(encoding='utf-8')
+    )
+
+
+def placeholder_reordering_documents():
+    fixture = placeholder_reordering_fixture()
+    source_unit = fixture['source_unit']
+    translated_unit = fixture['translated_unit']
+    for placeholder, original in fixture['protected'].items():
+        source_unit = source_unit.replace(placeholder, original)
+        translated_unit = translated_unit.replace(placeholder, original)
+    source = f'# cxb525\n\n## 题面\n\n{source_unit}\n\n## 最终答案\n\nD\n'
+    translated = f'# cxb525\n\n## 题面\n\n{translated_unit}\n\n## 最终答案\n\nD\n'
+    return source, translated
+
+
 def audit_fixture():
     return json.loads((FIXTURES / 'full-pair-audit.json').read_text(encoding='utf-8'))
 
@@ -467,6 +485,26 @@ def test_math_and_inline_code_changes_are_rejected(old, new):
 
 def test_identical_math_and_code_are_accepted():
     assert FindingType.MATH_MISMATCH not in types()
+
+
+def test_cxb_525_placeholder_pipeline_allows_math_multiset_reordering_only():
+    source, translated = placeholder_reordering_documents()
+
+    assert FindingType.MATH_MISMATCH in types(source, translated)
+    assert verify_translation(
+        source,
+        translated,
+        target_lang='zh',
+        source_lang='en',
+        placeholder_pipeline=True,
+    ) == []
+
+    changed = translated.replace(r'$a_1+\cdots+a_n \ne 0$', r'$a_1+\cdots+a_n = 0$')
+    assert FindingType.MATH_MISMATCH in types(
+        source,
+        changed,
+        placeholder_pipeline=True,
+    )
 
 
 def test_frac_changed_to_slash_is_rejected():

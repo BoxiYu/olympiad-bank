@@ -303,8 +303,8 @@ def test_cxb_497_hook_is_called_and_findings_fail(tmp_path):
     make_problem(corpus)
     calls = []
 
-    def verify(source, translated, *, target_lang, source_lang):
-        calls.append((source, translated, target_lang, source_lang))
+    def verify(source, translated, *, target_lang, source_lang, placeholder_pipeline):
+        calls.append((source, translated, target_lang, source_lang, placeholder_pipeline))
         return [] if source == translated else [{'kind': 'math_mismatch', 'section': '题面'}]
 
     result = tc.check_corpus(str(tmp_path), sample=10, fidelity_verifier=verify)
@@ -313,6 +313,25 @@ def test_cxb_497_hook_is_called_and_findings_fail(tmp_path):
     assert any('保真校验失败' in error and 'math_mismatch' in error for error in result.errors)
     assert calls[0][2] == 'zh'
     assert calls[0][3] == 'en'
+    assert calls[0][4] is True
+
+
+def test_translated_contract_uses_placeholder_math_multiset_comparison(tmp_path):
+    corpus = os.path.join(tmp_path, 'mathnet-full')
+    source = '# 0abc\n\n## 题面\n\nFor $x$ and $y$, find the sum.\n'.encode()
+    translated = '# 0abc\n\n## 题面\n\n对 $y$ 与 $x$，求其和。\n'.encode()
+    make_problem(
+        corpus,
+        source=source,
+        en=False,
+        zh=translated,
+        variants={'zh': {'mode': 'translated', 'sha256': _sha(translated)}},
+        source_lang='en',
+    )
+
+    result = tc.check_corpus(str(tmp_path), sample=10)
+
+    assert result.status == 'ok', result.errors
 
 
 def test_en_medium_identical_translated_variant_passes_contract(tmp_path):
