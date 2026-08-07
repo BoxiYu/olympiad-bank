@@ -122,6 +122,11 @@ _FEATURE_WORDS = {
     },
 }
 
+# A single shared function word (for example French ``on`` or Dutch ``is``)
+# must never authorize zero-call English passthrough.  The tiny-text rescue is
+# limited to unambiguous olympiad prompt markers already scored as English.
+_EN_TINY_MARKERS = {"determine", "find", "let", "prove"}
+
 _DISTINCTIVE_CHARS = {
     "es": set("ñ¿¡"),
     "pt": set("ãõç"),
@@ -308,6 +313,7 @@ def _latin_evidence(text: str) -> tuple[str, str]:
         # this tiny-text exception, and only with a clear lead and at least
         # half of the remaining words drawn from its function-word set.
         if (winner == "en" and len(words) <= 3 and best >= 1
+                and any(word in _EN_TINY_MARKERS for word in words)
                 and margin >= 1 and density >= 0.5):
             return "en", "high"
         return "und", "low"

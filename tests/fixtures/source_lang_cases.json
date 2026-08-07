@@ -308,6 +308,18 @@
     "expected": ["und", "low"]
   },
   {
+    "id": "und_tiny_french_shared_on",
+    "body": "On cherche $x$.",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
+    "id": "und_tiny_dutch_shared_is",
+    "body": "Is $x$ positief?",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
     "id": "en_holder_diacritic",
     "body": "Prove that Hölder's inequality holds for all positive real numbers.",
     "meta": {},
