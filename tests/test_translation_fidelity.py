@@ -811,6 +811,59 @@ def test_directory_cli_reports_passes_and_counts(tmp_path, capsys):
     assert payload['finding_counts']['math_mismatch'] == 1
 
 
+def test_directory_cli_placeholder_pipeline_allows_reordering(tmp_path, capsys):
+    source, translated = placeholder_reordering_documents()
+    source_dir = tmp_path / 'source'
+    translated_dir = tmp_path / 'translated'
+    source_dir.mkdir()
+    translated_dir.mkdir()
+    (source_dir / 'sample.md').write_text(source, encoding='utf-8')
+    (translated_dir / 'sample.md').write_text(translated, encoding='utf-8')
+
+    strict = verify_directory(source_dir, translated_dir)
+    relaxed = verify_directory(
+        source_dir,
+        translated_dir,
+        placeholder_pipeline=True,
+    )
+
+    assert strict.finding_counts[FindingType.MATH_MISMATCH.value] > 0
+    assert (relaxed.total, relaxed.passed, relaxed.failed) == (1, 1, 0)
+    assert main([
+        str(source_dir),
+        str(translated_dir),
+        '--placeholder-pipeline',
+        '--json',
+    ]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload['finding_counts'] == {}
+
+
+@pytest.mark.parametrize('damage', ['missing', 'duplicate'])
+def test_directory_placeholder_pipeline_rejects_placeholder_damage(tmp_path, damage):
+    source, translated = placeholder_reordering_documents()
+    protected = placeholder_reordering_fixture()['protected']
+    marker = protected['{{MNT_0004}}']
+    replacement = '' if damage == 'missing' else protected['{{MNT_0003}}']
+    source_dir = tmp_path / 'source'
+    translated_dir = tmp_path / 'translated'
+    source_dir.mkdir()
+    translated_dir.mkdir()
+    (source_dir / 'sample.md').write_text(source, encoding='utf-8')
+    (translated_dir / 'sample.md').write_text(
+        translated.replace(marker, replacement),
+        encoding='utf-8',
+    )
+
+    report = verify_directory(
+        source_dir,
+        translated_dir,
+        placeholder_pipeline=True,
+    )
+
+    assert report.finding_counts[FindingType.MATH_MISMATCH.value] > 0
+
+
 def test_directory_reports_missing_translation(tmp_path):
     source_dir = tmp_path / 'source'
     translated_dir = tmp_path / 'translated'
