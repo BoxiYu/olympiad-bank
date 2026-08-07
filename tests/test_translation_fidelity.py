@@ -16,6 +16,14 @@ from translation_fidelity import (  # noqa: E402
     verify_directory,
     verify_translation,
 )
+import translation_language as language_rules  # noqa: E402
+from translation_language import (  # noqa: E402
+    LanguageConfig,
+    has_translatable_prose,
+    is_pure_symbol,
+    plain_prose,
+    target_language_mismatch,
+)
 
 
 FIXTURES = Path(__file__).parent / 'fixtures' / 'translation_fidelity'
@@ -122,6 +130,212 @@ def placeholder_reordering_documents():
 
 def audit_fixture():
     return json.loads((FIXTURES / 'full-pair-audit.json').read_text(encoding='utf-8'))
+
+
+def zh_language_fixture():
+    return json.loads(
+        (FIXTURES / 'zh-language-constructed.json').read_text(encoding='utf-8')
+    )
+
+
+def language_document(body, heading='题面'):
+    return f'# constructed-language-case\n\n## {heading}\n\n{body}\n'
+
+
+def test_zh_language_fixture_is_explicitly_constructed_without_real_ids():
+    fixture = zh_language_fixture()
+    assert fixture['fixture_kind'].startswith('explicitly constructed')
+    assert all('mathnet_id' not in row for row in fixture['rows'])
+    assert all(row['fixture_id'].startswith('constructed-') for row in fixture['rows'])
+
+
+@pytest.mark.parametrize(
+    'row', zh_language_fixture()['rows'], ids=lambda row: row['fixture_id'],
+)
+def test_constructed_zh_language_fixture_findings(row):
+    findings = verify_translation(
+        language_document(row['source_body']),
+        language_document(row['translated_body']),
+        target_lang='zh',
+    )
+    language_types = [
+        finding.type.value for finding in findings
+        if finding.type in {
+            FindingType.TARGET_LANGUAGE_MISMATCH,
+            FindingType.MOJIBAKE,
+        }
+    ]
+    expected = [] if row['expected'] == 'clean' else [row['expected']]
+    assert language_types == expected
+
+
+def test_identical_zh_section_emits_untranslated_without_duplicate_mismatch():
+    document = language_document(
+        'Find all positive integers satisfying the condition.'
+    )
+    findings = verify_translation(document, document, target_lang='zh')
+    assert [finding.type for finding in findings] == [FindingType.UNTRANSLATED]
+
+
+def test_changed_zh_section_emits_only_target_language_mismatch():
+    source = language_document('Find all positive integers satisfying the condition.')
+    translated = language_document('求出 all positive integers，并证明结论。')
+    findings = verify_translation(source, translated, target_lang='zh')
+    assert [finding.type for finding in findings] == [
+        FindingType.TARGET_LANGUAGE_MISMATCH,
+    ]
+
+
+def test_english_untranslated_contract_remains_on_master_paths():
+    french = language_document('Pour simplifier, comparons les deux membres.')
+    english = language_document('Find all positive integers.')
+    changed = language_document('Сравните две стороны и сделайте вывод.')
+    placeholder = language_document('（数据集未提供 / 证明题）', '解法 1')
+    mojibake = language_document('Compare the two quantitiÃ©s.')
+
+    assert [finding.type for finding in verify_translation(
+        french, french, target_lang='en', source_lang='fr'
+    )] == [FindingType.UNTRANSLATED]
+    assert verify_translation(
+        english, english, target_lang='en', source_lang='en'
+    ) == []
+    assert verify_translation(english, changed, target_lang='en') == []
+    assert [finding.type for finding in verify_translation(
+        placeholder, placeholder, target_lang='en', source_lang='zh'
+    )] == [FindingType.UNTRANSLATED]
+    assert verify_translation(english, mojibake, target_lang='en') == []
+
+
+def test_plain_prose_strips_html_meta_key_math_and_punctuation():
+    body = '- **Case**: <span>**Pour** simplifier, comparons.</span> {{MNT_0001}} $x$ !!!'
+    assert plain_prose(body) == 'Pour simplifier comparons'
+
+
+def test_plain_prose_strips_fenced_code_before_counting_residual_prose():
+    body = '中文开头\n```text\nNO SOLUTION\n```\n中文结论'
+    assert plain_prose(body) == '中文开头 中文结论'
+
+
+def test_pure_symbol_whitelist_and_command_stripping_are_independently_live():
+    assert is_pure_symbol('gcd')
+    assert is_pure_symbol('pi')
+    assert is_pure_symbol(r'\operatorname{x}')
+    assert not is_pure_symbol('regular polygon')
+
+
+def test_final_answer_pure_symbol_exemption_is_heading_specific():
+    answer = r'\sqrt{5}/125'
+    assert not has_translatable_prose(answer, '最终答案')
+    assert has_translatable_prose(answer, '题面')
+
+
+def test_single_letters_and_proper_name_connectors_are_exempt():
+    assert language_rules._residual_latin_letters('连接 A 与 B，并使用 gcd。') == 0
+    assert language_rules._residual_latin_letters('连接 x 与 y。') == 0
+    for connector in ('de', 'van', 'von'):
+        assert language_rules._residual_latin_letters(
+            f'由 Paul {connector} Erdős 的结论可知。'
+        ) == 0
+    assert language_rules._residual_latin_letters('把 regular polygon 分成三角形。') > 0
+    assert language_rules._residual_latin_letters('de regular') == len('deregular')
+
+
+def test_capitalized_english_prose_is_not_treated_as_a_proper_name():
+    assert language_rules._residual_latin_letters('NO SOLUTION') == len('NOSOLUTION')
+    assert target_language_mismatch('中文结论 NO SOLUTION', LanguageConfig())
+
+
+@pytest.mark.parametrize('body', [
+    '（数据集未提供）',
+    '（数据集未提供 / 证明题）',
+])
+def test_known_generator_placeholders_are_not_translatable_prose(body):
+    assert not has_translatable_prose(body, '解法 1')
+
+
+def test_parenthesized_real_solution_is_not_treated_as_generator_placeholder():
+    assert has_translatable_prose('（将两边平方得到结论）', '解法 1')
+
+
+def test_language_findings_skip_target_section_when_source_has_no_prose():
+    source = language_document('（数据集未提供 / 证明题）', '解法 1')
+    translated = language_document('This generated section must be ignored.', '解法 1')
+    findings = verify_translation(source, translated, target_lang='zh')
+    assert not {
+        FindingType.UNTRANSLATED,
+        FindingType.TARGET_LANGUAGE_MISMATCH,
+        FindingType.MOJIBAKE,
+    }.intersection(finding.type for finding in findings)
+
+
+def test_short_latin_section_falls_back_to_document_ratio():
+    source = (
+        '# constructed-short-section\n\n'
+        '## 题面\n\nLet positive reals satisfy the relation.\n\n'
+        '## 解法 1\n\nProve the conclusion from the stated relation.\n'
+    )
+    translated = (
+        '# constructed-short-section\n\n'
+        '## 题面\n\n正实数满足 relation，证明该结论。\n\n'
+        '## 解法 1\n\n先整理条件，再逐项比较两边，最后得到所需结论。\n'
+    )
+    assert verify_translation(source, translated, target_lang='zh') == []
+
+
+@pytest.mark.parametrize('body', [
+    '中文结论中残留 Это 西里尔文字。',
+    '中文结论中残留 λέξη 希腊文字。',
+])
+def test_foreign_script_early_return_is_live(body):
+    assert target_language_mismatch(body, LanguageConfig())
+
+
+def test_mojibake_finding_and_marker_threshold_are_live():
+    source = language_document('Compare the two quantities.')
+    translated = language_document('比较两边后得到 Ã©。')
+    assert [finding.type for finding in verify_translation(
+        source, translated, target_lang='zh'
+    )] == [FindingType.MOJIBAKE]
+
+    markers = 'Ç\u0080È\u0081É\u0082'
+    assert not language_rules.looks_mojibake(markers[:4], LanguageConfig())
+    assert language_rules.looks_mojibake(markers, LanguageConfig())
+
+
+@pytest.mark.parametrize('body', [
+    '出现替换字符 �。',
+    '错误破折号 â€” 出现在句中。',
+    '错误不等号 â‰¤ 出现在句中。',
+    '错误乘号 Ã— 出现在句中。',
+])
+def test_common_windows_1252_and_replacement_mojibake_is_detected(body):
+    assert language_rules.looks_mojibake(body, LanguageConfig())
+
+
+def test_chinese_ratio_and_short_english_thresholds_are_live():
+    config = LanguageConfig()
+    assert not target_language_mismatch('!!!', config)
+    assert target_language_mismatch('求 find', config)
+    assert not target_language_mismatch('求 abcdef', config)
+    assert not target_language_mismatch('中文 abcdefg', config)
+    assert target_language_mismatch('中文 abcdefgh', config)
+
+
+@pytest.mark.parametrize('kwargs', [
+    {'zh_max_latin_ratio': -0.01},
+    {'zh_max_latin_ratio': 1.01},
+    {'zh_min_latin_letters': 0},
+    {'zh_short_section_latin_letters': 0},
+    {'zh_min_foreign_script_letters': 0},
+    {'mojibake_min_markers': 0},
+])
+def test_language_config_rejects_dead_thresholds(kwargs):
+    with pytest.raises(ValueError):
+        verify_translation(
+            SOURCE,
+            VALID_TRANSLATION,
+            language_config=LanguageConfig(**kwargs),
+        )
 
 
 def normal_batch(size=97):

@@ -11,7 +11,7 @@ gate-clean-random-sample 与 independent-latin-ratio 为独立判据 + 人工抽
 
 天花板 = 2026-08-07 master 实测值（棘轮只紧不松）：
   en: fp 0 / fn 7    —— fn 7 是 CJK 双语与部分荷兰语照抄，CXB-523 落地时应收紧
-  zh: fp 0 / fn 139  —— master 尚无中文语言闸门；CXB-522 中文侧落地时应收紧到个位数
+  zh: fp 0 / fn 3    —— CXB-522 中文侧闸门实测；3 份漏检为冻结语料已知边界
 改善后请把常量往下调并在提交信息里写明依据；调松必须给出与本文件同等级的实测证据。
 """
 import json
@@ -25,7 +25,7 @@ FIXDIR = pathlib.Path(__file__).parent / 'fixtures' / 'translation_language_corp
 
 CEILINGS = {
     'en': {'fp': 0, 'fn': 7},
-    'zh': {'fp': 0, 'fn': 139},
+    'zh': {'fp': 0, 'fn': 3},
 }
 
 

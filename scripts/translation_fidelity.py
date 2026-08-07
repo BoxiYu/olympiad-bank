@@ -19,6 +19,14 @@ from itertools import zip_longest
 from pathlib import Path
 
 from source_lang import detect_source_lang
+from translation_language import (
+    LanguageConfig,
+    has_translatable_prose as _has_zh_translatable_prose,
+    looks_mojibake as _looks_mojibake,
+    plain_prose as _language_plain_prose,
+    target_language_mismatch as _target_language_mismatch,
+    validate_language_config as _validate_language_config,
+)
 
 
 class FindingType(str, Enum):
@@ -36,6 +44,8 @@ class FindingType(str, Enum):
     BATCH_BOILERPLATE = 'batch_boilerplate'
     LENGTH_RATIO = 'length_ratio'
     CONTENT_ANCHOR_MISSING = 'content_anchor_missing'
+    TARGET_LANGUAGE_MISMATCH = 'target_language_mismatch'
+    MOJIBAKE = 'mojibake'
 
 
 @dataclass(frozen=True)
@@ -170,7 +180,6 @@ _PROTECTED_RE = re.compile(
 )
 _IMAGE_RE = re.compile(r'!\[\]\(attached_image_(\d+)\.png\)')
 _PLACEHOLDER_RE = re.compile(r'\{\{MNT_\d{4}\}\}')
-_HAN_RE = re.compile(r'[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]')
 _SYMBOL_WORDS = {
     'bmod', 'cos', 'gcd', 'inf', 'lcm', 'ln', 'log', 'max', 'min', 'mod',
     'pmod', 'sin', 'sqrt', 'sup', 'tan',
@@ -618,6 +627,7 @@ def _has_prose_outside_target_language(
     section: _Section,
     target_lang: str,
     source_lang: str | None,
+    language_config: LanguageConfig,
 ) -> bool:
     """源小节是否仍含需要翻到目标语言的散文。
 
@@ -635,12 +645,15 @@ def _has_prose_outside_target_language(
     if not _has_translatable_prose(section):
         return False
 
+    if target_lang == 'zh':
+        return (
+            _has_zh_translatable_prose(section.body, section.heading)
+            and _target_language_mismatch(section.body, language_config)
+        )
+
     body = _PROTECTED_RE.sub('', section.body)
     body = _IMAGE_RE.sub('', body)
     body = re.sub(r'<[^>]+>', '', body)
-    letters = [ch for ch in body if unicodedata.category(ch).startswith('L')]
-    if target_lang == 'zh':
-        return any(_HAN_RE.fullmatch(ch) is None for ch in letters)
     if _NON_ENGLISH_FRAGMENT_RE.search(_ascii_fold(body)):
         return True
     detected_lang, _confidence = detect_source_lang(body, {})
@@ -661,6 +674,7 @@ def _content_findings(
     mode: str,
     target_lang: str,
     source_lang: str | None,
+    language_config: LanguageConfig,
 ) -> list[Finding]:
     findings = []
     if not translated.strip():
@@ -692,7 +706,7 @@ def _content_findings(
                 continue
             if (source_section.body == translated_section.body
                     and _has_prose_outside_target_language(
-                        source_section, target_lang, source_lang)):
+                        source_section, target_lang, source_lang, language_config)):
                 findings.append(Finding(
                     FindingType.UNTRANSLATED,
                     source_section.heading,
@@ -711,6 +725,57 @@ def _content_findings(
                 '最终答案',
                 _excerpt(source_answer),
                 _excerpt(translated_answer),
+            ))
+    return findings
+
+
+def _language_findings(
+    source: str,
+    translated: str,
+    mode: str,
+    target_lang: str,
+    language_config: LanguageConfig,
+) -> list[Finding]:
+    """只检查中文 variant 的覆盖与乱码，并跳过无可译内容的小节。"""
+    if target_lang != 'zh':
+        return []
+    source_sections = _sections(source)
+    translated_sections = _sections(translated) or [_Section('文档', translated)]
+    eligible_sections = []
+    for index, section in enumerate(translated_sections):
+        source_section = source_sections[index] if index < len(source_sections) else None
+        matching_source = (
+            source_section is not None and source_section.heading == section.heading
+        )
+        if (matching_source
+                and not _has_zh_translatable_prose(
+                    source_section.body, source_section.heading)):
+            continue
+        if _has_zh_translatable_prose(section.body, section.heading):
+            eligible_sections.append((section, source_section, matching_source))
+    document_body = '\n'.join(section.body for section in translated_sections)
+    findings = []
+    for section, source_section, matching_source in eligible_sections:
+        if _looks_mojibake(section.body, language_config):
+            findings.append(Finding(
+                FindingType.MOJIBAKE,
+                section.heading,
+                '',
+                _excerpt(_language_plain_prose(section.body)),
+            ))
+        identical = matching_source and source_section.body == section.body
+        if (mode == 'translated'
+                and not identical
+                and _target_language_mismatch(
+                    section.body,
+                    language_config,
+                    fallback_body=document_body,
+                )):
+            findings.append(Finding(
+                FindingType.TARGET_LANGUAGE_MISMATCH,
+                section.heading,
+                '',
+                _excerpt(_language_plain_prose(section.body)),
             ))
     return findings
 
@@ -744,6 +809,7 @@ def verify_translation(
     target_lang: str = 'zh',
     source_lang: str | None = None,
     placeholder_pipeline: bool = False,
+    language_config: LanguageConfig | None = None,
 ) -> list[Finding]:
     """校验一对 Markdown 字符串，返回全部可定位问题。
 
@@ -757,6 +823,8 @@ def verify_translation(
         raise ValueError(f'unsupported translation mode: {mode}')
     if target_lang not in {'en', 'zh'}:
         raise ValueError(f'unsupported target language: {target_lang}')
+    config = language_config or LanguageConfig()
+    _validate_language_config(config)
     findings = []
     compare_math = (
         _compare_occurrence_multisets
@@ -768,7 +836,10 @@ def verify_translation(
     findings.extend(_compare_occurrences(
         FindingType.IMAGE_MISMATCH, _images(source), _images(translated)))
     findings.extend(_structure_findings(source, translated))
-    findings.extend(_content_findings(source, translated, mode, target_lang, source_lang))
+    findings.extend(_content_findings(
+        source, translated, mode, target_lang, source_lang, config))
+    findings.extend(_language_findings(
+        source, translated, mode, target_lang, config))
     findings.extend(_leak_findings(source, translated))
     return findings
 

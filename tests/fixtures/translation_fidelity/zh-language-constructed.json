@@ -1,0 +1,24 @@
+{
+  "fixture_kind": "explicitly constructed Chinese target-language and mojibake regressions",
+  "source_policy": "Every row is synthetic, uses a constructed-* fixture_id, and intentionally has no mathnet_id.",
+  "rows": [
+    {
+      "fixture_id": "constructed-zh-residual-english",
+      "source_body": "Find all positive integers satisfying the condition.",
+      "translated_body": "求出 all positive integers，并证明结论。",
+      "expected": "target_language_mismatch"
+    },
+    {
+      "fixture_id": "constructed-zh-proper-name-symbols",
+      "source_body": "Connect the named points and apply the theorem.",
+      "translated_body": "由 Paul van Erdős 连接 A 与 B，并使用 gcd。",
+      "expected": "clean"
+    },
+    {
+      "fixture_id": "constructed-zh-mojibake",
+      "source_body": "Compare both quantities and conclude.",
+      "translated_body": "比较两边后得到 Ã©。",
+      "expected": "mojibake"
+    }
+  ]
+}
