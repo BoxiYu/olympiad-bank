@@ -291,7 +291,7 @@
   },
   {
     "id": "und_tiny_non_en_winner",
-    "body": "Bepaal gehele waarden.",
+    "body": "Bepaal find getal.",
     "meta": {},
     "expected": ["und", "low"]
   },
@@ -316,6 +316,18 @@
   {
     "id": "und_tiny_dutch_shared_is",
     "body": "Is $x$ positief?",
+    "meta": {},
+    "expected": ["und", "low"]
+  },
+  {
+    "id": "nl_density_below_point_five",
+    "body": "Bepaal het getal Fibonacci recursion vandaag morgen.",
+    "meta": {},
+    "expected": ["nl", "medium"]
+  },
+  {
+    "id": "und_three_letter_english_marker",
+    "body": "Let",
     "meta": {},
     "expected": ["und", "low"]
   },

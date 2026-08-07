@@ -312,7 +312,9 @@ def _latin_evidence(text: str) -> tuple[str, str]:
         # after math stripping (for example "Find $x$.").  Only English gets
         # this tiny-text exception, and only with a clear lead and at least
         # half of the remaining words drawn from its function-word set.
-        if (winner == "en" and len(words) <= 3 and best >= 1
+        # Every marker is also an English feature, so its presence already
+        # implies at least one feature hit; a separate ``best >= 1`` is dead.
+        if (winner == "en" and len(words) <= 3
                 and any(word in _EN_TINY_MARKERS for word in words)
                 and margin >= 1 and density >= 0.5):
             return "en", "high"
@@ -321,7 +323,8 @@ def _latin_evidence(text: str) -> tuple[str, str]:
     # Short mathematical prompts can instead earn high confidence from dense,
     # independent function words and a clear lead over every other language.
     density_threshold = 0.4 if winner == "en" else 0.5
-    if density >= density_threshold and margin >= 2:
+    # Reaching this point already implies ``margin >= 2`` from the guard above.
+    if density >= density_threshold:
         return winner, "high"
     if best >= 7 and margin >= 4:
         return winner, "high"
