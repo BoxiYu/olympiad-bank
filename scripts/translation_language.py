@@ -56,6 +56,7 @@ _LATIN_PROSE_STARTERS = {
     'if', 'let', 'on', 'pour', 'prove', 'set', 'show', 'there', 'what', 'when',
 }
 _PROPER_NAME_CONNECTORS = {'and', 'de', 'der', 'of', 'the', 'van', 'von'}
+_MAX_PROPER_NAME_WORDS = 2
 _SHORT_ENGLISH_PROSE_RE = re.compile(
     r'\b(?:no[ \t]+solutions?|proof[ \t]+(?:is[ \t]+)?omitted'
     r'|the[ \t]+answers?[ \t]+(?:is|are)|find\b|set\b|verify\b|where\b'
@@ -179,7 +180,9 @@ def _residual_latin_letters(body: str) -> int:
                             or next_folded in _PROPER_NAME_CONNECTORS)):
                 break
             end += 1
-        if any(name_anchor[index:end]):
+        name_word_count = sum(title_name[index:end])
+        if (any(name_anchor[index:end])
+                and name_word_count <= _MAX_PROPER_NAME_WORDS):
             for name_index in range(index, end):
                 if (title_name[name_index]
                         or _ascii_fold(latin_words[name_index])

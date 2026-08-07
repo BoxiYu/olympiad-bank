@@ -243,6 +243,13 @@ def test_single_letters_and_proper_name_connectors_are_exempt():
 def test_capitalized_english_prose_is_not_treated_as_a_proper_name():
     assert language_rules._residual_latin_letters('NO SOLUTION') == len('NOSOLUTION')
     assert target_language_mismatch('中文结论 NO SOLUTION', LanguageConfig())
+    title_case_prose = 'Thus We Have The Following Result'
+    assert language_rules._residual_latin_letters(
+        f'中文结论 {title_case_prose}'
+    ) == len(title_case_prose.replace(' ', ''))
+    assert target_language_mismatch(
+        f'中文结论 {title_case_prose}', LanguageConfig()
+    )
 
 
 @pytest.mark.parametrize('body', [
