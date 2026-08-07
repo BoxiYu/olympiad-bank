@@ -77,6 +77,38 @@ def test_detector_threshold_boundaries_are_observable():
     assert detect_source_lang("In Ĳmuiden en Ĳlst.", {}) == ("nl", "medium")
 
 
+def test_en_high_relaxation_does_not_expand_zero_call_passthrough():
+    """Every case is just outside one en/high shortcut's safe boundary."""
+    expected = {
+        "en_density_between_point_three_and_point_four_a": ("en", "medium"),
+        "en_density_between_point_three_and_point_four_b": ("en", "medium"),
+        "und_four_word_dense_english": ("und", "low"),
+        "und_tiny_non_en_winner": ("und", "low"),
+        "und_tiny_zero_margin_tie": ("und", "low"),
+        "und_tiny_english_density_below_half": ("und", "low"),
+    }
+    selected = {case["id"]: case for case in CASES if case["id"] in expected}
+    assert set(selected) == set(expected)
+    for case_id, result in expected.items():
+        case = selected[case_id]
+        assert detect_source_lang(case["body"], case["meta"]) == result
+        assert should_passthrough(*result, "en") is False
+
+
+def test_representative_minor_lexicon_boundaries_are_observable():
+    expected = {
+        "nl_short_math": ("nl", "high"),
+        "ro_three_feature_word_boundary": ("ro", "high"),
+        "mn_two_feature_word_boundary": ("mn", "high"),
+        "mk_two_feature_word_boundary": ("mk", "high"),
+    }
+    selected = {case["id"]: case for case in CASES if case["id"] in expected}
+    assert set(selected) == set(expected)
+    for case_id, result in expected.items():
+        case = selected[case_id]
+        assert detect_source_lang(case["body"], case["meta"]) == result
+
+
 def test_no_non_english_fixture_is_misclassified_as_english():
     non_english = [case for case in CASES if case["expected"][0] != "en"]
     false_english = [
